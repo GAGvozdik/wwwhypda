@@ -4,11 +4,11 @@
     Add long random codes in JWT_KEY.txt, SECRET_KEY.txt.
     Add your gmail in MAIL.txt
     Turn on 2 step verification in your google account
-    ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction 3.png)
+    ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction3.png)
     Go to App passwords
-    ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction 2.png)
+    ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction2.png)
     Register your gmail app and copy code
-    ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction 1.png)
+    ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/wwwhypda-frontend/src/logos/insruction1.png)
     
     or try to follow instruction (https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code
 
