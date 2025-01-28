@@ -1,0 +1,71 @@
+openapi: 3.0.0
+info:
+  title: Flask API Documentation
+  version: 1.0.0
+paths:
+  /api/anonce:
+    get:
+      summary: Get data anonce
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/rock_type:
+    get:
+      summary: Get all rock types
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /api/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User successfully registered
+        '400':
+          description: Invalid data
+        '409':
+          description: Conflict - Username or email already exists
+  /api/confirm:
+    post:
+      summary: Confirm user registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                code:
+                  type: string
+      responses:
+        '200':
+          description: User confirmed
+        '400':
+          description: Invalid code or missing fields
