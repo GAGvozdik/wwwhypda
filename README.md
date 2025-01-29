@@ -9,7 +9,6 @@
     ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction1.png)
     Register your gmail app and copy code
     ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction2.png)
-    
     or try to follow instruction (https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code
 
     Add your mail code in MAIL_PASSWORD.txt
