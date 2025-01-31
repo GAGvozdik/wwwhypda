@@ -83,12 +83,12 @@ export default function MainMenu() {
                 Documents
             </MenuButtuon>
 
-            {/* <MenuButtuon 
+            <MenuButtuon 
                 className={` ${styles.menuButton}`} 
-                path={'register'}
+                path={token ? '/input' : '/login'}
             >
-                Registration
-            </MenuButtuon> */}
+                Add data
+            </MenuButtuon>
 
 
             <div className={`${styles.helpItem} ${styles.menuLabel}`}>
@@ -128,6 +128,8 @@ export default function MainMenu() {
                     </IconButton>
                 </Link>
             </div>
+
+
                     
         </div>
     );

@@ -5,7 +5,7 @@ import { useMediaQuery } from 'react-responsive';
 import styles from "./menu.module.scss"; 
 import MainTree from './pages/mainTree';
 import MainMenu from './menu/mainMenu';
-import MainBody from './pages/mainBody';
+import MainBody from './mainBody';
 
 export default function MainWindow() {
 

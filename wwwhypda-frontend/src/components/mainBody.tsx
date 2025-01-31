@@ -11,32 +11,32 @@ import {useEffect, useState, useRef} from 'react';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import IconButton from '@mui/material/IconButton';
-import styles from "../menu.module.scss" 
+import styles from "./menu.module.scss" 
 
 import { useSelector, useDispatch } from 'react-redux';
-import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
-import { State, UpdateThemeAction, UpdateOpenCloseAction } from '../../common/types';
+import { UpdateTheme, UpdateOpenClose } from '../redux/actions';
+import { State, UpdateThemeAction, UpdateOpenCloseAction } from '../common/types';
 
 import { useMediaQuery } from 'react-responsive';
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import Home from '../pages/home';
-import About from '../pages/about';
-import NotFound from '../pages/notFound';
-import Contribute from '../pages/contribute';
-import Search from '../pages/search';
-import Documents from '../pages/documents';
+import Home from './pages/home';
+import About from './pages/about';
+import NotFound from './pages/notFound';
+import Contribute from './pages/contribute';
+import Search from './pages/search';
+import Documents from './pages/documents';
 
-import Account from '../pages/account';
-
-import ProtectedRoute from '../users/protectedRoute';
-import Login from '../users/login';
-import Register from '../users/registration';
+import Account from './pages/account';
+import InputPage from './pages/inputPage'; 
+import ProtectedRoute from './users/protectedRoute';
+import Login from './users/login';
+import Register from './users/registration';
 // import Dashboard from './pages/Dashboard';
 
 import { AppProvider } from '@toolpad/core/AppProvider';
-import ForgotPassword from '../../components/users/forgotPassword';
+import ForgotPassword from './users/forgotPassword';
 
 
 
@@ -46,9 +46,7 @@ export default function MainMenu() {
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
 
-    const handleSignIn = (email: string, password: string) => {
-        alert(`Signing in with Email: ${email} and Password: ${password}`);
-    };
+    const token = useSelector((state: State) => state.token);
     
     return (
         <div className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
@@ -74,8 +72,18 @@ export default function MainMenu() {
                         </ProtectedRoute>
                     }
                 />
+                
+                <Route
+                    path="/input"
+                    element={
+                        <ProtectedRoute>
+                            <InputPage />
+                        </ProtectedRoute>
+                    }
+                />
 
                 <Route path="/login" element={<Login />} />
+                {/* <Route path="/input" element={<InputPage />} /> */}
 
                 <Route
                     path="/contribute"
