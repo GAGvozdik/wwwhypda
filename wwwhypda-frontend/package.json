@@ -20,6 +20,8 @@
     "@types/react-dom": "^18.3.1",
     "@types/react-redux": "^7.1.34",
     "@types/react-router-dom": "^5.3.3",
+    "ag-grid-enterprise": "^33.0.4",
+    "ag-grid-react": "^33.0.4",
     "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
