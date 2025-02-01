@@ -12,8 +12,8 @@ import {useEffect, useState, useRef} from 'react';
 import MessureTable from './messureTable';
 import axios from 'axios';
 
-import { UpdateSearchResult } from '../../redux/actions';
-import { State, UpdateSearchResultsAction } from '../../common/types';
+import { UpdateTableData, } from '../../redux/actions';
+import { State, UpdateTableDataAction } from '../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
 // import {MeasurementData, testColumns} from '../../common/types';
 import { DynamicRowData } from '../../common/types'; // Импортируем новый тип
@@ -79,8 +79,10 @@ const Search: React.FC = () => {
                         id: index + 1 
                     }));
 
-                    dispatch<UpdateSearchResultsAction>(UpdateSearchResult(res));
-                    
+                    dispatch<UpdateTableDataAction>(UpdateTableData(res));
+
+                    console.log(res);
+
                 } catch (error: any) {
                     setError(error.message);
                 } finally {

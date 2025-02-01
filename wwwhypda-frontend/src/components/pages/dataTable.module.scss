@@ -1,0 +1,30 @@
+
+
+.submitButton {
+    background-color: var(--menu);
+    color: var(--submit-button-text);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    box-sizing: border-box;  
+    font-family: Afacad_Flux !important;
+    font-size: var(--button-font-size);
+    transition: 0.5s;
+
+
+}
+
+
+
+.submitButton:hover {
+    transition: 0.5s;
+    color: var(--submit-button-text-hover);
+    background-color: var(--submit-button-hover);
+    
+}
+.submitButton:active  {
+    transition: 0.5s;
+    background-color: var(--submit-button-active);
+    color: var(--submit-button-text);
+    transition: 0.5s;
+}

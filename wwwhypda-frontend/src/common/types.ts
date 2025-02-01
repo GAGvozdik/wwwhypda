@@ -1,20 +1,25 @@
 import { GridColDef } from '@mui/x-data-grid';
+
+
+import { ColDef } from "ag-grid-community";
+
+
 export type DynamicRowData = Record<string, unknown>;
 
-export function generateColumns(data: DynamicRowData[]): GridColDef[] {
+export function generateColumns(data: DynamicRowData[]): ColDef[] {
     if (!data || data.length === 0) return [];
 
-    const firstRowKeys = Object.keys(data[0]); 
+    const firstRowKeys = Object.keys(data[0]);
 
-    return firstRowKeys.map(key => ({
+    return firstRowKeys.map((key) => ({
         field: key,
-        headerName: key,
-        // minWidth: 80, // Минимальная ширина в пикселях
-        // flex: 1,       // Дополнительная гибкость
-        type: inferType(data[0][key]),
+        headerName: key.toUpperCase(), // Делаем заголовки столбцов заглавными
+        sortable: true,
+        filter: true,
+        resizable: true,
+        editable: false, // Запрещаем редактирование
     }));
 }
-
 
 function inferType(value: unknown): GridColDef['type'] {
   if (typeof value === 'number') return 'number';
@@ -29,8 +34,15 @@ export interface State {
     isDarkTheme: boolean;
     currentRTID: string;
     currentRTName: string;
-    currentSearchResult: DynamicRowData[];
-    token: string | null; // JWT токен
+    currentTableData: DynamicRowData[]; // <-- Переименовал для логичности
+    token: string | null;
+}
+
+
+export interface UpdateTableDataAction extends Action {
+    type: 'UPDATE_TABLE_DATA';
+    payload: DynamicRowData[];
+    [key: string]: any; // <-- Добавляем индексную сигнатуру
 }
 
 
@@ -60,12 +72,6 @@ export interface UpdateRTIDAction extends Action {
 export interface UpdateRTNameAction extends Action {
     type: 'UPDATE_RTNAME';
     payload: string;
-    [key: string]: any; 
-}
-
-export interface UpdateSearchResultsAction extends Action {
-    type: 'UPDATE_SEARCHRESULT';
-    payload: DynamicRowData[];
     [key: string]: any; 
 }
 
