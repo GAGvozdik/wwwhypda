@@ -20,12 +20,16 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
             height: "90%",
             fontFamily: "Afacad_Flux !important",
             "--ag-background-color": "#22282e",
+            color: 'red',
+            // color: '--tree-text',
         }),
         []
     );
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
+        foregroundColor: "var(--tree-text)",
+        headerTextColor: "var(--tree-text)",
     });
 
     const defaultColDef = useMemo<ColDef>(
@@ -53,7 +57,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
     };
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", height: "100%", color: '--tree-text' }}>
             {/* Таблица */}
             <div style={containerStyle}>
                 <AgGridReact
