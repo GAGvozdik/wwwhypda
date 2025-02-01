@@ -3,8 +3,8 @@ import {
     UpdateThemeAction,
     UpdateRTIDAction,
     UpdateRTNameAction,
-    UpdateSearchResultsAction,
-    DynamicRowData
+    DynamicRowData,
+    UpdateTableDataAction,
 } from '../common/types';
 
 import { UpdateTokenAction, LogoutAction } from '../common/types';
@@ -14,7 +14,10 @@ export const UpdateToken = (token: string): UpdateTokenAction => ({
     payload: token,
 });
 
-
+export const UpdateTableData = (data: DynamicRowData[]): UpdateTableDataAction => ({
+    type: 'UPDATE_TABLE_DATA',
+    payload: data,
+});
 
 export const Logout = (): LogoutAction => ({
     type: 'LOGOUT',
@@ -39,9 +42,3 @@ export const UpdateRTName = (currentRTName: string): UpdateRTNameAction => ({
     type: 'UPDATE_RTNAME',
     payload: currentRTName,
 });
-
-export const UpdateSearchResult = (currentSearchResult: DynamicRowData[]): UpdateSearchResultsAction => ({
-    type: 'UPDATE_SEARCHRESULT',
-    payload: currentSearchResult,
-});
-
