@@ -1,15 +1,17 @@
 import { createStore } from 'redux';
 import { State, Action } from '../common/types';
 
+
 const initialState: State = {
     open: false,
     isDarkTheme: true,
     currentRTID: '',
     currentRTName: '',
-    currentSearchResult: [],
-    // token: '', // Токен по умолчанию
+    currentTableData: [], // <-- Обновляем состояние
     token: null,
 };
+
+
 
 
 const reducer = (state: State = initialState, action: Action): State => {
@@ -27,8 +29,8 @@ const reducer = (state: State = initialState, action: Action): State => {
         case 'UPDATE_RTNAME':
             return { ...state, currentRTName: action.payload };
 
-        case 'UPDATE_SEARCHRESULT':
-            return { ...state, currentSearchResult: action.payload };
+        case 'UPDATE_TABLE_DATA': // <-- Добавляем обработку данных таблицы
+            return { ...state, currentTableData: action.payload };
 
         case 'UPDATE_TOKEN':
             return { ...state, token: action.payload };
