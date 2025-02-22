@@ -85,7 +85,8 @@ export default function MainMenu() {
 
             <MenuButtuon 
                 className={` ${styles.menuButton}`} 
-                path={token ? '/input' : '/login'}
+                // path={token ? '/input' : '/login'}
+                path={'/input'}
             >
                 Add data
             </MenuButtuon>
