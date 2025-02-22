@@ -19,13 +19,29 @@ const rowData = [
     { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
 ];
 
+const envName = ["env 1", "env 2", "env 3", "-- unavailable --"];
+const reviewLevel = ["lvl 1", "lvl 2", "lvl 3", "lvl 4", "-- unavailable --"];
+
 const GeneralInfo = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '2vh', marginBottom: '7vh' }), []);
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [
         { headerName: "Field", field: "field", editable: false, flex: 1 },
-        { headerName: "Value", field: "value", editable: true, flex: 1 },
+        // { headerName: "Value", field: "value", editable: true, flex: 1, singleClickEdit: true, },
+
+        { 
+            field: "value", 
+            editable: true, 
+            singleClickEdit: true,
+            flex: 1,
+            cellEditorSelector: (params) => {
+                return params.data.field === "env_name"
+                    ? { component: "agSelectCellEditor", params: { values: envName } }
+                    : { component: "agSelectCellEditor", params: { values: reviewLevel } };
+            }
+        },
+
         { headerName: "Description", field: "description", editable: false, flex: 2 }
     ], []);
 

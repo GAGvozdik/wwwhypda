@@ -30,7 +30,7 @@ const SourceInfo = () => {
     
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
-        { field: "value", editable: true, flex: 1 },
+        { field: "value", editable: true, flex: 1, singleClickEdit: true },
         { field: "description", editable: false, flex: 2 }
     ], []);
 
