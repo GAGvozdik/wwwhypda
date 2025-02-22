@@ -6,12 +6,14 @@ import {
     ClientSideRowModelModule, 
     ColDef, 
     ModuleRegistry, 
-    TextEditorModule
+    TextEditorModule,
+    SelectEditorModule,
 } from "ag-grid-community";
 
 ModuleRegistry.registerModules([
     TextEditorModule,
-    ClientSideRowModelModule
+    ClientSideRowModelModule,
+    SelectEditorModule
 ]);
 
 const rowData = [
@@ -22,13 +24,25 @@ const rowData = [
     { field: "latitude", value: "", description: "" }
 ];
 
+const countries = ["France", "Italy", "Angola", "Serbia", "-- unavailable --"];
+
 const SiteInfo = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '2vh', marginBottom: '7vh' }), []);
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
-        { field: "value", editable: true, flex: 1 },
+        { 
+            field: "value", 
+            editable: true, 
+            singleClickEdit: true,
+            flex: 1,
+            cellEditorSelector: (params) => {
+                return params.data.field === "country_name"
+                    ? { component: "agSelectCellEditor", params: { values: countries } }
+                    : { component: "agTextCellEditor" };
+            }
+        },
         { field: "description", editable: false, flex: 2 }
     ], []);
 
