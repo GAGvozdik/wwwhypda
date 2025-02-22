@@ -1,4 +1,4 @@
-import styles from '../menu.module.scss'; 
+import styles from '../../menu.module.scss'; 
 import React, { useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
@@ -8,15 +8,33 @@ import {
     ModuleRegistry, 
     TextEditorModule,
     SelectEditorModule,
+    CellSelectionOptions,
 } from "ag-grid-community";
+
+
+import {
+    CellSelectionModule,
+    ClipboardModule,
+    ColumnMenuModule,
+    ContextMenuModule,
+    ExcelExportModule,
+} from "ag-grid-enterprise";
 
 ModuleRegistry.registerModules([
     TextEditorModule,
     ClientSideRowModelModule,
-    SelectEditorModule
+    ClipboardModule,
+    ExcelExportModule,
+    ColumnMenuModule,
+    ContextMenuModule,
+    CellSelectionModule,
+    SelectEditorModule,
+    //   ValidationModule /* Development Only */,
 ]);
 
-const selectableValues = ["- undefined -", "1", "2", "3"];
+const rockTypeValues = ["- undefined -", "sand", "marl", "basalt"];
+const scaleValues = ["- undefined -", "middle", "large", "low"];
+const fracturationDegreeValues = ["- undefined -", "val 1", "val 2", "val 3"];
 
 const MeasurementSampleTable = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '13vh' }), []);
@@ -42,12 +60,75 @@ const MeasurementSampleTable = () => {
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
-        { headerName: "id", field: "id", editable: false, flex: 0.5, tooltipField: "Sample id", singleClickEdit: true },
-        { headerName: "smpl_name", field: "smpl_name", editable: true, flex: 1, tooltipField: "A name to identify the sample in the Measurements table.", singleClickEdit: true },
-        { headerName: "rock_type", field: "rock_type", editable: true, flex: 1, cellEditor: "agSelectCellEditor", cellEditorParams: { values: selectableValues }, tooltipField: "The name of the rock type", singleClickEdit: true },
-        { headerName: "scale", field: "scale", editable: true, flex: 1, cellEditor: "agSelectCellEditor", cellEditorParams: { values: selectableValues }, tooltipField: "The scale to which the measurements are made", singleClickEdit: true },
-        { headerName: "fracturation_degree", field: "fracturation_degree", editable: true, flex: 1, cellEditor: "agSelectCellEditor", cellEditorParams: { values: selectableValues }, tooltipField: "The degree of fracturation of the volume investigated", singleClickEdit: true },
-        { headerName: "Sample_comment", field: "Sample_comment", editable: true, flex: 1, tooltipField: "A comment about the sample", singleClickEdit: true }
+        { 
+            headerName: "id", 
+            field: "id", 
+            editable: false, 
+            flex: 0.5, 
+            singleClickEdit: false 
+        },
+        { 
+            headerName: "smpl_name", 
+            field: "smpl_name", 
+            editable: true, 
+            flex: 1, 
+            singleClickEdit: false 
+        },
+        { 
+            headerName: "rock_type", 
+            field: "rock_type", 
+            editable: true, 
+            flex: 1, 
+            cellEditor: "agSelectCellEditor", 
+            cellEditorParams: { values: rockTypeValues }, 
+            valueParser: (params) => {
+                if (rockTypeValues.includes(params.newValue)) {
+                    return params.newValue; 
+                } else {
+                    return params.oldValue; 
+                }
+            },
+            singleClickEdit: false 
+        },
+        { 
+            headerName: "scale", 
+            field: "scale", 
+            editable: true, 
+            flex: 1, 
+            cellEditor: "agSelectCellEditor", 
+            cellEditorParams: { values: scaleValues }, 
+            valueParser: (params) => {
+                if (scaleValues.includes(params.newValue)) {
+                    return params.newValue; 
+                } else {
+                    return params.oldValue; 
+                }
+            },
+            singleClickEdit: false 
+        },
+        { 
+            headerName: "fracturation_degree", 
+            field: "fracturation_degree", 
+            editable: true, 
+            flex: 1, 
+            cellEditor: "agSelectCellEditor", 
+            cellEditorParams: { values: fracturationDegreeValues }, 
+            valueParser: (params) => {
+                if (fracturationDegreeValues.includes(params.newValue)) {
+                    return params.newValue; 
+                } else {
+                    return params.oldValue; 
+                }
+            },
+            singleClickEdit: false 
+        },
+        { 
+            headerName: "Sample_comment", 
+            field: "Sample_comment", 
+            editable: true, 
+            flex: 1, 
+            singleClickEdit: false 
+        }
     ], []);
 
     const defaultColDef = useMemo<ColDef>(() => {
@@ -68,6 +149,14 @@ const MeasurementSampleTable = () => {
         columnBorder: { color: '#33383d', width: '1px' },
     });
     
+    const cellSelection = useMemo<boolean | CellSelectionOptions>(() => {
+        return {
+            handle: {
+                mode: "fill",
+            },
+        };
+    }, []);
+
     return (
         <div style={containerStyle}>
             
@@ -119,6 +208,7 @@ const MeasurementSampleTable = () => {
                 defaultColDef={defaultColDef}
                 tooltipShowDelay={0}
                 headerHeight={40}
+                cellSelection={cellSelection}
             />
         </div>
     );
