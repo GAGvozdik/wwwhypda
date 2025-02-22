@@ -101,7 +101,6 @@
     background: var(--tree-hover); /* Firefox */
 }
 
-
 body {
     background-color: var(--body-color);
     transition: 0.3s;
@@ -118,7 +117,9 @@ body {
     gap: 0px; 
     transition: 0.3s;
 }
-
+.ag-row-hover {
+    background-color: #28a745 !important; /* Зелёный цвет для строки */
+}
 .openContainer {
     background-color: var(--body-color);
     width: 100%;

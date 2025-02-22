@@ -140,9 +140,9 @@ def register():
     }
 
     try:
-        msg = Message(subject='Email Confirmation', sender=app.config['MAIL_USERNAME'], recipients=[email])
-        msg.body = f'Your confirmation code is: {confirmation_code}'
-        mail.send(msg)
+        # msg = Message(subject='Email Confirmation', sender=app.config['MAIL_USERNAME'], recipients=[email])
+        # msg.body = f'Your confirmation code is: {confirmation_code}'
+        # mail.send(msg)
         print(f"Confirmation code for {email}: {confirmation_code}")
     except Exception as e:
         return jsonify({"error": "Failed to send email", "details": str(e)}), 500
@@ -211,9 +211,9 @@ def forgot_password():
 
     try:
         # Отправка email с кодом восстановления
-        msg = Message(subject='Password Reset', sender=app.config['MAIL_USERNAME'], recipients=[email])
-        msg.body = f'Your password reset code is: {reset_code}'
-        mail.send(msg)
+        # msg = Message(subject='Password Reset', sender=app.config['MAIL_USERNAME'], recipients=[email])
+        # msg.body = f'Your password reset code is: {reset_code}'
+        # mail.send(msg)
         print(f"Confirmation code for {email}: {reset_code}")
         return jsonify({"message": "Password reset code sent to your email!"}), 200
 
