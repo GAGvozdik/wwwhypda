@@ -11,11 +11,11 @@ import { styled } from '@mui/material/styles';
 import { StepIconProps } from '@mui/material/StepIcon';
 import Check from '@mui/icons-material/Check';
 
-import SiteInfo from './siteInfo';
-import GeneralInfo from './generalInfo';
-import SourceInfo from './sourceInfo';
-import MeasurementSample from './measurementSample';
-import Measurements from './measurements';
+import SiteInfo from './steps/siteInfo';
+import GeneralInfo from './steps/generalInfo';
+import SourceInfo from './steps/sourceInfo';
+import MeasurementSample from './steps/measurementSample';
+import Measurements from './steps/measurements';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
