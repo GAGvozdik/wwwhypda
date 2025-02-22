@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from '../menu.module.scss';
-import InputDataTable from '../inputData/inputDataTable'; 
+import CustomStepper from '../inputData/stepper';
 
 
 const InputPage: React.FC = () => {
@@ -12,7 +12,7 @@ const InputPage: React.FC = () => {
                 <h2>InputPage</h2>
             </div>
 
-            <InputDataTable />
+            <CustomStepper />
         </div>
 
     );

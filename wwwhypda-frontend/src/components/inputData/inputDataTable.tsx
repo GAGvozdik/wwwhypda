@@ -109,7 +109,7 @@ const InputDataTable = () => {
                 values: languages, // Массив значений для выпадающего списка
             } as ISelectCellEditorParams,
             // Включаем редактирование по одному клику
-            singleClickEdit: true,
+            // singleClickEdit: true,
             // Валидация: только значения из списка
             valueParser: (params) => {
                 if (languages.includes(params.newValue)) {
@@ -150,7 +150,17 @@ const InputDataTable = () => {
         };
     }, []);
 
-    const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({fontFamily: 'Afacad_Flux !important'});
+    const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
+        fontFamily: "Afacad_Flux !important",
+        foregroundColor: "var(--tree-text)",
+        headerTextColor: "var(--tree-text)",
+        rangeSelectionBorderColor: "var(--tree-text)",
+        rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
+        
+        // Добавляем параметры для изменения цвета строки и ячейки при наведении
+        // "--ag-row-hover-color": "#28a745",  // Зелёный цвет для строки при наведении
+        // "--ag-cell-edit-border": "red",     // Красный бордер для редактируемой ячейки
+    });
     // --under-body-color: #2c333a;
     // --drawer-icon: #949494;
 
@@ -174,23 +184,6 @@ const InputDataTable = () => {
 };
 
 
-
-// const root = createRoot(document.getElementById("root")!);
-// root.render(
-//   <StrictMode>
-//     <InputDataTable />
-//   </StrictMode>,
-// );
-
-
-
-// const InputDataTable: React.FC = () => {
-//     return (
-//         <div className={styles.treeText}>
-
-//         </div>
-//     );
-// };
 
 
 export default InputDataTable;

@@ -2,6 +2,7 @@ openapi: 3.0.0
 info:
   title: Flask API Documentation
   version: 1.0.0
+
 paths:
   /api/anonce:
     get:
@@ -15,6 +16,12 @@ paths:
                 type: array
                 items:
                   type: object
+      examples:
+        application/json:
+          value:
+            - id: 1
+              name: "Example Source"
+
   /api/rock_type:
     get:
       summary: Get all rock types
@@ -27,6 +34,44 @@ paths:
                 type: array
                 items:
                   type: object
+
+  /api/parameters:
+    get:
+      summary: Get all parameters
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /api/samples/{rt_id}/{id_Parameter}:
+    get:
+      summary: Get samples by rock type and parameter
+      parameters:
+        - name: rt_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: id_Parameter
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
   /api/register:
     post:
       summary: Register a new user
@@ -50,6 +95,7 @@ paths:
           description: Invalid data
         '409':
           description: Conflict - Username or email already exists
+
   /api/confirm:
     post:
       summary: Confirm user registration
@@ -69,3 +115,74 @@ paths:
           description: User confirmed
         '400':
           description: Invalid code or missing fields
+
+  /api/login:
+    post:
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+        '401':
+          description: Invalid username or password
+
+  /api/forgot-password:
+    post:
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+      responses:
+        '200':
+          description: Reset code sent
+        '400':
+          description: Missing email field
+        '404':
+          description: Email not found
+
+  /api/reset-password:
+    post:
+      summary: Reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                code:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        '200':
+          description: Password reset successful
+        '400':
+          description: Invalid code or weak password
+        '404':
+          description: User not found
