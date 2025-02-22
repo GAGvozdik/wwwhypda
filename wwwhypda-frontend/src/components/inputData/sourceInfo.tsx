@@ -25,7 +25,7 @@ const rowData = [
 ];
 
 const SourceInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '2vh', marginBottom: '7vh' }), []);
+    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '9vh' }), []);    
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -55,7 +55,17 @@ const SourceInfo = () => {
     
     return (
         <div style={containerStyle}>
-            <h2 style={{ color: "var(--tree-text)", textAlign: "center" }}>Source of information (Info about the paper or the technical report that contains the measurements)</h2>
+            <div 
+                style={{ 
+                    color: "var(--tree-text)", 
+                    textAlign: "center", 
+                    fontSize: '3vh', 
+                    margin: '1vh 0vh 1vh 0vh' 
+                }}
+            >
+                Source of information (Info about the paper or the technical report that contains the measurements)
+            </div>
+
             <AgGridReact
                 theme={themeDarkBlue}
                 rowData={tableData}

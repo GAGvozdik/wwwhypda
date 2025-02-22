@@ -23,7 +23,7 @@ const envName = ["env 1", "env 2", "env 3", "-- unavailable --"];
 const reviewLevel = ["lvl 1", "lvl 2", "lvl 3", "lvl 4", "-- unavailable --"];
 
 const GeneralInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '2vh', marginBottom: '7vh' }), []);
+    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '5vh' }), []);    
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -63,7 +63,17 @@ const GeneralInfo = () => {
     
     return (
         <div style={containerStyle}>
-            <h2 style={{ color: "var(--tree-text)", textAlign: "center" }}>General information about measurements</h2>
+            <div 
+                style={{ 
+                    color: "var(--tree-text)", 
+                    textAlign: "center", 
+                    fontSize: '3vh', 
+                    margin: '1vh 0vh 1vh 0vh' 
+                }}
+            >
+                    General information about measurements
+            </div>
+
             <AgGridReact
                 theme={themeDarkBlue}
                 rowData={tableData}

@@ -27,7 +27,7 @@ const rowData = [
 const countries = ["France", "Italy", "Angola", "Serbia", "-- unavailable --"];
 
 const SiteInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '2vh', marginBottom: '7vh' }), []);
+    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '5vh' }), []);
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -67,7 +67,15 @@ const SiteInfo = () => {
     
     return (
         <div style={containerStyle}>
-            <h2 style={{ color: "var(--tree-text)", textAlign: "center" }}>Site Information</h2>
+            <div 
+                style={{ 
+                    color: "var(--tree-text)", 
+                    textAlign: "center", 
+                    fontSize: '3vh', 
+                    margin: '1vh 0vh 1vh 0vh' 
+                }}>
+                    Site Information
+                </div>
             <AgGridReact
                 theme={themeDarkBlue}
                 rowData={tableData}
