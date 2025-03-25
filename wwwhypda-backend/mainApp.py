@@ -11,6 +11,8 @@ import random
 from flask_swagger_ui import get_swaggerui_blueprint
 
 #TODO add recaptcha
+#TODO separate tables
+#TODO add only read users and admistrators
 #TODO add compulsory long password
 #TODO add limit to requests maybe recaptcha will fix this problem
 
@@ -85,7 +87,6 @@ app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
 
 @app.route('/api/anonce', methods=['GET']) 
 def api_anonce():
