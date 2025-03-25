@@ -278,4 +278,60 @@ class Country(db.Model):
             }), 500
 
 
+class Review(db.Model):
+    __tablename__ = 'Review'
+    
+    id_Review = db.Column(db.Integer, primary_key=True, nullable=False)
+    review_level = db.Column(db.String(70), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"<Review(id_Review='{self.id_Review}', review_level='{self.review_level}')>"
+
+    @classmethod
+    def get_all_reviews(cls):
+        try:
+            reviews = cls.query.all()
+            return jsonify([{ 'id_Review': review.id_Review, 'review_level': review.review_level } for review in reviews])
+        except Exception as e:
+            return jsonify({
+                'error': 'Error in Review.get_all_reviews',
+                'details': str(e)
+            }), 500
+        
+class Environment(db.Model):
+    __tablename__ = 'Environment'
+    
+    env_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
+    env_name = db.Column(db.String(100), nullable=False)
+    env_description = db.Column(db.String(500), nullable=False)
+    env_wiki_link = db.Column(db.String(500), nullable=True)
+    env_id_parent = db.Column(db.Integer, db.ForeignKey('Environment.env_id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    UID = db.Column(db.String(50), unique=True, nullable=True)
+    PARENTUID = db.Column(db.String(50), nullable=True)
+    env_Status = db.Column(db.Integer, db.ForeignKey('status.id_Status', onupdate='CASCADE'), nullable=False, default=0)
+
+    def __repr__(self):
+        return f"<Environment(env_id='{self.env_id}', env_name='{self.env_name}')>"
+
+    @classmethod
+    def get_all_environments(cls):
+        try:
+            environments = cls.query.all()
+            return jsonify([{ 
+                'env_id': env.env_id, 
+                'env_name': env.env_name, 
+                'env_description': env.env_description,
+                'env_wiki_link': env.env_wiki_link,
+                'env_id_parent': env.env_id_parent,
+                'UID': env.UID,
+                'PARENTUID': env.PARENTUID,
+                'env_Status': env.env_Status
+            } for env in environments])
+        except Exception as e:
+            return jsonify({
+                'error': 'Error in Environment.get_all_environments',
+                'details': str(e)
+            }), 500
+
+
 
