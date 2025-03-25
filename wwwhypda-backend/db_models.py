@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.orm import relationship
 import random
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import Flask, jsonify, session, request, redirect, url_for
 
 db = SQLAlchemy()
 
@@ -255,3 +256,26 @@ class Parameter(db.Model):
 
 # samples = Sample.getSamplesByRockType(3)
 # print(samples)
+
+class Country(db.Model):
+    __tablename__ = 'Country'
+    
+    ISO_code = db.Column(db.String(3), primary_key=True, nullable=False, default='AAA')
+    country_name = db.Column(db.String(50), unique=True, nullable=False)
+
+    def __repr__(self):
+        return f"<Country(ISO_code='{self.ISO_code}', country_name='{self.country_name}')>"
+
+    @classmethod
+    def get_all_countries(cls):
+        try:
+            countries = cls.query.all()
+            return jsonify([{ 'ISO_code': country.ISO_code, 'country_name': country.country_name } for country in countries])
+        except Exception as e:
+            return jsonify({
+                'error': 'Error in Country.get_all_countries',
+                'details': str(e)
+            }), 500
+
+
+

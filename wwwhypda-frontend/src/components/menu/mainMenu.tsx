@@ -22,20 +22,16 @@ export default function MainMenu() {
     const token = useSelector((state: State) => state.token);
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
-    const [isDarkMode, setIsDarkMode] = useState(isDarkTheme); 
     const dispatch = useDispatch();
 
     const toggleTheme = () => {
-        setIsDarkMode((prevMode) => !prevMode); 
-        dispatch<UpdateThemeAction>(UpdateTheme(isDarkMode)); 
+        dispatch<UpdateThemeAction>(UpdateTheme(!isDarkTheme)); 
     };
 
     let isOpenNow = useSelector((state: State) => state.open);  
-    const [isOpen, setIsOpen] = useState(isOpenNow); 
 
     const toggleOpen = () => {
-        setIsOpen((prevMode) => !prevMode); 
-        dispatch<UpdateOpenCloseAction>(UpdateOpenClose(isOpen)); 
+        dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
     };
 
     return (
@@ -100,7 +96,7 @@ export default function MainMenu() {
 
             <div className={`${styles.themeItem} ${styles.menuLabel}`}>
                 <IconButton onClick={toggleTheme}>
-                    {isDarkMode ? 
+                    {isDarkTheme ? 
                         (<Brightness4Icon className={styles.themeIcon}/>) 
                             : 
                         (<Brightness7Icon className={styles.themeIcon}/>)

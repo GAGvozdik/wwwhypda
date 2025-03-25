@@ -1,6 +1,6 @@
 import os
 from flask_cors import CORS
-from db_models import db, User
+from db_models import db, User, Country
 from db_models import Source, RockType, Parameter, Sample, Measure
 from flask import Flask, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
@@ -255,6 +255,10 @@ def reset_password():
 
     except Exception as e:
         return jsonify({"error": "Failed to reset password", "details": str(e)}), 500
+
+@app.route('/api/countries', methods=['GET'])
+def get_countries():
+    return Country.get_all_countries()
 
 if __name__ == "__main__":
     with app.app_context():
