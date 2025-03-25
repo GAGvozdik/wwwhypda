@@ -186,3 +186,37 @@ paths:
           description: Invalid code or weak password
         '404':
           description: User not found
+
+  /api/countries:
+    get:
+      summary: Get all countries
+      description: Returns a list of all countries with their ISO codes and names.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ISO_code:
+                      type: string
+                      example: "USA"
+                    country_name:
+                      type: string
+                      example: "United States"
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Error in Country.get_all_countries"
+                  details:
+                    type: string
+                    example: "Database connection failed"
