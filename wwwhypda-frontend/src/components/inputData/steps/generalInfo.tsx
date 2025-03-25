@@ -1,7 +1,9 @@
 import styles from '../menu.module.scss'; 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
+import axios from 'axios';
+
 import { 
     ClientSideRowModelModule, 
     ColDef, 
@@ -14,43 +16,105 @@ ModuleRegistry.registerModules([
     ClientSideRowModelModule
 ]);
 
+interface Reviews {
+    id_Review: number;
+    review_level: string;
+}
+
+interface Environment {
+    PARENTUID: string | null;
+    UID: string | null;
+    env_Status: number;
+    env_description: string;
+    env_id: number;
+    env_id_parent: number;
+    env_name: string;
+    env_wiki_link: string | null;
+}
+
 const rowData = [
     { field: "env_name", value: "", description: "the hydrogeological environment" },
     { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
 ];
 
-const envName = ["env 1", "env 2", "env 3", "-- unavailable --"];
-const reviewLevel = ["lvl 1", "lvl 2", "lvl 3", "lvl 4", "-- unavailable --"];
-
 const GeneralInfo = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '5vh' }), []);    
-    const [tableData, setTableData] = useState(rowData);
     
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [reviews, setReviews] = useState<Reviews[]>([]);
+    const [envs, setEnvs] = useState<Environment[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [envResponse, reviewResponse] = await Promise.all([
+                    axios.get<Environment[]>('http://localhost:5000/api/environments'),
+                    axios.get<Reviews[]>('http://localhost:5000/api/reviews')
+                ]);
+
+                if (!envResponse.data || envResponse.data.length === 0) {
+                    setError("No environment data received from the server.");
+                } else {
+                    setEnvs(envResponse.data);
+                }
+
+                if (!reviewResponse.data || reviewResponse.data.length === 0) {
+                    setError("No review data received from the server.");
+                } else {
+                    setReviews(reviewResponse.data);
+                }
+
+                console.log('Environments:', envResponse.data);
+                console.log('Reviews:', reviewResponse.data);
+
+            } catch (error: any) {
+                setError(getErrorMessage(error));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getErrorMessage = (error: any): string => {
+        if (error.response) {
+            return `HTTP error! status: ${error.response.status}, data: ${error.response.data}`;
+        } else if (error.request) {
+            return 'Error: No response received from the server.';
+        } else {
+            return `Error: ${error.message}`;
+        }
+    };
+
+    const reviewLevel = useMemo(() => reviews.map(r => r.review_level), [reviews]);
+    const environments = useMemo(() => envs.map(e => e.env_name), [envs]);
+
     const columnDefs = useMemo<ColDef[]>(() => [
         { headerName: "Field", field: "field", editable: false, flex: 1 },
-        // { headerName: "Value", field: "value", editable: true, flex: 1, singleClickEdit: true, },
-
         { 
             field: "value", 
             editable: true, 
             singleClickEdit: true,
             flex: 1,
-            cellEditorSelector: (params) => {
-                return params.data.field === "env_name"
-                    ? { component: "agSelectCellEditor", params: { values: envName } }
-                    : { component: "agSelectCellEditor", params: { values: reviewLevel } };
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: (params: any) => {
+                if (params.data.field === "env_name") {
+                    return { values: environments };
+                } else if (params.data.field === "review_level") {
+                    return { values: reviewLevel };
+                }
+                return { values: [] };
             }
         },
-
         { headerName: "Description", field: "description", editable: false, flex: 2 }
-    ], []);
+    ], [environments, reviewLevel]);
 
-    const defaultColDef = useMemo<ColDef>(() => {
-        return {
-            editable: true,
-            flex: 1,
-        };
-    }, []);
+    const defaultColDef = useMemo<ColDef>(() => ({
+        editable: true,
+        flex: 1,
+    }), []);
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
@@ -74,18 +138,19 @@ const GeneralInfo = () => {
                     General information about measurements
             </div>
 
-            <AgGridReact
-                theme={themeDarkBlue}
-                rowData={tableData}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                // suppressHeaderOnAutoSize={true}
-                suppressColumnVirtualisation={true}
-                suppressRowHoverHighlight={true}
-                suppressNoRowsOverlay={true}
-                suppressMenuHide={true}
-                headerHeight={0}
-            />
+            {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={rowData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    suppressColumnVirtualisation={true}
+                    suppressRowHoverHighlight={true}
+                    suppressNoRowsOverlay={true}
+                    suppressMenuHide={true}
+                    headerHeight={0}
+                />
+            )}
         </div>
     );
 };

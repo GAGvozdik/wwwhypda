@@ -1,6 +1,6 @@
 import os
 from flask_cors import CORS
-from db_models import db, User, Country
+from db_models import db, User, Country, Review, Environment
 from db_models import Source, RockType, Parameter, Sample, Measure
 from flask import Flask, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
@@ -259,6 +259,15 @@ def reset_password():
 @app.route('/api/countries', methods=['GET'])
 def get_countries():
     return Country.get_all_countries()
+
+@app.route('/api/reviews', methods=['GET'])
+def get_reviews():
+    return Review.get_all_reviews()
+
+@app.route('/api/environments', methods=['GET'])
+def get_environments():
+    return Environment.get_all_environments()
+
 
 if __name__ == "__main__":
     with app.app_context():

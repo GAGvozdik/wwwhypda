@@ -220,3 +220,91 @@ paths:
                   details:
                     type: string
                     example: "Database connection failed"
+  /api/reviews:
+    get:
+      summary: Get all reviews
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_Review:
+                      type: integer
+                      description: Review ID
+                    review_level:
+                      type: string
+                      description: Review level
+      examples:
+        application/json:
+          value:
+            - id_Review: 1
+              review_level: "High"
+            - id_Review: 2
+              review_level: "Medium"
+            - id_Review: 3
+              review_level: "Low"
+
+  /api/environments:
+    get:
+      summary: Get all environments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    env_id:
+                      type: integer
+                      description: Environment ID
+                    env_name:
+                      type: string
+                      description: Environment name
+                    env_description:
+                      type: string
+                      description: Environment description
+                    env_wiki_link:
+                      type: string
+                      nullable: true
+                      description: Link to environment wiki
+                    env_id_parent:
+                      type: integer
+                      description: Parent environment ID
+                    UID:
+                      type: string
+                      nullable: true
+                      description: Unique Identifier
+                    PARENTUID:
+                      type: string
+                      nullable: true
+                      description: Parent Unique Identifier
+                    env_Status:
+                      type: integer
+                      description: Environment status
+      examples:
+        application/json:
+          value:
+            - env_id: 1
+              env_name: "Forest"
+              env_description: "A dense and diverse ecosystem."
+              env_wiki_link: "https://example.com/forest"
+              env_id_parent: 0
+              UID: "123-ABC"
+              PARENTUID: null
+              env_Status: 1
+            - env_id: 2
+              env_name: "Desert"
+              env_description: "An arid and sandy biome."
+              env_wiki_link: null
+              env_id_parent: 1
+              UID: "456-DEF"
+              PARENTUID: "123-ABC"
+              env_Status: 0

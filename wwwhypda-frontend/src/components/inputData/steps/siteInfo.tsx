@@ -48,7 +48,7 @@ const SiteInfo = () => {
                 }
 
                 setCountries(response.data);
-                console.log(response.data);
+                // console.log(response.data);
 
             } catch (error: any) {
                 setError(getErrorMessage(error));
