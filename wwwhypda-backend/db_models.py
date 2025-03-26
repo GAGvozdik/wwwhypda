@@ -171,7 +171,17 @@ class Sample(db.Model):
         except Exception as e:
             print(f"getSamplesByRockType error: {e}")
             return []
-        
+
+    @classmethod
+    def get_all_samples():
+        try:
+            results = db.session.query(Sample).all()
+            return [sample.to_dict() for sample in results]
+        except Exception as e:
+            print(f"get_all_samples error: {e}")
+            return []
+
+
 class Measure(db.Model):
     __tablename__ = 'Measure'
     id_Measure = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -332,6 +342,100 @@ class Environment(db.Model):
                 'error': 'Error in Environment.get_all_environments',
                 'details': str(e)
             }), 500
+
+
+class Fracturation(db.Model):
+    __tablename__ = 'Fracturation'
+
+    id_fracturation = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    fracturation_degree = db.Column(db.String(20), nullable=False)
+
+    @staticmethod
+    def get_all_fracturations():
+        try:
+            fracturations = Fracturation.query.all()
+            return jsonify([{"id_fracturation": f.id_fracturation, "fracturation_degree": f.fracturation_degree} for f in fracturations]), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+        
+
+class Scale(db.Model):
+    __tablename__ = 'Scale'
+
+    id_Scale = db.Column(db.Integer, primary_key=True)
+    scale_value = db.Column(db.String(50), nullable=False, unique=True)
+    scale_descr = db.Column(db.String(125), nullable=True)
+
+    @staticmethod
+    def get_all_scales():
+        try:
+            scales = Scale.query.all()
+            return jsonify([{"id_Scale": s.id_Scale, "scale_value": s.scale_value, "scale_descr": s.scale_descr} for s in scales]), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+class Quality(db.Model):
+    __tablename__ = 'Quality'
+
+    id_Quality = db.Column(db.Integer, primary_key=True)
+    quality_level = db.Column(db.String(20), nullable=False, unique=True)
+
+    @staticmethod
+    def get_all_qualities():
+        try:
+            qualities = Quality.query.all()
+            return jsonify([{
+                "id_Quality": q.id_Quality,
+                "quality_level": q.quality_level
+            } for q in qualities]), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+class ExperimentType(db.Model):
+    __tablename__ = 'Experiment_type'
+
+    id_Exp_type = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    exp_name = db.Column(db.String(100), nullable=False)
+    exp_description = db.Column(db.String(500), nullable=False)
+    exp_status = db.Column(db.Integer, db.ForeignKey('status.id_Status'), nullable=False, default=0)
+
+    @staticmethod
+    def get_all_experiment_types():
+        try:
+            experiment_types = ExperimentType.query.all()
+            return jsonify([{
+                "id_Exp_type": e.id_Exp_type,
+                "exp_name": e.exp_name,
+                "exp_description": e.exp_description,
+                "exp_status": e.exp_status
+            } for e in experiment_types]), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+class InterpretationMethod(db.Model):
+    __tablename__ = 'Interpretation_method'
+
+    id_Int_meth = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    int_meth_name = db.Column(db.String(100), nullable=False)
+    int_meth_desc = db.Column(db.String(500), nullable=False)
+    id_Exp_ty = db.Column(db.Integer, db.ForeignKey('Experiment_type.id_Exp_type'), nullable=False)
+    int_meth_status = db.Column(db.Integer, db.ForeignKey('status.id_Status'), nullable=False, default=0)
+
+    @staticmethod
+    def get_all_interpretation_methods():
+        try:
+            methods = InterpretationMethod.query.all()
+            return jsonify([{
+                "id_Int_meth": m.id_Int_meth,
+                "int_meth_name": m.int_meth_name,
+                "int_meth_desc": m.int_meth_desc,
+                "id_Exp_ty": m.id_Exp_ty,
+                "int_meth_status": m.int_meth_status
+            } for m in methods]), 200
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+
+
 
 
 
