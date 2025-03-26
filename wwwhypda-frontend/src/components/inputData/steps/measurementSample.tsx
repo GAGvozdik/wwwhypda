@@ -1,7 +1,9 @@
 import styles from '../../menu.module.scss'; 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
+import axios from 'axios';
+
 import { 
     ClientSideRowModelModule, 
     ColDef, 
@@ -22,21 +24,115 @@ import {
 ModuleRegistry.registerModules([
     TextEditorModule,
     ClientSideRowModelModule,
-    ClipboardModule,
-    ExcelExportModule,
-    ColumnMenuModule,
-    ContextMenuModule,
-    CellSelectionModule,
     SelectEditorModule,
+
+    // ClipboardModule,
+    // ExcelExportModule,
+    // ColumnMenuModule,
+    // ContextMenuModule,
+    CellSelectionModule,
+
     //   ValidationModule /* Development Only */,
 ]);
 
-const rockTypeValues = ["- undefined -", "sand", "marl", "basalt"];
-const scaleValues = ["- undefined -", "middle", "large", "low"];
-const fracturationDegreeValues = ["- undefined -", "val 1", "val 2", "val 3"];
+export interface Fracturation {
+    id_fracturation: number;
+    fracturation_degree: string;
+}
+
+export interface Scale {
+    id_Scale: number;
+    scale_value: string;
+    scale_descr?: string | null;
+}
+
+
+interface RockTypeData {
+    rt_id: number;
+    rt_name: string;
+    rt_description: string | null;
+    rt_wiki_link: string | null;
+    rt_left: number;
+    rt_right: number;
+    rt_id_parent: number;
+    rt_USCS: string | null;
+    UID: string | null;
+    PARENTUID: string | null;
+    rt_status: number;
+    status_name: string | null; 
+}
+
+
+// const rockTypeValues = ["- undefined -", "sand", "marl", "basalt"];
+// const scaleValues = ["- undefined -", "middle", "large", "low"];
+// const fracturationDegreeValues = ["- undefined -", "val 1", "val 2", "val 3"];
 
 const MeasurementSampleTable = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '13vh' }), []);
+
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [scale, setScale] = useState<Scale[]>([]);
+    const [fracturation, setFracturation] = useState<Fracturation[]>([]);
+    const [rocksData, setRocksData] = useState<RockTypeData[]>([]);
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
+                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations'),
+                    axios.get<Scale[]>('http://localhost:5000/api/scales'),
+                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type')
+                ]);
+
+                if (!envResponse.data || envResponse.data.length === 0) {
+                    setError("No environment data received from the server.");
+                } else {
+                    setFracturation(envResponse.data);
+                }
+
+                if (!reviewResponse.data || reviewResponse.data.length === 0) {
+                    setError("No review data received from the server.");
+                } else {
+                    setScale(reviewResponse.data);
+                }
+
+                if (!rocksResponse.data || rocksResponse.data.length === 0) {
+                    setError("No review data received from the server.");
+                } else {
+                    setRocksData(rocksResponse.data);
+                }
+
+                console.log('Environments:', envResponse.data);
+                console.log('Scale:', reviewResponse.data);
+                console.log('Rocks:', rocksResponse.data);
+
+            } catch (error: any) {
+                setError(getErrorMessage(error));
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    const getErrorMessage = (error: any): string => {
+        if (error.response) {
+            return `HTTP error! status: ${error.response.status}, data: ${error.response.data}`;
+        } else if (error.request) {
+            return 'Error: No response received from the server.';
+        } else {
+            return `Error: ${error.message}`;
+        }
+    };
+
+    const scales = useMemo(() => scale.map(s => s.scale_value), [scale]);
+    const fracturations = useMemo(() => fracturation.map(f => f.fracturation_degree), [fracturation]);
+    const rocksNames = useMemo(() => rocksData.map(r => r.rt_name), [rocksData]);
+
+
+
     const [tableData, setTableData] = useState([
         { id: 1, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
         { id: 2, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
@@ -79,9 +175,9 @@ const MeasurementSampleTable = () => {
             editable: true, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: rockTypeValues }, 
+            cellEditorParams: { values: rocksNames }, 
             valueParser: (params) => {
-                if (rockTypeValues.includes(params.newValue)) {
+                if (rocksNames.includes(params.newValue)) {
                     return params.newValue; 
                 } else {
                     return params.oldValue; 
@@ -95,9 +191,9 @@ const MeasurementSampleTable = () => {
             editable: true, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: scaleValues }, 
+            cellEditorParams: { values: scales }, 
             valueParser: (params) => {
-                if (scaleValues.includes(params.newValue)) {
+                if (scales.includes(params.newValue)) {
                     return params.newValue; 
                 } else {
                     return params.oldValue; 
@@ -111,9 +207,9 @@ const MeasurementSampleTable = () => {
             editable: true, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: fracturationDegreeValues }, 
+            cellEditorParams: { values: fracturations }, 
             valueParser: (params) => {
-                if (fracturationDegreeValues.includes(params.newValue)) {
+                if (fracturations.includes(params.newValue)) {
                     return params.newValue; 
                 } else {
                     return params.oldValue; 
@@ -128,7 +224,7 @@ const MeasurementSampleTable = () => {
             flex: 1, 
             singleClickEdit: false 
         }
-    ], []);
+    ], [scales, fracturations, rocksNames]);
 
     const defaultColDef = useMemo<ColDef>(() => {
         return {
@@ -200,15 +296,20 @@ const MeasurementSampleTable = () => {
                 </button>
             </div>
 
-            <AgGridReact
-                theme={themeDarkBlue}
-                rowData={tableData}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                tooltipShowDelay={0}
-                headerHeight={40}
-                cellSelection={cellSelection}
-            />
+
+
+            {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    tooltipShowDelay={0}
+                    headerHeight={40}
+                    cellSelection={cellSelection}
+                />
+            )}
+
         </div>
     );
 };

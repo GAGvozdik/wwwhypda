@@ -248,7 +248,6 @@ paths:
               review_level: "Medium"
             - id_Review: 3
               review_level: "Low"
-
   /api/environments:
     get:
       summary: Get all environments
@@ -308,3 +307,124 @@ paths:
               UID: "456-DEF"
               PARENTUID: "123-ABC"
               env_Status: 0
+  /api/fracturations:
+    get:
+      summary: Get all fracturation degrees
+      description: Returns a list of all fracturation degrees.
+      responses:
+        '200':
+          description: A list of fracturation degrees
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_fracturation:
+                      type: integer
+                      example: 1
+                    fracturation_degree:
+                      type: string
+                      example: "High"
+  /api/scales:
+    get:
+      summary: Get all scales
+      description: Returns a list of all scales with their descriptions.
+      responses:
+        '200':
+          description: A list of scales
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_Scale:
+                      type: integer
+                      example: 1
+                    scale_value:
+                      type: string
+                      example: "10 cm"
+                    scale_descr:
+                      type: string
+                      example: "Small scale"
+
+  /api/qualities:
+    get:
+      summary: Get all qualities
+      description: Returns a list of all quality levels.
+      responses:
+        '200':
+          description: A list of quality levels
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_Quality:
+                      type: integer
+                      example: 1
+                    quality_level:
+                      type: string
+                      example: "High"
+
+  /api/experiment_types:
+    get:
+      summary: Get all experiment types
+      description: Returns a list of all experiment types.
+      responses:
+        '200':
+          description: A list of experiment types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_Exp_type:
+                      type: integer
+                      example: 1
+                    exp_name:
+                      type: string
+                      example: "Hydrostatic Test"
+                    exp_description:
+                      type: string
+                      example: "Testing water pressure in a controlled environment"
+                    exp_status:
+                      type: integer
+                      example: 1
+
+  /api/interpretation_methods:
+    get:
+      summary: Get all interpretation methods
+      description: Returns a list of all interpretation methods.
+      responses:
+        '200':
+          description: A list of interpretation methods
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id_Int_meth:
+                      type: integer
+                      example: 1
+                    int_meth_name:
+                      type: string
+                      example: "Regression Analysis"
+                    int_meth_desc:
+                      type: string
+                      example: "Analyzing trends using regression models"
+                    id_Exp_ty:
+                      type: integer
+                      example: 1
+                    int_meth_status:
+                      type: integer
+                      example: 0

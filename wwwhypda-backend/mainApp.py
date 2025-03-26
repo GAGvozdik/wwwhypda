@@ -1,7 +1,8 @@
 import os
 from flask_cors import CORS
-from db_models import db, User, Country, Review, Environment
-from db_models import Source, RockType, Parameter, Sample, Measure
+from db_models import db, User, Country, Review, Environment, Fracturation
+from db_models import Source, RockType, Parameter, Sample, Measure, Scale
+from db_models import ExperimentType, Quality, InterpretationMethod
 from flask import Flask, jsonify, session, request, redirect, url_for
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity, get_jwt
 from flask_login import LoginManager
@@ -268,6 +269,30 @@ def get_reviews():
 def get_environments():
     return Environment.get_all_environments()
 
+@app.route('/api/fracturations', methods=['GET'])
+def get_fracturations():
+    return Fracturation.get_all_fracturations()
+
+@app.route('/api/scales', methods=['GET'])
+def get_scales():
+    return Scale.get_all_scales()
+
+@app.route('/api/samples', methods=['GET']) 
+def api_samples():
+    results = Sample.get_all_samples()
+    return jsonify(results)
+
+@app.route('/api/qualities', methods=['GET'])
+def get_qualities():
+    return Quality.get_all_qualities()
+
+@app.route('/api/experiment_types', methods=['GET'])
+def get_experiment_types():
+    return ExperimentType.get_all_experiment_types()
+
+@app.route('/api/interpretation_methods', methods=['GET'])
+def get_interpretation_methods():
+    return InterpretationMethod.get_all_interpretation_methods()
 
 if __name__ == "__main__":
     with app.app_context():
