@@ -1,34 +1,37 @@
-1)  Install NodeJS  
+1) Install NodeJS
+2) Create file env.configs and write into:
 
-2)  Create folder SECRET_KEYS with files: JWT_KEY.txt, MAIL_PASSWORD.txt, MAIL.txt, SECRET_KEY.txt.  
-    Add long random codes in JWT_KEY.txt, SECRET_KEY.txt.  
-    Add your gmail in MAIL.txt  
-    Turn on 2 step verification in your google account  
+   SECRET_KEY='long_random_code'
+   DATABASE_URL='sqlite:///wwhypda.db'
+   DEBUG=True
 
-    ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction3.png)
+   SECRET_MAIL = 'your gmail'
 
-    Go to App passwords  
+   SWAGGER_URL = '/swagger'
+   API_URL = '/static/swagger.json'
 
-    ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction1.png)
+   MAIL_PASSWORD = 'your mail special code'
 
-    Register your gmail app and copy code  
+   To get special mail code:
 
-    ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction2.png)
+   Turn on 2 step verification in your google account
 
-    or try to follow instruction (https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code  
+   ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction3.png)
 
-    Add your mail code in MAIL_PASSWORD.txt  
+   Go to App passwords
 
-    DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!  
+   ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction1.png)
 
-3)  cd wwhypda-backend  
-    python -m venv workEnv  
-    workEnv/Scripts/Activate  
-    pip install -r requrements.txt  
-    python mainApp.py  
-    P.S. demo documentation is available at http://127.0.0.1:5000/swagger/  
+   Register your gmail app and copy code
 
-4)  cd wwhypda-frontend  
-    npm i  
-    npm start  
+   ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction2.png)
 
+   or try to follow instruction (https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code
+
+   Add your mail code in env.configs in ``MAIL_PASSWORD = 'your mail special code'``
+
+   DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
+3) cd wwhypda-backendpython -m venv workEnvworkEnv/Scripts/Activatepip install -r requrements.txtpython mainApp.pyP.S. demo documentation is available at http://127.0.0.1:5000/swagger/
+4) cd wwhypda-frontend
+   npm i
+   npm start
