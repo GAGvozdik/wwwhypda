@@ -15,10 +15,10 @@ import {
 
 import {
     CellSelectionModule,
-    ClipboardModule,
-    ColumnMenuModule,
-    ContextMenuModule,
-    ExcelExportModule,
+    // ClipboardModule,
+    // ColumnMenuModule,
+    // ContextMenuModule,
+    // ExcelExportModule,
 } from "ag-grid-enterprise";
 
 ModuleRegistry.registerModules([
@@ -135,11 +135,12 @@ export default function Measurements() {
             return `Error: ${error.message}`;
         }
     };
-
+    
     const parameterNames = useMemo(() => parameters.map(s => s.param_name), [parameters]);
     const qualityNames = useMemo(() => quality.map(s => s.quality_level), [quality]);
     const experimentTypeNames = useMemo(() => experimentType.map(s => s.exp_name), [experimentType]);
     const interpretationMethodNames = useMemo(() => interpretationMethod.map(s => s.int_meth_name), [interpretationMethod]);
+
 
     const [tableData, setTableData] = useState([
         { id: 1, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
