@@ -9,31 +9,31 @@ from flask import Flask, jsonify, session, request, redirect, url_for
 
 db = SQLAlchemy()
 
-class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
-    is_active = db.Column(db.Boolean(), default=False)
+# class User(db.Model, UserMixin):
+#     id = db.Column(db.Integer, primary_key=True)
+#     username = db.Column(db.String(20), unique=True, nullable=False)
+#     email = db.Column(db.String(100), unique=True, nullable=False)
+#     password = db.Column(db.String(80), nullable=False)
+#     is_active = db.Column(db.Boolean(), default=False)
 
-    @staticmethod
-    def find_by_username(username):
-        return User.query.filter_by(username=username).first()
+#     @staticmethod
+#     def find_by_username(username):
+#         return User.query.filter_by(username=username).first()
 
-    @staticmethod
-    def find_by_email(email):
-        return User.query.filter_by(email=email).first()
+#     @staticmethod
+#     def find_by_email(email):
+#         return User.query.filter_by(email=email).first()
 
-    @staticmethod
-    def create_user(username, email, password):
-        hashed_password = generate_password_hash(password)
-        new_user = User(username=username, email=email, password=hashed_password, is_active=False)
-        db.session.add(new_user)
-        db.session.commit()
-        return new_user
+#     @staticmethod
+#     def create_user(username, email, password):
+#         hashed_password = generate_password_hash(password)
+#         new_user = User(username=username, email=email, password=hashed_password, is_active=False)
+#         db.session.add(new_user)
+#         db.session.commit()
+#         return new_user
 
-    def check_password(self, password):
-        return check_password_hash(self.password, password)
+#     def check_password(self, password):
+#         return check_password_hash(self.password, password)
 
 class Source(db.Model):
     id_Source = db.Column(db.Integer, primary_key=True, autoincrement=True)
