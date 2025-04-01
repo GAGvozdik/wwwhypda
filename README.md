@@ -1,11 +1,12 @@
-1) Install NodeJS
-2) Create file env.configs and write into:
+1) Install NodeJS (`https://nodejs.org/en/download`) and Python (stable work with Python 3.12.6).
 
-   SECRET_KEY='long_random_code'
+2) Create file env.configs in folder with `mainApp.py` and write into:
+
+   SECRET_KEY='your_long_random_code_%*&8hHJ+=_Klhtfo*89buibgyuoGUIonguionphiohio'
    DATABASE_URL='sqlite:///wwhypda.db'
    DEBUG=True
 
-   SECRET_MAIL = 'your gmail'
+   SECRET_MAIL = 'yourmail@gmail.com'
 
    SWAGGER_URL = '/swagger'
    API_URL = '/static/swagger.json'
@@ -32,6 +33,8 @@
 
    DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 3) cd wwhypda-backendpython -m venv workEnvworkEnv/Scripts/Activatepip install -r requrements.txtpython mainApp.pyP.S. demo documentation is available at http://127.0.0.1:5000/swagger/
-4) cd wwhypda-frontend
+
+4) Type in terminal in folder wwwhydpa/ :
+   cd wwhypda-frontend
    npm i
    npm start
