@@ -11,13 +11,15 @@ from flask_swagger_ui import get_swaggerui_blueprint
 from flask import send_from_directory
 import re
 from rocks.rocks_bp import rocks_bp
-
+from dotenv import load_dotenv
 
 #TODO add recaptcha
 #TODO separate tables
 #TODO add only read users and admistrators
 #TODO add compulsory long password
 #TODO add limit to requests maybe recaptcha will fix this problem
+
+load_dotenv(dotenv_path='env.configs')
 
 # pending_users = {}
 
@@ -48,10 +50,11 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], resources={r"/api/*": {"origins": "*"}})
 
+# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-app.config['SECRET_KEY'] = read_key('SECRET_KEYS/SECRET_KEY.txt')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # app.config["JWT_SECRET_KEY"] = read_key('SECRET_KEYS/JWT_KEY.txt')
 # app.config['JWT_TOKEN_LOCATION'] = ['headers']
 
@@ -59,8 +62,8 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
-app.config["MAIL_USERNAME"] = read_key('SECRET_KEYS/MAIL.txt')
-app.config['MAIL_PASSWORD'] = read_key('SECRET_KEYS/MAIL_PASSWORD.txt')
+app.config["MAIL_USERNAME"] = os.getenv('SECRET_MAIL')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 mail = Mail(app)
 # jwt = JWTManager(app)
@@ -71,18 +74,15 @@ db.init_app(app)
 # login_manager.init_app(app)
 # login_manager.login_view = 'login'  # Здесь укажите ваше представление для логина (если есть)
 
-SWAGGER_URL = '/swagger'  # URL для доступа к документации
-API_URL = '/static/swagger.json'  # Путь к вашему Swagger-файлу
-
 swaggerui_blueprint = get_swaggerui_blueprint(
-    SWAGGER_URL,
-    API_URL,
+    os.getenv('SWAGGER_URL'),
+    os.getenv('API_URL'),
     config={
         'app_name': "Flask API with Swagger UI"
     }
 )
 
-app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+app.register_blueprint(swaggerui_blueprint, url_prefix=os.getenv('SWAGGER_URL'))
 
 @app.route("/swagger.json")
 def swagger_json():
