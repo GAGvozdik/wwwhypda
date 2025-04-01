@@ -1,0 +1,657 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Flask API Documentation",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/anonce": {
+      "get": {
+        "summary": "Get data anonce",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "examples": {
+          "application/json": {
+            "value": [
+              {
+                "id": 1,
+                "name": "Example Source"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "/api/rock_type": {
+      "get": {
+        "summary": "Get all rock types",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parameters": {
+      "get": {
+        "summary": "Get all parameters",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/samples/{rt_id}/{id_Parameter}": {
+      "get": {
+        "summary": "Get samples by rock type and parameter",
+        "parameters": [
+          {
+            "name": "rt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "id_Parameter",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/register": {
+      "post": {
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User successfully registered"
+          },
+          "400": {
+            "description": "Invalid data"
+          },
+          "409": {
+            "description": "Conflict - Username or email already exists"
+          }
+        }
+      }
+    },
+    "/api/confirm": {
+      "post": {
+        "summary": "Confirm user registration",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User confirmed"
+          },
+          "400": {
+            "description": "Invalid code or missing fields"
+          }
+        }
+      }
+    },
+    "/api/login": {
+      "post": {
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password"
+          }
+        }
+      }
+    },
+    "/api/forgot-password": {
+      "post": {
+        "summary": "Request password reset",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reset code sent"
+          },
+          "400": {
+            "description": "Missing email field"
+          },
+          "404": {
+            "description": "Email not found"
+          }
+        }
+      }
+    },
+    "/api/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful"
+          },
+          "400": {
+            "description": "Invalid code or weak password"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/countries": {
+      "get": {
+        "summary": "Get all countries",
+        "description": "Returns a list of all countries with their ISO codes and names.",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "ISO_code": {
+                        "type": "string",
+                        "example": "USA"
+                      },
+                      "country_name": {
+                        "type": "string",
+                        "example": "United States"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "example": "Error in Country.get_all_countries"
+                    },
+                    "details": {
+                      "type": "string",
+                      "example": "Database connection failed"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/reviews": {
+      "get": {
+        "summary": "Get all reviews",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_Review": {
+                        "type": "integer",
+                        "description": "Review ID"
+                      },
+                      "review_level": {
+                        "type": "string",
+                        "description": "Review level"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "examples": {
+          "application/json": {
+            "value": [
+              {
+                "id_Review": 1,
+                "review_level": "High"
+              },
+              {
+                "id_Review": 2,
+                "review_level": "Medium"
+              },
+              {
+                "id_Review": 3,
+                "review_level": "Low"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "/api/environments": {
+      "get": {
+        "summary": "Get all environments",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "env_id": {
+                        "type": "integer",
+                        "description": "Environment ID"
+                      },
+                      "env_name": {
+                        "type": "string",
+                        "description": "Environment name"
+                      },
+                      "env_description": {
+                        "type": "string",
+                        "description": "Environment description"
+                      },
+                      "env_wiki_link": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Link to environment wiki"
+                      },
+                      "env_id_parent": {
+                        "type": "integer",
+                        "description": "Parent environment ID"
+                      },
+                      "UID": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Unique Identifier"
+                      },
+                      "PARENTUID": {
+                        "type": "string",
+                        "nullable": true,
+                        "description": "Parent Unique Identifier"
+                      },
+                      "env_Status": {
+                        "type": "integer",
+                        "description": "Environment status"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "examples": {
+          "application/json": {
+            "value": [
+              {
+                "env_id": 1,
+                "env_name": "Forest",
+                "env_description": "A dense and diverse ecosystem.",
+                "env_wiki_link": "https://example.com/forest",
+                "env_id_parent": 0,
+                "UID": "123-ABC",
+                "PARENTUID": null,
+                "env_Status": 1
+              },
+              {
+                "env_id": 2,
+                "env_name": "Desert",
+                "env_description": "An arid and sandy biome.",
+                "env_wiki_link": null,
+                "env_id_parent": 1,
+                "UID": "456-DEF",
+                "PARENTUID": "123-ABC",
+                "env_Status": 0
+              }
+            ]
+          }
+        }
+      }
+    },
+    "/api/fracturations": {
+      "get": {
+        "summary": "Get all fracturation degrees",
+        "description": "Returns a list of all fracturation degrees.",
+        "responses": {
+          "200": {
+            "description": "A list of fracturation degrees",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_fracturation": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "fracturation_degree": {
+                        "type": "string",
+                        "example": "High"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/scales": {
+      "get": {
+        "summary": "Get all scales",
+        "description": "Returns a list of all scales with their descriptions.",
+        "responses": {
+          "200": {
+            "description": "A list of scales",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_Scale": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "scale_value": {
+                        "type": "string",
+                        "example": "10 cm"
+                      },
+                      "scale_descr": {
+                        "type": "string",
+                        "example": "Small scale"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/qualities": {
+      "get": {
+        "summary": "Get all qualities",
+        "description": "Returns a list of all quality levels.",
+        "responses": {
+          "200": {
+            "description": "A list of quality levels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_Quality": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "quality_level": {
+                        "type": "string",
+                        "example": "High"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/experiment_types": {
+      "get": {
+        "summary": "Get all experiment types",
+        "description": "Returns a list of all experiment types.",
+        "responses": {
+          "200": {
+            "description": "A list of experiment types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_Exp_type": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "exp_name": {
+                        "type": "string",
+                        "example": "Hydrostatic Test"
+                      },
+                      "exp_description": {
+                        "type": "string",
+                        "example": "Testing water pressure in a controlled environment"
+                      },
+                      "exp_status": {
+                        "type": "integer",
+                        "example": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/interpretation_methods": {
+      "get": {
+        "summary": "Get all interpretation methods",
+        "description": "Returns a list of all interpretation methods.",
+        "responses": {
+          "200": {
+            "description": "A list of interpretation methods",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id_Int_meth": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "int_meth_name": {
+                        "type": "string",
+                        "example": "Regression Analysis"
+                      },
+                      "int_meth_desc": {
+                        "type": "string",
+                        "example": "Analyzing trends using regression models"
+                      },
+                      "id_Exp_ty": {
+                        "type": "integer",
+                        "example": 1
+                      },
+                      "int_meth_status": {
+                        "type": "integer",
+                        "example": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_mail import Mail, Message
 import random
 from flask_swagger_ui import get_swaggerui_blueprint
+from flask import send_from_directory
+import re
 
 #TODO add recaptcha
 #TODO separate tables
@@ -19,7 +21,6 @@ from flask_swagger_ui import get_swaggerui_blueprint
 
 pending_users = {}
 
-import re
 
 def is_password_strong(password):
     if len(password) < 8:
@@ -45,7 +46,11 @@ def read_key(way):
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000'])
+# CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'])
+# CORS(app)
+# CORS(app, resources={r"/swagger.json": {"origins": "*"}})
+CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], resources={r"/api/*": {"origins": "*"}})
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -71,7 +76,8 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'  # Здесь укажите ваше представление для логина (если есть)
 
 SWAGGER_URL = '/swagger'  # URL для доступа к документации
-API_URL = '/static/swagger.yaml'  # Путь к вашему Swagger-файлу
+API_URL = '/static/swagger.json'  # Путь к вашему Swagger-файлу
+# API_URL = '/static/swagger.yaml'  # Путь к вашему Swagger-файлу
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
@@ -84,6 +90,9 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 
+@app.route("/swagger.json")
+def swagger_json():
+    return send_from_directory('static', 'swagger.json', mimetype='application/json')
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -114,6 +114,8 @@ class RockType(db.Model):
 
 
 
+
+
 # Модель для таблицы measure_group
 class MeasureGroup(db.Model):
     id_Measure_group = db.Column(db.Integer, primary_key=True)
@@ -258,7 +260,7 @@ class Parameter(db.Model):
     @staticmethod
     def getParameters():
         try:
-            results = db.session.query(Parameter).order_by(Parameter.id_Parameter.desc()).all()
+            results = db.session.query(Parameter).order_by(Parameter.id_Parameter).all()
             return [parameter.to_dict() for parameter in results]
         except Exception as e:
             print(f"getParameters error: {e}")
@@ -425,6 +427,7 @@ class InterpretationMethod(db.Model):
     def get_all_interpretation_methods():
         try:
             methods = InterpretationMethod.query.all()
+            print('methods = ', methods)
             return jsonify([{
                 "id_Int_meth": m.id_Int_meth,
                 "int_meth_name": m.int_meth_name,
@@ -433,7 +436,7 @@ class InterpretationMethod(db.Model):
                 "int_meth_status": m.int_meth_status
             } for m in methods]), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error get_all_interpretation_methods": str(e)}), 500
 
 
 
