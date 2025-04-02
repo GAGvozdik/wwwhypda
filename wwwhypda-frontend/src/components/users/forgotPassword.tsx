@@ -14,6 +14,7 @@ const ForgotPassword: React.FC = () => {
     const [step, setStep] = useState(1);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isError, setIsError] = useState<boolean>(false); // Флаг для ошибки
     const navigate = useNavigate();
 
     const handleSendCode = async (e: React.FormEvent) => {
@@ -25,14 +26,16 @@ const ForgotPassword: React.FC = () => {
 
             if (response.status === 200) {
                 setError('Code sent to your email.');
+                setIsError(false); // Сообщение об успешной отправке
                 setStep(2); // Переход на шаг ввода кода
             }
         } catch (error: any) {
-            if (error.response && error.response.data && error.response.data.error) {
-                setError(error.response.data.error); // Обработка ошибок от сервера
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message); // Сообщение об ошибке от сервера
             } else {
                 setError('Failed to send reset code. Please try again.');
             }
+            setIsError(true); // Сообщение об ошибке
         } finally {
             setIsLoading(false);
         }
@@ -43,6 +46,7 @@ const ForgotPassword: React.FC = () => {
 
         if (newPassword !== confirmPassword) {
             setError('Passwords do not match!');
+            setIsError(true); // Сообщение об ошибке
             return;
         }
 
@@ -60,12 +64,13 @@ const ForgotPassword: React.FC = () => {
                     state: { message: 'Password reset successful! Please log in.' },
                 });
             }
-        } catch (err: any) {
-            if (err.response && err.response.data && err.response.data.error) {
-                setError(err.response.data.error); // Установить сообщение об ошибке от сервера
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message); // Сообщение об ошибке от сервера
             } else {
                 setError('Failed to reset password. Please try again.');
             }
+            setIsError(true); // Сообщение об ошибке
         } finally {
             setIsLoading(false);
         }
@@ -84,14 +89,12 @@ const ForgotPassword: React.FC = () => {
                         className={styles.inputField}
                         required
                     />
-
-                    <ErrorMessage error={error} />
-
+                    {/* Передаем флаг isError */}
+                    <ErrorMessage error={error} isError={isError} />
                     <UserButton
                         text='Send Code'
                         isLoading={isLoading}
                     />
-
                 </form>
             )}
 
@@ -121,15 +124,12 @@ const ForgotPassword: React.FC = () => {
                         className={styles.inputField}
                         required
                     />
-
-                    <ErrorMessage error={error} />
-
+                    {/* Передаем флаг isError */}
+                    <ErrorMessage error={error} isError={isError} />
                     <UserButton
                         text='Reset Password'
                         isLoading={isLoading}
                     />
-
-
                 </form>
             )}
         </div>

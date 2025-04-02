@@ -1,10 +1,12 @@
+// errorMessage.tsx
 import React from 'react';
 
 export interface ErrorMessageProps {
     error: string | null; // Позволяет передавать null, если нет ошибки
+    isError: boolean;     // Флаг, который указывает, является ли это ошибкой
 }
 
-const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
+const ErrorMessage: React.FC<ErrorMessageProps> = ({ error, isError }) => {
     if (!error) return null; // Если нет ошибки, ничего не отображаем
 
     // Убедитесь, что error — это строка перед вызовом includes
@@ -13,7 +15,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
     return (
         <div
             style={{
-                color: errorMessage.includes('failed') || errorMessage.includes('do not match') ? 'red' : 'green',
+                color: isError ? 'red' : 'green',  // Используем isError для выбора цвета
                 fontSize: '60%',
                 width: '80%',
                 marginLeft: '10%',

@@ -41,23 +41,23 @@ const Account: React.FC = () => {
     };
 
     const handleLogout = () => {
-        dispatch(Logout()); // Очищаем токен из Redux
-        navigate('/login'); // Перенаправляем на страницу входа
+        dispatch(Logout());
+        navigate('/login');
     };
 
     return (
-        <div className={styles.authForm} style={{ color: 'var(--tree-text)', fontSize: '2.5vh', fontFamily: 'Afacad_Flux !important' }}>
+        <div className={styles.authForm} style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
             <div className={styles.formTitle} style={{ fontSize: '4.5vh'}}>Your Account</div>
-            {isLoading && <p>Loading...</p>}
-            {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
-            {userData && (
-                <div style={{ margin: '5vh'}}>
-                    <div>Name: {userData.name}</div>
-                    <div>Email: {userData.email}</div>
-
-                    {/* Можно добавить другие данные, если они есть */}
-                </div>
-            )}
+            <div style={{ margin: '5vh'}}>
+                {isLoading && <p>Loading...</p>}
+                {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
+                {userData && (
+                    <div>
+                        <div>Name: {userData.name}</div>
+                        <div>Email: {userData.email}</div>
+                    </div>
+                )}
+            </div>
             <button onClick={handleLogout} className={styles.submitButton}>Log Out</button>
         </div>
     );

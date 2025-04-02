@@ -52,10 +52,7 @@ def confirm_registration():
         return jsonify(message="User not found or already activated", error="Not Found"), 404
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
-
-
-
-
+    
 @auth_bp.route("/", methods=["POST"])
 def add_user():
     """Register a new user and send an activation email."""
@@ -65,9 +62,11 @@ def add_user():
             return jsonify(message="Please provide user details", data=None, error="Bad request"), 400
 
         # Validate user data
-        is_validated = validate_user(**user_data)
-        if is_validated is not True:
-            return jsonify(message="Password is invalid, Should be atleast 8 characters with upper and lower case letters, numbers and special characters", data=None, error=is_validated), 400
+        validation_result = validate_user(**user_data)
+        if validation_result is not True:
+            # Преобразуем ошибки в одну строку
+            error_message = " | ".join(f"{field}: {msg}" for field, msg in validation_result.items())
+            return jsonify(message=error_message, data=None, error="Validation error"), 400
 
         # Check if the user already exists
         existing_user = User.query.filter_by(email=user_data["email"]).first()
@@ -76,18 +75,17 @@ def add_user():
 
         # Generate and send confirmation code
         confirmation_code = ConfirmationCode.create_code(user_data["email"], "registration")
-        print('confirmation_code = ', confirmation_code.to_dict())
-            
+        print("confirmation_code =", confirmation_code.to_dict())
+
         try:
-            with current_app.app_context():  # Ensure you're within an application context
+            with current_app.app_context():
                 msg = Message("Activate your account", sender=current_app.config["MAIL_USERNAME"], recipients=[user_data["email"]])
                 msg.body = f"Your activation code: {confirmation_code.code}"
                 mail.send(msg)
-
         except Exception as e:
             return jsonify(message="Mail server is broken", error=str(e)), 202
 
-                # Create an inactive user
+        # Create an inactive user
         user = User.create(**user_data)
 
         return jsonify(message="Successfully created new user. Please check your email for activation.", data=None), 201
@@ -123,25 +121,28 @@ def request_password_reset():
         return jsonify(message="Password reset code sent"), 200
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
-
 @auth_bp.route("/confirm-password-reset", methods=["POST"])
 def confirm_password_reset():
     """Verify the reset code and update the user's password."""
     try:
         data = request.json
         if not data or "email" not in data or "code" not in data or "new_password" not in data:
-            return jsonify(message="Please provide email, code and new password", error="Bad request"), 400
+            return jsonify(message="Please provide code and new password", error="Bad request"), 400
 
         email = data["email"]
         code = data["code"]
         new_password = data["new_password"]
 
-        if not validate_password(new_password):
-            return jsonify(message="Password is invalid", error="Bad request"), 400
+        # Проверка пароля с использованием вашей валидации
+        password_validation = validate_password(new_password)
+        if password_validation is not True:
+            return jsonify(message=password_validation, error="Bad password"), 400  # Передаем ошибку от validate_password
 
+        # Проверка кода подтверждения
         if not ConfirmationCode.verify_code(email, code, "password_reset"):
             return jsonify(message="Invalid or expired reset code", error="Unauthorized"), 401
 
+        # Обновление пароля пользователя
         if User.change_password(email, new_password):
             ConfirmationCode.delete_code(email, code, "password_reset")
             return jsonify(message="Password successfully updated"), 200
@@ -149,6 +150,7 @@ def confirm_password_reset():
         return jsonify(message="User not found or inactive", error="Not Found"), 404
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
+
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
