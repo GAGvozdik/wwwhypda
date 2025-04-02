@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import CircularProgress from '@mui/material/CircularProgress';
 import styles from './users.module.scss';
-import ErrorMessage from './errorMessage'; // Ваш компонент ошибки
+import ErrorMessage from './errorMessage'; // Компонент ошибки
 import UserButton from './userButton';
 
 const Register: React.FC = () => {
@@ -13,8 +12,8 @@ const Register: React.FC = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
     const [confirmationCode, setConfirmationCode] = useState('');
-    const [error, setError] = useState<string | null>(''); // Начальное значение null
-    const [isLoading, setIsLoading] = useState(false); 
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(1);
     const navigate = useNavigate();
 
@@ -35,42 +34,37 @@ const Register: React.FC = () => {
             });
 
             if (response.status === 201) {
-                setError(response.data.message);  // Используем поле message из ответа сервера
+                setError(response.data.message);
                 setStep(2);
             }
         } catch (err: any) {
-            if (err.response && err.response.data && err.response.data.message) {
-                setError(err.response.data.message);  // Отображаем сообщение из ответа сервера
-            } else {
-                setError('Registration failed. Please try again.');
-            }
+            setError(err.response?.data?.message || "Registration failed. Please try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const confirmRegistration = async () => {
+    const confirmRegistration = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+
         try {
-            const response = await fetch("http://localhost:5000/confirm-registration/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include",  // <-- ОБЯЗАТЕЛЬНО ЕСЛИ ИСПОЛЬЗУЕТСЯ JWT/СЕССИИ
-                body: JSON.stringify({ email, confirmationCode }),
+            const response = await axios.post("http://localhost:5000/users/confirm-registration", {
+                email: email,
+                code: confirmationCode,
             });
 
-            if (!response.ok) {
-                throw new Error(`Error: ${response.status} ${response.statusText}`);
+            if (response.status === 200) {
+                navigate("/login");  // ✅ Перенаправление после успешного подтверждения
+            } else {
+                setError(response.data.message || "Invalid confirmation code.");
             }
-
-            const data = await response.json();
-            console.log("Success:", data);
-        } catch (error) {
-            console.error("Error:", error);
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Confirmation failed. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
-
 
     return (
         <div className={styles.authForm}>
@@ -112,12 +106,9 @@ const Register: React.FC = () => {
 
                     <ErrorMessage error={error} />
 
-                    <UserButton
-                        text='Register'
-                        isLoading={isLoading}
-                    />
+                    <UserButton text="Register" isLoading={isLoading} />
 
-                    <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
+                    <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
                         <div style={{ fontSize: '2.5vh' }}>Already have an account?</div>
                         <div>
                             <Link to="/login" className={styles.link}>
@@ -140,10 +131,7 @@ const Register: React.FC = () => {
 
                     <ErrorMessage error={error} />
 
-                    <UserButton
-                        text='Confirm'
-                        isLoading={isLoading}
-                    />
+                    <UserButton text="Confirm" isLoading={isLoading} />
                 </form>
             )}
         </div>
