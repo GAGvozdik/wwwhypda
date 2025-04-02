@@ -116,6 +116,7 @@
     "/api/countries": {
       "get": {
         "summary": "Get all countries",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all countries with their ISO codes and names.",
         "responses": {
           "200": {
@@ -167,6 +168,7 @@
     "/api/reviews": {
       "get": {
         "summary": "Get all reviews",
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Success",
@@ -215,6 +217,7 @@
     "/api/environments": {
       "get": {
         "summary": "Get all environments",
+        "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Success",
@@ -298,6 +301,7 @@
     "/api/fracturations": {
       "get": {
         "summary": "Get all fracturation degrees",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all fracturation degrees.",
         "responses": {
           "200": {
@@ -329,6 +333,7 @@
     "/api/scales": {
       "get": {
         "summary": "Get all scales",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all scales with their descriptions.",
         "responses": {
           "200": {
@@ -364,6 +369,7 @@
     "/api/qualities": {
       "get": {
         "summary": "Get all qualities",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all quality levels.",
         "responses": {
           "200": {
@@ -395,6 +401,7 @@
     "/api/experiment_types": {
       "get": {
         "summary": "Get all experiment types",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all experiment types.",
         "responses": {
           "200": {
@@ -434,6 +441,7 @@
     "/api/interpretation_methods": {
       "get": {
         "summary": "Get all interpretation methods",
+        "security": [{ "bearerAuth": [] }],
         "description": "Returns a list of all interpretation methods.",
         "responses": {
           "200": {
@@ -472,6 +480,15 @@
             }
           }
         }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
