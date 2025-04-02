@@ -3,6 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
+import { State } from '../../../common/types';
+import { useSelector, useDispatch } from 'react-redux'
 
 import { 
     ClientSideRowModelModule, 
@@ -75,14 +77,15 @@ const MeasurementSampleTable = () => {
     const [scale, setScale] = useState<Scale[]>([]);
     const [fracturation, setFracturation] = useState<Fracturation[]>([]);
     const [rocksData, setRocksData] = useState<RockTypeData[]>([]);
-    
+    const token = useSelector((state: State) => state.token);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
-                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations'),
-                    axios.get<Scale[]>('http://localhost:5000/api/scales'),
-                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type')
+                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<Scale[]>('http://localhost:5000/api/scales', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type', { headers: { Authorization: `Bearer ${token}`}})
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {

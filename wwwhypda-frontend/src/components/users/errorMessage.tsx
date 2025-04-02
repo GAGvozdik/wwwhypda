@@ -7,19 +7,21 @@ export interface ErrorMessageProps {
 const ErrorMessage: React.FC<ErrorMessageProps> = ({ error }) => {
     if (!error) return null; // Если нет ошибки, ничего не отображаем
 
+    // Убедитесь, что error — это строка перед вызовом includes
+    const errorMessage = typeof error === 'string' ? error : '';
+
     return (
         <div
             style={{
-                color: error.includes('failed') || error.includes('do not match') ? 'red' : 'green',
+                color: errorMessage.includes('failed') || errorMessage.includes('do not match') ? 'red' : 'green',
                 fontSize: '60%',
                 width: '80%',
                 marginLeft: '10%',
                 textAlign: 'center',
                 marginBottom: '1vh',
-                // backgroundColor: error.includes('failed') ? '#f8d7da' : '#d4edda', // Красный фон для ошибок
             }}
         >
-            {error}
+            {errorMessage}
         </div>
     );
 }

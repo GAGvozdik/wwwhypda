@@ -3,6 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
+import { State } from '../../../common/types';
+import { useSelector, useDispatch } from 'react-redux'
 import { 
     ClientSideRowModelModule, 
     ColDef, 
@@ -36,11 +38,12 @@ const SiteInfo = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [countries, setCountries] = useState<Country[]>([]);
+    const token = useSelector((state: State) => state.token);
 
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await axios.get<Country[]>('http://localhost:5000/api/countries'); 
+                const response = await axios.get<Country[]>('http://localhost:5000/api/countries', { headers: { Authorization: `Bearer ${token}`}}); 
 
                 if (!response.data || response.data.length === 0) {
                     setError("No data received from the server.");
