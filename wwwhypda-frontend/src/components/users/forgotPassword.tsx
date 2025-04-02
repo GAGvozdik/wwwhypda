@@ -21,14 +21,18 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/forgot-password', { email });
+            const response = await axios.post('http://localhost:5000/users/request-password-reset', { email });
 
             if (response.status === 200) {
                 setError('Code sent to your email.');
                 setStep(2); // Переход на шаг ввода кода
             }
-        } catch (error) {
-            setError('Failed to send reset code. Please try again.');
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error); // Обработка ошибок от сервера
+            } else {
+                setError('Failed to send reset code. Please try again.');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -45,7 +49,7 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/reset-password', {
+            const response = await axios.post('http://localhost:5000/users/confirm-password-reset', {
                 email,
                 code,
                 new_password: newPassword,
