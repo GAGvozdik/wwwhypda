@@ -1,63 +1,80 @@
 """Validator Module"""
 import re
-from bson.objectid import ObjectId
+
+"""Validator Module"""
+import re
 
 def validate(data, regex):
     """Custom Validator"""
-    return True if re.match(regex, data) else False
+    return bool(re.match(regex, data))
 
 def validate_password(password: str):
     """Password Validator"""
     reg = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$"
-    return validate(password, reg)
+    if not validate(password, reg):
+        return "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character."
+    return True
 
 def validate_email(email: str):
     """Email Validator"""
-    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    return validate(email, regex)
+    regex = r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$'
+    if not validate(email, regex):
+        return "Email is invalid. Expected format: example@domain.com"
+    return True
+
+def validate_name(name: str):
+    """Name Validator"""
+    if not isinstance(name, str):
+        return "Name must be a string."
+    if not (3 <= len(name) <= 30):
+        return "Name must be between 3 and 30 characters long."
+    if not re.match(r"^[A-Za-z0-9\s'-]+$", name):
+        return "Name can only contain letters, numbers, spaces, hyphens, and apostrophes."
+    return True
 
 def validate_user(**args):
     """User Validator"""
-    if  not args.get('email') or not args.get('password') or not args.get('name'):
-        return {
-            'email': 'Email is required',
-            'password': 'Password is required',
-            'name': 'Name is required'
-        }
-    if not isinstance(args.get('name'), str) or \
-        not isinstance(args.get('email'), str) or not isinstance(args.get('password'), str):
-        return {
-            'email': 'Email must be a string',
-            'password': 'Password must be a string',
-            'name': 'Name must be a string'
-        }
-    if not validate_email(args.get('email')):
-        return {
-            'email': 'Email is invalid'
-        }
-    if not validate_password(args.get('password')):
-        return {
-            'password': 'Password is invalid, Should be atleast 8 characters with upper and lower case letters, numbers and special characters'
-        }
-    if not 2 <= len(args['name'].split(' ')) <= 30:
-        return {
-            'name': 'Name must be between 2 and 30 words'
-        }
-    return True
+    errors = {}
+
+    if not args.get("email"):
+        errors["email"] = "Email is required."
+    else:
+        email_validation = validate_email(args["email"])
+        if email_validation is not True:
+            errors["email"] = email_validation
+
+    if not args.get("password"):
+        errors["password"] = "Password is required."
+    else:
+        password_validation = validate_password(args["password"])
+        if password_validation is not True:
+            errors["password"] = password_validation
+
+    if not args.get("name"):
+        errors["name"] = "Name is required."
+    else:
+        name_validation = validate_name(args["name"])
+        if name_validation is not True:
+            errors["name"] = name_validation
+
+    return errors if errors else True
 
 def validate_email_and_password(email, password):
     """Email and Password Validator"""
-    if not (email and password):
-        return {
-            'email': 'Email is required',
-            'password': 'Password is required'
-        }
-    if not validate_email(email):
-        return {
-            'email': 'Email is invalid'
-        }
-    if not validate_password(password):
-        return {
-            'password': 'Password is invalid, Should be atleast 8 characters with upper and lower case letters, numbers and special characters'
-        }
-    return True
+    errors = {}
+    
+    if not email:
+        errors['email'] = 'Email is required.'
+    else:
+        email_validation = validate_email(email)
+        if email_validation is not True:
+            errors['email'] = email_validation
+    
+    if not password:
+        errors['password'] = 'Password is required.'
+    else:
+        password_validation = validate_password(password)
+        if password_validation is not True:
+            errors['password'] = password_validation
+    
+    return errors if errors else True

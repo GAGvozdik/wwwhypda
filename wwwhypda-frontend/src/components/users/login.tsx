@@ -8,9 +8,6 @@ import styles from './users.module.scss';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
 
-
-
-
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -18,6 +15,7 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
+    const [isError, setIsError] = useState<boolean>(false); // Добавляем флаг для ошибки
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,16 +31,20 @@ const Login: React.FC = () => {
             dispatch(UpdateToken(token)); // Сохраняем токен в Redux
             localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage
 
+            setError('Login successful!'); // Успешный логин
+            setIsError(false); // Устанавливаем, что это не ошибка
             navigate('/account'); // Переход на страницу аккаунта
         } catch (error: any) {
             setIsLoading(false);
 
             // Обработка ошибок от сервера
-            if (error.response && error.response.data && error.response.data.error) {
-                setError(String(error.response.data.error)); // Преобразуем error в строку
+            if (error.response && error.response.data && error.response.data.message) {
+                setError(error.response.data.message); // Сообщение об ошибке от сервера
             } else {
-                setError("Login failed. Please check your credentials.");
+                setError("Login failed. Please check your credentials."); // Общая ошибка
             }
+
+            setIsError(true); // Устанавливаем, что это ошибка
         }
     };
 
@@ -53,7 +55,7 @@ const Login: React.FC = () => {
             <form onSubmit={handleLogin}>
                 <input
                     type="text"
-                    placeholder="Username"
+                    placeholder="Mail"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     className={styles.inputField}
@@ -68,13 +70,13 @@ const Login: React.FC = () => {
                     required
                 />
 
-                <ErrorMessage error={error} />
+                {/* Передаем параметр isError для изменения цвета */}
+                <ErrorMessage error={error} isError={isError} />
 
                 <UserButton
                     text='Login'
                     isLoading={isLoading}
                 />
-
             </form>
 
             <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
