@@ -15,6 +15,7 @@ const Register: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(1);
+    const [isError, setIsError] = useState<boolean>(false); // Флаг для ошибки
     const navigate = useNavigate();
 
     const handleRegister = async (e: React.FormEvent) => {
@@ -22,6 +23,7 @@ const Register: React.FC = () => {
 
         if (password !== confirmPassword) {
             setError("Passwords do not match!");
+            setIsError(true); // Устанавливаем ошибку
             return;
         }
 
@@ -35,10 +37,14 @@ const Register: React.FC = () => {
 
             if (response.status === 201) {
                 setError(response.data.message);
+                setIsError(false); // Устанавливаем успешный ответ
+                console.log(response.data.message);
                 setStep(2);
             }
         } catch (err: any) {
             setError(err.response?.data?.message || "Registration failed. Please try again.");
+            setIsError(true); // Устанавливаем ошибку
+            console.log(err.response?.data?.message || "Registration failed. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -58,9 +64,11 @@ const Register: React.FC = () => {
                 navigate("/login");  // ✅ Перенаправление после успешного подтверждения
             } else {
                 setError(response.data.message || "Invalid confirmation code.");
+                setIsError(true); // Устанавливаем ошибку
             }
         } catch (err: any) {
             setError(err.response?.data?.message || "Confirmation failed. Please try again.");
+            setIsError(true); // Устанавливаем ошибку
         } finally {
             setIsLoading(false);
         }
@@ -104,7 +112,8 @@ const Register: React.FC = () => {
                         required
                     />
 
-                    <ErrorMessage error={error} />
+                    {/* Передаем параметр isError, чтобы изменить цвет */}
+                    <ErrorMessage error={error} isError={isError} />
 
                     <UserButton text="Register" isLoading={isLoading} />
 
@@ -129,7 +138,8 @@ const Register: React.FC = () => {
                         required
                     />
 
-                    <ErrorMessage error={error} />
+                    {/* Передаем параметр isError, чтобы изменить цвет */}
+                    <ErrorMessage error={error} isError={isError} />
 
                     <UserButton text="Confirm" isLoading={isLoading} />
                 </form>
