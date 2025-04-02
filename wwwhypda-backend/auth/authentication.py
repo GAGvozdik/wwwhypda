@@ -27,6 +27,35 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 def options_user():
     return jsonify({"message": "OK"}), 200
 
+@auth_bp.route("/confirm-registration", methods=["OPTIONS"])
+def options_confirm_registration():
+    return jsonify({"message": "OK"}), 200
+
+@auth_bp.route("/confirm-registration", methods=["POST"])
+def confirm_registration():
+    """Confirm user registration by verifying the activation code."""
+    try:
+        data = request.json
+        if not data or "email" not in data or "code" not in data:
+            return jsonify(message="Please provide email and code", error="Bad request"), 400
+        
+        email = data["email"]
+        code = data["code"]
+
+        if not ConfirmationCode.verify_code(email, code, "registration"):
+            return jsonify(message="Invalid or expired confirmation code", error="Unauthorized"), 401
+
+        if User.activate_user(email):
+            ConfirmationCode.delete_code(email, code, "registration")
+            return jsonify(message="Account successfully activated"), 200
+        
+        return jsonify(message="User not found or already activated", error="Not Found"), 404
+    except Exception as e:
+        return jsonify(message="Something went wrong", error=str(e)), 500
+
+
+
+
 @auth_bp.route("/", methods=["POST"])
 def add_user():
     """Register a new user and send an activation email."""
@@ -38,7 +67,7 @@ def add_user():
         # Validate user data
         is_validated = validate_user(**user_data)
         if is_validated is not True:
-            return jsonify(message="Invalid data", data=None, error=is_validated), 400
+            return jsonify(message="Password is invalid, Should be atleast 8 characters with upper and lower case letters, numbers and special characters", data=None, error=is_validated), 400
 
         # Check if the user already exists
         existing_user = User.query.filter_by(email=user_data["email"]).first()
@@ -65,27 +94,6 @@ def add_user():
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e), data=None), 500
 
-@auth_bp.route("/confirm-registration", methods=["POST"])
-def confirm_registration():
-    """Confirm user registration by verifying the activation code."""
-    try:
-        data = request.json
-        if not data or "email" not in data or "code" not in data:
-            return jsonify(message="Please provide email and code", error="Bad request"), 400
-        
-        email = data["email"]
-        code = data["code"]
-
-        if not ConfirmationCode.verify_code(email, code, "registration"):
-            return jsonify(message="Invalid or expired confirmation code", error="Unauthorized"), 401
-
-        if User.activate_user(email):
-            ConfirmationCode.delete_code(email, code, "registration")
-            return jsonify(message="Account successfully activated"), 200
-        
-        return jsonify(message="User not found or already activated", error="Not Found"), 404
-    except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e)), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
 def request_password_reset():
