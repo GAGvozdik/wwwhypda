@@ -11,11 +11,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const token = useSelector((state: State) => state.token);
 
     if (!token) {
-        console.log('No token found, redirecting to login'); // Добавьте лог
         return <Navigate to="/login" />;
     }
 
-    console.log('Token found, rendering children'); // Проверка условия
     return <>{children}</>;
 };
 

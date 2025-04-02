@@ -20,23 +20,35 @@ const Login: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false); 
 
     const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault(); 
-        setIsLoading(true); 
+        e.preventDefault();
+        setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/api/login', { username, password });
+            // Отправляем email и password на бэкенд
+            const response = await axios.post('http://localhost:5000/users/login', { email: username, password });
+
             console.log('Server Response:', response.data);
 
-            const { access_token } = response.data;
+            // Извлекаем token и другие данные пользователя
+            const { token, ...userData } = response.data.data;
 
-            dispatch(UpdateToken(access_token));
-            navigate('/account');
-        } catch (error) {
-            setIsLoading(false); 
-            setError("Login failed. Please check your credentials.");
+            // Сохраняем токен в Redux или в локальном хранилище
+            dispatch(UpdateToken(token)); // Сохраняем токен в Redux
+            localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage (если нужно)
 
+            navigate('/account'); // Переход на страницу аккаунта
+        } catch (error: any) {
+            setIsLoading(false);
+
+            // Обработка ошибок от сервера
+            if (error.response && error.response.data && error.response.data.error) {
+                setError(error.response.data.error); // Отображаем ошибку от сервера
+            } else {
+                setError("Login failed. Please check your credentials."); // Общее сообщение об ошибке
+            }
         }
     };
+
 
     return (
         <div className={styles.authForm}>
