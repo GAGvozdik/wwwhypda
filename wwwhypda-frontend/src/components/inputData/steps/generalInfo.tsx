@@ -3,6 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
+import { State } from '../../../common/types';
+import { useSelector, useDispatch } from 'react-redux'
 
 import { 
     ClientSideRowModelModule, 
@@ -44,13 +46,15 @@ const GeneralInfo = () => {
     const [loading, setLoading] = useState(true);
     const [reviews, setReviews] = useState<Reviews[]>([]);
     const [envs, setEnvs] = useState<Environment[]>([]);
+    const token = useSelector((state: State) => state.token);
+    // axios.get<Environment>('http://localhost:5000/api/environments', { headers: { Authorization: `Bearer ${token}`}})
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [envResponse, reviewResponse] = await Promise.all([
-                    axios.get<Environment[]>('http://localhost:5000/api/environments'),
-                    axios.get<Reviews[]>('http://localhost:5000/api/reviews')
+                    axios.get<Environment[]>('http://localhost:5000/api/environments', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<Reviews[]>('http://localhost:5000/api/reviews', { headers: { Authorization: `Bearer ${token}`}}),
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {

@@ -73,19 +73,19 @@ export default function MainMenu() {
                     }
                 />
                 
-                <Route
+                {/* <Route
                     path="/input"
                     element={<InputPage />}
-                />
+                /> */}
 
-                {/* <Route
+                <Route
                     path="/input"
                     element={
                         <ProtectedRoute>
                             <InputPage />
                         </ProtectedRoute>
                     }
-                /> */}
+                />
 
                 <Route path="/login" element={<Login />} />
 
