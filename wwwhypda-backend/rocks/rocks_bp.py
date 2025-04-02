@@ -4,46 +4,56 @@ import jwt
 from rocks.rocks_models import Country, Review, Environment, Fracturation
 from rocks.rocks_models import Source, RockType, Parameter, Sample, Measure, Scale
 from rocks.rocks_models import ExperimentType, Quality, InterpretationMethod
+from auth.auth_middleware import token_required
 
 rocks_bp = Blueprint("api", __name__, url_prefix="/api")
 
 # @rocks_bp.route("/", methods=["POST"])
 
 @rocks_bp.route('/countries', methods=['GET'])
-def get_countries():
+@token_required
+def get_countries(current_user):
     return Country.get_all_countries()
 
 @rocks_bp.route('/reviews', methods=['GET'])
-def get_reviews():
+@token_required
+def get_reviews(current_user):
     return Review.get_all_reviews()
 
 @rocks_bp.route('/environments', methods=['GET'])
-def get_environments():
+@token_required
+def get_environments(current_user):
     return Environment.get_all_environments()
 
 @rocks_bp.route('/fracturations', methods=['GET'])
-def get_fracturations():
+@token_required
+def get_fracturations(current_user):
     return Fracturation.get_all_fracturations()
 
 @rocks_bp.route('/scales', methods=['GET'])
-def get_scales():
+@token_required
+def get_scales(current_user):
     return Scale.get_all_scales()
 
 @rocks_bp.route('/samples', methods=['GET']) 
-def api_samples():
+@token_required
+def api_samples(current_user):
     results = Sample.get_all_samples()
     return jsonify(results)
 
 @rocks_bp.route('/qualities', methods=['GET'])
-def get_qualities():
+@token_required
+def get_qualities(current_user):
     return Quality.get_all_qualities()
 
 @rocks_bp.route('/experiment_types', methods=['GET'])
-def get_experiment_types():
+@token_required
+def get_experiment_types(current_user):
     return ExperimentType.get_all_experiment_types()
 
 @rocks_bp.route('/interpretation_methods', methods=['GET'])
-def get_interpretation_methods():
+@token_required
+def get_interpretation_methods(current_user):
     return InterpretationMethod.get_all_interpretation_methods()
 
 @rocks_bp.route('/anonce', methods=['GET']) 

@@ -3,6 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
+import { State } from '../../../common/types';
+import { useSelector, useDispatch } from 'react-redux'
 
 import { 
     ClientSideRowModelModule, 
@@ -75,16 +77,16 @@ export default function Measurements() {
     const [quality, setQuality] = useState<Quality[]>([]);
     const [experimentType, setExperimentType] = useState<ExperimentType[]>([]);
     const [interpretationMethod, setInterpretationMethod] = useState<InterpretationMethod[]>([]);
-
+    const token = useSelector((state: State) => state.token);
     
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    axios.get<Parameter[]>('http://localhost:5000/api/parameters'),
-                    axios.get<Quality[]>('http://localhost:5000/api/qualities'),
-                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types'),
-                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods')
+                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { headers: { Authorization: `Bearer ${token}`}}),
+                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { headers: { Authorization: `Bearer ${token}`}})
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {

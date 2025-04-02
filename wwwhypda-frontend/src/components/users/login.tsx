@@ -24,17 +24,14 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            // Отправляем email и password на бэкенд
             const response = await axios.post('http://localhost:5000/users/login', { email: username, password });
 
             console.log('Server Response:', response.data);
 
-            // Извлекаем token и другие данные пользователя
             const { token, ...userData } = response.data.data;
 
-            // Сохраняем токен в Redux или в локальном хранилище
             dispatch(UpdateToken(token)); // Сохраняем токен в Redux
-            localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage (если нужно)
+            localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage
 
             navigate('/account'); // Переход на страницу аккаунта
         } catch (error: any) {
@@ -42,13 +39,12 @@ const Login: React.FC = () => {
 
             // Обработка ошибок от сервера
             if (error.response && error.response.data && error.response.data.error) {
-                setError(error.response.data.error); // Отображаем ошибку от сервера
+                setError(String(error.response.data.error)); // Преобразуем error в строку
             } else {
-                setError("Login failed. Please check your credentials."); // Общее сообщение об ошибке
+                setError("Login failed. Please check your credentials.");
             }
         }
     };
-
 
     return (
         <div className={styles.authForm}>

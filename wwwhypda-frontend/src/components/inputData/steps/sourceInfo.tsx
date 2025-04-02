@@ -1,5 +1,7 @@
 import styles from '../menu.module.scss'; 
 import React, { useMemo, useState } from "react";
+import { State } from '../../../common/types';
+import { useSelector, useDispatch } from 'react-redux'
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import { 
