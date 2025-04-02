@@ -1,0 +1,242 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Authentication API",
+    "description": "API for user authentication and account management",
+    "version": "1.0.0"
+  },
+  "host": "localhost:5000",
+  "schemes": ["http"],
+  "basePath": "/users",
+
+  "securityDefinitions": {
+    "JWT": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header",
+        "description": "Type 'Bearer' followed by a space and your token."
+    }
+  },
+
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "User login",
+        "description": "Authenticate user and receive a JWT token",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "john.doe@example.com" },
+                "password": { "type": "string", "example": "Aa12345!" }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Authentication successful, returns JWT token" },
+          "400": { "description": "Invalid input" },
+          "404": { "description": "Invalid email or password" }
+        }
+      }
+    },
+
+    "/": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Create a new user",
+        "description": "Register a new user with email and password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "John Doe" },
+                "email": { "type": "string", "example": "john.doe@example.com" },
+                "password": { "type": "string", "example": "Aa12345!" }
+              },
+              "required": ["name", "email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "User created successfully" },
+          "400": { "description": "Invalid input" },
+          "409": { "description": "User already exists" },
+          "202": { "description": "Mail server is broken" }
+        }
+      },
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user",
+        "description": "Fetch the authenticated user's details",
+        "security": [{ "JWT": [] }],
+        "responses": {
+          "200": { "description": "User details retrieved successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Update user",
+        "description": "Update the authenticated user's name",
+        "security": [{ "JWT": [] }],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "example": "John Updated" }
+              },
+              "required": ["name"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "User updated successfully" },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorized" }
+        }
+      },
+      "delete": {
+        "tags": ["Authentication"],
+        "summary": "Disable user",
+        "description": "Disable the authenticated user's account",
+        "security": [{ "JWT": [] }],
+        "responses": {
+          "204": { "description": "Account disabled successfully" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+
+    "/confirm-registration": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Confirm registration",
+        "description": "Activate the user account by providing an activation code sent via email",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "john.doe@example.com" },
+                "code": { "type": "string", "example": "123456" }
+              },
+              "required": ["email", "code"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Account successfully activated" },
+          "202": { "description": "Mail server is broken" },
+          "401": { "description": "Invalid or expired confirmation code" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+
+    "/request-password-reset": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Request password reset",
+        "description": "Request a password reset by providing an email address. A reset code will be sent to the user's email",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "john.doe@example.com" }
+              },
+              "required": ["email"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Password reset code sent to email" },
+          "404": { "description": "User not found or inactive" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+
+    "/confirm-password-reset": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Confirm password reset",
+        "description": "Confirm the password reset by providing an email, reset code, and new password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "john.doe@example.com" },
+                "code": { "type": "string", "example": "123456" },
+                "new_password": { "type": "string", "example": "new_secure_password" }
+              },
+              "required": ["email", "code", "new_password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Password successfully updated" },
+          "401": { "description": "Invalid or expired reset code" },
+          "404": { "description": "User not found or inactive" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+
+    "/change-password": {
+      "put": {
+        "tags": ["Authentication"],
+        "summary": "Change user password",
+        "description": "Change the password for a user by providing their email and new password",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "example": "john.doe@example.com" },
+                "new_password": { "type": "string", "example": "new_secure_password" }
+              },
+              "required": ["email", "new_password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Password successfully updated" },
+          "404": { "description": "User not found or inactive" },
+          "400": { "description": "Invalid input" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    }
+  }
+}

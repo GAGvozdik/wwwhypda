@@ -1,12 +1,15 @@
 1) Install NodeJS (`https://nodejs.org/en/download`) and Python (stable work with Python 3.12.6).
-
 2) Create file env.configs in folder with `mainApp.py` and write into:
+
+   MAIL_SERVER = smtp.gmail.com
+
+   MAIL_PORT = 465
 
    SECRET_KEY='your_long_random_code_%*&8hHJ+=_Klhtfo*89buibgyuoGUIonguionphiohio'
    DATABASE_URL='sqlite:///wwhypda.db'
    DEBUG=True
 
-   SECRET_MAIL = 'yourmail@gmail.com'
+   MAIL_USERNAME = 'yourmail@gmail.com'
 
    SWAGGER_URL = '/swagger'
    API_URL = '/static/swagger.json'
@@ -33,7 +36,6 @@
 
    DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 3) cd wwhypda-backendpython -m venv workEnvworkEnv/Scripts/Activatepip install -r requrements.txtpython mainApp.pyP.S. demo documentation is available at http://127.0.0.1:5000/swagger/
-
 4) Type in terminal in folder wwwhydpa/ :
    cd wwhypda-frontend
    npm i
