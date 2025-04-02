@@ -23,6 +23,10 @@ from datetime import datetime, timedelta, timezone
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
+@auth_bp.route("/", methods=["OPTIONS"])
+def options_user():
+    return jsonify({"message": "OK"}), 200
+
 @auth_bp.route("/", methods=["POST"])
 def add_user():
     """Register a new user and send an activation email."""
