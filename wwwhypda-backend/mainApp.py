@@ -26,7 +26,12 @@ load_dotenv(dotenv_path='env.configs')
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], resources={r"/api/*": {"origins": "*"}})
+# CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], resources={r"/api/*": {"origins": "*"}})
+# CORS(app, supports_credentials=True)  
+# CORS(auth_bp)
+# CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], supports_credentials=True, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
@@ -60,10 +65,6 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 )
 app.register_blueprint(swaggerui_blueprint, url_prefix=os.getenv('SWAGGER_URL'))
 
-# @app.route("/swagger.json")
-# def swagger_json():
-#     return send_from_directory('static', 'swagger.json', mimetype='application/json')
-
 app.register_blueprint(rocks_bp)
 
 # Global error handlers
@@ -79,7 +80,7 @@ def not_found(e):
 
 if __name__ == "__main__":
     # Ensure database tables are created before running the application
-    # with app.app_context():
-    #     db.create_all()
+    with app.app_context():
+        db.create_all()
     # Start the Flask application in debug mode
     app.run(debug=True)
