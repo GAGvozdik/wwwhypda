@@ -37,7 +37,7 @@ const CustomStepIconRoot = styled('div')<{ ownerState: { active?: boolean; compl
     height: '4vh',
     fontSize: '2vh',
     fontFamily: 'Afacad_Flux',
-    color: 'var(--tree-text)', 
+    color: 'var(--step-color)', 
     transition: '0.8s',
   })
 );
@@ -47,12 +47,12 @@ const StepNumberCircle = styled('div')<{ ownerState: { active?: boolean } }>(
     width: '4vh',
     height: '4vh',
     borderRadius: '50%',
-    backgroundColor: ownerState.active ? 'rgb(32, 78, 108)' : 'rgb(51, 67, 78)', // Красный, если шаг активен
+    backgroundColor: ownerState.active ? 'var(--step-color-active)' : 'var(--step-color)', // Красный, если шаг активен
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     fontSize: '2vh',
-    color: 'var(--tree-text)', 
+    color: 'var(--step-text)', 
     fontWeight: ownerState.active ? 'bold' : '',
     transition: '0.8s',
   })

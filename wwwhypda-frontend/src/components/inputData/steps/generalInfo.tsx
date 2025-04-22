@@ -45,7 +45,7 @@ const GeneralInfo = () => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "58vh", 
-        "--ag-background-color": "#22282e", 
+        "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '5vh', 
         // backgroundColor: 'grey',

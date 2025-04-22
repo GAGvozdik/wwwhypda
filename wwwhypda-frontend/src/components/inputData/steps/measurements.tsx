@@ -70,7 +70,7 @@ interface InterpretationMethod {
     int_meth_status: number;
 }
 export default function Measurements() {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '13vh' }), []);
+    const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
