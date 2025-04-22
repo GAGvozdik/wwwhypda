@@ -1,8 +1,6 @@
 """Validator Module"""
 import re
 
-"""Validator Module"""
-import re
 
 def validate(data, regex):
     """Custom Validator"""

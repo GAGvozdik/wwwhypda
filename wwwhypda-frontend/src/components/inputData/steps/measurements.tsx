@@ -5,6 +5,7 @@ import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
+import LoadIcon from './loadIcon';
 
 import { 
     ClientSideRowModelModule, 
@@ -218,62 +219,76 @@ export default function Measurements() {
 
     return (
         <div style={containerStyle}>
-            
-            <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    textAlign: "center", 
-                    fontSize: '2.5vh', 
-                    margin: '1vh 0vh 1vh 0vh' 
-                }}
-            >
-                Measurements
-            </div>
-
-            <div style={{display: 'flex'}}>
-                <button
-                    onClick={addRow}
-                    className={styles.submitButton}
-                    style={{
-                        margin: '1vh 1vh 1vh 0vh', 
-                        width: '10vh', 
-                        height: '3.5vh', 
-                        fontSize: '1.5vh', 
-                        padding: '0vh'
+            {loading ? 
+                <div 
+                    style={{ 
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '63vh',
+                        marginTop: '1vh', 
+                        marginBottom: '5vh',
                     }}
                 >
-                    Add Row
-                </button>
+                    <LoadIcon size={60}/>
+                </div> 
+                    : 
+                error ? <p>{error}</p> 
+                : 
+            (
+                <>
+                    <div 
+                        style={{ 
+                            color: "var(--tree-text)", 
+                            textAlign: "center", 
+                            fontSize: '2.5vh', 
+                            margin: '1vh 0vh 1vh 0vh' 
+                        }}
+                    >
+                        Measurements
+                    </div>
 
-                <button
-                    onClick={deleteRow}
-                    className={styles.submitButton}
-                    style={{
-                        margin: '1vh 1vh 1vh 0vh', 
-                        width: '10vh', 
-                        height: '3.5vh', 
-                        fontSize: '1.5vh', 
-                        padding: '0vh'
-                    }}
-                >
-                    Delete Row
-                </button>
-            </div>
+                    <div style={{display: 'flex'}}>
+                        <button
+                            onClick={addRow}
+                            className={styles.submitButton}
+                            style={{
+                                margin: '1vh 1vh 1vh 0vh', 
+                                width: '10vh', 
+                                height: '3.5vh', 
+                                fontSize: '1.5vh', 
+                                padding: '0vh'
+                            }}
+                        >
+                            Add Row
+                        </button>
 
+                        <button
+                            onClick={deleteRow}
+                            className={styles.submitButton}
+                            style={{
+                                margin: '1vh 1vh 1vh 0vh', 
+                                width: '10vh', 
+                                height: '3.5vh', 
+                                fontSize: '1.5vh', 
+                                padding: '0vh'
+                            }}
+                        >
+                            Delete Row
+                        </button>
+                    </div>
 
-
-            {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
-                <AgGridReact
-                    theme={themeDarkBlue}
-                    rowData={tableData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    tooltipShowDelay={0}
-                    headerHeight={40}
-                    cellSelection={cellSelection}
-                />
+                        <AgGridReact
+                            theme={themeDarkBlue}
+                            rowData={tableData}
+                            columnDefs={columnDefs}
+                            defaultColDef={defaultColDef}
+                            tooltipShowDelay={0}
+                            headerHeight={40}
+                            cellSelection={cellSelection}
+                        />
+                </>
             )}
-
         </div>
     );
 };

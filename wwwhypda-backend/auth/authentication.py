@@ -121,6 +121,7 @@ def request_password_reset():
         return jsonify(message="Password reset code sent"), 200
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
+    
 @auth_bp.route("/confirm-password-reset", methods=["POST"])
 def confirm_password_reset():
     """Verify the reset code and update the user's password."""
