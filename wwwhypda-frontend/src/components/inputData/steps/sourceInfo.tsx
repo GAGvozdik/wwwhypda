@@ -27,7 +27,7 @@ const rowData = [
 ];
 
 const SourceInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '9vh' }), []);    
+    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '9vh' }), []);    
     const [tableData, setTableData] = useState(rowData);
     
     const columnDefs = useMemo<ColDef[]>(() => [

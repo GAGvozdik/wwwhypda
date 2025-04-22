@@ -23,6 +23,7 @@
     --drawer-icon: #f7f6fc;
     --menu-labels: #f7f6fc;
     --icons: white;
+    --icon-hover-color: rgb(197, 242, 255);
     --buttons: #164077;
     --border: #164077; 
     --drawer-color: #fff2d9;  
@@ -39,7 +40,10 @@
     --radio-color: #436ca1;
     --scrollbar-color: #669de4;
     --scrollbar-hover-color: #3c659a;
-
+    --table-color: #fff2d9; 
+    --step-color-active: #3c659a; 
+    --step-color: #7292bd; 
+    --step-text: #fff2d9;
 }
 
 .dark {
@@ -53,7 +57,7 @@
 
     --menu: #101316;
     --tree-text: #949494;
-    --menu-hover: #1a1f24;
+        --menu-hover: #191e24;
     --menu-border: #4e555a;
     --body-color: #191e24;
     --form-color: #242a31;
@@ -62,6 +66,7 @@
     --drawer-icon-hover: #949494;
     --menu-labels: #949494;
     --icons: #949494;
+    --icon-hover-color: rgb(201, 201, 201);
     --buttons: #164077;
     --border: #949494; 
     --drawer-color: #22282e;  
@@ -79,8 +84,11 @@
     --scrollbar-color: #505861;
     --scrollbar-hover-color: #43494f;
     --scrollbar-track-color: #2f3841;
-
+    --table-color: #22282e; 
     --color-scheme: dark;
+    --step-color-active: rgb(32, 78, 108); 
+    --step-color: rgb(51, 67, 78); 
+    --step-text: #949494;
 }
 
 
@@ -241,7 +249,21 @@ body {
 
 .themeIcon{
     color: var(--icons);
-    transition: 0.5s;
+    transition: 1.5s ease;
+}
+
+
+// .menuLabel:hover .themeIcon {
+//     color: var(--icon-hover-color);
+//     transition: 1.5s ease;
+// }
+.menuLabel .themeIcon {
+    color: var(--icons);
+    transition: color 1.5s ease;
+}
+
+.menuLabel:hover .themeIcon {
+    color: var(--icon-hover-color);
 }
 
 // common menu button

@@ -19,7 +19,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
             width: "100%",
             height: "90%",
             fontFamily: "Afacad_Flux !important",
-            "--ag-background-color": "#22282e",
+            "--ag-background-color": "var(--table-color)",
             color: 'red',
             // color: '--tree-text',
         }),

@@ -28,7 +28,7 @@ import Contribute from './pages/contribute';
 import Search from './pages/search';
 import Documents from './pages/documents';
 
-import Account from './pages/account';
+import Account from './users/account';
 import InputPage from './pages/inputPage'; 
 import ProtectedRoute from './users/protectedRoute';
 import Login from './users/login';

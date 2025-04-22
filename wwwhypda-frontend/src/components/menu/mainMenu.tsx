@@ -110,13 +110,7 @@ export default function MainMenu() {
                 </IconButton>
             </div>
 
-            {/* <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={'login'}>
-                    <IconButton>
-                        <AccountCircleIcon className={styles.themeIcon}/> 
-                    </IconButton>
-                </Link>
-            </div> */}
+
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
                 <Link to={token ? '/account' : '/login'}>
@@ -126,7 +120,13 @@ export default function MainMenu() {
                 </Link>
             </div>
 
-
+            {/* <div className={`${styles.accountItem} ${styles.menuLabel}`}>
+                <Link to={'login'}>
+                    <IconButton>
+                        <AccountCircleIcon className={styles.themeIcon}/> 
+                    </IconButton>
+                </Link>
+            </div> */}
                     
         </div>
     );
