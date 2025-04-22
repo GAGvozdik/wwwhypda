@@ -4,7 +4,8 @@ import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux';
+import LoadIcon from './loadIcon';
 
 import { 
     ClientSideRowModelModule, 
@@ -40,7 +41,18 @@ const rowData = [
 ];
 
 const GeneralInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '5vh' }), []);    
+    // const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "grey": "#22282e", marginTop: '0vh', marginBottom: '5vh',  }), []);    
+    const containerStyle = useMemo(() => ({ 
+        width: "100%", 
+        height: "58vh", 
+        "--ag-background-color": "#22282e", 
+        marginTop: '0vh', 
+        marginBottom: '5vh', 
+        // backgroundColor: 'grey',
+        // display: 'flex',
+        // justifyContent: 'center',
+        // alignItems: 'center',
+    }), []);    
     
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -131,29 +143,47 @@ const GeneralInfo = () => {
     
     return (
         <div style={containerStyle}>
-            <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    textAlign: "center", 
-                    fontSize: '3vh', 
-                    margin: '1vh 0vh 1vh 0vh' 
-                }}
-            >
-                    General information about measurements
-            </div>
+            {loading ? 
+                <div 
+                    style={{ 
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '63vh',
+                        marginTop: '1vh', 
+                        marginBottom: '5vh',
+                    }}
+                >
+                    <LoadIcon size={60}/>
+                </div> 
+                    : 
+                error ? <p>{error}</p> 
+                : 
+            (
+                <>
+                    <div 
+                        style={{ 
+                            color: "var(--tree-text)", 
+                            textAlign: "center", 
+                            fontSize: '3vh', 
+                            margin: '1vh 0vh 1vh 0vh',
+                        }}
+                    >
+                            General information about measurements
+                    </div>
 
-            {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
-                <AgGridReact
-                    theme={themeDarkBlue}
-                    rowData={rowData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    suppressColumnVirtualisation={true}
-                    suppressRowHoverHighlight={true}
-                    suppressNoRowsOverlay={true}
-                    suppressMenuHide={true}
-                    headerHeight={0}
-                />
+                    <AgGridReact
+                        theme={themeDarkBlue}
+                        rowData={rowData}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        suppressColumnVirtualisation={true}
+                        suppressRowHoverHighlight={true}
+                        suppressNoRowsOverlay={true}
+                        suppressMenuHide={true}
+                        headerHeight={0}
+                    />
+                </>
             )}
         </div>
     );

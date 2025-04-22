@@ -5,6 +5,8 @@ import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
+import LoadIcon from './loadIcon';
+
 import { 
     ClientSideRowModelModule, 
     ColDef, 
@@ -111,24 +113,47 @@ const SiteInfo = () => {
     
     return (
         <div style={containerStyle}>
-            <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    textAlign: "center", 
-                    fontSize: '3vh', 
-                    margin: '1vh 0vh 1vh 0vh' 
-                }}>
-                    Site Information
-                </div>
-            {loading ? <p>Loading...</p> : error ? <p>{error}</p> : (
-                <AgGridReact
-                    theme={themeDarkBlue}
-                    rowData={rowData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    headerHeight={0}
-                />
+
+            {loading ? 
+                <div 
+                    style={{ 
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '63vh',
+                        marginTop: '1vh', 
+                        marginBottom: '5vh',
+                    }}
+                >
+                    <LoadIcon size={60}/>
+                </div> 
+                    : 
+                error ? <p>{error}</p> 
+                : 
+            (
+                <>
+                    <div 
+                        style={{ 
+                            color: "var(--tree-text)", 
+                            textAlign: "center", 
+                            fontSize: '3vh', 
+                            margin: '1vh 0vh 1vh 0vh' 
+                        }}>
+                            Site Information
+                        </div>
+
+                    <AgGridReact
+                        theme={themeDarkBlue}
+                        rowData={rowData}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        headerHeight={0}
+                    />
+
+                </>
             )}
+
+
         </div>
     );
 };
