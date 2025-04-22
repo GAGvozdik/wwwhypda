@@ -35,7 +35,7 @@ const rowData = [
 ];
 
 const SiteInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "#22282e", marginTop: '0vh', marginBottom: '5vh' }), []);
+    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '5vh' }), []);
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
