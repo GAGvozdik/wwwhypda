@@ -45,6 +45,7 @@ const SuperiserAccount: React.FC = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('tokenExpiration'); // Если ты сохраняешь и время истечения
+        localStorage.removeItem('is_superuser'); // Если ты сохраняешь и время истечения
 
         // Сброс состояния через Redux
         dispatch(Logout());
@@ -56,7 +57,7 @@ const SuperiserAccount: React.FC = () => {
 
     return (
         <div className={styles.authForm} style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
-            <div className={styles.formTitle} style={{ fontSize: '4.5vh'}}>Your Account</div>
+            <div className={styles.formTitle} style={{ fontSize: '4.5vh'}}>Super Account</div>
             <div style={{ margin: '5vh'}}>
                 {isLoading && <p>Loading...</p>}
                 {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}

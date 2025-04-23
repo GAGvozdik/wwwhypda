@@ -45,6 +45,7 @@ const Account: React.FC = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         localStorage.removeItem('tokenExpiration'); // Если ты сохраняешь и время истечения
+        localStorage.removeItem('is_superuser'); // Если ты сохраняешь и время истечения
 
         // Сброс состояния через Redux
         dispatch(Logout());

@@ -38,6 +38,8 @@ import Register from './users/registration';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import ForgotPassword from './users/forgotPassword';
 
+import SuperuserAccount from './users/superuser';
+import SuperProtectedRoute from './users/superProtectedRoute';
 
 
 
@@ -64,14 +66,9 @@ export default function MainMenu() {
                     </AppProvider>
                 } />  */}
 
-                <Route
-                    path="/account"
-                    element={
-                        <ProtectedRoute>
-                            <Account />
-                        </ProtectedRoute>
-                    }
-                />
+                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                <Route path="/superaccount" element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} />
+
                 
                 {/* <Route
                     path="/input"

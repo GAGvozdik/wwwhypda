@@ -26,15 +26,23 @@ const Login: React.FC = () => {
 
             console.log('Server Response:', response.data);
 
-            const { token, ...userData } = response.data.data;
+            const { token, is_superuser, ...userData } = response.data.data;
 
             dispatch(UpdateToken(token)); // Сохраняем токен в Redux
             localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage
             localStorage.setItem('token', token);
 
+            localStorage.setItem('is_superuser', is_superuser); // 👈 сохраняем флаг
+            console.log('is_superuser = ', is_superuser);
+
+
             setError('Login successful!'); // Успешный логин
+
+
             setIsError(false); // Устанавливаем, что это не ошибка
-            navigate('/account'); // Переход на страницу аккаунта
+            navigate(is_superuser ? '/superaccount' : '/account');
+
+
         } catch (error: any) {
             setIsLoading(false);
 
