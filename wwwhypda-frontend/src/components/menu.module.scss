@@ -14,7 +14,6 @@
 
     --color-scheme: light;
 
-
     --menu: #164077;
     --tree-text: #164077;
     --menu-hover: #c2a776;
@@ -244,7 +243,7 @@ body {
     @media (max-width: 1000px) {
         grid-template-columns: 60px 2.5fr 2.5fr 2.5fr 3fr 2.5fr 1fr 1fr 1fr 1fr;
     }
-
+    
     grid-template-columns: 60px 4fr 4fr 4fr 4fr 4fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr;
     transition: 0.5s;

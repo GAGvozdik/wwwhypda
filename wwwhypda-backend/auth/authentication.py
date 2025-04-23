@@ -181,7 +181,7 @@ def login():
         user = User.login(data["email"], data["password"])
         if user:
             # Set token expiration time (1 minute from now)
-            expiration_time = datetime.now(timezone.utc) + timedelta(minutes=1)
+            expiration_time = datetime.now(timezone.utc) + timedelta(minutes=2)
 
             # Create JWT payload with essential claims
             token_payload = {
@@ -232,7 +232,7 @@ def refresh_token(current_user):
     """
     try:
         # Устанавливаем новое время жизни токена (например, 30 минут)
-        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=3)
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=2)
 
         token_payload = {
             "user_id": current_user["id"],

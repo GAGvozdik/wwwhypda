@@ -1,16 +1,16 @@
-import styles from '../menu.module.scss'; 
+import styles from '../menu.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux';
 import LoadIcon from './loadIcon';
 
-import { 
-    ClientSideRowModelModule, 
-    ColDef, 
-    ModuleRegistry, 
+import {
+    ClientSideRowModelModule,
+    ColDef,
+    ModuleRegistry,
     TextEditorModule,
     SelectEditorModule,
 } from "ag-grid-community";
@@ -26,7 +26,13 @@ interface Country {
     country_name: string;
 }
 
-const rowData = [
+interface SiteRow {
+    field: string;
+    value: string;
+    description: string;
+}
+
+const defaultRowData: SiteRow[] = [
     { field: "site_name", value: "", description: "the site name" },
     { field: "region", value: "", description: "the region where the measurements are made" },
     { field: "country_name", value: "", description: "the country where the measurements are made" },
@@ -35,17 +41,35 @@ const rowData = [
 ];
 
 const SiteInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "58vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '5vh' }), []);
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        height: "58vh",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0vh',
+        marginBottom: '5vh'
+    }), []);
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [countries, setCountries] = useState<Country[]>([]);
+    const [tableData, setTableData] = useState<SiteRow[]>(() => {
+        const saved = localStorage.getItem("siteInfoTableData");
+        try {
+            return saved ? JSON.parse(saved) : defaultRowData;
+        } catch (e) {
+            console.error("Failed to parse localStorage data:", e);
+            return defaultRowData;
+        }
+    });
+
     const token = useSelector((state: State) => state.token);
 
     useEffect(() => {
         const fetchCountries = async () => {
             try {
-                const response = await axios.get<Country[]>('http://localhost:5000/api/countries', { headers: { Authorization: `Bearer ${token}`}}); 
+                const response = await axios.get<Country[]>('http://localhost:5000/api/countries', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
 
                 if (!response.data || response.data.length === 0) {
                     setError("No data received from the server.");
@@ -53,16 +77,19 @@ const SiteInfo = () => {
                 }
 
                 setCountries(response.data);
-                // console.log(response.data);
-
             } catch (error: any) {
                 setError(getErrorMessage(error));
             } finally {
                 setLoading(false);
             }
         };
+
         fetchCountries();
     }, []);
+
+    useEffect(() => {
+        localStorage.setItem("siteInfoTableData", JSON.stringify(tableData));
+    }, [tableData]);
 
     const getErrorMessage = (error: any): string => {
         if (error.response) {
@@ -78,9 +105,9 @@ const SiteInfo = () => {
 
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
-        { 
-            field: "value", 
-            editable: true, 
+        {
+            field: "value",
+            editable: true,
             singleClickEdit: true,
             flex: 1,
             cellEditorSelector: (params) => {
@@ -90,17 +117,15 @@ const SiteInfo = () => {
             }
         },
         { field: "description", editable: false, flex: 2 }
-    ], [countryNames]); // Добавляем зависимость от countryNames
+    ], [countryNames]);
 
-    const defaultColDef = useMemo<ColDef>(() => {
-        return {
-            editable: true,
-            flex: 1,
-            suppressMenu: true,
-            suppressSorting: true,
-            headerComponentParams: { suppressHeader: true }
-        };
-    }, []);
+    const defaultColDef = useMemo<ColDef>(() => ({
+        editable: true,
+        flex: 1,
+        suppressMenu: true,
+        suppressSorting: true,
+        headerComponentParams: { suppressHeader: true }
+    }), []);
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
@@ -110,50 +135,48 @@ const SiteInfo = () => {
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
         columnBorder: { color: '#33383d', width: '1px' },
     });
-    
+
+    const handleCellValueChanged = (params: any) => {
+        const updatedData = tableData.map((row) =>
+            row.field === params.data.field ? { ...params.data } : row
+        );
+        setTableData(updatedData);
+    };
+
     return (
         <div style={containerStyle}>
-
-            {loading ? 
-                <div 
-                    style={{ 
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '63vh',
-                        marginTop: '1vh', 
-                        marginBottom: '5vh',
-                    }}
-                >
-                    <LoadIcon size={60}/>
-                </div> 
-                    : 
-                error ? <p>{error}</p> 
-                : 
-            (
+            {loading ? (
+                <div style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: '63vh',
+                    marginTop: '1vh',
+                    marginBottom: '5vh',
+                }}>
+                    <LoadIcon size={60} />
+                </div>
+            ) : error ? <p>{error}</p> : (
                 <>
-                    <div 
-                        style={{ 
-                            color: "var(--tree-text)", 
-                            textAlign: "center", 
-                            fontSize: '3vh', 
-                            margin: '1vh 0vh 1vh 0vh' 
-                        }}>
-                            Site Information
-                        </div>
+                    <div style={{
+                        color: "var(--tree-text)",
+                        textAlign: "center",
+                        fontSize: '3vh',
+                        margin: '1vh 0vh 1vh 0vh'
+                    }}>
+                        Site Information
+                    </div>
 
                     <AgGridReact
                         theme={themeDarkBlue}
-                        rowData={rowData}
+                        rowData={tableData}
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         headerHeight={0}
+                        onCellValueChanged={handleCellValueChanged}
                     />
-
                 </>
             )}
-
-
         </div>
     );
 };

@@ -36,7 +36,7 @@ export default function MainMenu() {
 
     return (
     
-        <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`} style={ isDarkTheme ? {} : {boxShadow: '0 0 0 1px var(--menu-border)'}}>
+        <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`}>
             
             <MenuButtuon 
                 className={`${styles.drawerItem} ${styles.menuButton}`} 
