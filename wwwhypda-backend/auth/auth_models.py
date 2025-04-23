@@ -34,17 +34,32 @@ class User(db.Model):
         Returns True if the user is a superuser.
         """
         return self.is_superuser
+    
     @classmethod
     def deactivate_user(cls, user_id: int) -> bool:
         """
         Deactivates a user account.
         Returns True if successful, otherwise False.
         """
+        print('fdsf')
         user = cls.query.filter_by(id=user_id).first()
         if user:
             user.active = False
             db.session.commit()
             return True
+        return False
+    
+    @classmethod
+    def activate_user_by_id(cls, user_id: int) -> bool:
+        print('+')
+        user = cls.query.filter_by(id=user_id).first()
+        print('++')
+        if user:
+            user.active = True
+            db.session.commit()
+            print('+++')
+            return True
+        print('++++')
         return False
 
     @classmethod
