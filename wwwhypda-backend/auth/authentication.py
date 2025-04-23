@@ -12,7 +12,7 @@ import jwt
 import time
 import uuid
 from auth.auth_models import db, User, ConfirmationCode
-from auth.auth_middleware import token_required
+from auth.auth_middleware import token_required, superuser_required
 from auth.validate import validate_email_and_password, validate_user, validate_password
 from flask_mail import Message
 from common_defenitions import mail
@@ -214,6 +214,45 @@ def get_current_user(current_user):
     """Retrieve the authenticated user's profile."""
     return jsonify(message="Successfully retrieved user profile", data=current_user)
 
+@auth_bp.route("/super/check", methods=["GET"])
+@token_required
+@superuser_required
+def check_superuser(current_user):
+    """Check if the current user is a superuser."""
+    return jsonify({
+        "message": "User is a superuser.",
+        "data": {"is_superuser": True}
+    }), 200
+
+
+@auth_bp.route("/super/promote/<int:user_id>", methods=["POST"])
+@token_required
+@superuser_required
+def promote_to_superuser(current_user, user_id):
+    """Promote another user to superuser (superuser-only)."""
+    from auth.auth_models import User
+    success = User.make_superuser(user_id)
+    if success:
+        return jsonify({
+            "message": f"User with id={user_id} promoted to superuser."
+        }), 200
+    return jsonify({
+        "message": "User not found or promotion failed.",
+        "error": "Not Found"
+    }), 404
+
+
+@auth_bp.route("/super/users", methods=["GET"])
+@token_required
+@superuser_required
+def get_all_users(current_user):
+    """Get a list of all users (superuser-only)."""
+    from auth.auth_models import User
+    users = User.get_all_users()
+    return jsonify({
+        "message": "All users retrieved successfully.",
+        "data": users
+    }), 200
 
 
     

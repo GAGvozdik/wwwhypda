@@ -18,7 +18,43 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)  # Hashed password
     active = db.Column(db.Boolean, default=False)  # User must be activated manually
+    is_superuser = db.Column(db.Boolean, default=False)  # User must be activated manually
 
+    @classmethod
+    def is_super(self) -> bool:
+        """
+        Returns True if the user is a superuser.
+        """
+        return self.is_superuser
+
+    @classmethod
+    def make_superuser(cls, user_id: int) -> bool:
+        """
+        Promotes a user to superuser status.
+        Returns True if successful, otherwise False.
+        """
+        user = cls.query.filter_by(id=user_id).first()
+        if user:
+            user.is_superuser = True
+            db.session.commit()
+            return True
+        return False
+
+    @classmethod
+    def get_all_users(cls):
+        """
+        Retrieves all users regardless of status.
+        Returns a list of user dictionaries.
+        """
+        users = cls.query.all()
+        return [{
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "active": user.active,
+            "is_superuser": user.is_superuser
+        } for user in users]
+        
     @classmethod
     def create(cls, name: str, email: str, password: str):
         """
