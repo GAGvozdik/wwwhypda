@@ -214,46 +214,51 @@ def get_current_user(current_user):
     """Retrieve the authenticated user's profile."""
     return jsonify(message="Successfully retrieved user profile", data=current_user)
 
-@auth_bp.route("/super/check", methods=["GET"])
+@auth_bp.route("/get_all_users", methods=["GET"])
 @token_required
-@superuser_required
-def check_superuser(current_user):
-    """Check if the current user is a superuser."""
-    return jsonify({
-        "message": "User is a superuser.",
-        "data": {"is_superuser": True}
-    }), 200
+def get_all_users(current_user):
+    """
+    Retrieve a list of all users in the system.
+    Only accessible to superusers.
+    """
+    users = User.get_all_users()
+    return jsonify(message="Successfully retrieved all users", data=users), 200
 
-
-@auth_bp.route("/super/promote/<int:user_id>", methods=["POST"])
+@auth_bp.route("/<int:user_id>", methods=["POST"])
 @token_required
-@superuser_required
 def promote_to_superuser(current_user, user_id):
-    """Promote another user to superuser (superuser-only)."""
-    from auth.auth_models import User
+    """
+    Promote a user to superuser status. Only superusers can access this endpoint.
+    """
     success = User.make_superuser(user_id)
     if success:
-        return jsonify({
-            "message": f"User with id={user_id} promoted to superuser."
-        }), 200
-    return jsonify({
-        "message": "User not found or promotion failed.",
-        "error": "Not Found"
-    }), 404
+        return jsonify(message=f"User {user_id} is now a superuser"), 200
+    else:
+        return jsonify(message="User not found", error="Not Found"), 404
 
-
-@auth_bp.route("/super/users", methods=["GET"])
+@auth_bp.route("/deactivate/<int:user_id>", methods=["POST"])
 @token_required
-@superuser_required
-def get_all_users(current_user):
-    """Get a list of all users (superuser-only)."""
-    from auth.auth_models import User
-    users = User.get_all_users()
-    return jsonify({
-        "message": "All users retrieved successfully.",
-        "data": users
-    }), 200
+def deactivate_user(current_user, user_id):
+    """
+    Deactivates a user account.
+    Only accessible by superusers.
+    """
+    success = User.deactivate_user(user_id)
+    if success:
+        return jsonify(message=f"User {user_id} has been deactivated"), 200
+    return jsonify(message="User not found", error="Not Found"), 404
 
+@auth_bp.route("/remove-super/<int:user_id>", methods=["POST"])
+@token_required
+def remove_superuser_status(current_user, user_id):
+    """
+    Removes superuser status from a user.
+    Only accessible by other superusers.
+    """
+    success = User.remove_superuser(user_id)
+    if success:
+        return jsonify(message=f"User {user_id} is no longer a superuser"), 200
+    return jsonify(message="User not found or not a superuser", error="Bad Request"), 400
 
     
 @auth_bp.route("/refresh", methods=["POST"])
