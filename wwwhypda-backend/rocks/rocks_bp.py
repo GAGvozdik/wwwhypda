@@ -5,15 +5,49 @@ from rocks.rocks_models import Country, Review, Environment, Fracturation
 from rocks.rocks_models import Source, RockType, Parameter, Sample, Measure, Scale
 from rocks.rocks_models import ExperimentType, Quality, InterpretationMethod
 from auth.auth_middleware import token_required
-
+import time 
 rocks_bp = Blueprint("api", __name__, url_prefix="/api")
 
-# @rocks_bp.route("/", methods=["POST"])
+
+@rocks_bp.route('/msg', methods=['POST'])
+def get_msg():
+    data = request.json  
+    time.sleep(4)  
+    return str(data['query'])  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @rocks_bp.route('/countries', methods=['GET'])
 @token_required
 def get_countries(current_user):
     return Country.get_all_countries()
+
+
 
 @rocks_bp.route('/reviews', methods=['GET'])
 @token_required
