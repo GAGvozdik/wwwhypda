@@ -232,7 +232,7 @@ def refresh_token(current_user):
     """
     try:
         # Устанавливаем новое время жизни токена (например, 30 минут)
-        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=30)
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=3)
 
         token_payload = {
             "user_id": current_user["id"],

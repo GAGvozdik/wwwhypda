@@ -6,8 +6,11 @@ import styles from "./menu.module.scss";
 import MainTree from './pages/mainTree';
 import MainMenu from './menu/mainMenu';
 import MainBody from './mainBody';
+import useTokenRefresh from './users/tokenRefresh';
 
+    
 export default function MainWindow() {
+    useTokenRefresh(); 
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     let isOpenNow = useSelector((state: State) => state.open);  
