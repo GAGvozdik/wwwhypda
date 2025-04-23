@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import MainWindow from './components/mainWindow';
 
 export default function App() {
+
     return (
         <div className={styles.app}>
             <Provider store={store}>

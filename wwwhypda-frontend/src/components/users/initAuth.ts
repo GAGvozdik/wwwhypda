@@ -1,4 +1,4 @@
-import { UpdateToken } from './actions';
+import { UpdateToken } from '../../redux/actions';
 
 export default function isTokenValid(token: string): boolean {
     try {
