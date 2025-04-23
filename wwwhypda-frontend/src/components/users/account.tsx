@@ -41,9 +41,18 @@ const Account: React.FC = () => {
     };
 
     const handleLogout = () => {
+        // Удаляем токен и данные пользователя из localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('tokenExpiration'); // Если ты сохраняешь и время истечения
+
+        // Сброс состояния через Redux
         dispatch(Logout());
+
+        // Перенаправляем на страницу логина
         navigate('/login');
     };
+
 
     return (
         <div className={styles.authForm} style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
