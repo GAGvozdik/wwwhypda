@@ -224,12 +224,26 @@ def get_all_users(current_user):
     users = User.get_all_users()
     return jsonify(message="Successfully retrieved all users", data=users), 200
 
+
+
+@auth_bp.route("/activate/<int:user_id>", methods=["POST"])
+@token_required
+def activate_user(current_user, user_id):
+    print('()')
+    success = User.activate_user_by_id(user_id)
+    print(user_id)
+    if success:
+        print(')(')
+        return jsonify(message=f"User {user_id} has been activated"), 200
+    return jsonify(message="User not found", error="Not Found"), 404
+
 @auth_bp.route("/<int:user_id>", methods=["POST"])
 @token_required
 def promote_to_superuser(current_user, user_id):
     """
     Promote a user to superuser status. Only superusers can access this endpoint.
     """
+    print(user_id)
     success = User.make_superuser(user_id)
     if success:
         return jsonify(message=f"User {user_id} is now a superuser"), 200
@@ -247,6 +261,8 @@ def deactivate_user(current_user, user_id):
     if success:
         return jsonify(message=f"User {user_id} has been deactivated"), 200
     return jsonify(message="User not found", error="Not Found"), 404
+
+
 
 @auth_bp.route("/remove-super/<int:user_id>", methods=["POST"])
 @token_required

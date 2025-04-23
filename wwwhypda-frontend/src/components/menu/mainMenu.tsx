@@ -34,6 +34,8 @@ export default function MainMenu() {
         dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
     };
 
+    let is_superuser = localStorage.getItem('is_superuser');
+
     return (
     
         <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`}>
@@ -113,7 +115,8 @@ export default function MainMenu() {
 
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={token ? '/account' : '/login'}>
+                <Link to={is_superuser ? '/superaccount' : token ? '/account' : '/login'}>
+                
                     <IconButton>
                         <AccountCircleIcon className={styles.themeIcon} />
                     </IconButton>
