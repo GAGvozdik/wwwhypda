@@ -16,38 +16,10 @@ def get_msg():
     return str(data['query'])  
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 @rocks_bp.route('/countries', methods=['GET'])
 @token_required
 def get_countries(current_user):
     return Country.get_all_countries()
-
-
 
 @rocks_bp.route('/reviews', methods=['GET'])
 @token_required
