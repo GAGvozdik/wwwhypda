@@ -181,7 +181,7 @@ def login():
         user = User.login(data["email"], data["password"])
         if user:
             # Set token expiration time (1 minute from now)
-            expiration_time = datetime.now(timezone.utc) + timedelta(minutes=60)
+            expiration_time = datetime.now(timezone.utc) + timedelta(minutes=1)
 
             # Create JWT payload with essential claims
             token_payload = {
@@ -214,10 +214,58 @@ def get_current_user(current_user):
     """Retrieve the authenticated user's profile."""
     return jsonify(message="Successfully retrieved user profile", data=current_user)
 
+
+
+    
+@auth_bp.route("/refresh", methods=["POST"])
+@token_required
+def refresh_token(current_user):
+    """
+    Refresh JWT token if the current one is still valid.
+
+    This endpoint verifies the user's current token and returns a new one
+    with a fresh expiration time.
+
+    Returns:
+        - 200: New JWT token and expiration details.
+        - 401: If token is invalid or expired.
+    """
+    try:
+        # Устанавливаем новое время жизни токена (например, 30 минут)
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=30)
+
+        token_payload = {
+            "user_id": current_user["id"],
+            "exp": expiration_time,
+            "iat": datetime.now(timezone.utc),
+            "jti": str(uuid.uuid4())
+        }
+
+        new_token = jwt.encode(
+            token_payload,
+            current_app.config["SECRET_KEY"],
+            algorithm="HS256"
+        )
+
+        return jsonify({
+            "message": "Token refreshed successfully",
+            "data": {
+                "token": new_token,
+                "expires_at": expiration_time.isoformat()
+            }
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "message": "Failed to refresh token",
+            "error": str(e)
+        }), 500
+
+
 @auth_bp.route("/", methods=["PUT"])
 @token_required
 def update_user(current_user):
-    """Update the authenticated user's profile (only name)."""
+    """Update the authenticated users profile (only name)."""
     try:
         user_data = request.json
         if "name" in user_data:
@@ -226,3 +274,4 @@ def update_user(current_user):
         return jsonify(message="Invalid data, you can only update your account name!", error="Bad Request"), 400
     except Exception as e:
         return jsonify(message="Failed to update account", error=str(e)), 400
+    
