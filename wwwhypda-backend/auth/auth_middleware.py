@@ -1,8 +1,20 @@
 from functools import wraps
 import jwt
-from flask import request, abort, current_app
+from flask import request, abort, current_app, jsonify
 import auth.auth_models as auth_models
 import time
+
+
+def superuser_required(f):
+    @wraps(f)
+    def decorated(current_user, *args, **kwargs):
+        if not current_user.get("is_superuser"):
+            return jsonify({
+                "message": "Access denied. Superuser privileges required.",
+                "error": "Forbidden"
+            }), 403
+        return f(current_user, *args, **kwargs)
+    return decorated
 
 def token_required(f):
     """
