@@ -30,7 +30,27 @@ app = Flask(__name__)
 # CORS(app, supports_credentials=True)  
 # CORS(auth_bp)
 # CORS(app, origins=['http://localhost:3000', 'http://localhost:5000', 'vscode-webview://*'], supports_credentials=True, resources={r"/*": {"origins": "*"}})
-CORS(app, resources={r"/*": {"origins": "*", "methods": ["GET", "POST", "OPTIONS"], "allow_headers": ["Content-Type", "Authorization"]}})
+
+CORS(
+    app, 
+    resources={
+        r"/*": {
+            "origins": "*", 
+            "methods": ["GET", "POST", "OPTIONS"], 
+            "allow_headers": ["Content-Type", "Authorization"]
+        },
+        r"/api/*": {
+            "origins": "*", 
+            "methods": ["GET", "POST", "OPTIONS"], 
+            "allow_headers": ["Content-Type", "Authorization"]
+        },
+        r"/user/*": {
+            "origins": "*", 
+            "methods": ["GET", "POST", "OPTIONS"], 
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    }
+)
 
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
