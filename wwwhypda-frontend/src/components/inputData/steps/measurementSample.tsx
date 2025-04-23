@@ -49,6 +49,15 @@ export interface Scale {
     scale_descr?: string | null;
 }
 
+interface SampleRow {
+    id: number;
+    smpl_name: string;
+    rock_type: string;
+    scale: string;
+    fracturation_degree: string;
+    Sample_comment: string;
+}
+
 
 interface RockTypeData {
     rt_id: number;
@@ -135,14 +144,32 @@ const MeasurementSampleTable = () => {
     const fracturations = useMemo(() => fracturation.map(f => f.fracturation_degree), [fracturation]);
     const rocksNames = useMemo(() => rocksData.map(r => r.rt_name), [rocksData]);
 
+    const [tableData, setTableData] = useState<SampleRow[]>(() => {
+        const saved = localStorage.getItem("sampleMeasurementTableData");
+        try {
+            return saved ? JSON.parse(saved) : [
+                { id: 1, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
+                { id: 2, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
+                { id: 3, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" }
+            ];
+        } catch (e) {
+            console.error("Error parsing localStorage:", e);
+            return [];
+        }
+    });
 
 
-    const [tableData, setTableData] = useState([
-        { id: 1, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
-        { id: 2, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
-        { id: 3, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" }
-    ]);
-    
+    useEffect(() => {
+        localStorage.setItem("sampleMeasurementTableData", JSON.stringify(tableData));
+    }, [tableData]);
+
+    const handleCellValueChanged = (params: any) => {
+        const updatedData = tableData.map((row) =>
+            row.id === params.data.id ? { ...params.data } : row
+        );
+        setTableData(updatedData);
+    };
+
     const addRow = () => {
         setTableData(prev => [...prev, {
             id: prev.length + 1,
@@ -326,7 +353,9 @@ const MeasurementSampleTable = () => {
                         tooltipShowDelay={0}
                         headerHeight={40}
                         cellSelection={cellSelection}
+                        onCellValueChanged={handleCellValueChanged}
                     />
+
                 </>
             )}
         </div>

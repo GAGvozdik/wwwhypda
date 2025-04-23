@@ -69,6 +69,21 @@ interface InterpretationMethod {
     id_Exp_ty: number;
     int_meth_status: number;
 }
+
+interface MeasurementRow {
+    id: number;
+    sampleRef: string;
+    parameter: string;
+    value: string;
+    error: string;
+    units: string;
+    quality: string;
+    experimentType: string;
+    interpretation: string;
+    comment: string;
+}
+
+
 export default function Measurements() {
     const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
 
@@ -80,7 +95,18 @@ export default function Measurements() {
     const [interpretationMethod, setInterpretationMethod] = useState<InterpretationMethod[]>([]);
     const token = useSelector((state: State) => state.token);
     
+    // При загрузке компонента
     useEffect(() => {
+        // const savedData = localStorage.getItem('generalInfoData');
+        // if (savedData) {
+        //     setTableData(JSON.parse(savedData));
+        // } else {
+        //     // Если нет сохранённых данных — берём дефолтные
+        //     setTableData([
+        //         { field: "env_name", value: "", description: "the hydrogeological environment" },
+        //         { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
+        //     ]);
+        // }
         const fetchData = async () => {
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
@@ -144,22 +170,30 @@ export default function Measurements() {
     const experimentTypeNames = useMemo(() => experimentType.map(s => s.exp_name), [experimentType]);
     const interpretationMethodNames = useMemo(() => interpretationMethod.map(s => s.int_meth_name), [interpretationMethod]);
 
+    const [tableData, setTableData] = useState<MeasurementRow[]>(() => {
+        const saved = localStorage.getItem("measurementsTableData");
+        try {
+            return saved ? JSON.parse(saved) : [
+                { id: 1, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
+                { id: 2, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
+                { id: 3, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" }
+            ];
+        } catch (e) {
+            console.error("Ошибка при парсинге localStorage:", e);
+            return [];
+        }
+    });
 
-    const [tableData, setTableData] = useState([
-        { id: 1, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
-        { id: 2, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
-        { id: 3, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" }
-    ]);
 
     const addRow = () => {
-        setTableData(prev => [...prev, {
+        setTableData((prev) => [...prev, {
             id: prev.length + 1,
             sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: ""
         }]);
     };
 
     const deleteRow = () => {
-        setTableData(prev => prev.slice(0, -1));
+        setTableData((prev) => prev.slice(0, -1));
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -216,6 +250,31 @@ export default function Measurements() {
             },
         };
     }, []);
+
+    useEffect(() => {
+        const savedTableData = localStorage.getItem("measurementsTableData");
+        if (savedTableData) {
+            try {
+                setTableData(JSON.parse(savedTableData));
+            } catch (e) {
+                console.error("Ошибка при разборе сохранённых данных:", e);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+            localStorage.setItem("measurementsTableData", JSON.stringify(tableData));
+        }, [tableData]);
+
+        const handleCellValueChanged = (event: any) => {
+        const updatedData = [...tableData];
+        const rowIndex = updatedData.findIndex(row => row.id === event.data.id);
+        if (rowIndex !== -1) {
+            updatedData[rowIndex] = { ...event.data };
+            setTableData(updatedData);
+        }
+    };
+
 
     return (
         <div style={containerStyle}>
@@ -286,6 +345,7 @@ export default function Measurements() {
                             tooltipShowDelay={0}
                             headerHeight={40}
                             cellSelection={cellSelection}
+                            onCellValueChanged={handleCellValueChanged}
                         />
                 </>
             )}
