@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 // import styles from "./menu/menu.module.scss" 
 // import styles from "./menu.module.scss" 
-import { initAuth } from './redux/initAuth';
+import { initAuth } from './components/users/initAuth';
 import store from './redux/store';
 
 initAuth(store);

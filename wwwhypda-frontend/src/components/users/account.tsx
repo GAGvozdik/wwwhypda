@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../menu.module.scss';
+import styles from './users.module.scss';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Logout } from '../../redux/actions';
