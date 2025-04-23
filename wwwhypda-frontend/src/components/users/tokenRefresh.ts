@@ -8,7 +8,7 @@ const useTokenRefresh = () => {
 
     useEffect(() => {
         const intervalId = setInterval(async () => {
-            console.log('setInt');
+            // console.log('setInt');
             const token = localStorage.getItem('token');
             if (!token) return;
 
@@ -18,7 +18,7 @@ const useTokenRefresh = () => {
                 const currentTime = Date.now();
 
                 if (expirationTime - currentTime <= 60 * 1000) {
-                    console.log('⏳ Refreshing token...');
+                    // console.log('⏳ Refreshing token...');
                     const response = await axios.post(
                         'http://localhost:5000/users/refresh',
                         {},
