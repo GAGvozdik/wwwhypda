@@ -1,7 +1,5 @@
 import styles from '../menu.module.scss'; 
-import React, { useMemo, useState } from "react";
-import { State } from '../../../common/types';
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import { 
@@ -16,7 +14,7 @@ ModuleRegistry.registerModules([
     ClientSideRowModelModule
 ]);
 
-const rowData = [
+const defaultRowData = [
     { field: "authors", value: "", description: "the source authors (i.e.: Ankeny M.D.,M. Ahmed, T.C. Kaspar, and R. Horton)" },
     { field: "title", value: "", description: "the source title (i.e. Simple field for determining unsaturated hydraulic conductivity)" },
     { field: "source", value: "", description: "the source (i.e. Journal of Contaminant Hydrology, Vol. 91, Issues 3-4, 14 May 2007)" },
@@ -26,25 +24,58 @@ const rowData = [
     { field: "source_link", value: "", description: "a web link to the source document (i.e. http://www.springerlink.com/content/plpva3c6ckgfy932/ ... or to the PDF)" }
 ];
 
+const LOCAL_STORAGE_KEY = "sourceTableData";
+
 const SourceInfo = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "54vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '9vh' }), []);    
-    const [tableData, setTableData] = useState(rowData);
-    
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        height: "54vh",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0vh',
+        marginBottom: '9vh'
+    }), []);
+
+    const [tableData, setTableData] = useState(defaultRowData);
+
+    // Загружаем данные из localStorage при монтировании
+    useEffect(() => {
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed)) {
+                    setTableData(parsed);
+                }
+            } catch (e) {
+                console.error("Failed to parse saved table data", e);
+            }
+        }
+    }, []);
+
+    // Обновляем значение и сохраняем в localStorage
+    const handleCellValueChanged = useCallback((params: any) => {
+        const updated = [...tableData];
+        updated[params.node.rowIndex] = {
+            ...updated[params.node.rowIndex],
+            [params.column.getColId()]: params.newValue
+        };
+        setTableData(updated);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
+    }, [tableData]);
+
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
         { field: "value", editable: true, flex: 1, singleClickEdit: true },
         { field: "description", editable: false, flex: 2 }
     ], []);
 
-    const defaultColDef = useMemo<ColDef>(() => {
-        return {
-            editable: true,
-            flex: 1,
-            suppressMenu: true,
-            suppressSorting: true,
-            headerComponentParams: { suppressHeader: true }
-        };
-    }, []);
+    const defaultColDef = useMemo<ColDef>(() => ({
+        editable: true,
+        flex: 1,
+        suppressMenu: true,
+        suppressSorting: true,
+        headerComponentParams: { suppressHeader: true }
+    }), []);
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
@@ -54,7 +85,7 @@ const SourceInfo = () => {
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
         columnBorder: { color: '#33383d', width: '1px' },
     });
-    
+
     return (
         <div style={containerStyle}>
             <div 
@@ -74,6 +105,7 @@ const SourceInfo = () => {
                 columnDefs={columnDefs}
                 defaultColDef={defaultColDef}
                 headerHeight={0}
+                onCellValueChanged={handleCellValueChanged}
             />
         </div>
     );

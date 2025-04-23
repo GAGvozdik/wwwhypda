@@ -17,7 +17,7 @@ const useTokenRefresh = () => {
                 const expirationTime = decodedToken.exp * 1000;
                 const currentTime = Date.now();
 
-                if (expirationTime - currentTime <= 1 * 60 * 1000) {
+                if (expirationTime - currentTime <= 60 * 1000) {
                     console.log('⏳ Refreshing token...');
                     const response = await axios.post(
                         'http://localhost:5000/users/refresh',
@@ -32,7 +32,7 @@ const useTokenRefresh = () => {
             } catch (error) {
                 console.error('Error checking or refreshing token:', error);
             }
-        }, 1 * 60 * 1000); // проверка каждую минуту
+        },  30 * 1000); // проверка каждую минуту
 
         return () => clearInterval(intervalId);
     }, [dispatch]);
