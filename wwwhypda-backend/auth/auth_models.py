@@ -20,6 +20,14 @@ class User(db.Model):
     active = db.Column(db.Boolean, default=False)  # User must be activated manually
     is_superuser = db.Column(db.Boolean, default=False)  # User must be activated manually
 
+    def set_password(self, password):
+        """Хэширует пароль и сохраняет его"""
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        """Проверяет пароль на соответствие хэшу"""
+        return check_password_hash(self.password, password)
+
     @classmethod
     def is_super(self) -> bool:
         """
@@ -135,8 +143,10 @@ class User(db.Model):
         """
         user = cls.query.filter_by(email=email, active=True).first()
         if user and check_password_hash(user.password, password):
-            return {"id": user.id, "name": user.name, "email": user.email}
+            return {"id": user.id, "name": user.name, "email": user.email,"is_superuser": user.is_superuser,  # 👈 обязательно добавь это!
+                "active": user.active}
         return None
+
 
     @classmethod
     def change_password(cls, email: str, new_password: str):
