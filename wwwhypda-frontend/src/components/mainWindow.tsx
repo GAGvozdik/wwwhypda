@@ -12,14 +12,14 @@ export default function MainWindow() {
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     let isOpenNow = useSelector((state: State) => state.open);  
 
-    const widthLessThan650 = useMediaQuery({ maxWidth: 1000 });
+    const widthLessThan650 = useMediaQuery({ maxWidth: 700 });
     const heightLessThan559 = useMediaQuery({ maxHeight: 559 });
     const unsupportedResolution = widthLessThan650 || heightLessThan559;
     
     if (unsupportedResolution) {
         return (
             <div className={`${styles.menuLabel} ${styles.lowScreen}`} style={{color: 'var(--tree-text)', backgroundColor: 'var(--drawer-color)', height: '100vh'}}>
-                The window size should be larger than 1000x560
+                The window size should be larger than 700x560
             </div>
         )
     }

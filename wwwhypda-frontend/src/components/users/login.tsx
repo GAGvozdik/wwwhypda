@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { UpdateToken } from '../../redux/actions';
 import axios from 'axios';
@@ -15,7 +15,47 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
-    const [isError, setIsError] = useState<boolean>(false); // Добавляем флаг для ошибки
+    const [isError, setIsError] = useState<boolean>(false);
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const decodedToken = JSON.parse(atob(token.split('.')[1]));
+                const expirationTime = decodedToken.exp * 1000; // Срок истечения токена в миллисекундах
+                const currentTime = new Date().getTime();
+                console.log('expirationTime - currentTime')
+                // Если токен истекает через 2 минуты или менее, обновляем его
+                if (expirationTime - currentTime <= 2 * 60 * 1000) {
+                    refreshToken();
+                }
+            }
+        }, 20 * 1000); // Проверяем каждую минуту
+        // }, 60 * 1000); // Проверяем каждую минуту
+
+        // Очищаем интервал при размонтировании компонента
+        return () => clearInterval(intervalId);
+    }, []);
+
+    const refreshToken = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) return;
+
+            const response = await axios.post(
+                'http://localhost:5000/users/refresh', 
+                {},
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const { token: newToken } = response.data.data;
+
+            // Обновляем токен в Redux и localStorage
+            dispatch(UpdateToken(newToken));
+            localStorage.setItem('token', newToken);
+        } catch (error) {
+            console.error('Error refreshing token:', error);
+        }
+    };
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,28 +64,31 @@ const Login: React.FC = () => {
         try {
             const response = await axios.post('http://localhost:5000/users/login', { email: username, password });
 
-            console.log('Server Response:', response.data);
-
             const { token, ...userData } = response.data.data;
 
-            dispatch(UpdateToken(token)); // Сохраняем токен в Redux
-            localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage
+            // Сохраняем токен и данные пользователя
+            dispatch(UpdateToken(token));
+            localStorage.setItem('user', JSON.stringify(userData));
             localStorage.setItem('token', token);
 
-            setError('Login successful!'); // Успешный логин
-            setIsError(false); // Устанавливаем, что это не ошибка
-            navigate('/account'); // Переход на страницу аккаунта
+            // Сохраняем время истечения токена
+            const decodedToken = JSON.parse(atob(token.split('.')[1]));
+            const expirationTime = decodedToken.exp * 1000; // Время истечения токена в миллисекундах
+            localStorage.setItem('tokenExpiration', expirationTime.toString());
+
+            setError('Login successful!');
+            setIsError(false);
+            navigate('/account');
         } catch (error: any) {
             setIsLoading(false);
 
-            // Обработка ошибок от сервера
             if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message); // Сообщение об ошибке от сервера
+                setError(error.response.data.message);
             } else {
-                setError("Login failed. Please check your credentials."); // Общая ошибка
+                setError("Login failed. Please check your credentials.");
             }
 
-            setIsError(true); // Устанавливаем, что это ошибка
+            setIsError(true);
         }
     };
 
@@ -70,14 +113,8 @@ const Login: React.FC = () => {
                     className={styles.inputField}
                     required
                 />
-
-                {/* Передаем параметр isError для изменения цвета */}
                 <ErrorMessage error={error} isError={isError} />
-
-                <UserButton
-                    text='Login'
-                    isLoading={isLoading}
-                />
+                <UserButton text='Login' isLoading={isLoading} />
             </form>
 
             <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>

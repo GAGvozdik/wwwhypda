@@ -5,6 +5,8 @@
     --main-font-size: 2vh;
     --under-menu-font-size: 4vh;
     --menu-font-size: 2.5vh;
+    --menu-font-size-little: 2vh;
+    --menu-font-size-smallest: 1.5vh;
     --head-font-size: 3vh;
     --button-font-size: 2vh;
     --input-font-size: 2vh;
@@ -50,6 +52,8 @@
     --main-font-size: 2vh;
     --under-menu-font-size: 4vh;
     --menu-font-size: 2.5vh;
+    --menu-font-size-little: 2vh;
+    --menu-font-size-smallest: 1.5vh;
     --head-font-size: 3vh;
     --button-font-size: 2vh;
     --input-font-size: 2vh;
@@ -237,9 +241,9 @@ body {
     //     grid-template-columns: 4.5fr 3fr 3fr 2fr 1fr 1fr 1fr;
     // }
 
-    // @media (max-width: 768px) {
-    //     grid-template-columns: 6fr 4fr 4fr 1fr 1fr 1fr 1fr;
-    // }
+    @media (max-width: 1000px) {
+        grid-template-columns: 60px 2.5fr 2.5fr 2.5fr 3fr 2.5fr 1fr 1fr 1fr 1fr;
+    }
 
     grid-template-columns: 60px 4fr 4fr 4fr 4fr 4fr 1fr 1fr 1fr 1fr;
     grid-template-rows: 1fr;
@@ -352,6 +356,15 @@ body {
     justify-content: center;
     align-items: center;
     font-size: var(--menu-font-size);
+
+    @media (max-width: 1000px) {
+        font-size: var(--menu-font-size-little);
+    }
+    @media (max-width: 850px) {
+        font-size: var(--menu-font-size-smallest);
+    }
+
+
     font-family: Afacad_Flux !important;
     letter-spacing: .15rem;
     text-decoration: none;
