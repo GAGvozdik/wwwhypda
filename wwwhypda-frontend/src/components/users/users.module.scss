@@ -3,17 +3,31 @@
     text-decoration: none;
 }
 
+
 .authForm {
     background-color: var(--form-color);
     border-radius: 8px;
-    padding: 0vh;
-    width: 30%;
 
+
+    // padding: 0vh;
+    // width: 30%;
+    // margin-top: 15vh;
+    // margin-bottom: 3vh;
+    // margin-left: 35%;
+    // margin-right: 35%;
+    // padding-bottom: 2vh;
+
+
+    align-self: center;
+    justify-self: center;
+    width: 40vh;
     margin-top: 15vh;
     margin-bottom: 3vh;
-    margin-left: 35%;
-    margin-right: 35%;
     padding-bottom: 2vh;
+
+
+
+
     border: 3px solid var(--border);
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
