@@ -14,6 +14,7 @@ from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
 import traceback  # В начало файла
+from flask_jwt_extended import get_csrf_token, create_access_token, set_access_cookies
 
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
 
@@ -26,12 +27,18 @@ def check_auth():
     identity = get_jwt_identity()
     return jsonify(logged_in=True, user=identity), 200
 
+
 @auth_bp.route("/", methods=["GET"])
 @jwt_required()
 def get_current_user():
-    current_user = get_jwt_identity()
-    """Retrieve the authenticated user's profile."""
-    return jsonify(message="Successfully retrieved user profile", data=current_user)
+    user_id = get_jwt_identity()
+    user_data = User.get_by_id(user_id)
+    
+    if not user_data:
+        return jsonify(message="User not found or inactive"), 404
+
+    return jsonify(message="Successfully retrieved user profile", data=user_data), 200
+
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
@@ -62,20 +69,16 @@ def login():
         print(f"Access Token: {access_token}")
         print(f"Refresh Token: {refresh_token}")
 
-
         response = jsonify(message="Successfully logged in", data={"email": user["email"], "is_superuser": user["is_superuser"]})
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
+        response.set_cookie("csrf_token", get_csrf_token(access_token))
         return response
  
     except Exception as e:
         import traceback
         traceback.print_exc()
         return jsonify(message="Something went wrong", error=str(e)), 500
-
-
-
-
 
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True)

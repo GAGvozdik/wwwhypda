@@ -8,7 +8,7 @@ const useAuthCheck = () => {
         const checkAuth = async () => {
             try {
                 const res = await axios.get('http://localhost:5000/users/check', {
-                    withCredentials: true 
+                    withCredentials: true,
                 });
                 setIsAuth(res.status === 200);  // Устанавливаем в true, если статус 200
             } catch (err) {

@@ -8,34 +8,37 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { IconButton, Tooltip } from '@mui/material';
-import { PersonOff, Security, SecurityOutlined } from '@mui/icons-material';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 
-const SuperiserAccount: React.FC = () => {
+const SuperuserAccount: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const token = useSelector((state: State) => state.token);
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
     const [userData, setUserData] = useState<any>(null);
     const [allUsers, setAllUsers] = useState<any[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    // Чтение cookie по имени
+    const getCookie = (name: string): string | null => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+        return null;
+    };
+
     useEffect(() => {
-        if (token) {
-            fetchUserData();
-            fetchAllUsers();
-        } else {
-            navigate('/login');
-        }
-    }, [token, navigate]);
+        fetchUserData();
+        fetchAllUsers();
+    }, []);
 
     const fetchUserData = async () => {
         setIsLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/users/', {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
             });
             setUserData(response.data.data);
         } catch (error: any) {
@@ -48,7 +51,7 @@ const SuperiserAccount: React.FC = () => {
     const fetchAllUsers = async () => {
         try {
             const response = await axios.get('http://localhost:5000/admin/get_all_users', {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
             });
             setAllUsers(response.data.data);
         } catch (error: any) {
@@ -57,22 +60,27 @@ const SuperiserAccount: React.FC = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('tokenExpiration'); // Если ты сохраняешь и время истечения
-        localStorage.removeItem('is_superuser'); // Если ты сохраняешь и время истечения
-
         dispatch(Logout());
         navigate('/login');
     };
 
     const performAction = async (url: string, userId: number) => {
+        const csrfToken = getCookie('csrf_access_token');
+        if (!csrfToken) {
+            setError("CSRF token not found in cookie");
+            return;
+        }
+
         try {
             await axios.post(`http://localhost:5000${url}/${userId}`, {}, {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                },
             });
             fetchAllUsers();
-        } catch (err) {
+        } catch (err: any) {
+            setError(err.response?.data?.error || 'Ошибка при отправке запроса');
             console.error(err);
         }
     };
@@ -115,7 +123,7 @@ const SuperiserAccount: React.FC = () => {
                     </Tooltip>
                     <Tooltip title="Remove Superuser Status">
                         <IconButton onClick={() => performAction('/admin/remove-super', data.id)}>
-                            <DoDisturbIcon sx={{ color: 'var(--tree-text)' }} />
+                            <DoDisturb sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
                 </div>
@@ -123,10 +131,8 @@ const SuperiserAccount: React.FC = () => {
             minWidth: 200,
             maxWidth: 300
         }
-    ], [token]);
+    ], []);
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
-    
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
         foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
@@ -164,7 +170,7 @@ const SuperiserAccount: React.FC = () => {
                         pagination={true}
                         suppressRowHoverHighlight
                         suppressColumnVirtualisation
-                        domLayout="autoHeight"  // позволяет автоматически подгонять высоту таблицы
+                        domLayout="autoHeight"
                     />
                 </div>
             </div>
@@ -173,4 +179,4 @@ const SuperiserAccount: React.FC = () => {
     );
 };
 
-export default SuperiserAccount;
+export default SuperuserAccount;

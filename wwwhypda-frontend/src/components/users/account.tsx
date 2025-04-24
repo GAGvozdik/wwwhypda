@@ -25,6 +25,9 @@ const Account: React.FC = () => {
             const response = await axios.get('http://localhost:5000/users/', {
                 withCredentials: true, // отправляем куки
             });
+            console.log('response.data.data', response.data.data.name);
+            console.log('response.data', response.data.name);
+            console.log('response', response);
             setUserData(response.data.data);
         } catch (error: any) {
             if (error.response?.status === 401) {
