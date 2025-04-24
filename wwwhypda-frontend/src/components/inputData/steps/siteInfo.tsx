@@ -41,6 +41,7 @@ const defaultRowData: SiteRow[] = [
 ];
 
 const SiteInfo = () => {
+    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const containerStyle = useMemo(() => ({
         width: "100%",
         height: "58vh",
@@ -129,11 +130,11 @@ const SiteInfo = () => {
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
-        foregroundColor: "var(--tree-text)",
-        headerTextColor: "var(--tree-text)",
-        rangeSelectionBorderColor: "var(--tree-text)",
+        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
+        headerTextColor: isDarkTheme ? "var(--tree-text)" : "red",
+        rangeSelectionBorderColor: isDarkTheme ? "var(--tree-text)" : "red",
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-        columnBorder: { color: '#33383d', width: '1px' },
+        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
     });
 
     const handleCellValueChanged = (params: any) => {

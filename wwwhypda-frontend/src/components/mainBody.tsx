@@ -38,8 +38,8 @@ import Register from './users/registration';
 import { AppProvider } from '@toolpad/core/AppProvider';
 import ForgotPassword from './users/forgotPassword';
 
-import SuperuserAccount from './users/superuser';
-import SuperProtectedRoute from './users/superProtectedRoute';
+import SuperuserAccount from './users/admin/superuser';
+import SuperProtectedRoute from './users/admin/superProtectedRoute';
 
 
 

@@ -81,7 +81,7 @@ interface RockTypeData {
 
 const MeasurementSampleTable = () => {
     const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
-
+    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [scale, setScale] = useState<Scale[]>([]);
@@ -268,11 +268,11 @@ const MeasurementSampleTable = () => {
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
-        foregroundColor: "var(--tree-text)",
+        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
         headerTextColor: "var(--tree-text)",
         rangeSelectionBorderColor: "var(--tree-text)",
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-        columnBorder: { color: '#33383d', width: '1px' },
+        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
     });
     
     const cellSelection = useMemo<boolean | CellSelectionOptions>(() => {
