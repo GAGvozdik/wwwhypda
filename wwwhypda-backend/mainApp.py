@@ -14,6 +14,7 @@ from rocks.rocks_bp import rocks_bp
 from dotenv import load_dotenv
 from auth.auth_models import db
 from auth.authentication import auth_bp
+from auth.admin.admin import admin_bp
 from common_defenitions import mail
 
 #TODO add recaptcha
@@ -75,6 +76,7 @@ db.init_app(app)
 
 # Register authentication Blueprint
 app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     os.getenv('SWAGGER_URL'),

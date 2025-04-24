@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from '../menu.module.scss'; 
+import styles from '../../menu.module.scss'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Logout } from '../../redux/actions';
-import { State } from '../../common/types';
+import { Logout } from '../../../redux/actions';
+import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -47,7 +47,7 @@ const SuperiserAccount: React.FC = () => {
 
     const fetchAllUsers = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/users/get_all_users', {
+            const response = await axios.get('http://localhost:5000/admin/get_all_users', {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setAllUsers(response.data.data);
@@ -95,22 +95,22 @@ const SuperiserAccount: React.FC = () => {
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Tooltip title="Deactivate User">
-                        <IconButton onClick={() => performAction('/users/deactivate', data.id)}>
+                        <IconButton onClick={() => performAction('/admin/deactivate', data.id)}>
                             <PersonOff sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Activate User">
-                        <IconButton onClick={() => performAction('/users/activate', data.id)}>
+                        <IconButton onClick={() => performAction('/admin/activate', data.id)}>
                             <CheckCircleIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Promote to Superuser">
-                        <IconButton onClick={() => performAction('/users', data.id)}>
+                        <IconButton onClick={() => performAction('/admin', data.id)}>
                             <Security sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Remove Superuser Status">
-                        <IconButton onClick={() => performAction('/users/remove-super', data.id)}>
+                        <IconButton onClick={() => performAction('/admin/remove-super', data.id)}>
                             <DoDisturbIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
@@ -121,13 +121,15 @@ const SuperiserAccount: React.FC = () => {
         }
     ], [token]);
 
+    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+    
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
-        fontFamily: 'Afacad_Flux !important',
-        foregroundColor: 'var(--tree-text)',
-        headerTextColor: 'var(--tree-text)',
-        rangeSelectionBorderColor: 'var(--tree-text)',
-        rangeSelectionBackgroundColor: 'var(--scrollbar-track-color)',
-        columnBorder: { color: '#33383d', width: '1px' },
+        fontFamily: "Afacad_Flux !important",
+        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
+        headerTextColor: "var(--tree-text)",
+        rangeSelectionBorderColor: "var(--tree-text)",
+        rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
+        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
     });
 
     const containerStyle = useMemo(() => ({ 

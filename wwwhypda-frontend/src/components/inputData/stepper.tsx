@@ -37,7 +37,7 @@ const CustomStepIconRoot = styled('div')<{ ownerState: { active?: boolean; compl
     height: '4vh',
     fontSize: '2vh',
     fontFamily: 'Afacad_Flux',
-    color: 'var(--step-color)', 
+    color: 'var(--step-color-active)', 
     transition: '0.8s',
   })
 );
