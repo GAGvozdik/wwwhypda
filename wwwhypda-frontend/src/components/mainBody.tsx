@@ -67,6 +67,7 @@ export default function MainMenu() {
                 } />  */}
 
                 <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
+                {/* <Route path="/superaccount" element={<SuperProtectedRoute><Account /></SuperProtectedRoute>} /> */}
                 <Route path="/superaccount" element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} />
 
                 
