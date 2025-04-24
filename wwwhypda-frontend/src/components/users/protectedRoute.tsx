@@ -1,32 +1,25 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { State } from '../../common/types';
-import isTokenValid  from './initAuth';
-
-interface ProtectedRouteProps {
-    children: React.ReactNode;
-}
+import useAuthCheck from './useAuthCheck';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const token = useSelector((state: State) => state.token);
+    const isAuth = useAuthCheck();
 
-    // Проверка валидности токена
-    const valid = token && isTokenValid(token);
-
-    if (!valid) {
-        return <Navigate to="/login" />;
+    if (isAuth === null) {
+        console.log('isAuth === null')
+        return <div>Checking authentication...</div>;  // Показываем спиннер или сообщение
     }
 
-    return <>{children}</>;
+    if (!isAuth) {
+        console.log('не авторизован, редиректим на /login')
+        return <Navigate to="/login" />;  // Если не авторизован, редиректим на /login
+    }
+    console.log('авторизован, показываем дочерние элементы')
+    return <>{children}</>;  // Если авторизован, показываем дочерние элементы
 };
 
 export default ProtectedRoute;
-
-
-
-
