@@ -14,36 +14,36 @@
 
     --color-scheme: light;
 
-    --menu: #164077;
-    --tree-text: #164077;
+    --menu: #4a96a3;
+    --tree-text: #4a96a3;
     --menu-hover: #c2a776;
     --menu-border: #4e555a;
     --body-color: #f2dcb3;
     --form-color: #fff2d9;
-    --under-body-color: #436ca1;
+    --under-body-color: #4a96a3ca;
     --drawer-icon: #f7f6fc;
     --menu-labels: #f7f6fc;
     --icons: white;
     --icon-hover-color: rgb(197, 242, 255);
-    --buttons: #164077;
-    --border: #164077; 
+    --buttons: #4a96a3;
+    --border: #4a96a3; 
     --drawer-color: #fff2d9;  
-    --drawer-border-color: #164077;
+    --drawer-border-color: #4a96a3;
     --input: rgb(255, 255, 255);
     --input-hover: rgba(255, 255, 255, 0.543);
     --input-placeholder: grey;
     --submit-button-text: rgb(255, 255, 255);
     --submit-button-text-hover: rgb(255, 255, 255);
-    --submit-button-hover: #436ca1;
-    --submit-button-active: #2063ba;
+    --submit-button-hover: #4a96a3ae;
+    --submit-button-active: #4a96a3;
     --tree-hover: #bec9d8;
     --table-color: #fffaef;
-    --radio-color: #436ca1;
-    --scrollbar-color: #669de4;
-    --scrollbar-hover-color: #3c659a;
+    --radio-color: #4a96a3;
+    --scrollbar-color: #4a96a3ae;
+    --scrollbar-hover-color: #4a96a351;
     --table-color: #fff2d9; 
-    --step-color-active: #3c659a; 
-    --step-color: #7292bd; 
+    --step-color-active: #358e9d; 
+    --step-color: #4a96a383; 
     --step-text: #fff2d9;
 }
 
@@ -70,10 +70,10 @@
     --menu-labels: #949494;
     --icons: #949494;
     --icon-hover-color: rgb(201, 201, 201);
-    --buttons: #164077;
+    --buttons: #4a96a3;
     --border: #949494; 
     --drawer-color: #22282e;  
-    --drawer-border-color: #164077;
+    --drawer-border-color: #4a96a3;
     --input: rgba(255, 255, 255, 0.411);
     --input-hover: rgba(255, 255, 255, 0.623);
     --input-placeholder: #1d1d1d;
@@ -241,7 +241,7 @@ body {
     // }
 
     @media (max-width: 1000px) {
-        grid-template-columns: 60px 2.5fr 2.5fr 2.5fr 3fr 2.5fr 1fr 1fr 1fr 1fr;
+        grid-template-columns: 60px 2fr 2.5fr 3fr 3fr 2.5fr 1fr 1fr 1fr 1fr;
     }
     
     grid-template-columns: 60px 4fr 4fr 4fr 4fr 4fr 1fr 1fr 1fr 1fr;

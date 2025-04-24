@@ -131,8 +131,8 @@ const SiteInfo = () => {
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
         foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
-        headerTextColor: isDarkTheme ? "var(--tree-text)" : "red",
-        rangeSelectionBorderColor: isDarkTheme ? "var(--tree-text)" : "red",
+        headerTextColor: "var(--tree-text)",
+        rangeSelectionBorderColor: "var(--tree-text)",
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
         columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
     });
