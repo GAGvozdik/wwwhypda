@@ -1,27 +1,84 @@
-"""Authentication and User Management Routes
-
-This module defines Flask routes for handling user authentication,
-registration, password reset, and profile management.
-
-It uses JWT for authentication, Flask-Mail for email-based verification,
-and SQLAlchemy for database interactions.
-"""
-
 from flask import Blueprint, request, jsonify, current_app
 import jwt
 import time
 import uuid
 from auth.auth_models import db, User, ConfirmationCode
-from auth.auth_middleware import token_required, superuser_required
 from auth.validate import validate_email_and_password, validate_user, validate_password
 from flask_mail import Message
 from common_defenitions import mail
 from datetime import datetime, timedelta, timezone
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, set_access_cookies
+from datetime import timedelta
+from flask import make_response
+from flask_jwt_extended import unset_jwt_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
+
 
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
 
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
+
+
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.json
+        if not data:
+            return jsonify(message="Please provide credentials"), 400
+
+        user = User.login(data["email"], data["password"])
+        if not user:
+            return jsonify(message="Invalid email or password", error="Unauthorized"), 404
+
+        identity = user["id"]
+
+        # Настраиваем время жизни
+        access_expires = timedelta(minutes=15)
+        refresh_expires = timedelta(days=30)
+
+        access_token = create_access_token(identity=identity, expires_delta=access_expires)
+        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires)
+
+        response = jsonify(message="Successfully logged in", data={"email": user["email"]})
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+        return response
+
+    except Exception as e:
+        return jsonify(message="Something went wrong", error=str(e)), 500
+
+
+
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify(message="Logged out")
+    unset_jwt_cookies(response)
+    return response
+
+
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    response = jsonify(message="Access token refreshed")
+    set_access_cookies(response, access_token)
+    return response
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @auth_bp.route("/", methods=["OPTIONS"])
 def options_user():
@@ -153,116 +210,20 @@ def confirm_password_reset():
         return jsonify(message="Something went wrong", error=str(e)), 500
 
 
-@auth_bp.route("/login", methods=["POST"])
-def login():
-    """
-    Authenticate user and return a JWT token with an expiration time.
-
-    This endpoint validates user credentials, and if correct, generates a JWT token.
-    The token contains an expiration timestamp to enforce session limits.
-    
-    Returns:
-        - 200: JSON containing the JWT token and user data.
-        - 400: If request data is missing or invalid.
-        - 404: If authentication fails due to incorrect credentials.
-        - 500: If an unexpected error occurs.
-    """
-    try:
-        data = request.json
-        if not data:
-            return jsonify(message="Please provide user details", error="Bad request"), 400
-
-        # Validate email and password before processing the request
-        is_validated = validate_email_and_password(data.get('email'), data.get('password'))
-        if is_validated is not True:
-            return jsonify(message="Invalid data", error=is_validated), 400
-
-        # Authenticate user
-        user = User.login(data["email"], data["password"])
-        if user:
-            # Set token expiration time (1 minute from now)
-            expiration_time = datetime.now(timezone.utc) + timedelta(minutes=2)
-
-            # Create JWT payload with essential claims
-            token_payload = {
-                "user_id": user["id"],
-                "exp": expiration_time,  # Expiration timestamp (token validity period)
-                "iat": datetime.now(timezone.utc),  # Issued-at timestamp (when the token was generated)
-                "jti": str(uuid.uuid4())  # Unique token identifier (optional but useful for revocation)
-            }
-
-            # Generate JWT token
-            user["token"] = jwt.encode(
-                token_payload,
-                current_app.config["SECRET_KEY"],
-                algorithm="HS256"
-            )
-
-            return jsonify(message="Successfully authenticated", data=user)
-
-        # If authentication fails (incorrect email/password)
-        return jsonify(message="Invalid email or password", error="Unauthorized"), 404
-
-    except Exception as e:
-        # Handle unexpected server errors
-        return jsonify(message="Something went wrong", error=str(e)), 500
-
 
 @auth_bp.route("/", methods=["GET"])
-@token_required
-def get_current_user(current_user):
+@jwt_required()
+def get_current_user():
+    current_user = get_jwt_identity()
     """Retrieve the authenticated user's profile."""
     return jsonify(message="Successfully retrieved user profile", data=current_user)
 
-    
-@auth_bp.route("/refresh", methods=["POST"])
-@token_required
-def refresh_token(current_user):
-    """
-    Refresh JWT token if the current one is still valid.
-
-    This endpoint verifies the user's current token and returns a new one
-    with a fresh expiration time.
-
-    Returns:
-        - 200: New JWT token and expiration details.
-        - 401: If token is invalid or expired.
-    """
-    try:
-        # Устанавливаем новое время жизни токена (например, 30 минут)
-        expiration_time = datetime.now(timezone.utc) + timedelta(minutes=2)
-
-        token_payload = {
-            "user_id": current_user["id"],
-            "exp": expiration_time,
-            "iat": datetime.now(timezone.utc),
-            "jti": str(uuid.uuid4())
-        }
-
-        new_token = jwt.encode(
-            token_payload,
-            current_app.config["SECRET_KEY"],
-            algorithm="HS256"
-        )
-
-        return jsonify({
-            "message": "Token refreshed successfully",
-            "data": {
-                "token": new_token,
-                "expires_at": expiration_time.isoformat()
-            }
-        }), 200
-
-    except Exception as e:
-        return jsonify({
-            "message": "Failed to refresh token",
-            "error": str(e)
-        }), 500
 
 
 @auth_bp.route("/", methods=["PUT"])
-@token_required
-def update_user(current_user):
+@jwt_required()
+def update_user():
+    current_user = get_jwt_identity()
     """Update the authenticated users profile (only name)."""
     try:
         user_data = request.json
