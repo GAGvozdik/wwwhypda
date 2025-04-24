@@ -22,8 +22,8 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/users/login', { email: username, password });
-
+            const response = await axios.post('http://localhost:5000/users/login', { email: username, password }, { withCredentials: true });
+            
             console.log('Server Response:', response.data);
 
             const { token, is_superuser, ...userData } = response.data.data;

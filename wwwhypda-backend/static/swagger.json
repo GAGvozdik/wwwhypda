@@ -1,110 +1,54 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.1",
   "info": {
-    "title": "Flask API Documentation",
+    "title": "Authentication API",
+    "description": "API for managing user authentication, including login, logout, token refresh, and authorization check.",
     "version": "1.0.0"
   },
   "paths": {
-    "/api/anonce": {
+    "/users/check": {
       "get": {
-        "summary": "Get data anonce",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "examples": {
-          "application/json": {
-            "value": [
-              {
-                "id": 1,
-                "name": "Example Source"
-              }
-            ]
-          }
-        }
-      }
-    },
-    "/api/rock_type": {
-      "get": {
-        "summary": "Get all rock types",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/parameters": {
-      "get": {
-        "summary": "Get all parameters",
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/samples/{rt_id}/{id_Parameter}": {
-      "get": {
-        "summary": "Get samples by rock type and parameter",
-        "parameters": [
+        "tags": ["Authentication"],
+        "summary": "Check if the user is logged in",
+        "description": "This endpoint checks if the user is logged in by validating the JWT token.",
+        "operationId": "checkAuth",
+        "security": [
           {
-            "name": "rt_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "id_Parameter",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "BearerAuth": []
           }
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "User is logged in",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
+                  "type": "object",
+                  "properties": {
+                    "logged_in": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "user": {
+                      "type": "string",
+                      "example": "123"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired JWT",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
+                    }
                   }
                 }
               }
@@ -113,29 +57,85 @@
         }
       }
     },
-    "/api/countries": {
-      "get": {
-        "summary": "Get all countries",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all countries with their ISO codes and names.",
+    "/users/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login and get access and refresh tokens",
+        "description": "This endpoint authenticates the user and returns access and refresh JWT tokens.",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "password123"
+                  }
+                },
+                "required": ["email", "password"]
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Successful response",
+            "description": "Successfully logged in and tokens returned",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "ISO_code": {
-                        "type": "string",
-                        "example": "USA"
-                      },
-                      "country_name": {
-                        "type": "string",
-                        "example": "United States"
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully logged in"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "email": {
+                          "type": "string",
+                          "example": "user@example.com"
+                        }
                       }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Please provide credentials"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid email or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Invalid email or password"
                     }
                   }
                 }
@@ -143,19 +143,41 @@
             }
           },
           "500": {
-            "description": "Internal Server Error",
+            "description": "Internal server error",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                    "message": {
                       "type": "string",
-                      "example": "Error in Country.get_all_countries"
-                    },
-                    "details": {
+                      "example": "Something went wrong"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/logout": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Logout and clear cookies",
+        "description": "This endpoint logs out the user by removing the JWT cookies.",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Successfully logged out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
                       "type": "string",
-                      "example": "Database connection failed"
+                      "example": "Logged out"
                     }
                   }
                 }
@@ -165,314 +187,44 @@
         }
       }
     },
-    "/api/reviews": {
-      "get": {
-        "summary": "Get all reviews",
-        "security": [{ "bearerAuth": [] }],
+    "/users/refresh": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Refresh access token",
+        "description": "This endpoint refreshes the access token using the refresh token.",
+        "operationId": "refresh",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Access token successfully refreshed",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_Review": {
-                        "type": "integer",
-                        "description": "Review ID"
-                      },
-                      "review_level": {
-                        "type": "string",
-                        "description": "Review level"
-                      }
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Access token refreshed"
                     }
                   }
                 }
               }
             }
-          }
-        },
-        "examples": {
-          "application/json": {
-            "value": [
-              {
-                "id_Review": 1,
-                "review_level": "High"
-              },
-              {
-                "id_Review": 2,
-                "review_level": "Medium"
-              },
-              {
-                "id_Review": 3,
-                "review_level": "Low"
-              }
-            ]
-          }
-        }
-      }
-    },
-    "/api/environments": {
-      "get": {
-        "summary": "Get all environments",
-        "security": [{ "bearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "Success",
+          },
+          "401": {
+            "description": "Unauthorized - Invalid or expired refresh token",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "env_id": {
-                        "type": "integer",
-                        "description": "Environment ID"
-                      },
-                      "env_name": {
-                        "type": "string",
-                        "description": "Environment name"
-                      },
-                      "env_description": {
-                        "type": "string",
-                        "description": "Environment description"
-                      },
-                      "env_wiki_link": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "Link to environment wiki"
-                      },
-                      "env_id_parent": {
-                        "type": "integer",
-                        "description": "Parent environment ID"
-                      },
-                      "UID": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "Unique Identifier"
-                      },
-                      "PARENTUID": {
-                        "type": "string",
-                        "nullable": true,
-                        "description": "Parent Unique Identifier"
-                      },
-                      "env_Status": {
-                        "type": "integer",
-                        "description": "Environment status"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "examples": {
-          "application/json": {
-            "value": [
-              {
-                "env_id": 1,
-                "env_name": "Forest",
-                "env_description": "A dense and diverse ecosystem.",
-                "env_wiki_link": "https://example.com/forest",
-                "env_id_parent": 0,
-                "UID": "123-ABC",
-                "PARENTUID": null,
-                "env_Status": 1
-              },
-              {
-                "env_id": 2,
-                "env_name": "Desert",
-                "env_description": "An arid and sandy biome.",
-                "env_wiki_link": null,
-                "env_id_parent": 1,
-                "UID": "456-DEF",
-                "PARENTUID": "123-ABC",
-                "env_Status": 0
-              }
-            ]
-          }
-        }
-      }
-    },
-    "/api/fracturations": {
-      "get": {
-        "summary": "Get all fracturation degrees",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all fracturation degrees.",
-        "responses": {
-          "200": {
-            "description": "A list of fracturation degrees",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_fracturation": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "fracturation_degree": {
-                        "type": "string",
-                        "example": "High"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/scales": {
-      "get": {
-        "summary": "Get all scales",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all scales with their descriptions.",
-        "responses": {
-          "200": {
-            "description": "A list of scales",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_Scale": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "scale_value": {
-                        "type": "string",
-                        "example": "10 cm"
-                      },
-                      "scale_descr": {
-                        "type": "string",
-                        "example": "Small scale"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/qualities": {
-      "get": {
-        "summary": "Get all qualities",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all quality levels.",
-        "responses": {
-          "200": {
-            "description": "A list of quality levels",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_Quality": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "quality_level": {
-                        "type": "string",
-                        "example": "High"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/experiment_types": {
-      "get": {
-        "summary": "Get all experiment types",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all experiment types.",
-        "responses": {
-          "200": {
-            "description": "A list of experiment types",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_Exp_type": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "exp_name": {
-                        "type": "string",
-                        "example": "Hydrostatic Test"
-                      },
-                      "exp_description": {
-                        "type": "string",
-                        "example": "Testing water pressure in a controlled environment"
-                      },
-                      "exp_status": {
-                        "type": "integer",
-                        "example": 1
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/interpretation_methods": {
-      "get": {
-        "summary": "Get all interpretation methods",
-        "security": [{ "bearerAuth": [] }],
-        "description": "Returns a list of all interpretation methods.",
-        "responses": {
-          "200": {
-            "description": "A list of interpretation methods",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id_Int_meth": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "int_meth_name": {
-                        "type": "string",
-                        "example": "Regression Analysis"
-                      },
-                      "int_meth_desc": {
-                        "type": "string",
-                        "example": "Analyzing trends using regression models"
-                      },
-                      "id_Exp_ty": {
-                        "type": "integer",
-                        "example": 1
-                      },
-                      "int_meth_status": {
-                        "type": "integer",
-                        "example": 0
-                      }
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Unauthorized"
                     }
                   }
                 }
@@ -485,7 +237,7 @@
   },
   "components": {
     "securitySchemes": {
-      "bearerAuth": {
+      "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
         "bearerFormat": "JWT"

@@ -13,13 +13,31 @@ from datetime import timedelta
 from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
-
+import traceback  # В начало файла
 
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
 
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
+@auth_bp.route('/check', methods=['GET'])
+@jwt_required()
+def check_auth():
+    identity = get_jwt_identity()
+    return jsonify(logged_in=True, user=identity), 200
+
+@auth_bp.route("/", methods=["GET"])
+@jwt_required()
+def get_current_user():
+    current_user = get_jwt_identity()
+    """Retrieve the authenticated user's profile."""
+    return jsonify(message="Successfully retrieved user profile", data=current_user)
+
+@auth_bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify(message="Logged out")
+    unset_jwt_cookies(response)
+    return response
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -32,30 +50,31 @@ def login():
         if not user:
             return jsonify(message="Invalid email or password", error="Unauthorized"), 404
 
-        identity = user["id"]
+        # !! Обязательно строка:
+        identity = str(user["id"])
 
-        # Настраиваем время жизни
         access_expires = timedelta(minutes=15)
         refresh_expires = timedelta(days=30)
 
         access_token = create_access_token(identity=identity, expires_delta=access_expires)
         refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires)
 
-        response = jsonify(message="Successfully logged in", data={"email": user["email"]})
+        print(f"Access Token: {access_token}")
+        print(f"Refresh Token: {refresh_token}")
+
+
+        response = jsonify(message="Successfully logged in", data={"email": user["email"], "is_superuser": user["is_superuser"]})
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
         return response
-
+ 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return jsonify(message="Something went wrong", error=str(e)), 500
 
 
 
-@auth_bp.route("/logout", methods=["POST"])
-def logout():
-    response = jsonify(message="Logged out")
-    unset_jwt_cookies(response)
-    return response
 
 
 @auth_bp.route("/refresh", methods=["POST"])
@@ -66,8 +85,6 @@ def refresh():
     response = jsonify(message="Access token refreshed")
     set_access_cookies(response, access_token)
     return response
-
-
 
 
 
@@ -209,14 +226,6 @@ def confirm_password_reset():
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
 
-
-
-@auth_bp.route("/", methods=["GET"])
-@jwt_required()
-def get_current_user():
-    current_user = get_jwt_identity()
-    """Retrieve the authenticated user's profile."""
-    return jsonify(message="Successfully retrieved user profile", data=current_user)
 
 
 

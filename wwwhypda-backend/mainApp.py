@@ -24,17 +24,22 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
 
 # === CORS ===
-CORS(
-    app,
-    supports_credentials=True,
-    resources={
-        r"/*": {
-            "origins": os.getenv("FRONTEND_ORIGIN", "*"),
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN"]
-        }
-    }
-)
+# CORS(
+#     app,
+#     supports_credentials=True,
+#     resources={
+#         r"/*": {
+#             "origins": os.getenv("FRONTEND_ORIGIN", "*"),
+#             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+#             "allow_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN"]
+#         }
+#     }
+# )
+
+# CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+CORS(app, supports_credentials=True, origins=["http://localhost:3000"], 
+     allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"])
+
 
 # === Configs ===
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')

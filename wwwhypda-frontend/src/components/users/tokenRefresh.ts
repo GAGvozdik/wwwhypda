@@ -32,7 +32,7 @@ const useTokenRefresh = () => {
             } catch (error) {
                 console.error('Error checking or refreshing token:', error);
             }
-        },  30 * 1000); // проверка каждую минуту
+        },  6 * 60 * 1000); // проверка каждую минуту
 
         return () => clearInterval(intervalId);
     }, [dispatch]);
