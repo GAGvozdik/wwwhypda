@@ -4,7 +4,7 @@ import jwt
 from rocks.rocks_models import Country, Review, Environment, Fracturation
 from rocks.rocks_models import Source, RockType, Parameter, Sample, Measure, Scale
 from rocks.rocks_models import ExperimentType, Quality, InterpretationMethod
-from auth.auth_middleware import token_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
 rocks_bp = Blueprint("api", __name__, url_prefix="/api")
 
@@ -17,49 +17,58 @@ def get_msg():
 
 
 @rocks_bp.route('/countries', methods=['GET'])
-@token_required
-def get_countries(current_user):
+@jwt_required()
+def get_countries():
+    current_user = get_jwt_identity()
     return Country.get_all_countries()
 
 @rocks_bp.route('/reviews', methods=['GET'])
-@token_required
-def get_reviews(current_user):
+@jwt_required()
+def get_reviews():
+    current_user = get_jwt_identity()
     return Review.get_all_reviews()
 
 @rocks_bp.route('/environments', methods=['GET'])
-@token_required
-def get_environments(current_user):
+@jwt_required()
+def get_environments():
+    current_user = get_jwt_identity()
     return Environment.get_all_environments()
 
 @rocks_bp.route('/fracturations', methods=['GET'])
-@token_required
-def get_fracturations(current_user):
+@jwt_required()
+def get_fracturations():
+    current_user = get_jwt_identity()
     return Fracturation.get_all_fracturations()
 
 @rocks_bp.route('/scales', methods=['GET'])
-@token_required
-def get_scales(current_user):
+@jwt_required()
+def get_scales():
+    current_user = get_jwt_identity()
     return Scale.get_all_scales()
 
 @rocks_bp.route('/samples', methods=['GET']) 
-@token_required
-def api_samples(current_user):
+@jwt_required()
+def api_samples():
+    current_user = get_jwt_identity()
     results = Sample.get_all_samples()
     return jsonify(results)
 
 @rocks_bp.route('/qualities', methods=['GET'])
-@token_required
-def get_qualities(current_user):
+@jwt_required()
+def get_qualities():
+    current_user = get_jwt_identity()
     return Quality.get_all_qualities()
 
 @rocks_bp.route('/experiment_types', methods=['GET'])
-@token_required
-def get_experiment_types(current_user):
+@jwt_required()
+def get_experiment_types():
+    current_user = get_jwt_identity()
     return ExperimentType.get_all_experiment_types()
 
 @rocks_bp.route('/interpretation_methods', methods=['GET'])
-@token_required
-def get_interpretation_methods(current_user):
+@jwt_required()
+def get_interpretation_methods():
+    current_user = get_jwt_identity()
     return InterpretationMethod.get_all_interpretation_methods()
 
 @rocks_bp.route('/anonce', methods=['GET']) 
