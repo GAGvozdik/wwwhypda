@@ -49,6 +49,7 @@ const GeneralInfo = () => {
         marginBottom: '5vh',
     }), []);    
 
+    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [reviews, setReviews] = useState<Reviews[]>([]);
@@ -136,11 +137,11 @@ const GeneralInfo = () => {
 
     const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
         fontFamily: "Afacad_Flux !important",
-        foregroundColor: "var(--tree-text)",
-        headerTextColor: "var(--tree-text)",
-        rangeSelectionBorderColor: "var(--tree-text)",
+        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
+        headerTextColor: isDarkTheme ? "var(--tree-text)" : "red",
+        rangeSelectionBorderColor: isDarkTheme ? "var(--tree-text)" : "red",
         rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-        columnBorder: { color: '#33383d', width: '1px' },
+        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
     });
 
     return (
