@@ -57,7 +57,11 @@ const SuperiserAccount: React.FC = () => {
     };
 
     const handleLogout = () => {
-        localStorage.clear();
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        localStorage.removeItem('tokenExpiration'); // Если ты сохраняешь и время истечения
+        localStorage.removeItem('is_superuser'); // Если ты сохраняешь и время истечения
+
         dispatch(Logout());
         navigate('/login');
     };
