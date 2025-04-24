@@ -63,13 +63,28 @@ const SiteInfo = () => {
         }
     });
 
-    const token = useSelector((state: State) => state.token);
+    const getCookie = (name: string): string | null => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+        return null;
+    };
 
     useEffect(() => {
         const fetchCountries = async () => {
+
+            const csrfToken = getCookie('csrf_access_token');
+
+            if (!csrfToken) {
+                setError("CSRF token not found in cookie");
+                return;
+            }
             try {
                 const response = await axios.get<Country[]>('http://localhost:5000/api/countries', {
-                    headers: { Authorization: `Bearer ${token}` }
+                                    withCredentials: true,
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
                 });
 
                 if (!response.data || response.data.length === 0) {
@@ -157,7 +172,7 @@ const SiteInfo = () => {
                 }}>
                     <LoadIcon size={60} />
                 </div>
-            ) : error ? <p>{error}</p> : (
+            ) : error ? <div style={{fontFamily: 'Afacad_Flux', fontSize: "2vh", margin:'1vh'}}>{error}</div>   : (
                 <>
                     <div style={{
                         color: "var(--tree-text)",

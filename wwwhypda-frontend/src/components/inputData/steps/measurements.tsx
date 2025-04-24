@@ -108,13 +108,31 @@ export default function Measurements() {
         //         { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
         //     ]);
         // }
+
+
+    const getCookie = (name: string): string | null => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+        return null;
+    };
+
+
         const fetchData = async () => {
+
+            const csrfToken = getCookie('csrf_access_token');
+
+            if (!csrfToken) {
+                setError("CSRF token not found in cookie");
+                return;
+            }
+
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { headers: { Authorization: `Bearer ${token}`}}),
-                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { headers: { Authorization: `Bearer ${token}`}}),
-                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { headers: { Authorization: `Bearer ${token}`}}),
-                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { headers: { Authorization: `Bearer ${token}`}})
+                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
+                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
+                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
+                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {
@@ -293,7 +311,7 @@ export default function Measurements() {
                     <LoadIcon size={60}/>
                 </div> 
                     : 
-                error ? <p>{error}</p> 
+                error ? <div style={{fontFamily: 'Afacad_Flux', fontSize: "2vh", margin:'1vh'}}>{error}</div> 
                 : 
             (
                 <>
