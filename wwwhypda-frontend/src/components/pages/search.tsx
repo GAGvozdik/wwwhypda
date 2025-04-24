@@ -156,6 +156,7 @@ const Search: React.FC = () => {
                         justifyContent: 'center',
                         alignItems: 'center',
                         fontSize: 'var(--head-font-size)',
+                        textAlign: 'center', 
                     }}
                 >
                     Search in {rt_name}

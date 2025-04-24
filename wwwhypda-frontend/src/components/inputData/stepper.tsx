@@ -109,9 +109,6 @@ export default function CustomStepper() {
 
     return (
         <Box sx={{ width: '100%' }} className={styles.treeText}>
-
-
-
             <Stepper activeStep={activeStep}>
                 {
                     steps.map((label, index) => {
