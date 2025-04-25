@@ -1,5 +1,8 @@
-1) Install NodeJS (`https://nodejs.org/en/download`) and Python (stable work with Python 3.12.6).
-2) Create file env.configs in folder with `mainApp.py` and write into:
+# Installation instructions
+
+1. Install NodeJS ([https://nodejs.org/en/download](https://nodejs.org/en/download))
+   and Python (this version was tested with Python 3.12.6).
+2. Create file `env.configs` in folder with `mainApp.py` and write into:
 
    MAIL_SERVER = smtp.gmail.com
 
