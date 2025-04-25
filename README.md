@@ -43,7 +43,7 @@
    :warning: **Warning:** DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 
 
-3. Run the backend. In your terminal, inside the cloned `wwhypda`
+3. Run the back-end. In your terminal, inside the cloned `wwhypda`
    folder, first move to the folder `wwhypda-backend`:
 
        cd wwhypda-backend
@@ -56,7 +56,7 @@
 
    In the activated virtual environment, install with ``pip`` the requirements:
    
-       pip install -r requrements.txt
+       pip install -r requirements.txt
 
    Finally, you can run the backend application by using:
    
@@ -67,14 +67,14 @@
    the running terminal busy, you can type `<CRTL>+<z>` and the `bg`.
    
    
-4. Run the frontend.
+4. Run the front-end.
    Type in terminal in folder `wwwhydpa`:
 
        cd wwhypda-frontend
        npm i
        npm start
 
-You can then follow the provided local url to work with wwhypda!
+You can then follow the provided local URL to work with wwhypda!
 
 :memo: **Note:** Once the main application is running, you can use
 Swagger to check the documentation using the link:
