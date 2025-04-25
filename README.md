@@ -24,15 +24,15 @@
 
    - Turn on 2 step verification in your google account
 
-     ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/instruction3.png)
+     ![Turn on 2 step verification in your google account](/instructions/instruction3.png)
 
    - Go to *App passwords*
 
-     ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/instruction1.png)
+     ![Go to App passwords](/instructions/instruction1.png)
 
    - Register your gmail app and copy code
 
-     ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/instruction2.png)
+     ![Register your gmail app and copy code](/instructions/instruction2.png)
 
      or try to follow the instructions that you can find at [https://mailtrap.io/blog/flask-send-email-gmail/](https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code.
 
