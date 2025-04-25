@@ -8,16 +8,16 @@
    > MAIL_SERVER = smtp.gmail.com
    >
    > MAIL_PORT = 465
-
+   >
    > SECRET_KEY='your_long_random_code_%*&8hHJ+=_Klhtfo*89buibgyuoGUIonguionphiohio'
    > DATABASE_URL='sqlite:///wwhypda.db'
    > DEBUG=True
-
+   >
    > MAIL_USERNAME = 'yourmail@gmail.com'
-
+   >
    > SWAGGER_URL = '/swagger'
    > API_URL = '/static/swagger.json'
-
+   >
    > MAIL_PASSWORD = 'your mail special code'
 
 3. Set up the mail server. To get mail code to set up a mail server using gmail:
@@ -42,10 +42,11 @@
 
 
 3. Run the backend.
-   In your terminal, inside the cloned `wwhypda` folder, first move to the folder ``wwhypda-backend`:
+   In your terminal, inside the cloned `wwhypda` folder, first move to the folder `wwhypda-backend`:
 
        cd wwhypda-backend
-   Then create a virtual environment and activate it. You can for example use the following line to create and activate
+       
+   Then, create a virtual environment and activate it. You can for example use the following line to create and activate
    the Python virtual environment `workEnv`:
    
        python -m venv workEnv workEnv/Scripts/Activate
@@ -58,8 +59,11 @@
    
        python mainApp.py
 
+   It may happen that some other module (for example `dotenv`) is missing. Install it with `pip`.
+   
    :memo: **Note:** Once the main application is running, you can use Swagger to check the documentation using the link:
    [http://127.0.0.1:5000/swagger/](http://127.0.0.1:5000/swagger/)
+   
 4. Run the frontend.
    Type in terminal in folder `wwwhydpa`:
 
