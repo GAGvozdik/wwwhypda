@@ -34,20 +34,23 @@
 
      ![Register your gmail app and copy code](/instructions/instruction2.png)
 
-     or try to follow the instructions that you can find at [https://mailtrap.io/blog/flask-send-email-gmail/](https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code.
+     or try to follow the instructions that you can find at
+     [https://mailtrap.io/blog/flask-send-email-gmail/](https://mailtrap.io/blog/flask-send-email-gmail/)
+     and create your own mail code.
 
    - Add your mail code in `env.configs` in ``MAIL_PASSWORD = 'your mail special code'``
 
    :warning: **Warning:** DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 
 
-3. Run the backend.
-   In your terminal, inside the cloned `wwhypda` folder, first move to the folder `wwhypda-backend`:
+3. Run the backend. In your terminal, inside the cloned `wwhypda`
+   folder, first move to the folder `wwhypda-backend`:
 
        cd wwhypda-backend
        
-   Then, create a virtual environment and activate it. You can for example use the following line to create and activate
-   the Python virtual environment `workEnv`:
+   Then, create a virtual environment and activate it. You can for
+   example use the following line to create and activate the Python
+   virtual environment `workEnv`:
    
        python -m venv workEnv workEnv/Scripts/Activate
 
@@ -59,10 +62,10 @@
    
        python mainApp.py
 
-   It may happen that some other module (for example `dotenv`) is missing. Install it with `pip`.
+   It may happen that some other module (for example `dotenv`) is
+   missing. Install it with `pip`.  Also, if you do not want to keep
+   the running terminal busy, you can type `<CRTL>+<z>` and the `bg`.
    
-   :memo: **Note:** Once the main application is running, you can use Swagger to check the documentation using the link:
-   [http://127.0.0.1:5000/swagger/](http://127.0.0.1:5000/swagger/)
    
 4. Run the frontend.
    Type in terminal in folder `wwwhydpa`:
@@ -73,4 +76,6 @@
 
 You can then follow the provided local url to work with wwhypda!
 
-
+:memo: **Note:** Once the main application is running, you can use
+Swagger to check the documentation using the link:
+[http://127.0.0.1:5000/swagger/](http://127.0.0.1:5000/swagger/)
