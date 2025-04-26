@@ -31,17 +31,19 @@ logging.basicConfig(level=logging.DEBUG)
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
-# 🔐 Защищённый маршрут для проверки текущей сессии
 @auth_bp.route('/check', methods=['GET'])
 @jwt_required()
 def check_auth():
     identity = get_jwt_identity()
-    claims = get_jwt()  # получаем дополнительные claims из токена
+    claims = get_jwt()
+    print('Received claims at /check:', claims)  # 📌 Печать claims в консоль
+
     return jsonify(
         logged_in=True,
         user_id=identity,
         is_superuser=claims.get("is_superuser", False)
     ), 200
+
     
 
 # 🔑 Логин
@@ -84,6 +86,8 @@ def login():
         return jsonify(message="Something went wrong", error=str(e)), 500
 
 
+
+
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh():
@@ -92,15 +96,38 @@ def refresh():
         if not identity:
             raise ValueError("Missing JWT identity")
 
-        access_token = create_access_token(identity=identity, expires_delta=timedelta(minutes=20))
+        # ⚡ Ищем пользователя в БД
+        user = User.query.get(identity)
+        if not user:
+            raise ValueError("User not found")
+
+        # ⚡ Читаем актуальный статус суперпользователя
+        is_superuser = user.is_superuser
+        print('is_superuser', is_superuser)
+        # ⚡ Генерируем новый access токен
+        new_access_token = create_access_token(
+            identity=identity,
+            additional_claims={"is_superuser": is_superuser},
+            expires_delta=timedelta(minutes=20)
+        )
+
         response = jsonify(message="Access token refreshed")
-        set_access_cookies(response, access_token)
-        response.set_cookie("csrf_token", get_csrf_token(access_token))
+        set_access_cookies(response, new_access_token)
+        response.set_cookie(
+            "csrf_token",
+            get_csrf_token(new_access_token),
+            httponly=False,
+            secure=True,
+            samesite="Strict"
+        )
         return response
 
     except Exception as e:
-        logging.error("Error refreshing access token: %s", str(e))
+        auth_bp.logger.error(f"Error refreshing access token: {e}")
         return jsonify(message="Failed to refresh access token", error=str(e)), 500
+
+
+
 
 @auth_bp.route('/super_check', methods=['GET'])
 @jwt_required()

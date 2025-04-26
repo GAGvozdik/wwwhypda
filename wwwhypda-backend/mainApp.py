@@ -12,6 +12,8 @@ from flask_jwt_extended import (
     set_access_cookies, set_refresh_cookies, get_csrf_token,
     jwt_required, get_jwt_identity, get_jwt
 )
+from flask_jwt_extended import get_jwt, get_jwt_identity, create_access_token, set_access_cookies, get_csrf_token
+from datetime import timedelta
 import secrets
 
 
@@ -91,19 +93,25 @@ db.init_app(app)
 jwt = JWTManager(app)
 
 
-# === CSRF token rotation ===
+
 @app.after_request
 def rotate_csrf_token(response):
     if request.method in ["POST", "PUT", "DELETE"] and response.status_code == 200:
         try:
-            identity = get_jwt_identity()
-            if identity:
-                new_token = create_access_token(identity=identity)
-                set_access_cookies(response, new_token)
-                response.set_cookie("csrf_token", get_csrf_token(new_token), httponly=False)
-        except Exception:
-            pass
+            access_token = request.cookies.get("access_token_cookie")
+            if access_token:
+                csrf_token = get_csrf_token(access_token)
+                response.set_cookie(
+                    "csrf_token",
+                    csrf_token,
+                    httponly=False,
+                    secure=True,  # если у тебя HTTPS
+                    samesite="Strict"
+                )
+        except Exception as e:
+            app.logger.error(f"Error rotating CSRF token: {e}")
     return response
+
 
 # === Register Blueprints ===
 app.register_blueprint(auth_bp)

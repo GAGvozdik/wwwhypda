@@ -5,14 +5,10 @@ const useTokenRefresh = () => {
     useEffect(() => {
         const refreshAccessToken = async () => {
             try {
-                console.log('Current cookies:', document.cookie);
-
                 const csrfRefreshToken = document.cookie
                     .split('; ')
                     .find(row => row.startsWith('csrf_refresh_token='))
                     ?.split('=')[1];
-
-                console.log('csrfRefreshToken:', csrfRefreshToken);
 
                 if (!csrfRefreshToken) {
                     console.warn('Missing CSRF refresh token, skipping refresh.');
@@ -32,12 +28,30 @@ const useTokenRefresh = () => {
 
                 console.log(response.data.message || 'Access token refreshed successfully');
 
+                // ⏩ После успешного рефреша сразу проверяем пользователя
+                await refreshUserData();
+
             } catch (error: any) {
                 console.error('Error refreshing access token:', error.response?.data || error.message);
 
                 if (error.response?.status === 401) {
                     console.error('Unauthorized! Refresh token is missing or expired.');
                 }
+            }
+        };
+
+        const refreshUserData = async () => {
+            try {
+                const res = await axios.get('http://localhost:5000/users/check', {
+                    withCredentials: true,
+                });
+
+                console.log('User checked:', res.data);
+                // 🔥 Тут ты можешь обновить состояние пользователя, например:
+                // dispatch(setUser(res.data))
+
+            } catch (error) {
+                console.error('Error checking user:', error);
             }
         };
 
