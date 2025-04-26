@@ -1,6 +1,8 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import useAuthCheck from '../useAuthCheck';
+import LoadIcon from '../../commonFeatures/loadIcon';
+
 
 interface SuperProtectedRouteProps {
     children: React.ReactNode;
@@ -11,7 +13,7 @@ const SuperProtectedRoute: React.FC<SuperProtectedRouteProps> = ({ children }) =
     console.log('10');
     if (isAuth === null || isSuperuser === null) {
         console.log('11');
-        return <div>Checking authentication...</div>;
+        return <LoadIcon size={60}/>;
     }
 
     if (!isAuth) {
