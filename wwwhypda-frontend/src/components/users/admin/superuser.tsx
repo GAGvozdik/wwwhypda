@@ -99,7 +99,7 @@ const SuperuserAccount: React.FC = () => {
             localStorage.clear();
             clearAllCookies(); // Очистка всех куков вручную
             dispatch(Logout());
-            navigate('/login');
+            navigate('/login', { replace: true });
         }
     };
 
