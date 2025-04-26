@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import styles from "../menu.module.scss" 
+import styles from "./menuStyles.module.scss" 
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 
 interface MenuButtonProps {
