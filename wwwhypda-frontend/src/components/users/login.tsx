@@ -37,6 +37,9 @@ const Login: React.FC = () => {
 
             const { is_superuser } = checkResponse.data;
 
+            localStorage.setItem('isSuperuser', JSON.stringify(is_superuser));
+            console.log('isSuperuser in main menu', is_superuser);
+
             // 🔄 Переход по роли
             navigate(is_superuser ? '/superaccount' : '/account');
 
