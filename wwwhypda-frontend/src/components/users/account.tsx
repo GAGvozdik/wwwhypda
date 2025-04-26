@@ -4,10 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Logout } from '../../redux/actions';
-
-
-
-
+import LoadIcon from '../commonFeatures/loadIcon';
 
 const Account: React.FC = () => {
     console.log('Account component rendered');
@@ -100,7 +97,7 @@ const Account: React.FC = () => {
                 Your Account
             </div>
             <div style={{ margin: '5vh' }}>
-                {isLoading && <p>Loading...</p>}
+                {isLoading && <LoadIcon size={60}/>}
                 {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
                 {userData && (
                     <div>
