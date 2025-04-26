@@ -3,7 +3,7 @@ import { State, Action } from '../common/types';
 
 
 const initialState: State = {
-    open: false,
+    open: true,
     isDarkTheme: true,
     currentRTID: '',
     currentRTName: '',
