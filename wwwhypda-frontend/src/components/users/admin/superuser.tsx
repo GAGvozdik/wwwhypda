@@ -11,6 +11,8 @@ import { IconButton, Tooltip } from '@mui/material';
 import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 
+import LoadIcon from '../../commonFeatures/loadIcon';
+
 const SuperuserAccount: React.FC = () => {
     console.log('SuperuserAccount');
     const dispatch = useDispatch();
@@ -192,7 +194,7 @@ const SuperuserAccount: React.FC = () => {
         <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
             <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>Super Account</div>
             <div style={{ margin: '5vh' }}>
-                {isLoading && <p>Loading...</p>}
+                {isLoading && <LoadIcon size={60}/>}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 {userData && (
                     <div style={{ marginBottom: '3vh' }}>
