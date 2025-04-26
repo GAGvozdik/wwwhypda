@@ -16,10 +16,10 @@ import ClearIcon from '@mui/icons-material/Clear';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LanguageIcon from '@mui/icons-material/Language';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import useAuthCheck from '../users/useAuthCheck';
 
 export default function MainMenu() {
 
-    const token = useSelector((state: State) => state.token);
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const dispatch = useDispatch();
@@ -34,7 +34,14 @@ export default function MainMenu() {
         dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
     };
 
-    let is_superuser = localStorage.getItem('is_superuser');
+    const { isAuth, isSuperuser } = useAuthCheck();  // Получаем данные о текущем пользователе
+
+
+    if (isAuth === null || isSuperuser === null) {
+        // Пока не знаем, кто пользователь -> можно вернуть "загрузку" или ничего
+        return null; // или какой-то Spinner
+    }
+
 
     return (
     
@@ -115,8 +122,7 @@ export default function MainMenu() {
 
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={is_superuser ? '/superaccount' : token ? '/account' : '/login'}>
-                
+                <Link to={isSuperuser ? '/superaccount' : '/account'}>
                     <IconButton>
                         <AccountCircleIcon className={styles.themeIcon} />
                     </IconButton>

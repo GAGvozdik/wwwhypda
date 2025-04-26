@@ -28,12 +28,12 @@ class User(db.Model):
         """Проверяет пароль на соответствие хэшу"""
         return check_password_hash(self.password, password)
 
-    @classmethod
     def is_super(self) -> bool:
         """
         Returns True if the user is a superuser.
         """
         return self.is_superuser
+
     
     @classmethod
     def deactivate_user(cls, user_id: int) -> bool:

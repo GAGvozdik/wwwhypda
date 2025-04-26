@@ -55,7 +55,6 @@ const GeneralInfo = () => {
     const [reviews, setReviews] = useState<Reviews[]>([]);
     const [envs, setEnvs] = useState<Environment[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);  // rowData из localStorage
-    const token = useSelector((state: State) => state.token);
 
     // При загрузке компонента
     useEffect(() => {
