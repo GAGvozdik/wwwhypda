@@ -7,7 +7,7 @@ import MainTree from './pages/mainTree';
 import MainMenu from './menu/mainMenu';
 import MainBody from './mainBody';
 import useTokenRefresh from './users/tokenRefresh';
-
+import GitHubIcon from '@mui/icons-material/GitHub';
     
 export default function MainWindow() {
     // useTokenRefresh(); 
@@ -40,8 +40,18 @@ export default function MainWindow() {
             <MainTree />
 
             <div className={`${styles.underMenu}`}>
+            <div style={{fontWeight: '300'}}>This website was created by Gvozdik G. and A. Comunian.</div>
+            <a 
+                href="https://github.com/GAGvozdik/wwwhypda" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={`${styles.undermenuLink}`}
+            >
+                <GitHubIcon />
+                https://github.com/GAGvozdik/wwwhypda
+            </a>
             </div>
-
+            
         </div>
     );
 }
