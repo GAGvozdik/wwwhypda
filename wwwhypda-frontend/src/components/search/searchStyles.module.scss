@@ -10,10 +10,8 @@
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size);
     transition: 0.5s;
-
-
+    height: 5vh;
 }
-
 
 
 .submitButton:hover {
@@ -27,4 +25,29 @@
     background-color: var(--submit-button-active);
     color: var(--submit-button-text);
     transition: 0.5s;
+}
+
+.treeText{
+    color: var(--tree-text);
+    font-family: Afacad_Flux !important;
+    font-size: var(--main-font-size);
+}
+
+
+.searchTableRow{
+    display: block;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.searchTableRow:hover{
+    background: var(--scrollbar-hover-color); 
+    transition: 0.5s;
+}
+
+
+.wrap-td {
+  max-width: 200px;
+  word-break: break-word;
+  white-space: normal;
 }

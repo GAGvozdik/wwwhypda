@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { State, DynamicRowData } from '../../common/types';
 import { generateColumns } from '../../common/types'; 
 import DataTable from './dataTable'; 
+import styles from "./searchStyles.module.scss";
 
 const SearchResultsTable: React.FC = () => {
     // Получаем данные из Redux

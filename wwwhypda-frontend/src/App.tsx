@@ -1,14 +1,13 @@
 import React from 'react';
-import styles from "./components/menu.module.scss" 
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import MainWindow from './components/mainWindow';
+import MainWindow from './components/mainWindow/mainWindow';
 
 export default function App() {
 
     return (
-        <div className={styles.app}>
+        <div>
             <Provider store={store}>
                 <Router>
                     <MainWindow />

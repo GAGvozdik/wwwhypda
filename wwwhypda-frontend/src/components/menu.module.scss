@@ -117,280 +117,8 @@ body {
     transition: 0.3s;
 }
 
-// menu and body position
-.container {
-    background-color: var(--body-color);
-    width: 100%;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 0fr 29fr;
-    grid-template-rows: 0.8fr 11fr 1fr;
-    gap: 0px; 
-    transition: 0.3s;
-}
 .ag-row-hover {
     background-color: #28a745 !important; /* Зелёный цвет для строки */
-}
-.openContainer {
-    background-color: var(--body-color);
-    width: 100%;
-    height: 100vh;
-    display: grid;
-    grid-template-columns: 1.2fr 3.9fr;
-
-    @media (max-width: 1400px) {
-        grid-template-columns: 1.3fr 3.7fr;
-    }
-
-    @media (max-width: 1300px) {
-        grid-template-columns: 1.5fr 3.5fr;
-    }
-    @media (max-width: 1100px) {
-        grid-template-columns: 1.7fr 3.3fr;
-    }
-    grid-template-rows: 0.8fr 11fr 1fr;
-    gap: 0px; 
-    box-sizing: border-box;
-    transition: 0.3s;
-}
-
-
-// body position
-.bodyMenuItem {
-    grid-row-start: 2; 
-    grid-row-end: 2; 
-    grid-column-start: 2; 
-    grid-column-end: 2; 
-    margin-bottom: 2vh;
-    margin-right: 2vh;
-}
-
-.drawerButton{
-    transition: 0.5s;
-}
-
-.drawerIcon{
-    color: var(--drawer-icon);
-    transition: 0.5s;
-}
-
-.drawerIcon:hover{
-    // color: var(--drawer-icon-hover);
-    transition: 0.5s;
-}
-
-
-
-
-
-// under menu box
-.underMenu {
-    padding: 1vh;
-    grid-row-start: 3; 
-    grid-row-end: 3; 
-    grid-column-start: 1; 
-    grid-column-end: 4; 
-    background-color: var(--under-body-color);
-    color: var(--menu-labels);
-    transition: 0.5s;
-    // display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0px; 
-    font-family: Afacad_Flux !important;
-    font-size: var(--under-menu-font-size);
-    font-weight: 300;
-}
-
-
-
-.undermenuLink{
-    text-decoration: underline;
-    color: var(--menu-labels);
-    transition: 0.5s;
-    display: flex;
-    align-items: center;
-    font-family: Afacad_Flux !important;
-    font-size: var(--under-menu-font-size);
-    font-weight: 300;
-    gap: 1vh;
-}
-
-.undermenuLink:hover{
-    transition: 0.5s;
-    font-weight: 600;
-}
-
-.undermenuLink:active{
-    text-decoration: none;
-    transition: 0.5s;
-}
-
-.mainMenuItems {
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-    grid-column-start: 1; 
-    grid-column-end: 4; 
-
-    display: grid;
-
-    // @media (max-width: 1200px) {
-    //     grid-template-columns: 3fr 2fr 2fr 3fr 1fr 1fr 1fr;
-    // }
-
-    // @media (max-width: 992px) {
-    //     grid-template-columns: 4.5fr 3fr 3fr 2fr 1fr 1fr 1fr;
-    // }
-
-    @media (max-width: 1000px) {
-        grid-template-columns: 60px 2fr 2.5fr 3fr 3fr 2.5fr 1fr 1fr 1fr 1fr;
-    }
-    
-    grid-template-columns: 60px 4fr 4fr 4fr 4fr 4fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 1fr;
-    transition: 0.5s;
-    background-color: var(--menu);
-}
-
-.themeIcon{
-    color: var(--icons);
-    transition: 1.5s ease;
-}
-
-
-// .menuLabel:hover .themeIcon {
-//     color: var(--icon-hover-color);
-//     transition: 1.5s ease;
-// }
-.menuLabel .themeIcon {
-    color: var(--icons);
-    transition: color 1.5s ease;
-}
-
-.menuLabel:hover .themeIcon {
-    color: var(--icon-hover-color);
-}
-
-// common menu button
-.menuButton {
-    padding: 0px;
-    border-radius: 0px;
-    transition: 0.5s;
-}
-
-.menuButton:hover {
-    color: var(--menu);
-    border-radius: 0px;
-    background-color: var(--menu-hover);
-    transition: 0.5s;
-}
-
-
-// menu button positions
-
-.drawerItem{
-    grid-column-start: 1; 
-    grid-column-end: 1; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.homePageItem{
-    grid-column-start: 2; 
-    grid-column-end: 2; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.searchItem{
-    grid-column-start: 3; 
-    grid-column-end: 3; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.contributeItem{
-    grid-column-start: 4; 
-    grid-column-end: 4; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.documentsItem{
-    grid-column-start: 5; 
-    grid-column-end: 5; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.helpItem{
-    grid-column-start: 7; 
-    grid-column-end: 7; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.languageItem{
-    grid-column-start: 8; 
-    grid-column-end: 8; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.accountItem{
-    grid-column-start: 9; 
-    grid-column-end: 9; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.themeItem{
-    grid-column-start: 10; 
-    grid-column-end: 10; 
-    grid-row-start: 1; 
-    grid-row-end: 1; 
-}
-
-.menuLabel {
-    float: left;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: var(--menu-font-size);
-
-    @media (max-width: 1000px) {
-        font-size: var(--menu-font-size-little);
-    }
-    @media (max-width: 850px) {
-        font-size: var(--menu-font-size-smallest);
-    }
-
-
-    font-family: Afacad_Flux !important;
-    letter-spacing: .15rem;
-    text-decoration: none;
-    color: var(--menu-labels);
-    transition: 0.5s;
-    height: 100%;
-    width: 100%;
-    transition: 0.5s;
-    // border: 1px solid var(--menu-border);
-}
-
-.lowScreen{
-    color: black; 
-    background-color: var(--body-color);
-}
-
-.menuLabel:hover {
-    transition: 0.5s;
-    
-}
-
-.mainMenu {
-    background-color: var(--menu);
-    transition: 0.5s;
-    border-radius: 50px;
 }
 
 
@@ -492,6 +220,20 @@ input::placeholder {
     transition: 0.5s;
 }
 
+.submitButton:hover {
+    transition: 0.5s;
+    color: var(--submit-button-text-hover);
+    background-color: var(--submit-button-hover);
+    
+}
+.submitButton:active  {
+    transition: 0.5s;
+    background-color: var(--submit-button-active);
+    color: var(--submit-button-text);
+    transition: 0.5s;
+}
+
+
 .link{
     color: var(--tree-text);
     text-decoration: underline;
@@ -508,18 +250,6 @@ input::placeholder {
     font-weight: 300;
 }
 
-.submitButton:hover {
-    transition: 0.5s;
-    color: var(--submit-button-text-hover);
-    background-color: var(--submit-button-hover);
-    
-}
-.submitButton:active  {
-    transition: 0.5s;
-    background-color: var(--submit-button-active);
-    color: var(--submit-button-text);
-    transition: 0.5s;
-}
 
 
 ::-webkit-scrollbar {
@@ -547,16 +277,5 @@ input::placeholder {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-hover-color); 
     border-radius: 8px;
-    transition: 0.5s;
-}
-
-.searchTableRow{
-    display: block;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.5s;
-}
-.searchTableRow:hover{
-    background: var(--scrollbar-hover-color); 
     transition: 0.5s;
 }

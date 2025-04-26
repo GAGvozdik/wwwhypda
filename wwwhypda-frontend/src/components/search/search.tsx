@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../menu.module.scss';
+import styles from "./searchStyles.module.scss";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
