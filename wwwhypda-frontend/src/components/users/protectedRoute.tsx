@@ -7,16 +7,19 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const isAuth = useAuthCheck();
-
+    const { isAuth } = useAuthCheck();
+    console.log('5');
     if (isAuth === null) {
-        return <div>Checking authentication...</div>;  // Показываем спиннер или сообщение
+        console.log('6');
+        return <div>Checking authentication...</div>;
     }
 
     if (!isAuth) {
-        return <Navigate to="/login" />;  // Если не авторизован, редиректим на /login
+        console.log('7');
+        return <Navigate to="/login" />;
     }
-    return <>{children}</>;  // Если авторизован, показываем дочерние элементы
+    console.log('8');
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;

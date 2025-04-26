@@ -8,33 +8,37 @@ const useTokenRefresh = () => {
 
     useEffect(() => {
         const intervalId = setInterval(async () => {
-            // console.log('setInt');
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
+            console.log('check');
             try {
-                const decodedToken = JSON.parse(atob(token.split('.')[1]));
-                const expirationTime = decodedToken.exp * 1000;
-                const currentTime = Date.now();
+                // Извлекаем CSRF токен из обычной куки
+                const csrfToken = document.cookie
+                    .split('; ')
+                    .find(row => row.startsWith('csrf_token='))
+                    ?.split('=')[1];
 
-                if (expirationTime - currentTime <= 60 * 1000) {
-                    // console.log('⏳ Refreshing token...');
-                    const response = await axios.post(
-                        'http://localhost:5000/users/refresh',
-                        {},
-                        { headers: { Authorization: `Bearer ${token}` } }
-                    );
+                if (!csrfToken) return;
 
-                    const { token: newToken } = response.data.data;
-                    dispatch(UpdateToken(newToken));
-                    localStorage.setItem('token', newToken);
-                }
+                // Попытка обновить токен
+                const response = await axios.post(
+                    'http://localhost:5000/users/refresh',
+                    {},
+                    {
+                        withCredentials: true,  // Это гарантирует, что cookies отправляются
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,  // Добавляем CSRF токен в заголовок
+                        },
+                    }
+                );
+
+                const { message } = response.data;
+                console.log(message);  // Можно логировать ответ, если нужно
+
             } catch (error) {
-                console.error('Error checking or refreshing token:', error);
+                console.error('Error refreshing token:', error);
             }
-        },  6 * 60 * 1000); // проверка каждую минуту
+        }, 60 * 1000); // Проверка каждую минуту
 
-        return () => clearInterval(intervalId);
+        return () => clearInterval(intervalId);  // Очистка интервала при демонтировании компонента
     }, [dispatch]);
 };
 

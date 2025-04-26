@@ -12,6 +12,7 @@ import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
 
 const SuperuserAccount: React.FC = () => {
+    console.log('SuperuserAccount');
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
@@ -59,10 +60,47 @@ const SuperuserAccount: React.FC = () => {
         }
     };
 
-    const handleLogout = () => {
-        dispatch(Logout());
-        navigate('/login');
+    // Вспомогательная функция для удаления всех кук
+    function clearAllCookies() {
+        document.cookie.split(";").forEach((c) => {
+            document.cookie = c
+            .replace(/^ +/, "")
+            .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+        });
+    }
+
+    // Вспомогательная функция, если надо получить csrf_token из cookie
+    function getCsrfTokenFromCookie() {
+        const csrf = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf_token='))
+        ?.split('=')[1];
+        return csrf || '';
+    }
+
+    const handleLogout = async () => {
+        try {
+            const res = await axios.post('http://localhost:5000/users/logout', {}, {
+                withCredentials: true, // обязательно для куков
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfTokenFromCookie(), // если у вас проверяется CSRF
+                }
+            });
+
+            if (res.status === 200) {
+                console.log('Успешный выход');
+            }
+        } catch (err) {
+            console.error("Ошибка при выходе:", err);
+        } finally {
+            // Даже если ошибка - всё равно чистим клиент
+            localStorage.clear();
+            clearAllCookies(); // Очистка всех куков вручную
+            dispatch(Logout());
+            navigate('/login');
+        }
     };
+
 
     const performAction = async (url: string, userId: number) => {
         const csrfToken = getCookie('csrf_access_token');

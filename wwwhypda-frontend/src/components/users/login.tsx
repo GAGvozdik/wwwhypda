@@ -22,37 +22,39 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/users/login', { email: username, password }, { withCredentials: true });
-            
-            console.log('Server Response:', response.data);
+            // Шаг 1: логинимся
+            await axios.post('http://localhost:5000/users/login', {
+                email: username,
+                password: password
+            }, {
+                withCredentials: true
+            });
 
-            const { token, is_superuser, ...userData } = response.data.data;
+            // Шаг 2: сразу после логина проверяем /check
+            const checkResponse = await axios.get('http://localhost:5000/users/check', {
+                withCredentials: true
+            });
 
-            dispatch(UpdateToken(token)); // Сохраняем токен в Redux
-            localStorage.setItem('user', JSON.stringify(userData)); // Можно сохранить данные о пользователе в localStorage
+            const { is_superuser } = checkResponse.data;
 
-            localStorage.setItem('is_superuser', is_superuser); // 👈 сохраняем флаг
-
-            setError('Login successful!'); // Успешный логин
-
-            setIsError(false); // Устанавливаем, что это не ошибка
-            console.log('is_superuser', is_superuser);
+            // 🔄 Переход по роли
             navigate(is_superuser ? '/superaccount' : '/account');
 
-
+            setError('Login successful!');
+            setIsError(false);
         } catch (error: any) {
             setIsLoading(false);
 
-            // Обработка ошибок от сервера
-            if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message); // Сообщение об ошибке от сервера
+            if (error.response?.data?.message) {
+                setError(error.response.data.message);
             } else {
-                setError("Login failed. Please check your credentials."); // Общая ошибка
+                setError("Login failed. Please check your credentials.");
             }
 
-            setIsError(true); // Устанавливаем, что это ошибка
+            setIsError(true);
         }
     };
+
 
     return (
         <div className={styles.authForm}>
