@@ -3,7 +3,7 @@
     // var(--main-font-size)
 
     --main-font-size: 2vh;
-    --under-menu-font-size: 4vh;
+    --under-menu-font-size: 2vh;
     --menu-font-size: 2.5vh;
     --menu-font-size-little: 2vh;
     --menu-font-size-smallest: 1.5vh;
@@ -49,7 +49,7 @@
 
 .dark {
     --main-font-size: 2vh;
-    --under-menu-font-size: 4vh;
+    --under-menu-font-size: 2vh;
     --menu-font-size: 2.5vh;
     --menu-font-size-little: 2vh;
     --menu-font-size-smallest: 1.5vh;
@@ -212,17 +212,40 @@ body {
     grid-column-start: 1; 
     grid-column-end: 4; 
     background-color: var(--under-body-color);
-    color: var(--under-menu-font);
+    color: var(--menu-labels);
     transition: 0.5s;
-    display: grid;
-    grid-template-columns: 3fr 4fr;
-    grid-template-rows: 1fr 1fr 1fr;
+    // display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
     gap: 0px; 
     font-family: Afacad_Flux !important;
     font-size: var(--under-menu-font-size);
+    font-weight: 300;
 }
 
 
+
+.undermenuLink{
+    text-decoration: underline;
+    color: var(--menu-labels);
+    transition: 0.5s;
+    display: flex;
+    align-items: center;
+    font-family: Afacad_Flux !important;
+    font-size: var(--under-menu-font-size);
+    font-weight: 300;
+    gap: 1vh;
+}
+
+.undermenuLink:hover{
+    transition: 0.5s;
+    font-weight: 600;
+}
+
+.undermenuLink:active{
+    text-decoration: none;
+    transition: 0.5s;
+}
 
 .mainMenuItems {
     grid-row-start: 1; 
