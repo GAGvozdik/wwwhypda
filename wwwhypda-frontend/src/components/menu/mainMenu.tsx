@@ -26,6 +26,7 @@ export default function MainMenu() {
 
     const toggleTheme = () => {
         dispatch<UpdateThemeAction>(UpdateTheme(!isDarkTheme)); 
+        localStorage.setItem("isDarkTheme", String(!isDarkTheme));
     };
 
     let isOpenNow = useSelector((state: State) => state.open);  
