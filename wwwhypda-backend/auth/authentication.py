@@ -7,25 +7,88 @@ from auth.validate import validate_email_and_password, validate_user, validate_p
 from flask_mail import Message
 from common_defenitions import mail
 from datetime import datetime, timedelta, timezone
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask_jwt_extended import create_access_token, set_access_cookies
+# from flask_jwt_extended import jwt_required, get_jwt_identity
+# from flask_jwt_extended import create_access_token, set_access_cookies
 from datetime import timedelta
 from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
-from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
+# from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies, set_refresh_cookies
 import traceback  # В начало файла
-from flask_jwt_extended import get_csrf_token, create_access_token, set_access_cookies
-
+# from flask_jwt_extended import get_csrf_token, create_access_token, set_access_cookies
+from flask_jwt_extended import (
+    create_access_token, create_refresh_token,
+    get_jwt_identity, get_jwt, jwt_required,
+    set_access_cookies, set_refresh_cookies, get_csrf_token
+)
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
 
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
+# 🔐 Защищённый маршрут для проверки текущей сессии
 @auth_bp.route('/check', methods=['GET'])
 @jwt_required()
 def check_auth():
     identity = get_jwt_identity()
-    return jsonify(logged_in=True, user=identity), 200
+    claims = get_jwt()  # получаем дополнительные claims из токена
+    return jsonify(
+        logged_in=True,
+        user_id=identity,
+        is_superuser=claims.get("is_superuser", False)
+    ), 200
+    
+
+# 🔑 Логин
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    try:
+        data = request.json
+        if not data:
+            return jsonify(message="Please provide credentials"), 400
+
+        user = User.login(data["email"], data["password"])
+        if not user:
+            return jsonify(message="Invalid email or password", error="Unauthorized"), 404
+
+        identity = str(user["id"])
+
+        access_expires = timedelta(minutes=60)
+        refresh_expires = timedelta(days=1)
+
+        # 📌 Добавляем is_superuser в токен
+        access_token = create_access_token(
+            identity=identity,
+            expires_delta=access_expires,
+            additional_claims={"is_superuser": user["is_superuser"]}
+        )
+        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires)
+
+        response = jsonify(message="Successfully logged in")
+        set_access_cookies(response, access_token)
+        set_refresh_cookies(response, refresh_token)
+
+        # ⚠️ CSRF-токен: нужен, если ты защищаешь POST-запросы от CSRF (для форм, не для fetch/AJAX)
+        response.set_cookie("csrf_token", get_csrf_token(access_token), httponly=False)
+
+        return response
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify(message="Something went wrong", error=str(e)), 500
+
+
+
+@auth_bp.route('/super_check', methods=['GET'])
+@jwt_required()
+def check_super_user():
+    identity = get_jwt_identity()
+    user = User.query.get(identity)
+    if not user:
+        return jsonify(message="User not found"), 404
+
+    return jsonify(logged_in=True, user=identity, is_superuser=user.is_super()), 200
+
 
 
 @auth_bp.route("/", methods=["GET"])
@@ -46,54 +109,18 @@ def logout():
     unset_jwt_cookies(response)
     return response
 
-@auth_bp.route("/login", methods=["POST"])
-def login():
-    try:
-        data = request.json
-        if not data:
-            return jsonify(message="Please provide credentials"), 400
 
-        user = User.login(data["email"], data["password"])
-        if not user:
-            return jsonify(message="Invalid email or password", error="Unauthorized"), 404
 
-        # !! Обязательно строка:
-        identity = str(user["id"])
-
-        access_expires = timedelta(minutes=15)
-        refresh_expires = timedelta(days=30)
-
-        access_token = create_access_token(identity=identity, expires_delta=access_expires)
-        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires)
-
-        print(f"Access Token: {access_token}")
-        print(f"Refresh Token: {refresh_token}")
-
-        response = jsonify(message="Successfully logged in", data={"email": user["email"], "is_superuser": user["is_superuser"]})
-        set_access_cookies(response, access_token)
-        set_refresh_cookies(response, refresh_token)
-        response.set_cookie("csrf_token", get_csrf_token(access_token))
-        return response
- 
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        return jsonify(message="Something went wrong", error=str(e)), 500
 
 @auth_bp.route("/refresh", methods=["POST"])
-@jwt_required(refresh=True)
+@jwt_required(refresh=True)  # Проверяем, что запрос содержит действующий refresh токен
 def refresh():
-    identity = get_jwt_identity()
-    access_token = create_access_token(identity=identity)
+    identity = get_jwt_identity()  # Извлекаем идентификатор пользователя из refresh токена
+    access_token = create_access_token(identity=identity, expires_delta=timedelta(minutes=2))  # Создаем новый access токен
     response = jsonify(message="Access token refreshed")
-    set_access_cookies(response, access_token)
+    set_access_cookies(response, access_token)  # Устанавливаем новый токен в HttpOnly cookie
+    response.set_cookie("csrf_token", get_csrf_token(access_token))  # Обновляем CSRF токен
     return response
-
-
-
-
-
-
 
 
 

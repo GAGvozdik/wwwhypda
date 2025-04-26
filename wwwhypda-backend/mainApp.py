@@ -4,10 +4,21 @@ from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from flask_swagger_ui import get_swaggerui_blueprint
 from dotenv import load_dotenv
+from flask_talisman import Talisman
+import logging
+from flask import request
+from flask_jwt_extended import (
+    JWTManager, create_access_token, create_refresh_token,
+    set_access_cookies, set_refresh_cookies, get_csrf_token,
+    jwt_required, get_jwt_identity, get_jwt
+)
+import secrets
+
 
 from auth.authentication import auth_bp
 from auth.admin.admin import admin_bp
 from rocks.rocks_bp import rocks_bp
+
 
 # from rocks.rocks_models import db
 # from auth.auth_models import db  # потенциально дублирование, оставь один из них
@@ -23,22 +34,28 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 
-# === CORS ===
-# CORS(
-#     app,
-#     supports_credentials=True,
-#     resources={
-#         r"/*": {
-#             "origins": os.getenv("FRONTEND_ORIGIN", "*"),
-#             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-#             "allow_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN"]
-#         }
-#     }
-# )
+# === Security Configuration ===
+csp = {
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'img-src': ["'self'", 'data:'],
+    'connect-src': ["'self'", "http://localhost:3000"],
+    'font-src': ["'self'"],
+    'object-src': ["'none'"],
+    'frame-src': ["'none'"],
+    'worker-src': ["'self'"],
+    'form-action': ["'self'"]
+}
+Talisman(app, content_security_policy=csp)
 
 # CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 CORS(app, supports_credentials=True, origins=["http://localhost:3000"], 
      allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"])
+
+# talisman = Talisman(app)
+logging.basicConfig(level=logging.DEBUG)
+
 
 
 # === Configs ===
@@ -70,6 +87,21 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 mail.init_app(app)
 db.init_app(app)
 jwt = JWTManager(app)
+
+
+# === CSRF token rotation ===
+@app.after_request
+def rotate_csrf_token(response):
+    if request.method in ["POST", "PUT", "DELETE"] and response.status_code == 200:
+        try:
+            identity = get_jwt_identity()
+            if identity:
+                new_token = create_access_token(identity=identity)
+                set_access_cookies(response, new_token)
+                response.set_cookie("csrf_token", get_csrf_token(new_token), httponly=False)
+        except Exception:
+            pass
+    return response
 
 # === Register Blueprints ===
 app.register_blueprint(auth_bp)

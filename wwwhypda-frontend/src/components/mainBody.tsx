@@ -47,8 +47,6 @@ import SuperProtectedRoute from './users/admin/superProtectedRoute';
 export default function MainMenu() {
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
-
-    const token = useSelector((state: State) => state.token);
     
     return (
         <div className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
@@ -66,9 +64,14 @@ export default function MainMenu() {
                     </AppProvider>
                 } />  */}
 
-                <Route path="/account" element={<ProtectedRoute><Account /></ProtectedRoute>} />
-                {/* <Route path="/superaccount" element={<SuperProtectedRoute><Account /></SuperProtectedRoute>} /> */}
-                <Route path="/superaccount" element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} />
+                <Route 
+                    path="/account" 
+                    element={<ProtectedRoute><Account /></ProtectedRoute>} 
+                />
+                <Route 
+                    path="/superaccount" 
+                    element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
+                />
 
                 
                 {/* <Route

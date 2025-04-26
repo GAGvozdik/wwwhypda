@@ -87,7 +87,6 @@ const MeasurementSampleTable = () => {
     const [scale, setScale] = useState<Scale[]>([]);
     const [fracturation, setFracturation] = useState<Fracturation[]>([]);
     const [rocksData, setRocksData] = useState<RockTypeData[]>([]);
-    const token = useSelector((state: State) => state.token);
 
     const getCookie = (name: string): string | null => {
         const value = `; ${document.cookie}`;

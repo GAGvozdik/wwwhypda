@@ -94,7 +94,6 @@ export default function Measurements() {
     const [quality, setQuality] = useState<Quality[]>([]);
     const [experimentType, setExperimentType] = useState<ExperimentType[]>([]);
     const [interpretationMethod, setInterpretationMethod] = useState<InterpretationMethod[]>([]);
-    const token = useSelector((state: State) => state.token);
     
     // При загрузке компонента
     useEffect(() => {
