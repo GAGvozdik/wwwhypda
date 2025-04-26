@@ -1,45 +1,53 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { UpdateToken } from '../../redux/actions';
 import axios from 'axios';
 
 const useTokenRefresh = () => {
-    const dispatch = useDispatch();
-
     useEffect(() => {
-        const intervalId = setInterval(async () => {
-            console.log('check');
+        const refreshAccessToken = async () => {
             try {
-                // Извлекаем CSRF токен из обычной куки
-                const csrfToken = document.cookie
+                console.log('Current cookies:', document.cookie);
+
+                const csrfRefreshToken = document.cookie
                     .split('; ')
-                    .find(row => row.startsWith('csrf_token='))
+                    .find(row => row.startsWith('csrf_refresh_token='))
                     ?.split('=')[1];
 
-                if (!csrfToken) return;
+                console.log('csrfRefreshToken:', csrfRefreshToken);
 
-                // Попытка обновить токен
+                if (!csrfRefreshToken) {
+                    console.warn('Missing CSRF refresh token, skipping refresh.');
+                    return;
+                }
+
                 const response = await axios.post(
                     'http://localhost:5000/users/refresh',
                     {},
                     {
-                        withCredentials: true,  // Это гарантирует, что cookies отправляются
+                        withCredentials: true,
                         headers: {
-                            'X-CSRF-TOKEN': csrfToken,  // Добавляем CSRF токен в заголовок
+                            'X-CSRF-TOKEN': csrfRefreshToken,
                         },
                     }
                 );
 
-                const { message } = response.data;
-                console.log(message);  // Можно логировать ответ, если нужно
+                console.log(response.data.message || 'Access token refreshed successfully');
 
-            } catch (error) {
-                console.error('Error refreshing token:', error);
+            } catch (error: any) {
+                console.error('Error refreshing access token:', error.response?.data || error.message);
+
+                if (error.response?.status === 401) {
+                    console.error('Unauthorized! Refresh token is missing or expired.');
+                }
             }
-        }, 60 * 1000); // Проверка каждую минуту
+        };
 
-        return () => clearInterval(intervalId);  // Очистка интервала при демонтировании компонента
-    }, [dispatch]);
+        const intervalId = setInterval(() => {
+            console.log('token refreshing');
+            refreshAccessToken();
+        }, 1 * 20 * 1000); // каждые 20 секунд
+
+        return () => clearInterval(intervalId);
+    }, []);
 };
 
 export default useTokenRefresh;

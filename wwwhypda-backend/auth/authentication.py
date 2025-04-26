@@ -20,6 +20,12 @@ from flask_jwt_extended import (
     get_jwt_identity, get_jwt, jwt_required,
     set_access_cookies, set_refresh_cookies, get_csrf_token
 )
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
+
+
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
 
 # Create a Blueprint for authentication-related routes
@@ -52,7 +58,7 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires = timedelta(minutes=60)
+        access_expires = timedelta(minutes=20)
         refresh_expires = timedelta(days=1)
 
         # 📌 Добавляем is_superuser в токен
@@ -66,7 +72,7 @@ def login():
         response = jsonify(message="Successfully logged in")
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
-
+        
         # ⚠️ CSRF-токен: нужен, если ты защищаешь POST-запросы от CSRF (для форм, не для fetch/AJAX)
         response.set_cookie("csrf_token", get_csrf_token(access_token), httponly=False)
 
@@ -78,6 +84,23 @@ def login():
         return jsonify(message="Something went wrong", error=str(e)), 500
 
 
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True, locations=["cookies"])
+def refresh():
+    try:
+        identity = get_jwt_identity()
+        if not identity:
+            raise ValueError("Missing JWT identity")
+
+        access_token = create_access_token(identity=identity, expires_delta=timedelta(minutes=20))
+        response = jsonify(message="Access token refreshed")
+        set_access_cookies(response, access_token)
+        response.set_cookie("csrf_token", get_csrf_token(access_token))
+        return response
+
+    except Exception as e:
+        logging.error("Error refreshing access token: %s", str(e))
+        return jsonify(message="Failed to refresh access token", error=str(e)), 500
 
 @auth_bp.route('/super_check', methods=['GET'])
 @jwt_required()
@@ -107,19 +130,6 @@ def get_current_user():
 def logout():
     response = jsonify(message="Logged out")
     unset_jwt_cookies(response)
-    return response
-
-
-
-
-@auth_bp.route("/refresh", methods=["POST"])
-@jwt_required(refresh=True)  # Проверяем, что запрос содержит действующий refresh токен
-def refresh():
-    identity = get_jwt_identity()  # Извлекаем идентификатор пользователя из refresh токена
-    access_token = create_access_token(identity=identity, expires_delta=timedelta(minutes=2))  # Создаем новый access токен
-    response = jsonify(message="Access token refreshed")
-    set_access_cookies(response, access_token)  # Устанавливаем новый токен в HttpOnly cookie
-    response.set_cookie("csrf_token", get_csrf_token(access_token))  # Обновляем CSRF токен
     return response
 
 

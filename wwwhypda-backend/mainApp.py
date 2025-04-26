@@ -66,14 +66,16 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 # JWT configuration with HttpOnly cookie storage
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-app.config['JWT_ACCESS_COOKIE_NAME'] =  os.getenv('JWT_ACCESS_COOKIE_NAME')
+app.config['JWT_ACCESS_COOKIE_NAME'] =  'jwt'
 app.config['JWT_COOKIE_SECURE'] = False  # Set True in production (with HTTPS)
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 app.config['JWT_COOKIE_HTTPONLY'] = True
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token_cookie"
 app.config["JWT_ACCESS_COOKIE_PATH"] = "/"
-app.config["JWT_REFRESH_COOKIE_PATH"] = "/refresh"
+app.config["JWT_REFRESH_COOKIE_PATH"] = "/users/refresh"
+
+
 
 # Mail config
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
@@ -123,6 +125,7 @@ def forbidden(e):
 @app.errorhandler(404)
 def not_found(e):
     return jsonify(message="Endpoint Not Found", error=str(e), data=None), 404
+
 
 # === Main Entry ===
 if __name__ == "__main__":
