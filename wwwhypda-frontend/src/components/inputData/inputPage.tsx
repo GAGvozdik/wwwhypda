@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from '../menu.module.scss';
-import CustomStepper from '../inputData/stepper';
+import CustomStepper from './stepper';
 
 
 const InputPage: React.FC = () => {

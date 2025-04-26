@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import styles from './users.module.scss';
+import styles from './../users.module.scss';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Logout } from '../../redux/actions';
-import LoadIcon from '../commonFeatures/loadIcon';
+import { Logout } from '../../../redux/actions';
+import LoadIcon from '../../commonFeatures/loadIcon';
 
 const Account: React.FC = () => {
     console.log('Account component rendered');

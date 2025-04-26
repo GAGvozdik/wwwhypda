@@ -1,5 +1,5 @@
-import DataTable from './dataTable';
-import SearchResultsTable from './searchResultsTable';
+import DataTable from '../search/dataTable';
+import SearchResultsTable from '../search/searchResultsTable';
 import React from 'react';
 import styles from '../menu.module.scss';
 import axios from 'axios';

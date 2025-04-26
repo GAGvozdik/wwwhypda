@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { State, UpdateThemeAction, UpdateOpenCloseAction } from '../../src/common/types';
 import { useMediaQuery } from 'react-responsive';
 import styles from "./menu.module.scss"; 
-import MainTree from './pages/mainTree';
+import MainTree from './tree/mainTree';
 import MainMenu from './menu/mainMenu';
 import MainBody from './mainBody';
 import useTokenRefresh from './users/tokenRefresh';

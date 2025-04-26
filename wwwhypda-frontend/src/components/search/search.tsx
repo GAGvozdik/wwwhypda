@@ -9,7 +9,6 @@ import FormLabel from '@mui/material/FormLabel';
 import SearchTableRow from './searchTableRow';
 
 import {useEffect, useState, useRef} from 'react';
-import MessureTable from './messureTable';
 import axios from 'axios';
 
 import { UpdateTableData, } from '../../redux/actions';
