@@ -34,14 +34,8 @@ export default function MainMenu() {
         dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
     };
 
-    const { isAuth, isSuperuser } = useAuthCheck();  // Получаем данные о текущем пользователе
-
-
-    if (isAuth === null || isSuperuser === null) {
-        // Пока не знаем, кто пользователь -> можно вернуть "загрузку" или ничего
-        return null; // или какой-то Spinner
-    }
-
+    const isSuperuser = JSON.parse(localStorage.getItem('isSuperuser') || 'false');
+    console.log('isSuperuser in main menu', isSuperuser);
 
     return (
     
@@ -122,7 +116,10 @@ export default function MainMenu() {
 
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={isSuperuser ? '/superaccount' : '/account'}>
+                <Link to={
+                    isSuperuser === null ? '/login' : 
+                    isSuperuser ? '/superaccount' : '/account'
+                }>
                     <IconButton>
                         <AccountCircleIcon className={styles.themeIcon} />
                     </IconButton>
