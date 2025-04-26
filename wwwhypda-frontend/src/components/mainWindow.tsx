@@ -10,7 +10,7 @@ import useTokenRefresh from './users/tokenRefresh';
 import GitHubIcon from '@mui/icons-material/GitHub';
     
 export default function MainWindow() {
-    // useTokenRefresh(); 
+    useTokenRefresh(); 
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     let isOpenNow = useSelector((state: State) => state.open);  
