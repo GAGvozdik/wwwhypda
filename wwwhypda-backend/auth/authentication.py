@@ -44,8 +44,6 @@ def check_auth():
         is_superuser=claims.get("is_superuser", False)
     ), 200
 
-    
-
 # 🔑 Логин
 @auth_bp.route("/login", methods=["POST"])
 def login():
@@ -84,8 +82,6 @@ def login():
         import traceback
         traceback.print_exc()
         return jsonify(message="Something went wrong", error=str(e)), 500
-
-
 
 
 @auth_bp.route("/refresh", methods=["POST"])

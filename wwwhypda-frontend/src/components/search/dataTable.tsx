@@ -2,7 +2,7 @@ import { AgGridReact } from "ag-grid-react";
 import { ColDef } from "ag-grid-community";
 import * as XLSX from "xlsx";
 import React, { useMemo } from "react";
-import styles from "./dataTable.module.scss";
+import styles from "./searchStyles.module.scss";
 import {
     colorSchemeDark,
     themeQuartz,

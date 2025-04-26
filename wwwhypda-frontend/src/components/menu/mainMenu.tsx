@@ -5,7 +5,7 @@ import {useEffect, useState, useRef} from 'react';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import IconButton from '@mui/material/IconButton';
-import styles from "../menu.module.scss" 
+import styles from "./menuStyles.module.scss" 
 
 import { useSelector, useDispatch } from 'react-redux';
 import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
@@ -38,7 +38,7 @@ export default function MainMenu() {
     console.log('isSuperuser in main menu', isSuperuser);
 
     return (
-    
+
         <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`}>
             
             <MenuButtuon 
@@ -113,8 +113,6 @@ export default function MainMenu() {
                 </IconButton>
             </div>
 
-
-
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
                 <Link to={
                     isSuperuser === null ? '/login' : 
@@ -126,14 +124,6 @@ export default function MainMenu() {
                 </Link>
             </div>
 
-            {/* <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={'login'}>
-                    <IconButton>
-                        <AccountCircleIcon className={styles.themeIcon}/> 
-                    </IconButton>
-                </Link>
-            </div> */}
-                    
         </div>
     );
 }

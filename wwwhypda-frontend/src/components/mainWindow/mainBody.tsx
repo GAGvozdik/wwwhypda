@@ -11,43 +11,40 @@ import {useEffect, useState, useRef} from 'react';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import IconButton from '@mui/material/IconButton';
-import styles from "./menu.module.scss" 
+import styles from "./windowStyles.module.scss"; 
 
 import { useSelector, useDispatch } from 'react-redux';
-import { UpdateTheme, UpdateOpenClose } from '../redux/actions';
-import { State, UpdateThemeAction, UpdateOpenCloseAction } from '../common/types';
+import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
+import { State, UpdateThemeAction, UpdateOpenCloseAction } from '../../common/types';
 
 import { useMediaQuery } from 'react-responsive';
 
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import Home from './pages/home';
-import About from './pages/about';
-import NotFound from './pages/notFound';
-import Contribute from './pages/contribute';
-import Search from './search/search';
-import Documents from './pages/documents';
+import Home from '../pages/home';
+import About from '../pages/about';
+import NotFound from '../pages/notFound';
+import Contribute from '../pages/contribute';
+import Search from '../search/search';
+import Documents from '../pages/documents';
 
-import Account from './users/accounts/account';
-import InputPage from './inputData/inputPage'; 
-import ProtectedRoute from './users/routes/protectedRoute';
-import Login from './users/auth/login';
-import Register from './users/auth/registration';
+import Account from '../users/accounts/account';
+import InputPage from '../inputData/inputPage'; 
+import ProtectedRoute from '../users/routes/protectedRoute';
+import Login from '../users/auth/login';
+import Register from '../users/auth/registration';
 // import Dashboard from './pages/Dashboard';
 
 import { AppProvider } from '@toolpad/core/AppProvider';
-import ForgotPassword from './users/auth/forgotPassword';
+import ForgotPassword from '../users/auth/forgotPassword';
 
-import SuperuserAccount from './users/accounts/superuser';
-import SuperProtectedRoute from './users/routes/superProtectedRoute';
-
-
-
+import SuperuserAccount from '../users/accounts/superuser';
+import SuperProtectedRoute from '../users/routes/superProtectedRoute';
 
 export default function MainMenu() {
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
-    
+
     return (
         <div className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
             <Routes>

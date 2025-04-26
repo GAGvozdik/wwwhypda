@@ -16,11 +16,9 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, create_access_token, s
 from datetime import timedelta
 import secrets
 
-
 from auth.authentication import auth_bp
 from auth.admin.admin import admin_bp
 from rocks.rocks_bp import rocks_bp
-
 
 # from rocks.rocks_models import db
 # from auth.auth_models import db  # потенциально дублирование, оставь один из них
@@ -58,8 +56,6 @@ CORS(app, supports_credentials=True, origins=["http://localhost:3000"],
 # talisman = Talisman(app)
 logging.basicConfig(level=logging.DEBUG)
 
-
-
 # === Configs ===
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -77,8 +73,6 @@ app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token_cookie"
 app.config["JWT_ACCESS_COOKIE_PATH"] = "/"
 app.config["JWT_REFRESH_COOKIE_PATH"] = "/users/refresh"
 
-
-
 # Mail config
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
@@ -91,8 +85,6 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 mail.init_app(app)
 db.init_app(app)
 jwt = JWTManager(app)
-
-
 
 @app.after_request
 def rotate_csrf_token(response):
@@ -111,7 +103,6 @@ def rotate_csrf_token(response):
         except Exception as e:
             app.logger.error(f"Error rotating CSRF token: {e}")
     return response
-
 
 # === Register Blueprints ===
 app.register_blueprint(auth_bp)
@@ -133,7 +124,6 @@ def forbidden(e):
 @app.errorhandler(404)
 def not_found(e):
     return jsonify(message="Endpoint Not Found", error=str(e), data=None), 404
-
 
 # === Main Entry ===
 if __name__ == "__main__":
