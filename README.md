@@ -1,42 +1,81 @@
-1) Install NodeJS (`https://nodejs.org/en/download`) and Python (stable work with Python 3.12.6).
-2) Create file env.configs in folder with `mainApp.py` and write into:
+# Installation instructions
 
-   MAIL_SERVER = smtp.gmail.com
+1. Install NodeJS ([https://nodejs.org/en/download](https://nodejs.org/en/download))
+   and Python (this version was tested with Python 3.12.6).
+2. Create the configuration file.
+   Create a new file named `env.configs` in folder with `mainApp.py` and write into:
 
-   MAIL_PORT = 465
+   > MAIL_SERVER = smtp.gmail.com
+   >
+   > MAIL_PORT = 465
+   >
+   > SECRET_KEY='your_long_random_code_%*&8hHJ+=_Klhtfo*89buibgyuoGUIonguionphiohio'
+   > DATABASE_URL='sqlite:///wwhypda.db'
+   > DEBUG=True
+   >
+   > MAIL_USERNAME = 'yourmail@gmail.com'
+   >
+   > SWAGGER_URL = '/swagger'
+   > API_URL = '/static/swagger.json'
+   >
+   > MAIL_PASSWORD = 'your mail special code'
 
-   SECRET_KEY='your_long_random_code_%*&8hHJ+=_Klhtfo*89buibgyuoGUIonguionphiohio'
-   DATABASE_URL='sqlite:///wwhypda.db'
-   DEBUG=True
+3. Set up the mail server. To get mail code to set up a mail server using gmail:
 
-   MAIL_USERNAME = 'yourmail@gmail.com'
+   - Turn on 2 step verification in your google account
 
-   SWAGGER_URL = '/swagger'
-   API_URL = '/static/swagger.json'
+     ![Turn on 2 step verification in your google account](/instructions/instruction3.png)
 
-   MAIL_PASSWORD = 'your mail special code'
+   - Go to *App passwords*
 
-   To get special mail code:
+     ![Go to App passwords](/instructions/instruction1.png)
 
-   Turn on 2 step verification in your google account
+   - Register your gmail app and copy code
 
-   ![Turn on 2 step verification in your google account](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction3.png)
+     ![Register your gmail app and copy code](/instructions/instruction2.png)
 
-   Go to App passwords
+     or try to follow the instructions that you can find at
+     [https://mailtrap.io/blog/flask-send-email-gmail/](https://mailtrap.io/blog/flask-send-email-gmail/)
+     and create your own mail code.
 
-   ![Go to App passwords](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction1.png)
+   - Add your mail code in `env.configs` in ``MAIL_PASSWORD = 'your mail special code'``
 
-   Register your gmail app and copy code
+   :warning: **Warning:** DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 
-   ![Register your gmail app and copy code](https://github.com/GAGvozdik/wwwhypda/blob/main/instructions/insruction2.png)
 
-   or try to follow instruction (https://mailtrap.io/blog/flask-send-email-gmail/) and create your own mail code
+3. Run the back-end. In your terminal, inside the cloned `wwhypda`
+   folder, first move to the folder `wwhypda-backend`:
 
-   Add your mail code in env.configs in ``MAIL_PASSWORD = 'your mail special code'``
+       cd wwhypda-backend
+       
+   Then, create a virtual environment and activate it. You can for
+   example use the following line to create and activate the Python
+   virtual environment `workEnv`:
+   
+       python -m venv workEnv workEnv/Scripts/Activate
 
-   DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
-3) cd wwhypda-backendpython -m venv workEnvworkEnv/Scripts/Activatepip install -r requrements.txtpython mainApp.pyP.S. demo documentation is available at http://127.0.0.1:5000/swagger/
-4) Type in terminal in folder wwwhydpa/ :
-   cd wwhypda-frontend
-   npm i
-   npm start
+   In the activated virtual environment, install with ``pip`` the requirements:
+   
+       pip install -r requirements.txt
+
+   Finally, you can run the backend application by using:
+   
+       python mainApp.py
+
+   It may happen that some other module (for example `dotenv`) is
+   missing. Install it with `pip`.  Also, if you do not want to keep
+   the running terminal busy, you can type `<CRTL>+<z>` and the `bg`.
+   
+   
+4. Run the front-end.
+   Type in terminal in folder `wwwhydpa`:
+
+       cd wwhypda-frontend
+       npm i
+       npm start
+
+You can then follow the provided local URL to work with wwhypda!
+
+:memo: **Note:** Once the main application is running, you can use
+Swagger to check the documentation using the link:
+[http://127.0.0.1:5000/swagger/](http://127.0.0.1:5000/swagger/)
