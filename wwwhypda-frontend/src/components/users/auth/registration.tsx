@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
-import ErrorMessage from '../errorMessage'; // Компонент ошибки
+import ErrorMessage from './errorMessage'; // Компонент ошибки
 import UserButton from './userButton';
 
 const Register: React.FC = () => {

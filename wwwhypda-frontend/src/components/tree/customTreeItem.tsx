@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../menu.module.scss';
+import styles from './treeStyles.module.scss';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 
