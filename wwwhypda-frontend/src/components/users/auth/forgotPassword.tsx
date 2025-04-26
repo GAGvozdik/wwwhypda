@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import styles from './users.module.scss';
+import styles from '../users.module.scss';
 import CircularProgress from '@mui/material/CircularProgress';
 import UserButton from './userButton';
-import ErrorMessage from './errorMessage';
+import ErrorMessage from '../errorMessage';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState('');
