@@ -5,7 +5,7 @@ import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector } from 'react-redux';
-import LoadIcon from './loadIcon';
+import LoadIcon from '../../commonFeatures/loadIcon';
 
 import {
     ClientSideRowModelModule,
