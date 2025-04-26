@@ -1,6 +1,6 @@
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import styles from './users.module.scss';
+import styles from '../users.module.scss';
 
 export interface UserButtonProps {
     text: string;

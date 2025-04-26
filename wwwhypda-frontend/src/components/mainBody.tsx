@@ -25,21 +25,21 @@ import Home from './pages/home';
 import About from './pages/about';
 import NotFound from './pages/notFound';
 import Contribute from './pages/contribute';
-import Search from './pages/search';
+import Search from './search/search';
 import Documents from './pages/documents';
 
-import Account from './users/account';
-import InputPage from './pages/inputPage'; 
-import ProtectedRoute from './users/protectedRoute';
-import Login from './users/login';
-import Register from './users/registration';
+import Account from './users/accounts/account';
+import InputPage from './inputData/inputPage'; 
+import ProtectedRoute from './users/routes/protectedRoute';
+import Login from './users/auth/login';
+import Register from './users/auth/registration';
 // import Dashboard from './pages/Dashboard';
 
 import { AppProvider } from '@toolpad/core/AppProvider';
-import ForgotPassword from './users/forgotPassword';
+import ForgotPassword from './users/auth/forgotPassword';
 
-import SuperuserAccount from './users/admin/superuser';
-import SuperProtectedRoute from './users/admin/superProtectedRoute';
+import SuperuserAccount from './users/accounts/superuser';
+import SuperProtectedRoute from './users/routes/superProtectedRoute';
 
 
 

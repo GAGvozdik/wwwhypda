@@ -83,7 +83,6 @@ interface MeasurementRow {
     comment: string;
 }
 
-
 export default function Measurements() {
     const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
@@ -97,17 +96,6 @@ export default function Measurements() {
     
     // При загрузке компонента
     useEffect(() => {
-        // const savedData = localStorage.getItem('generalInfoData');
-        // if (savedData) {
-        //     setTableData(JSON.parse(savedData));
-        // } else {
-        //     // Если нет сохранённых данных — берём дефолтные
-        //     setTableData([
-        //         { field: "env_name", value: "", description: "the hydrogeological environment" },
-        //         { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
-        //     ]);
-        // }
-
 
     const getCookie = (name: string): string | null => {
         const value = `; ${document.cookie}`;
