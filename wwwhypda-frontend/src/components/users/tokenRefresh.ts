@@ -47,8 +47,6 @@ const useTokenRefresh = () => {
                 });
 
                 console.log('User checked:', res.data);
-                // 🔥 Тут ты можешь обновить состояние пользователя, например:
-                // dispatch(setUser(res.data))
 
             } catch (error) {
                 console.error('Error checking user:', error);

@@ -116,7 +116,7 @@ export default function MainMenu() {
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
                 <Link to={
-                    isSuperuser === null ? '/login' : 
+                    // isSuperuser === null ? '/login' : 
                     isSuperuser ? '/superaccount' : '/account'
                 }>
                     <IconButton>
