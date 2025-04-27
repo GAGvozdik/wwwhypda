@@ -4,7 +4,7 @@ import { State, Action } from '../common/types';
 
 const initialState: State = {
     open: true,
-    isDarkTheme: localStorage.getItem("isDarkTheme") === "true",
+    isDarkTheme: localStorage.getItem("isDarkTheme") ? localStorage.getItem("isDarkTheme") === "true" : true,
     currentRTID: '',
     currentRTName: '',
     currentTableData: [], // <-- Обновляем состояние
