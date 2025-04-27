@@ -9,8 +9,7 @@ import { AgGridReact } from 'ag-grid-react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { IconButton, Tooltip } from '@mui/material';
 import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
-import { themeQuartz, colorSchemeDark } from 'ag-grid-community';
-
+import { useStepsTheme } from '../../inputData/steps';
 import LoadIcon from '../../commonFeatures/loadIcon';
 
 const SuperuserAccount: React.FC = () => {
@@ -173,14 +172,7 @@ const SuperuserAccount: React.FC = () => {
         }
     ], []);
 
-    const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
-        fontFamily: "Afacad_Flux !important",
-        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
-        headerTextColor: "var(--tree-text)",
-        rangeSelectionBorderColor: "var(--tree-text)",
-        rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
-    });
+    const themeDarkBlue = useStepsTheme();
 
     const containerStyle = useMemo(() => ({ 
         width: "100%", 

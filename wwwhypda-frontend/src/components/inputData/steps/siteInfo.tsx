@@ -1,7 +1,7 @@
 import styles from '../menu.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
-import { colorSchemeDark, themeQuartz } from "ag-grid-community";
+import { useStepsTheme } from '../steps';
 import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector } from 'react-redux';
@@ -144,14 +144,7 @@ const SiteInfo = () => {
         headerComponentParams: { suppressHeader: true }
     }), []);
 
-    const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
-        fontFamily: "Afacad_Flux !important",
-        foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
-        headerTextColor: "var(--tree-text)",
-        rangeSelectionBorderColor: "var(--tree-text)",
-        rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-        columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
-    });
+    const themeDarkBlue = useStepsTheme();
 
     const handleCellValueChanged = (params: any) => {
         const updatedData = tableData.map((row) =>
