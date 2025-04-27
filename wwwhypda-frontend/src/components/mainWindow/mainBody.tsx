@@ -29,7 +29,7 @@ import Search from '../search/search';
 import Documents from '../pages/documents';
 
 import Account from '../users/accounts/account';
-import InputPage from '../inputData/inputPage'; 
+import InputPage from '../pages/inputPage'; 
 import ProtectedRoute from '../users/routes/protectedRoute';
 import Login from '../users/auth/login';
 import Register from '../users/auth/registration';
