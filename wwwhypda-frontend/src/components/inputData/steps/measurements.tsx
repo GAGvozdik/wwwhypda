@@ -5,7 +5,7 @@ import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
-import LoadIcon from '../../commonFeatures/loadIcon';
+import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
 import { 
     ClientSideRowModelModule, 
@@ -284,77 +284,78 @@ export default function Measurements() {
 
     return (
         <div style={containerStyle}>
-            {loading ? 
-                <div 
-                    style={{ 
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '63vh',
-                        marginTop: '1vh', 
-                        marginBottom: '5vh',
-                    }}
+            <div 
+                style={{ 
+                    color: "var(--tree-text)", 
+                    textAlign: "center", 
+                    fontSize: '2.5vh', 
+                    margin: '1vh 0vh 1vh 0vh' 
+                }}
+            >
+                Measurements
+            </div>
+
+            <div style={{display: 'flex'}}>
+                
+                <SingleSkeleton 
+                    loading={loading}
+                    error={error}
+                    margin={'1vh 1vh 1vh 0vh'}
+                    width={'10vh'}
+                    height={'3.5vh'}
                 >
-                    <LoadIcon size={60}/>
-                </div> 
-                    : 
-                error ? <div style={{fontFamily: 'Afacad_Flux', fontSize: "2vh", margin:'1vh'}}>{error}</div> 
-                : 
-            (
-                <>
-                    <div 
-                        style={{ 
-                            color: "var(--tree-text)", 
-                            textAlign: "center", 
-                            fontSize: '2.5vh', 
-                            margin: '1vh 0vh 1vh 0vh' 
+                    <button
+                        onClick={addRow}
+                        className={styles.submitButton}
+                        style={{
+                            margin: '1vh 1vh 1vh 0vh', 
+                            width: '10vh', 
+                            height: '3.5vh', 
+                            fontSize: '1.5vh', 
+                            padding: '0vh'
                         }}
                     >
-                        Measurements
-                    </div>
+                        Add Row
+                    </button>
+                </SingleSkeleton>
 
-                    <div style={{display: 'flex'}}>
-                        <button
-                            onClick={addRow}
-                            className={styles.submitButton}
-                            style={{
-                                margin: '1vh 1vh 1vh 0vh', 
-                                width: '10vh', 
-                                height: '3.5vh', 
-                                fontSize: '1.5vh', 
-                                padding: '0vh'
-                            }}
-                        >
-                            Add Row
-                        </button>
+                <SingleSkeleton 
+                    loading={loading}
+                    error={error}
+                    margin={'1vh 1vh 1vh 0vh'}
+                    width={'10vh'}
+                    height={'3.5vh'}
+                >
+                    <button
+                        onClick={deleteRow}
+                        className={styles.submitButton}
+                        style={{
+                            margin: '1vh 1vh 1vh 0vh', 
+                            width: '10vh', 
+                            height: '3.5vh', 
+                            fontSize: '1.5vh', 
+                            padding: '0vh'
+                        }}
+                    >
+                        Delete Row
+                    </button>
+                </SingleSkeleton>
 
-                        <button
-                            onClick={deleteRow}
-                            className={styles.submitButton}
-                            style={{
-                                margin: '1vh 1vh 1vh 0vh', 
-                                width: '10vh', 
-                                height: '3.5vh', 
-                                fontSize: '1.5vh', 
-                                padding: '0vh'
-                            }}
-                        >
-                            Delete Row
-                        </button>
-                    </div>
+            </div>
 
-                        <AgGridReact
-                            theme={themeDarkBlue}
-                            rowData={tableData}
-                            columnDefs={columnDefs}
-                            defaultColDef={defaultColDef}
-                            tooltipShowDelay={0}
-                            headerHeight={40}
-                            cellSelection={cellSelection}
-                            onCellValueChanged={handleCellValueChanged}
-                        />
-                </>
-            )}
+            <SingleSkeleton loading={loading} error={error}>
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    tooltipShowDelay={0}
+                    headerHeight={40}
+                    cellSelection={cellSelection}
+                    onCellValueChanged={handleCellValueChanged}
+                />
+            </SingleSkeleton>
+
         </div>
     );
 };

@@ -31,18 +31,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Create a Blueprint for authentication-related routes
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
-@auth_bp.route('/check', methods=['GET'])
-@jwt_required()
-def check_auth():
-    identity = get_jwt_identity()
-    claims = get_jwt()
-    print('Received claims at /check:', claims)  # 📌 Печать claims в консоль
 
-    return jsonify(
-        logged_in=True,
-        user_id=identity,
-        is_superuser=claims.get("is_superuser", False)
-    ), 200
 
 # 🔑 Логин
 @auth_bp.route("/login", methods=["POST"])
@@ -83,6 +72,18 @@ def login():
         traceback.print_exc()
         return jsonify(message="Something went wrong", error=str(e)), 500
 
+@auth_bp.route('/check', methods=['GET'])
+@jwt_required()
+def check_auth():
+    identity = get_jwt_identity()
+    claims = get_jwt()
+    # print('Received claims at /check:', claims)  # 📌 Печать claims в консоль
+
+    return jsonify(
+        logged_in=True,
+        user_id=identity,
+        is_superuser=claims.get("is_superuser", False)
+    ), 200
 
 @auth_bp.route("/refresh", methods=["POST"])
 @jwt_required(refresh=True, locations=["cookies"])
@@ -120,7 +121,7 @@ def refresh():
 
     except Exception as e:
         auth_bp.logger.error(f"Error refreshing access token: {e}")
-        return jsonify(message="Failed to refresh access token", error=str(e)), 500
+        return jsonify(message="Failed to refresh access token"), 500
 
 
 

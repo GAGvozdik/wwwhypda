@@ -6,6 +6,7 @@ import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector } from 'react-redux';
 import LoadIcon from '../../commonFeatures/loadIcon';
+import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
 import {
     ClientSideRowModelModule,
@@ -161,38 +162,26 @@ const SiteInfo = () => {
 
     return (
         <div style={containerStyle}>
-            {loading ? (
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    height: '63vh',
-                    marginTop: '1vh',
-                    marginBottom: '5vh',
-                }}>
-                    <LoadIcon size={60} />
-                </div>
-            ) : error ? <div style={{fontFamily: 'Afacad_Flux', fontSize: "2vh", margin:'1vh'}}>{error}</div>   : (
-                <>
-                    <div style={{
-                        color: "var(--tree-text)",
-                        textAlign: "center",
-                        fontSize: '3vh',
-                        margin: '1vh 0vh 1vh 0vh'
-                    }}>
-                        Site Information
-                    </div>
 
-                    <AgGridReact
-                        theme={themeDarkBlue}
-                        rowData={tableData}
-                        columnDefs={columnDefs}
-                        defaultColDef={defaultColDef}
-                        headerHeight={0}
-                        onCellValueChanged={handleCellValueChanged}
-                    />
-                </>
-            )}
+            <div style={{
+                color: "var(--tree-text)",
+                textAlign: "center",
+                fontSize: '3vh',
+                margin: '1vh 0vh 1vh 0vh'
+            }}>
+                Site Information
+            </div>
+
+            <SingleSkeleton loading={loading} error={error}>
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    headerHeight={0}
+                    onCellValueChanged={handleCellValueChanged}
+                />
+            </SingleSkeleton>
         </div>
     );
 };

@@ -6,6 +6,7 @@ import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
 import LoadIcon from '../../commonFeatures/loadIcon';
+import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
 import { 
     ClientSideRowModelModule, 
@@ -164,31 +165,25 @@ const GeneralInfo = () => {
 
     return (
         <div style={containerStyle}>
-            {loading ? 
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '63vh', marginTop: '1vh', marginBottom: '5vh' }}>
-                    <LoadIcon size={60}/>
-                </div> 
-                : error ? <div style={{fontFamily: 'Afacad_Flux', fontSize: "2vh", margin:'1vh'}}>{error}</div> 
-                : (
-                    <>
-                        <div style={{ color: "var(--tree-text)", textAlign: "center", fontSize: '3vh', margin: '1vh 0' }}>
-                            General information about measurements
-                        </div>
-                        <AgGridReact
-                            theme={themeDarkBlue}
-                            rowData={tableData}
-                            columnDefs={columnDefs}
-                            defaultColDef={defaultColDef}
-                            onCellValueChanged={handleCellValueChanged}
-                            suppressColumnVirtualisation={true}
-                            suppressRowHoverHighlight={true}
-                            suppressNoRowsOverlay={true}
-                            suppressMenuHide={true}
-                            headerHeight={0}
-                        />
-                    </>
-                )
-            }
+
+            <div style={{ color: "var(--tree-text)", textAlign: "center", fontSize: '3vh', margin: '1vh 0' }}>
+                General information about measurements
+            </div>
+
+            <SingleSkeleton loading={loading} error={error}>
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    onCellValueChanged={handleCellValueChanged}
+                    suppressColumnVirtualisation={true}
+                    suppressRowHoverHighlight={true}
+                    suppressNoRowsOverlay={true}
+                    suppressMenuHide={true}
+                    headerHeight={0}
+                />
+            </SingleSkeleton>
         </div>
     );
 };
