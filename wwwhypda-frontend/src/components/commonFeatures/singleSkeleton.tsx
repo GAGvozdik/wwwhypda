@@ -9,10 +9,11 @@ interface SingleSkeletonProps {
     height?: string; 
     width?: string; 
     margin?: string; 
+    backgroundColor?: string;
 }
 
 
-export default function SingleSkeleton({ loading = false, error = null, margin, height, width, children }: SingleSkeletonProps) {
+export default function SingleSkeleton({ loading = false, error = null, margin, height, width, children, backgroundColor }: SingleSkeletonProps) {
     if (loading) {
         return (
             <Box
@@ -33,7 +34,7 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
                     height="100%"
                     sx={{
                         borderRadius: 2,
-                        bgcolor: 'var(--table-color)',
+                        bgcolor: backgroundColor ? backgroundColor : 'var(--table-color)',
                     }}
                 />
             </Box>
@@ -42,7 +43,16 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
 
     if (error) {
         return (
-            <div style={{ fontFamily: 'Afacad_Flux', fontSize: '2vh', margin: '1vh' }}>
+            <div style={{ 
+                fontFamily: 'Afacad_Flux', 
+                fontSize: '2vh', 
+                margin: '1vh', 
+                color: 'var(--error-text)', 
+                wordWrap: 'break-word', 
+                overflowWrap: 'break-word', 
+                whiteSpace: 'normal', 
+                overflow: 'hidden'
+            }}>
                 {error}
             </div>
         );

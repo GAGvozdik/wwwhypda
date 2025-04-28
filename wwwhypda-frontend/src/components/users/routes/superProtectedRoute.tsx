@@ -13,7 +13,7 @@ const SuperProtectedRoute: React.FC<SuperProtectedRouteProps> = ({ children }) =
     console.log('10');
     if (isAuth === null || isSuperuser === null) {
         console.log('11');
-        return <LoadIcon size={60}/>;
+        return <></>;
     }
 
     if (!isAuth) {

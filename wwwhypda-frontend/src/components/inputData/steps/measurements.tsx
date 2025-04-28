@@ -280,9 +280,12 @@ export default function Measurements() {
             <div 
                 style={{ 
                     color: "var(--tree-text)", 
-                    textAlign: "center", 
+                    display: 'grid',
+                    alignContent: 'center',
+                    justifyContent: 'center',
                     fontSize: '2.5vh', 
-                    margin: '1vh 0vh 1vh 0vh' 
+                    margin: '1vh 0vh 1vh 0vh',
+                    height: '6.71vh'
                 }}
             >
                 Measurements
@@ -336,8 +339,8 @@ export default function Measurements() {
 
             </div>
 
-            <SingleSkeleton loading={loading} error={error} height={'53.5vh'}>
-                <div style={{height: '53.5vh'}}>
+            <SingleSkeleton loading={loading} error={error} height={'50vh'}>
+                <div style={{height: '50vh'}}>
                     <AgGridReact
                         theme={themeDarkBlue}
                         rowData={tableData}

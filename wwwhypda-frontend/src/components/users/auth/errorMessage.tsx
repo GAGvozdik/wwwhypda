@@ -1,4 +1,3 @@
-// errorMessage.tsx
 import React from 'react';
 
 export interface ErrorMessageProps {
@@ -15,7 +14,7 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ error, isError }) => {
     return (
         <div
             style={{
-                color: isError ? 'red' : 'green',  // Используем isError для выбора цвета
+                color: isError ? 'var(--error-text)' : 'green',  // Используем isError для выбора цвета
                 fontSize: '60%',
                 width: '80%',
                 marginLeft: '10%',
