@@ -26,6 +26,8 @@ from common_defenitions import mail, db
 
 # TODO: Add reCAPTCHA
 # TODO: Add request limiting (maybe reCAPTCHA will help)
+# TODO: Check expiration of reset password code
+# TODO: Check csrf token verification
 
 # Load environment variables
 load_dotenv(dotenv_path='env.configs')

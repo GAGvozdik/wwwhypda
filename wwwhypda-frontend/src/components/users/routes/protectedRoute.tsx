@@ -2,24 +2,39 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import useAuthCheck from '../useAuthCheck';
 import LoadIcon from '../../commonFeatures/loadIcon';
-
+import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import styles from '../users.module.scss';
 interface ProtectedRouteProps {
     children: React.ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const { isAuth } = useAuthCheck();
-    console.log('5');
+
     if (isAuth === null) {
-        console.log('6');
-        return <LoadIcon size={60}/>;
+        return (
+            <div 
+                // className={styles.authForm}
+                style={{      
+                    alignSelf: 'center',
+                    justifySelf: 'center',
+                    width: '45vh',
+                    height: '50%',
+                    marginTop: '15vh',
+                    marginBottom: '3vh',
+                    // borderRadius: '8px',
+                    // border: '3px solid var(--border)',
+                }}
+            >
+                <SingleSkeleton loading={true}> 
+                    <div></div>
+                </SingleSkeleton>
+            </div>);
     }
 
     if (!isAuth) {
-        console.log('7');
         return <Navigate to="/login" />;
     }
-    console.log('8');
     return <>{children}</>;
 };
 

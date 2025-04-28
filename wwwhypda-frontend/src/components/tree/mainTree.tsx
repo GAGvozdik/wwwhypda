@@ -14,6 +14,7 @@ import IconButton from '@mui/material/IconButton';
 import ClearIcon from '@mui/icons-material/Clear';
 import MenuIcon from '@mui/icons-material/Menu';
 import axios from 'axios';
+import SingleSkeleton from '../commonFeatures/singleSkeleton';
 
 
 interface RockTypeData {
@@ -68,34 +69,39 @@ const buildTree = (data: RockTypeData[]): JSX.Element[] => {
 };
 
 
-
-
 export default function ModelsTreeDrawer() {
-    
     const [treeData, setTreeData] = useState<RockTypeData[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
+    const isOpenNow = useSelector((state: State) => state.open);
+
+    // Загружаем данные
     useEffect(() => {
         const fetchRockTypes = async () => {
             try {
-                const response = await axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type'); 
+                const response = await axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type');
 
                 if (!response.data || response.data.length === 0) {
                     setError("No data received from the server.");
-                    return;
+                } else {
+                    setTreeData(response.data);
                 }
-                setTreeData(response.data);
-                // console.log(response.data); 
-
             } catch (error: any) {
                 setError(getErrorMessage(error));
-            } finally {
-                setLoading(false);
             }
         };
+
         fetchRockTypes();
     }, []);
+
+    // Отслеживаем загрузку
+    useEffect(() => {
+        if (treeData.length > 0 || error) {
+            setLoading(false);
+        }
+    }, [treeData, error]);
 
     const getErrorMessage = (error: any): string => {
         if (error.response) {
@@ -107,58 +113,36 @@ export default function ModelsTreeDrawer() {
         }
     };
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme); 
-    let isOpenNow = useSelector((state: State) => state.open);  
-
-
-    const tree = buildTree(treeData);
+    const tree = buildTree(treeData); // твоя функция построения дерева
 
     return (
-      
-        <div 
-            className={
-                isOpenNow ? 
-                    (`${styles.hidingDrawer} ${isDarkTheme ? styles.dark : ''}`) 
-                        : 
-                    (`${styles.openHidingDrawer} ${isDarkTheme ? styles.dark : ''}`)   
-            }
-        >
-            <div 
-                style={
-                    isDarkTheme ? 
-                        { 
-                            backgroundColor: 'var(--drawer-color)', 
-                            // border: isOpenNow ? '' : '1px solid var(--border)',
-                            height: '100%', 
-                            borderRadius: '5px',
-                            overflowY: 'auto',
-                            overflowX: 'hidden'
-                            // overflowX: 'auto'
-                            // boxShadow: '0 0 0 1px var(--menu-border)'
-                        }
-                            : 
-                        { 
-                            backgroundColor: 'var(--drawer-color)', 
-                            // border: '0.1px solid var(--border)', 
-                            height: '100%', 
-                            borderRadius: '5px' ,
-                            // boxShadow: isOpenNow ? '' : '0 0 0 1px var(--menu-border)',
-                            overflowY: 'auto',
-                            overflowX: 'hidden'
-                        } 
-                    
-                }       
-            >
-
-                {isOpenNow ? 
+        <div className={
+            isOpenNow 
+                ? `${styles.hidingDrawer} ${isDarkTheme ? styles.dark : ''}`
+                : `${styles.openHidingDrawer} ${isDarkTheme ? styles.dark : ''}`
+        }>
+            <div style={{
+                backgroundColor: 'var(--drawer-color)',
+                height: '100%',
+                borderRadius: '5px',
+                overflowY: 'auto',
+                overflowX: 'hidden',
+            }}>
+                {isOpenNow ? (
                     <></>
-                        : 
-                    <SimpleTreeView sx={{ color: 'var(--tree-text)', fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'}}>
-
-                        {tree}
-
-                    </SimpleTreeView>
-                }
+                ) : (
+                    <SingleSkeleton loading={loading} error={error}>
+                        <SimpleTreeView
+                            sx={{
+                                color: 'var(--tree-text)',
+                                fontFamily: 'Afacad_Flux !important',
+                                fontSize: 'var(--tree-font-size)'
+                            }}
+                        >
+                            {tree}
+                        </SimpleTreeView>
+                    </SingleSkeleton>
+                )}
             </div>
         </div>
     );

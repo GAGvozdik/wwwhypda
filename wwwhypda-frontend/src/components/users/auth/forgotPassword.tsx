@@ -5,6 +5,7 @@ import styles from '../users.module.scss';
 import CircularProgress from '@mui/material/CircularProgress';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
+import { Link } from 'react-router-dom';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -95,6 +96,16 @@ const ForgotPassword: React.FC = () => {
                         text='Send Code'
                         isLoading={isLoading}
                     />
+
+                    <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
+                        <div style={{ fontSize: '2.5vh' }}>Already have an account?</div>
+                        <div>
+                            <Link to="/login" className={styles.link}>
+                                Login here
+                            </Link>
+                        </div>
+                    </div>
+
                 </form>
             )}
 

@@ -88,21 +88,25 @@ const SourceInfo = () => {
                 style={{ 
                     color: "var(--tree-text)", 
                     textAlign: "center", 
-                    fontSize: '3vh', 
-                    margin: '1vh 0vh 1vh 0vh' 
+                    fontSize: '2.5vh', 
+                    margin: '3vh 0vh 3.21vh 0vh',
+                    height: '6.71vh'
                 }}
             >
                 Source of information (Info about the paper or the technical report that contains the measurements)
             </div>
 
-            <AgGridReact
-                theme={themeDarkBlue}
-                rowData={tableData}
-                columnDefs={columnDefs}
-                defaultColDef={defaultColDef}
-                headerHeight={0}
-                onCellValueChanged={handleCellValueChanged}
-            />
+            <div style={{height: '50vh'}}>
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    headerHeight={0}
+                    onCellValueChanged={handleCellValueChanged}
+                />
+            </div>
+
         </div>
     );
 };

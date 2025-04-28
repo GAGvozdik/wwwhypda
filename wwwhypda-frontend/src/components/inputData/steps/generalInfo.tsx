@@ -158,23 +158,33 @@ const GeneralInfo = () => {
     return (
         <div style={containerStyle}>
 
-            <div style={{ color: "var(--tree-text)", textAlign: "center", fontSize: '3vh', margin: '1vh 0' }}>
+            <div 
+                style={{ 
+                    color: "var(--tree-text)", 
+                    textAlign: "center", 
+                    fontSize: '2.5vh', 
+                    margin: '2.21vh 0vh 3vh 0vh',
+                    height: '6.71vh'
+                }}
+            >
                 General information about measurements
             </div>
 
-            <SingleSkeleton loading={loading} error={error}>
-                <AgGridReact
-                    theme={themeDarkBlue}
-                    rowData={tableData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    onCellValueChanged={handleCellValueChanged}
-                    suppressColumnVirtualisation={true}
-                    suppressRowHoverHighlight={true}
-                    suppressNoRowsOverlay={true}
-                    suppressMenuHide={true}
-                    headerHeight={0}
-                />
+            <SingleSkeleton loading={loading} error={error} height={'50vh'}>
+                <div style={{height: '50vh'}}>
+                    <AgGridReact
+                        theme={themeDarkBlue}
+                        rowData={tableData}
+                        columnDefs={columnDefs}
+                        defaultColDef={defaultColDef}
+                        onCellValueChanged={handleCellValueChanged}
+                        suppressColumnVirtualisation={true}
+                        suppressRowHoverHighlight={true}
+                        suppressNoRowsOverlay={true}
+                        suppressMenuHide={true}
+                        headerHeight={0}
+                    />
+                </div>                
             </SingleSkeleton>
         </div>
     );

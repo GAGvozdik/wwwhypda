@@ -12,6 +12,8 @@ const LoadIcon: React.FC<LoadIconProps> = ({ size = 30 }) => {
                 color: 'var(--border)',
                 display: 'flex',
                 justifyContent: 'center',
+                alignContent: 'center',
+                justifyItems: 'center',
                 alignItems: 'center',
             }}
         />

@@ -300,7 +300,8 @@ const MeasurementSampleTable = () => {
                             color: "var(--tree-text)", 
                             textAlign: "center", 
                             fontSize: '2.5vh', 
-                            margin: '1vh 0vh 1vh 0vh' 
+                            margin: '1vh 0vh 1vh 0vh',
+                            height: '6.71vh'
                         }}
                     >
                         Measurement “Sample” (the borehole, the sample, or the borehole section where the measurement was performed)
