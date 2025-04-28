@@ -10,7 +10,6 @@ import ErrorMessage from './errorMessage';
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [savedEmails, setSavedEmails] = useState<string[]>([]); // Состояние для сохранённых почт
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
     const [isError, setIsError] = useState<boolean>(false);
@@ -18,13 +17,6 @@ const Login: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        // Загружаем сохранённые email из localStorage при монтировании компонента
-        const emails = JSON.parse(localStorage.getItem('savedEmails') || '[]');
-        if (Array.isArray(emails)) {
-            setSavedEmails(emails);
-        }
-    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,10 +38,6 @@ const Login: React.FC = () => {
 
             localStorage.setItem('isSuperuser', JSON.stringify(is_superuser));
 
-            // Обновляем список сохранённых email
-            const updatedEmails = Array.from(new Set([username, ...savedEmails])).slice(0, 5);
-            localStorage.setItem('savedEmails', JSON.stringify(updatedEmails));
-
             navigate(is_superuser ? '/superaccount' : '/account');
 
             setError('Login successful!');
@@ -61,13 +49,6 @@ const Login: React.FC = () => {
         }
     };
 
-    // Функция для отображения предложений
-    const filterEmails = (value: string) => {
-        if (!value) return [];
-        return savedEmails.filter(email =>
-            email.toLowerCase().includes(value.toLowerCase())
-        );
-    };
 
     return (
         <div className={styles.authForm}>
@@ -84,14 +65,6 @@ const Login: React.FC = () => {
                         required
                         list="emailSuggestions"
                     />
-                    {/* Список предложений */}
-                    {username && (
-                        <datalist id="emailSuggestions">
-                            {filterEmails(username).map((email, index) => (
-                                <option key={index} value={email} />
-                            ))}
-                        </datalist>
-                    )}
                 </div>
 
                 <input
