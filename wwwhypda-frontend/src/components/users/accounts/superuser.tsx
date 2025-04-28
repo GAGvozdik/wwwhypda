@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from '../../menu.module.scss'; 
+import styles from './../users.module.scss';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Logout } from '../../../redux/actions';
@@ -11,12 +11,12 @@ import { IconButton, Tooltip } from '@mui/material';
 import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { useStepsTheme } from '../../inputData/steps';
 import LoadIcon from '../../commonFeatures/loadIcon';
+import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
 const SuperuserAccount: React.FC = () => {
     console.log('SuperuserAccount');
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
     const [userData, setUserData] = useState<any>(null);
     const [allUsers, setAllUsers] = useState<any[]>([]);
@@ -176,7 +176,7 @@ const SuperuserAccount: React.FC = () => {
 
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "55vh", 
+        height: "50vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '0vh',
@@ -186,27 +186,47 @@ const SuperuserAccount: React.FC = () => {
         <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
             <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>Super Account</div>
             <div style={{ margin: '5vh' }}>
-                {isLoading && <LoadIcon size={60}/>}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                {userData && (
-                    <div style={{ marginBottom: '3vh' }}>
+
+
+                <div style={containerStyle}>
+                    <SingleSkeleton loading={isLoading} error={error} height={'50vh'}>
+                        <AgGridReact
+                            theme={themeDarkBlue}
+                            rowData={allUsers}
+                            columnDefs={columnDefs}
+                            pagination={true}
+                            suppressRowHoverHighlight
+                            suppressColumnVirtualisation
+                            domLayout="normal"
+                        />
+                    </SingleSkeleton>
+
+                </div>
+
+
+                {isLoading ? (
+                    <div style={{height: '8.3vh', display: 'flex', alignItems: 'center', justifyContent:'center'}}>
+                        <LoadIcon size={20} />
+                    </div>
+                ) : error ? (
+                    <p style={{ color: 'var(--error-text)' }}>{error}</p>
+                ) : userData ? (
+                    <div style={{ marginTop: '3vh', marginBottom: '3vh' }}>
                         <div>Name: {userData.name}</div>
                         <div>Email: {userData.email}</div>
                     </div>
-                )}
-                <div style={containerStyle}>
-                    <AgGridReact
-                        theme={themeDarkBlue}
-                        rowData={allUsers}
-                        columnDefs={columnDefs}
-                        pagination={true}
-                        suppressRowHoverHighlight
-                        suppressColumnVirtualisation
-                        domLayout="autoHeight"
-                    />
-                </div>
+                ) : null}
+
             </div>
-            <button onClick={handleLogout} className={styles.submitButton} style={{width: '30vh', marginLeft: '40%', marginRight: '40%'}}>Log Out</button>
+
+            <button
+                onClick={handleLogout}
+                className={styles.submitButton}
+                style={{width: '30%', margin: '0% 35% 0% 35%'}}
+            >
+                Log Out
+            </button>
+
         </div>
     );
 };
