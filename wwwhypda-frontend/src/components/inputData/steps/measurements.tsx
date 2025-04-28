@@ -84,7 +84,14 @@ interface MeasurementRow {
 }
 
 export default function Measurements() {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
+    const containerStyle = useMemo(() => ({ 
+        width: "100%", 
+        height: "44.5vh", 
+        "--ag-background-color": "var(--table-color)", 
+        marginTop: '0vh', 
+        marginBottom: '17.5vh',
+    }), []);   
+
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
 
     const [error, setError] = useState<string | null>(null);
@@ -278,21 +285,24 @@ export default function Measurements() {
     return (
         <div style={containerStyle}>
             <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    display: 'grid',
-                    alignContent: 'center',
-                    justifyContent: 'center',
-                    fontSize: '2.5vh', 
+                style={{
+                    color: "var(--tree-text)",
+                    textAlign: "center",
+                    fontSize: '3vh',
+                    height: '10vh',
                     margin: '1vh 0vh 1vh 0vh',
-                    height: '6.71vh'
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    justifyItems: 'center',
+                    alignItems: 'center',
                 }}
             >
                 Measurements
             </div>
 
             <div style={{display: 'flex'}}>
-                
+
                 <SingleSkeleton 
                     loading={loading}
                     error={error}
@@ -336,11 +346,10 @@ export default function Measurements() {
                         Delete Row
                     </button>
                 </SingleSkeleton>
-
             </div>
 
-            <SingleSkeleton loading={loading} error={error} height={'50vh'}>
-                <div style={{height: '50vh'}}>
+            <SingleSkeleton loading={loading} error={error}>
+                {/* <div style={{height: '50vh'}}> */}
                     <AgGridReact
                         theme={themeDarkBlue}
                         rowData={tableData}
@@ -351,7 +360,7 @@ export default function Measurements() {
                         cellSelection={cellSelection}
                         onCellValueChanged={handleCellValueChanged}
                     />
-                </div>
+                {/* </div> */}
             </SingleSkeleton>
 
         </div>
