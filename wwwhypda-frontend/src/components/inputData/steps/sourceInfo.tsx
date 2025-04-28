@@ -30,13 +30,13 @@ const LOCAL_STORAGE_KEY = "sourceTableData";
 
 const SourceInfo = () => {
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
-    const containerStyle = useMemo(() => ({
-        width: "100%",
-        height: "54vh",
-        "--ag-background-color": "var(--table-color)",
-        marginTop: '0vh',
-        marginBottom: '9vh'
-    }), []);
+    const containerStyle = useMemo(() => ({ 
+        width: "100%", 
+        height: "50vh", 
+        "--ag-background-color": "var(--table-color)", 
+        marginTop: '0vh', 
+        marginBottom: '5vh',
+    }), []);    
 
     const [tableData, setTableData] = useState(defaultRowData);
 
@@ -85,12 +85,17 @@ const SourceInfo = () => {
     return (
         <div style={containerStyle}>
             <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    textAlign: "center", 
-                    fontSize: '2.5vh', 
-                    margin: '3vh 0vh 3.21vh 0vh',
-                    height: '6.71vh'
+                style={{
+                    color: "var(--tree-text)",
+                    textAlign: "center",
+                    fontSize: '3vh',
+                    height: '10vh',
+                    margin: '1vh 0vh 1vh 0vh',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    justifyItems: 'center',
+                    alignItems: 'center',
                 }}
             >
                 Source of information (Info about the paper or the technical report that contains the measurements)

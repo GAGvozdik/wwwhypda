@@ -43,7 +43,7 @@ const rowData = [
 const GeneralInfo = () => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "58vh", 
+        height: "50vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '5vh',
@@ -159,12 +159,17 @@ const GeneralInfo = () => {
         <div style={containerStyle}>
 
             <div 
-                style={{ 
-                    color: "var(--tree-text)", 
-                    textAlign: "center", 
-                    fontSize: '2.5vh', 
-                    margin: '2.21vh 0vh 3vh 0vh',
-                    height: '6.71vh'
+                style={{
+                    color: "var(--tree-text)",
+                    textAlign: "center",
+                    fontSize: '3vh',
+                    height: '10vh',
+                    margin: '1vh 0vh 1vh 0vh',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignContent: 'center',
+                    justifyItems: 'center',
+                    alignItems: 'center',
                 }}
             >
                 General information about measurements

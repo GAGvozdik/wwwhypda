@@ -80,7 +80,14 @@ interface RockTypeData {
 // const fracturationDegreeValues = ["- undefined -", "val 1", "val 2", "val 3"];
 
 const MeasurementSampleTable = () => {
-    const containerStyle = useMemo(() => ({ width: "100%", height: "50vh", "--ag-background-color": "var(--table-color)", marginTop: '0vh', marginBottom: '13vh' }), []);
+    const containerStyle = useMemo(() => ({ 
+        width: "100%", 
+        height: "44.5vh", 
+        "--ag-background-color": "var(--table-color)", 
+        marginTop: '0vh', 
+        marginBottom: '17.5vh',
+    }), []);    
+
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -296,12 +303,17 @@ const MeasurementSampleTable = () => {
         <div style={containerStyle}>
             
                     <div 
-                        style={{ 
-                            color: "var(--tree-text)", 
-                            textAlign: "center", 
-                            fontSize: '2.5vh', 
+                        style={{
+                            color: "var(--tree-text)",
+                            textAlign: "center",
+                            fontSize: '3vh',
+                            height: '10vh',
                             margin: '1vh 0vh 1vh 0vh',
-                            height: '6.71vh'
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignContent: 'center',
+                            justifyItems: 'center',
+                            alignItems: 'center',
                         }}
                     >
                         Measurement “Sample” (the borehole, the sample, or the borehole section where the measurement was performed)
