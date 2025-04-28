@@ -45,10 +45,9 @@ const SiteInfo = () => {
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const containerStyle = useMemo(() => ({
         width: "100%",
-        height: "58vh",
+        height: "50vh",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0vh',
-        marginBottom: '5vh'
     }), []);
 
     const [error, setError] = useState<string | null>(null);
@@ -158,9 +157,17 @@ const SiteInfo = () => {
 
             <div style={{
                 color: "var(--tree-text)",
-                textAlign: "center",
+                // textAlign: "center",
                 fontSize: '3vh',
-                margin: '1vh 0vh 1vh 0vh'
+                height: '10vh',
+                margin: '1vh 0vh 1vh 0vh',
+
+                display: 'flex',
+                justifyContent: 'center',
+                alignContent: 'center',
+                justifyItems: 'center',
+                alignItems: 'center',
+
             }}>
                 Site Information
             </div>
