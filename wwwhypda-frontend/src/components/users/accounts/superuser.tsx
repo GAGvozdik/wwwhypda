@@ -14,8 +14,7 @@ import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
 const SuperuserAccount: React.FC = () => {
-    console.log('SuperuserAccount');
-    const dispatch = useDispatch();
+
     const navigate = useNavigate();
 
     const [userData, setUserData] = useState<any>(null);
@@ -89,15 +88,15 @@ const SuperuserAccount: React.FC = () => {
             });
 
             if (res.status === 200) {
-                console.log('Успешный выход');
+                localStorage.removeItem('isSuperuser');
+                clearAllCookies(); 
+                navigate('/login', { replace: true });
             }
         } catch (err) {
             console.error("Ошибка при выходе:", err);
         } finally {
-            // Даже если ошибка - всё равно чистим клиент
-            localStorage.clear();
-            clearAllCookies(); // Очистка всех куков вручную
-            dispatch(Logout());
+            localStorage.removeItem('isSuperuser');
+            clearAllCookies(); 
             navigate('/login', { replace: true });
         }
     };

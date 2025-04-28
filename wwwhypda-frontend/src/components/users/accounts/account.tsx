@@ -7,7 +7,6 @@ import { Logout } from '../../../redux/actions';
 import LoadIcon from '../../commonFeatures/loadIcon';
 
 const Account: React.FC = () => {
-    console.log('Account component rendered');
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -24,15 +23,13 @@ const Account: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await axios.get('http://localhost:5000/users/', {
-                withCredentials: true, // отправляем куки
+                withCredentials: true, 
             });
-            console.log('response.data.data', response.data.data.name);
-            console.log('response.data', response.data.name);
-            console.log('response', response);
+
             setUserData(response.data.data);
         } catch (error: any) {
             if (error.response?.status === 401) {
-                navigate('/login'); // если не авторизован, редирект
+                navigate('/login');
             } else {
                 setError(error.response?.data?.error || 'Error fetching user data');
             }
@@ -60,8 +57,6 @@ const Account: React.FC = () => {
     }
 
     const handleLogout = async () => {
-
-
         try {
             const res = await axios.post('http://localhost:5000/users/logout', {}, {
                 withCredentials: true, // обязательно для куков
@@ -71,15 +66,17 @@ const Account: React.FC = () => {
             });
 
             if (res.status === 200) {
-                console.log('Успешный выход');
+                localStorage.removeItem('isSuperuser');
+                clearAllCookies(); 
+                navigate('/login', { replace: true });
+                console.log('Sucess user logout');
             }
         } catch (err) {
             console.error("Ошибка при выходе:", err);
+
         } finally {
-            // Даже если ошибка - всё равно чистим клиент
-            localStorage.clear();
-            clearAllCookies(); // Очистка всех куков вручную
-            dispatch(Logout());
+            localStorage.removeItem('isSuperuser');
+            clearAllCookies(); 
             navigate('/login', { replace: true });
         }
     };
