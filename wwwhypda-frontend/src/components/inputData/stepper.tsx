@@ -73,18 +73,16 @@ function CustomStepIcon(props: StepIconProps) {
 }
 
 
-
 export default function CustomStepper() {
-    const [activeStep, setActiveStep] = React.useState(0);
+    const [activeStep, setActiveStep] = React.useState<number>(() => {
+        const savedStep = localStorage.getItem('activeStep');
+        return savedStep !== null ? Number(savedStep) : 0;
+    });
+
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
-    const isStepOptional = (step: number) => {
-        return step === 1;
-    };
-
-    const isStepSkipped = (step: number) => {
-        return skipped.has(step);
-    };
+    const isStepOptional = (step: number) => step === 1;
+    const isStepSkipped = (step: number) => skipped.has(step);
 
     const handleNext = () => {
         let newSkipped = skipped;
@@ -92,47 +90,40 @@ export default function CustomStepper() {
             newSkipped = new Set(newSkipped.values());
             newSkipped.delete(activeStep);
         }
-
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        const newStep = activeStep + 1;
+        setActiveStep(newStep);
         setSkipped(newSkipped);
+        localStorage.setItem('activeStep', newStep.toString());
     };
 
     const handleBack = () => {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+        const newStep = activeStep - 1;
+        setActiveStep(newStep);
+        localStorage.setItem('activeStep', newStep.toString());
     };
-
-
 
     const handleReset = () => {
         setActiveStep(0);
+        localStorage.removeItem('activeStep');
     };
 
     return (
         <Box sx={{ width: '100%' }} className={styles.treeText}>
             <Stepper activeStep={activeStep}>
-                {
-                    steps.map((label, index) => {
-                        return (
-                            <Step key={label}>
-                                <StepLabel
-                                    StepIconComponent={CustomStepIcon} 
-                                >
-                                    <div className={styles.treeText}>{label}</div>
-                                </StepLabel>
-                            </Step>
-
-                        );
-                    }
-                )}
+                {steps.map((label) => (
+                    <Step key={label}>
+                        <StepLabel StepIconComponent={CustomStepIcon}>
+                            <div className={styles.treeText}>{label}</div>
+                        </StepLabel>
+                    </Step>
+                ))}
             </Stepper>
-
 
             {activeStep === steps.length ? (
                 <React.Fragment>
                     <Typography sx={{ mt: 2, mb: 1 }}>
-                        All steps completed - you&apos;re finished
+                        All steps completed - you're finished
                     </Typography>
-
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
                         <Box sx={{ flex: '1 1 auto' }} />
                         <Button onClick={handleReset} className={styles.submitButton}>Reset</Button>
@@ -159,7 +150,7 @@ export default function CustomStepper() {
                     </Box>
                 </React.Fragment>
             )}
-
         </Box>
     );
 }
+
