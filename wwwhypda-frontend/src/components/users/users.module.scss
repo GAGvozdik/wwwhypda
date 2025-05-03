@@ -6,31 +6,23 @@
 
 .authForm {
     background-color: var(--form-color);
-
-
-
-    // padding: 0vh;
-    // width: 30%;
-    // margin-top: 15vh;
-    // margin-bottom: 3vh;
-    // margin-left: 35%;
-    // margin-right: 35%;
-    // padding-bottom: 2vh;
-
-
+    
     align-self: center;
     justify-self: center;
+
+
     width: 45vh;
-    margin-top: 15vh;
-    margin-bottom: 3vh;
+    // margin-top: 15vh;
+    // margin-bottom: 3vh;
     padding-bottom: 2vh;
 
     border-radius: 8px;
     border: 3px solid var(--border);
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
-    
 }
+
+
 
 .errorMessage {
     font-size: 2vh;
@@ -69,12 +61,22 @@
         transition: 0.5s;
         outline: none;
     }
-    font-family: Afacad_Flux !important;
+    font-family: system-ui, Afacad_Flux !important;
     font-size: var(--input-font-size);
 }
 
+input[type="password"] {
+    font-family: system-ui,Afacad_Flux !important;
+    font-size: var(--input-font-size);
+}
+
+a
 input::placeholder {
-  color: var(--input-placeholder);
+
+    font-family: system-ui, Afacad_Flux !important;
+    font-size: var(--input-font-size);
+
+    color: var(--input-placeholder);
 }
 
 

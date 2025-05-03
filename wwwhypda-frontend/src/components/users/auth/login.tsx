@@ -51,50 +51,62 @@ const Login: React.FC = () => {
 
 
     return (
-        <div className={styles.authForm}>
-            <div className={styles.formTitle}>Authorization</div>
+    
+        <div 
+            style={{    
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+            }}
+        >
 
-            <form onSubmit={handleLogin}>
-                <div className={styles.autocompleteContainer}>
+
+            <div className={styles.authForm}>
+                <div className={styles.formTitle}>Authorization</div>
+
+                <form onSubmit={handleLogin}>
+                    <div className={styles.autocompleteContainer}>
+                        <input
+                            type="text"
+                            placeholder="Email"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className={styles.inputField}
+                            required
+                            list="emailSuggestions"
+                        />
+                    </div>
+
                     <input
-                        type="text"
-                        placeholder="Email"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         className={styles.inputField}
                         required
-                        list="emailSuggestions"
                     />
+
+                    <ErrorMessage error={error} isError={isError} />
+
+                    <UserButton text='Login' isLoading={isLoading} />
+                </form>
+
+                <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
+                    <div style={{ fontSize: '2.5vh' }}>Do you have an account?</div>
+                    <div>
+                        <Link to="/register" className={styles.link}>
+                            Register here
+                        </Link>
+                    </div>
                 </div>
-
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={styles.inputField}
-                    required
-                />
-
-                <ErrorMessage error={error} isError={isError} />
-
-                <UserButton text='Login' isLoading={isLoading} />
-            </form>
-
-            <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                <div style={{ fontSize: '2.5vh' }}>Do you have an account?</div>
-                <div>
-                    <Link to="/register" className={styles.link}>
-                        Register here
-                    </Link>
-                </div>
-            </div>
-            <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                <div style={{ fontSize: '2.5vh' }}>Do you want to reset your password?</div>
-                <div>
-                    <Link to="/forgot-password" className={styles.link}>
-                        Reset password
-                    </Link>
+                <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
+                    <div style={{ fontSize: '2.5vh' }}>Do you want to reset your password?</div>
+                    <div>
+                        <Link to="/forgot-password" className={styles.link}>
+                            Reset password
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

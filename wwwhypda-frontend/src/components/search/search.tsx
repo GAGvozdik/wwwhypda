@@ -105,7 +105,8 @@ const Search: React.FC = () => {
                 // overflow: 'scroll',
                 // overflowY: 'scroll',
                 paddingTop: '2vh',
-                gap: '2vh'
+                gap: '2vh',
+                
             }}
         >
             <div 
@@ -115,9 +116,10 @@ const Search: React.FC = () => {
                     // padding: '1vh',
                     // border: '3px solid var(--border)',
                     backgroundColor: 'var(--drawer-color)',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     boxSizing: 'border-box',
                     height: '82vh',
+                    // width: '90vh',
                     // overflow: 'scroll',
                     // overflowY: 'scroll',
                     gridRowStart: 1, 
@@ -140,7 +142,8 @@ const Search: React.FC = () => {
                     boxSizing: 'border-box',
                     height: '82vh',
                     // overflow: 'scroll',
-                    overflowY: 'scroll',
+                    // overflowY: 'scroll',
+                    overflowY: 'hidden',
                     gridRowStart: 1, 
                     gridRowEnd: 1, 
                     gridColumnStart: 1, 
@@ -167,6 +170,7 @@ const Search: React.FC = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
+                         
                     }}
                     component="form" // Добавляем компонент формы
                     onSubmit={handleSubmit} // Обрабатываем событие отправки формы

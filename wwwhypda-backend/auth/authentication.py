@@ -47,7 +47,7 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires = timedelta(minutes=20)
+        access_expires = timedelta(minutes=5)
         refresh_expires = timedelta(days=1)
 
         # 📌 Добавляем is_superuser в токен

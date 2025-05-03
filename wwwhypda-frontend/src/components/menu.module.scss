@@ -14,7 +14,7 @@
 
     --color-scheme: light;
 
-    --menu: #4a96a3;
+    --menu: #078ea6;
     --error-text: #ff6666;
     --tree-text: #4a96a3;
     --menu-hover: #c2a776;
@@ -46,6 +46,7 @@
     --step-color-active: #358e9d; 
     --step-color: #4a96a383; 
     --step-text: #fff2d9;
+    --scrollbar-track-color: #fff2d9;
 }
 
 .dark {
@@ -252,9 +253,15 @@ input::placeholder {
     font-weight: 300;
 }
 
+// * {
+//     scrollbar-width: thin;
+//     border-radius: 1px;
+//     scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
+// }
 
 
 ::-webkit-scrollbar {
+    scrollbar-width: thin;
     width: 10px;
     height: 10px;
     border-radius: 8px;
@@ -281,3 +288,7 @@ input::placeholder {
     border-radius: 8px;
     transition: 0.5s;
 }
+
+
+
+
