@@ -253,11 +253,14 @@ input::placeholder {
     font-weight: 300;
 }
 
-// * {
-//     scrollbar-width: thin;
-//     border-radius: 1px;
-//     scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
-// }
+@-moz-document url-prefix() {
+  * {
+    scrollbar-width: thin;
+    border-radius: 4px;
+    // scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
+    scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
+  }
+}
 
 
 ::-webkit-scrollbar {
