@@ -20,3 +20,15 @@
     box-sizing: border-box;
     white-space: nowrap;
 }
+
+.treeBody {
+    border-radius: 5px;
+}
+
+@-moz-document url-prefix() {
+  .treeBody {
+    border-radius: 1px;
+  }
+}
+
+

@@ -35,21 +35,21 @@ const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, className, pa
     return (
         <>
         {path ? 
-            <Link to={path} style={{fontFamily: 'Afacad_Flux !important', textDecoration: 'none', fontSize: 'var(--tree-font-size)'}}>
+            <Link to={path} style={{borderRadius: '15px',fontFamily: 'Afacad_Flux !important', textDecoration: 'none', fontSize: 'var(--tree-font-size)'}}>
                 <TreeItem  
                     onClick={toggleTheme}
                     itemId={name}
                     label={name}
                     sx={{ 
-                        '.MuiTreeItem-label': {fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
+                        '.MuiTreeItem-label': {borderRadius: '15px',fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
                         // '& .MuiTreeItem-content.Mui-selected ': { borderRadius: '0px', backgroundColor: 'red' },
-                        '& .MuiTreeItem-content:hover': { backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' }, 
+                        '& .MuiTreeItem-content:hover': {borderRadius: '15px', backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' }, 
                         // '& .MuiTreeItem-conten': { paddingLeft: '100px' }, 
                         // '& .MuiTreeItem- group': { padding: '6vh' }, 
                         color: 'var(--tree-text)',
                         '--TreeView-itemChildrenIndentation': '3vh',
-                        '& .MuiTreeItem-content': {paddingLeft: '1.5vh'},
-                        '& .MuiTreeItem-iconContainer': {width: '0px'},
+                        '& .MuiTreeItem-content': {paddingLeft: '1.5vh', borderRadius: '15px',},
+                        '& .MuiTreeItem-iconContainer': {width: '0px',borderRadius: '15px',},
                     }}
                 >
                     {children ? children : ''}
@@ -71,6 +71,7 @@ const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, className, pa
                     '--TreeView-itemChildrenIndentation': '2.5vh',
                     '& .MuiTreeItem-content': {paddingLeft: '1.5vh', backgroundColor: ''},
                     '& .MuiTreeItem-iconContainer': {display: children ? '' : ''},
+                    borderRadius: '15px',
                 }}
             >
                 {children ? children : ''}

@@ -63,7 +63,7 @@ const Login: React.FC = () => {
 
 
             <div className={styles.authForm}>
-                <div className={styles.formTitle}>Authorization</div>
+                <div className={styles.formTitle}>Email Authorization</div>
 
                 <form onSubmit={handleLogin}>
                     <div className={styles.autocompleteContainer}>

@@ -9,7 +9,10 @@ import MainMenu from '../menu/mainMenu';
 import MainBody from './mainBody';
 import useTokenRefresh from '../users/tokenRefresh';
 import GitHubIcon from '@mui/icons-material/GitHub';
-    
+
+import 'simplebar/dist/simplebar.min.css';
+
+
 export default function MainWindow() {
     // useTokenRefresh(); 
 

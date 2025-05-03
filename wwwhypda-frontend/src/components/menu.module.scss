@@ -256,7 +256,7 @@ input::placeholder {
 @-moz-document url-prefix() {
   * {
     scrollbar-width: thin;
-    border-radius: 4px;
+    border-radius: 1px;
     // scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
     scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
   }
