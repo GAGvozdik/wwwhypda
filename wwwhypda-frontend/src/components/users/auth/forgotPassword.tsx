@@ -78,71 +78,81 @@ const ForgotPassword: React.FC = () => {
     };
 
     return (
-        <div className={styles.authForm}>
-            <div className={styles.formTitle}>Forgot Password</div>
-            {step === 1 && (
-                <form onSubmit={handleSendCode}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className={styles.inputField}
-                        required
-                    />
-                    {/* Передаем флаг isError */}
-                    <ErrorMessage error={error} isError={isError} />
-                    <UserButton
-                        text='Send Code'
-                        isLoading={isLoading}
-                    />
+        <div 
+            style={{    
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
+            }}
+        >
 
-                    <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                        <div style={{ fontSize: '2.5vh' }}>Already have an account?</div>
-                        <div>
-                            <Link to="/login" className={styles.link}>
-                                Login here
-                            </Link>
+            <div className={styles.authForm}>
+                <div className={styles.formTitle}>Forgot Password</div>
+                {step === 1 && (
+                    <form onSubmit={handleSendCode}>
+                        <input
+                            type="email"
+                            placeholder="Email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={styles.inputField}
+                            required
+                        />
+                        {/* Передаем флаг isError */}
+                        <ErrorMessage error={error} isError={isError} />
+                        <UserButton
+                            text='Send Code'
+                            isLoading={isLoading}
+                        />
+
+                        <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
+                            <div style={{ fontSize: '2.5vh' }}>Already have an account?</div>
+                            <div>
+                                <Link to="/login" className={styles.link}>
+                                    Login here
+                                </Link>
+                            </div>
                         </div>
-                    </div>
 
-                </form>
-            )}
+                    </form>
+                )}
 
-            {step === 2 && (
-                <form onSubmit={handleResetPassword}>
-                    <input
-                        type="text"
-                        placeholder="Reset Code"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value)}
-                        className={styles.inputField}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="New Password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        className={styles.inputField}
-                        required
-                    />
-                    <input
-                        type="password"
-                        placeholder="Confirm New Password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={styles.inputField}
-                        required
-                    />
-                    {/* Передаем флаг isError */}
-                    <ErrorMessage error={error} isError={isError} />
-                    <UserButton
-                        text='Reset Password'
-                        isLoading={isLoading}
-                    />
-                </form>
-            )}
+                {step === 2 && (
+                    <form onSubmit={handleResetPassword}>
+                        <input
+                            type="text"
+                            placeholder="Reset Code"
+                            value={code}
+                            onChange={(e) => setCode(e.target.value)}
+                            className={styles.inputField}
+                            required
+                        />
+                        <input
+                            type="password"
+                            placeholder="New Password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className={styles.inputField}
+                            required
+                        />
+                        <input
+                            type="password"
+                            placeholder="Confirm New Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className={styles.inputField}
+                            required
+                        />
+                        {/* Передаем флаг isError */}
+                        <ErrorMessage error={error} isError={isError} />
+                        <UserButton
+                            text='Reset Password'
+                            isLoading={isLoading}
+                        />
+                    </form>
+                )}
+            </div>
         </div>
     );
 };
