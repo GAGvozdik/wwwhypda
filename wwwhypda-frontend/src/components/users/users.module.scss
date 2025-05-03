@@ -40,40 +40,44 @@
 }
 
 .inputField {
-    border: 0px solid grey;
-    color: rgb(51, 51, 51);
-    padding: 3%;
-    border-radius: 4px;
-    width: 74%;
-    margin-left: 10%;
-    margin-right: 10%;
-    margin-bottom: 1vh;
-    // height: 5vh;
-    background-color: var(--input);
-    transition: 0.5s;
-    &:hover {
-        background-color: var(--input-hover);
-        transition: 0.5s;
-    }
-    &:focus {
-        // background-color: var(--input-hover);
-        // border: 3px solid red;
-        transition: 0.5s;
-        outline: none;
-    }
-    font-family: system-ui, Afacad_Flux !important;
+  border: none;
+  color: rgb(51, 51, 51);
+  padding: 3%;
+  border-radius: 4px;
+  width: 74%;
+  margin: 0 10% 1vh 10%;
+  background-color: var(--input);
+  transition: background-color 0.5s;
+  
+  font-family: 'Afacad_Flux', system-ui, sans-serif;
+  font-size: var(--input-font-size);
+
+  &:hover {
+    background-color: var(--input-hover);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &::placeholder {
+    font-family: 'Afacad_Flux', system-ui, sans-serif;
     font-size: var(--input-font-size);
+    color: var(--input-placeholder);
+    opacity: 1; // чтобы Firefox не делал серее
+  }
 }
+
 
 input[type="password"] {
     font-family: system-ui,Afacad_Flux !important;
     font-size: var(--input-font-size);
 }
 
-a
+
 input::placeholder {
 
-    font-family: system-ui, Afacad_Flux !important;
+    font-family: 'Afacad_Flux', system-ui, sans-serif;
     font-size: var(--input-font-size);
 
     color: var(--input-placeholder);

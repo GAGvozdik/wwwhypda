@@ -121,10 +121,12 @@ export default function ModelsTreeDrawer() {
                 ? `${styles.hidingDrawer} ${isDarkTheme ? styles.dark : ''}`
                 : `${styles.openHidingDrawer} ${isDarkTheme ? styles.dark : ''}`
         }>
-            <div style={{
+            <div 
+            className={styles.treeBody}
+            style={{
                 backgroundColor: 'var(--drawer-color)',
                 height: '100%',
-                borderRadius: '5px',
+                // borderRadius: '5px',
                 overflowY: 'auto',
                 overflowX: 'hidden',
             }}>
