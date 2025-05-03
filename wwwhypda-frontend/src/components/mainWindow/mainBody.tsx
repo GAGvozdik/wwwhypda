@@ -85,15 +85,15 @@ export default function MainMenu() {
                     }
                 />
 
-                <Route path="/login" element={<Login />} />
-
                 <Route
                     path="/contribute"
                     element={<Contribute />}
                 />
 
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+
 
             </Routes>
         </div>

@@ -16,13 +16,13 @@ import {
     CellSelectionOptions,
 } from "ag-grid-community";
 
-import {
-    CellSelectionModule,
-    ClipboardModule,
-    ColumnMenuModule,
-    ContextMenuModule,
-    ExcelExportModule,
-} from "ag-grid-enterprise";
+// import {
+//     CellSelectionModule,
+//     ClipboardModule,
+//     ColumnMenuModule,
+//     ContextMenuModule,
+//     ExcelExportModule,
+// } from "ag-grid-enterprise";
 
 ModuleRegistry.registerModules([
     TextEditorModule,
@@ -33,7 +33,7 @@ ModuleRegistry.registerModules([
     // ExcelExportModule,
     // ColumnMenuModule,
     // ContextMenuModule,
-    CellSelectionModule,
+    // CellSelectionModule,
 
     //   ValidationModule /* Development Only */,
 ]);

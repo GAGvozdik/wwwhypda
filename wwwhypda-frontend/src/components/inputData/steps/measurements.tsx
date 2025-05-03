@@ -16,13 +16,13 @@ import {
     CellSelectionOptions,
 } from "ag-grid-community";
 
-import {
-    CellSelectionModule,
-    // ClipboardModule,
-    // ColumnMenuModule,
-    // ContextMenuModule,
-    // ExcelExportModule,
-} from "ag-grid-enterprise";
+// import {
+//     CellSelectionModule,
+//     // ClipboardModule,
+//     // ColumnMenuModule,
+//     // ContextMenuModule,
+//     // ExcelExportModule,
+// } from "ag-grid-enterprise";
 
 ModuleRegistry.registerModules([
     TextEditorModule,
@@ -33,7 +33,7 @@ ModuleRegistry.registerModules([
     // ExcelExportModule,
     // ColumnMenuModule,
     // ContextMenuModule,
-    CellSelectionModule,
+    // CellSelectionModule,
 
     //   ValidationModule /* Development Only */,
 ]);
@@ -218,7 +218,7 @@ export default function Measurements() {
         },
         { headerName: "The measurement value", field: "value", editable: true, flex: 1 },
         { headerName: "The error", field: "error", editable: true, flex: 1 },
-        { headerName: "The parameter units", field: "units", editable: true, flex: 1 },
+        { headerName: "shuiosehuiesrhhuipgerhuiogaerhuio", field: "units", editable: true, flex: 1 },
         { 
             headerName: "Quality", field: "quality", editable: true, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: qualityNames },
