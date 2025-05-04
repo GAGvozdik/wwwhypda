@@ -51,15 +51,11 @@ class User(db.Model):
     
     @classmethod
     def activate_user_by_id(cls, user_id: int) -> bool:
-        print('+')
         user = cls.query.filter_by(id=user_id).first()
-        print('++')
         if user:
             user.active = True
             db.session.commit()
-            print('+++')
             return True
-        print('++++')
         return False
 
     @classmethod

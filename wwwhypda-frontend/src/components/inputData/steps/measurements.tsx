@@ -153,10 +153,10 @@ export default function Measurements() {
                     setInterpretationMethod(metodResponse.data);
                 }
 
-                console.log('parameterResponse:', parameterResponse.data);
-                console.log('qualityResponse:', qualityResponse.data);
-                console.log('experimentTypeResponse:', experimentTypeResponse.data);
-                console.log('metodResponse:', metodResponse.data);
+                // console.log('parameterResponse:', parameterResponse.data);
+                // console.log('qualityResponse:', qualityResponse.data);
+                // console.log('experimentTypeResponse:', experimentTypeResponse.data);
+                // console.log('metodResponse:', metodResponse.data);
 
             } catch (error: any) {
                 setError(getErrorMessage(error));

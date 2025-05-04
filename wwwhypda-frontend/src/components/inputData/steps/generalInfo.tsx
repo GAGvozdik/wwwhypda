@@ -2,8 +2,6 @@ import styles from '../menu.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import axios from 'axios';
-import { State } from '../../../common/types';
-import { useSelector, useDispatch } from 'react-redux';
 import { useStepsTheme } from '../steps';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 
@@ -35,11 +33,6 @@ interface Environment {
     env_wiki_link: string | null;
 }
 
-const rowData = [
-    { field: "env_name", value: "", description: "the hydrogeological environment" },
-    { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
-];
-
 const GeneralInfo = () => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
@@ -49,7 +42,6 @@ const GeneralInfo = () => {
         marginBottom: '5vh',
     }), []);    
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [reviews, setReviews] = useState<Reviews[]>([]);
@@ -69,7 +61,6 @@ const GeneralInfo = () => {
             ]);
         }
 
-
     const getCookie = (name: string): string | null => {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
@@ -77,17 +68,12 @@ const GeneralInfo = () => {
         return null;
     };
 
-
         const fetchData = async () => {
-
-
             const csrfToken = getCookie('csrf_access_token');
-
             if (!csrfToken) {
                 setError("CSRF token not found in cookie");
                 return;
             }
-
 
             try {
                 const [envResponse, reviewResponse] = await Promise.all([

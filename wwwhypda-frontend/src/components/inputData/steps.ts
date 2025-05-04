@@ -3,6 +3,44 @@
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import { State } from '../../common/types';
 import { useSelector } from 'react-redux';
+import axios from "axios";
+
+// Пример функции для получения CSRF-токена из cookie
+const getCsrfTokenFromCookie = () => {
+  const match = document.cookie.match(/csrf_token=([^;]+)/);
+  return match ? match[1] : "";
+};
+
+export const sendAllDataToServer = async () => {
+  const payload = insertData();
+
+  try {
+    const response = await axios.post("http://localhost:5000/input/submit", payload, {
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-TOKEN": getCsrfTokenFromCookie(),
+      },
+      withCredentials: true, // Отправлять HttpOnly cookie (JWT)
+    });
+
+    console.log("Данные успешно отправлены:", response.data);
+  } catch (error: any) {
+    console.error("Ошибка при отправке:", error.response?.data || error.message);
+  }
+};
+
+
+
+const insertData = () => {
+  return {
+    generalInfoData: JSON.parse(localStorage.getItem("generalInfoData") || "[]"),
+    measurementsTableData: JSON.parse(localStorage.getItem("measurementsTableData") || "[]"),
+    sampleMeasurementTableData: JSON.parse(localStorage.getItem("sampleMeasurementTableData") || "[]"),
+    siteInfoTableData: JSON.parse(localStorage.getItem("siteInfoTableData") || "[]"),
+    sourceTableData: JSON.parse(localStorage.getItem("sourceTableData") || "[]"),
+  };
+};
+
 
 export const useStepsTheme = () => {
   const isDarkTheme = useSelector((state: State) => state.isDarkTheme);

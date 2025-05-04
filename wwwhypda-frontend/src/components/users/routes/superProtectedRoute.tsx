@@ -10,19 +10,15 @@ interface SuperProtectedRouteProps {
 
 const SuperProtectedRoute: React.FC<SuperProtectedRouteProps> = ({ children }) => {
     const { isAuth, isSuperuser } = useAuthCheck();
-    console.log('10');
     if (isAuth === null || isSuperuser === null) {
-        console.log('11');
         return <></>;
     }
 
     if (!isAuth) {
-        console.log('12');
         return <Navigate to="/login" />;
     }
 
     if (!isSuperuser) {
-        console.log('13');
         return <Navigate to="/account" />;
     }
 

@@ -41,7 +41,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
         }),
         []
     );
-
+    
     // Функция экспорта данных в XLSX
     const exportToExcel = () => {
         if (!rows || rows.length === 0) {
