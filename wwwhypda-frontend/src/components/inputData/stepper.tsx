@@ -17,6 +17,7 @@ import SourceInfo from './steps/sourceInfo';
 import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
 import {sendAllDataToServer} from './steps';
+import BasicModal from './../modal/basicModal';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
@@ -128,12 +129,37 @@ export default function CustomStepper() {
                     <Typography sx={{ mt: 2, mb: 1 }}>
                         All steps completed - you're finished
                     </Typography>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
+
+                    <Box sx={{ minHeight: '46vh' }} /> 
+                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '12vh' }}>
+                        <Button
+                            onClick={() => {
+                                const lastStep = steps.length - 1;
+                                setActiveStep(lastStep);
+                                localStorage.setItem('activeStep', lastStep.toString());
+                            }}
+                            className={styles.submitButton}
+                            sx={{ mr: 1 }}
+                        >
+                            Back
+                        </Button>
+
                         <Box sx={{ flex: '1 1 auto' }} />
-                        <Button onClick={handleReset} className={styles.submitButton}>Reset</Button>
+
+
+                        <BasicModal>
+                            <Button
+                                onClick={handleReset}
+                                className={styles.submitButton}
+                            >
+                                Send
+                            </Button>
+                        </BasicModal>
                     </Box>
+
                 </React.Fragment>
             ) : (
+
                 <React.Fragment>
                     {stepComponents[activeStep]}
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '12vh' }}>
