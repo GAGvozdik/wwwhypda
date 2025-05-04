@@ -397,7 +397,7 @@ class InterpretationMethod(db.Model):
     def get_all_interpretation_methods():
         try:
             methods = InterpretationMethod.query.all()
-            print('methods = ', methods)
+            # print('methods = ', methods)
             return jsonify([{
                 "id_Int_meth": m.id_Int_meth,
                 "int_meth_name": m.int_meth_name,

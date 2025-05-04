@@ -16,6 +16,7 @@ from flask_jwt_extended import get_jwt, get_jwt_identity, create_access_token, s
 from datetime import timedelta
 import secrets
 
+from inputData.inputData import input_bp
 from auth.authentication import auth_bp
 from auth.admin.admin import admin_bp
 from rocks.rocks_bp import rocks_bp
@@ -56,7 +57,7 @@ CORS(app, supports_credentials=True, origins=["http://localhost:3000"],
      allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"])
 
 # talisman = Talisman(app)
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 # === Configs ===
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
@@ -110,6 +111,7 @@ def rotate_csrf_token(response):
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(rocks_bp)
+app.register_blueprint(input_bp)
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     os.getenv('SWAGGER_URL'),

@@ -23,7 +23,7 @@ from flask_jwt_extended import (
 import logging
 
 # Настройка логирования
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 
 
 # Code reference: https://www.loginradius.com/blog/engineering/guest-post/securing-flask-api-with-jwt/
@@ -47,7 +47,7 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires = timedelta(minutes=5)
+        access_expires = timedelta(minutes=25)
         refresh_expires = timedelta(days=1)
 
         # 📌 Добавляем is_superuser в токен

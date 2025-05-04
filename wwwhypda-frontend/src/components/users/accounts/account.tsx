@@ -17,6 +17,7 @@ const Account: React.FC = () => {
 
     useEffect(() => {
         fetchUserData();
+        fetchMySubmissions();
     }, []);
 
     const fetchUserData = async () => {
@@ -37,6 +38,26 @@ const Account: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+
+    const fetchMySubmissions = async () => {
+    try {
+        const response = await axios.get("http://localhost:5000/input/my_submissions", {
+        headers: {
+            "X-CSRF-TOKEN": getCsrfTokenFromCookie(),
+        },
+        withCredentials: true, // обязательно, чтобы отправлялся HttpOnly JWT
+        });
+
+        console.log("Мои записи:", response.data);
+        return response.data;
+    } catch (error: any) {
+        console.error("Ошибка при получении записей:", error.response?.data || error.message);
+        return [];
+    }
+    };
+
+
 
     // Вспомогательная функция для удаления всех кук
     function clearAllCookies() {
@@ -69,7 +90,6 @@ const Account: React.FC = () => {
                 localStorage.removeItem('isSuperuser');
                 clearAllCookies(); 
                 navigate('/login', { replace: true });
-                console.log('Sucess user logout');
             }
         } catch (err) {
             console.error("Ошибка при выходе:", err);

@@ -18,7 +18,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { DynamicRowData } from '../../common/types'; // Импортируем новый тип
 import SearchResultsTable from './searchResultsTable';
 
-
 interface Parameter {
   id_Parameter: number;
   code: string;
@@ -30,8 +29,6 @@ interface Parameter {
   MinValue: number;
 }
 
-
-
 const Search: React.FC = () => {
 
     let rt_id = useSelector((state: State) => state.currentRTID);  
@@ -39,7 +36,6 @@ const Search: React.FC = () => {
 
     const dispatch = useDispatch();
     
-
     const [parameters, setParameters] = useState<Parameter[]>([]);
 
     const [error, setError] = useState<string | null>(null);
@@ -70,8 +66,6 @@ const Search: React.FC = () => {
             const fetchParameters = async () => {
                 try {
                     const response = await axios.get<DynamicRowData[]>(`http://localhost:5000/api/samples/${rt_id}/${selectedValue}`); 
-
-                    console.log(response.data);
 
                     const res = response.data.map((item, index) => ({
                         ...item,
