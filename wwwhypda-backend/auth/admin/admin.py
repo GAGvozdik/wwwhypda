@@ -31,11 +31,8 @@ def get_all_users():
 @jwt_required()
 def activate_user(user_id):
     current_user = get_jwt_identity()
-    print('()')
     success = User.activate_user_by_id(user_id)
-    print(user_id)
     if success:
-        print(')(')
         return jsonify(message=f"User {user_id} has been activated"), 200
     return jsonify(message="User not found", error="Not Found"), 404
 
@@ -46,7 +43,6 @@ def promote_to_superuser(user_id):
     """
     Promote a user to superuser status. Only superusers can access this endpoint.
     """
-    print(user_id)
     success = User.make_superuser(user_id)
     if success:
         return jsonify(message=f"User {user_id} is now a superuser"), 200

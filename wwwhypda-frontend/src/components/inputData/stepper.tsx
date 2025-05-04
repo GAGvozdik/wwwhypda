@@ -16,6 +16,7 @@ import GeneralInfo from './steps/generalInfo';
 import SourceInfo from './steps/sourceInfo';
 import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
+import {sendAllDataToServer} from './steps';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
@@ -104,6 +105,9 @@ export default function CustomStepper() {
 
     const handleReset = () => {
         setActiveStep(0);
+
+        sendAllDataToServer();
+
         localStorage.removeItem('activeStep');
     };
 

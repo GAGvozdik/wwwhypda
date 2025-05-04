@@ -139,9 +139,9 @@ const MeasurementSampleTable = () => {
                     setRocksData(rocksResponse.data);
                 }
 
-                console.log('Environments:', envResponse.data);
-                console.log('Scale:', reviewResponse.data);
-                console.log('Rocks:', rocksResponse.data);
+                // console.log('Environments:', envResponse.data);
+                // console.log('Scale:', reviewResponse.data);
+                // console.log('Rocks:', rocksResponse.data);
 
             } catch (error: any) {
                 setError(getErrorMessage(error));

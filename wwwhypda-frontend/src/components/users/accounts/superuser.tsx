@@ -12,7 +12,7 @@ import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { useStepsTheme } from '../../inputData/steps';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
-
+import InputSuggestions from './inputSuggestions';
 const SuperuserAccount: React.FC = () => {
 
     const navigate = useNavigate();
@@ -182,7 +182,7 @@ const SuperuserAccount: React.FC = () => {
     }), []);    
 
     return (
-        <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important' }}>
+        <div style={{ height: '84vh', color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important', overflowY: 'scroll' }}>
             <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>Super Account</div>
             <div style={{ margin: '5vh' }}>
 
@@ -217,6 +217,8 @@ const SuperuserAccount: React.FC = () => {
                 ) : null}
 
             </div>
+
+            <InputSuggestions />
 
             <button
                 onClick={handleLogout}
