@@ -40,6 +40,17 @@ def get_input_suggestions():
         current_app.logger.error(f"Error in get_input_suggestions: {e}")
         return jsonify({"error": str(e)}), 500
 
+@input_bp.route("/get_input_by_id/<int:input_id>", methods=["GET"])
+@jwt_required()
+def get_input_by_id(input_id):
+    try:
+        input_data = InputData.query.filter_by(id=input_id).first()
+        if not input_data:
+            return jsonify({"error": "Not found"}), 404
+        return jsonify(input_data.to_dict()), 200  # важно, чтобы .to_dict() возвращал всю нужную структуру
+    except Exception as e:
+        current_app.logger.error(f"Error in get_input_by_id: {e}")
+        return jsonify({"error": str(e)}), 500
 
 
 @input_bp.route("/delete_submission/<int:submission_id>", methods=["DELETE"])
