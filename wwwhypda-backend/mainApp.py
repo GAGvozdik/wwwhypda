@@ -53,8 +53,12 @@ csp = {
 Talisman(app, content_security_policy=csp)
 
 # CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
-CORS(app, supports_credentials=True, origins=["http://localhost:3000"], 
-     allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"])
+CORS(
+    app, 
+    supports_credentials=True, 
+    origins=["http://localhost:3000"], 
+    allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"]
+)
 
 # talisman = Talisman(app)
 # logging.basicConfig(level=logging.DEBUG)

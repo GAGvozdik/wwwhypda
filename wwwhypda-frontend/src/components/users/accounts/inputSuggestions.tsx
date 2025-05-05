@@ -112,12 +112,6 @@ const InputSuggestions: React.FC = () => {
     ], []);
 
 
-    const handleViewRequest = (rowData: any) => {
-        console.log('Просмотр записи:', rowData);
-        // Или переход: navigate(`/admin/view/${rowData.id}`)
-    };
-
-
     const themeDarkBlue = useStepsTheme();
 
     const containerStyle = useMemo(() => ({ 

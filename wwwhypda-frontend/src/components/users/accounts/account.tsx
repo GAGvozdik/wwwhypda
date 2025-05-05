@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Logout } from '../../../redux/actions';
 import LoadIcon from '../../commonFeatures/loadIcon';
-
+import UserSuggestions from './userSuggestions';
 const Account: React.FC = () => {
 
     const dispatch = useDispatch();
@@ -17,7 +17,6 @@ const Account: React.FC = () => {
 
     useEffect(() => {
         fetchUserData();
-        fetchMySubmissions();
     }, []);
 
     const fetchUserData = async () => {
@@ -38,26 +37,6 @@ const Account: React.FC = () => {
             setIsLoading(false);
         }
     };
-
-
-    const fetchMySubmissions = async () => {
-    try {
-        const response = await axios.get("http://localhost:5000/input/my_submissions", {
-        headers: {
-            "X-CSRF-TOKEN": getCsrfTokenFromCookie(),
-        },
-        withCredentials: true, // обязательно, чтобы отправлялся HttpOnly JWT
-        });
-
-        console.log("Мои записи:", response.data);
-        return response.data;
-    } catch (error: any) {
-        console.error("Ошибка при получении записей:", error.response?.data || error.message);
-        return [];
-    }
-    };
-
-
 
     // Вспомогательная функция для удаления всех кук
     function clearAllCookies() {
@@ -104,14 +83,15 @@ const Account: React.FC = () => {
     return (
         <div 
             style={{    
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
+                // display: 'flex',
+                // justifyContent: 'center',
+                // alignItems: 'center',
                 height: '100%',
+                width: '100%'
             }}
         >
             <div
-                className={styles.authForm}
+                // className={styles.authForm}
                 style={{
                     color: 'var(--tree-text)',
                     fontSize: '2vh',
@@ -121,6 +101,10 @@ const Account: React.FC = () => {
                 <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>
                     Your Account
                 </div>
+
+                <UserSuggestions />
+
+
                 <div style={{ margin: '5vh' }}>
                     {isLoading && <LoadIcon size={60}/>}
                     {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
@@ -131,7 +115,7 @@ const Account: React.FC = () => {
                         </div>
                     )}
                 </div>
-                <button onClick={handleLogout} className={styles.submitButton}>
+                <button onClick={handleLogout} className={styles.submitButton} style={{width: '20vh', justifySelf: 'center'}}>
                     Log Out
                 </button>
             </div>

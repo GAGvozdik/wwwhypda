@@ -65,7 +65,7 @@ class InputData(db.Model):
             results = cls.query.filter_by(user_id=user_id).order_by(cls.created_at.desc()).all()
             return [entry.to_dict() for entry in results]
         except SQLAlchemyError as e:
-            current_app.logger.error(f"[DB ERROR] Failed to retrieve InputData: {e}")
+            current_app.logger.error(f"[DB ERROR] get_user_submissions: {e}")
             return []
         
     @classmethod
@@ -81,6 +81,20 @@ class InputData(db.Model):
                 for row in results
             ]
         except SQLAlchemyError as e:
-            current_app.logger.error(f"get_input_suggestions error : {e}")
+            current_app.logger.error(f"[DB ERROR] get_input_suggestions error : {e}")
             return []
 
+    @classmethod
+    def delete_by_id_if_owned(cls, entry_id: int, user_id: int) -> bool:
+        try:
+            entry = cls.query.filter_by(id=entry_id, user_id=user_id).first()
+            if not entry:
+                return False  # Либо не существует, либо не принадлежит пользователю
+
+            db.session.delete(entry)
+            db.session.commit()
+            return True
+        except SQLAlchemyError as e:
+            current_app.logger.error(f"[DB ERROR] (delete_by_id_if_owned) Failed to delete InputData id={entry_id}: {e}")
+            db.session.rollback()
+            return False
