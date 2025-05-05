@@ -33,7 +33,7 @@ const InputSuggestions: React.FC = () => {
                 withCredentials: true,
             });
             setAllSuggestions(response.data.data);
-            console.log(allSuggestions);
+            console.log(response.data.data);
 
         } catch (error: any) {
             setError(error.response?.data?.error || 'Error fetching suggestions data');
@@ -51,11 +51,14 @@ const InputSuggestions: React.FC = () => {
             flex: 1,
         },
         {
-            headerName: 'User ID',
-            field: 'user_id',
+            headerName: 'Name',
+            field: 'username',
             sortable: true,
             filter: true,
             flex: 1,
+            valueFormatter: (params: any) => {
+                return params.value || '—'; 
+            },
         },
         {
             headerName: 'Created At',
@@ -71,19 +74,21 @@ const InputSuggestions: React.FC = () => {
             headerName: 'Status',
             field: 'status',
             flex: 1,
-            valueGetter: () => 'New', // или вычисление по другим условиям
+            valueFormatter: (params: any) => {
+                return params.value || '—'; // Показывает статус или тире, если null/undefined
+            },
         },
         {
             headerName: 'Actions',
             field: 'actions',
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Deny request">
+                    <Tooltip title="Submit request">
                         <IconButton onClick={() =>{}}>
                             <CheckCircleOutlineIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Submit request">
+                    <Tooltip title="Deny request">
                         <IconButton onClick={() => {}}>
                             <DoDisturbIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
