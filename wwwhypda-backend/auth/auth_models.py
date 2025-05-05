@@ -20,6 +20,18 @@ class User(db.Model):
     active = db.Column(db.Boolean, default=False)  # User must be activated manually
     is_superuser = db.Column(db.Boolean, default=False)  # User must be activated manually
 
+
+
+    @classmethod
+    def get_by_id(cls, user_id: int):
+        """
+        Retrieves a user by their ID if they are active.
+        Returns a dictionary or None if not found.
+        """
+        user = cls.query.filter_by(id=user_id, active=True).first()
+        return {"id": user.id, "name": user.name, "email": user.email, "active": user.active} if user else None
+
+
     def set_password(self, password):
         """Хэширует пароль и сохраняет его"""
         self.password = generate_password_hash(password)
@@ -126,15 +138,6 @@ class User(db.Model):
         """
         users = cls.query.filter_by(active=True).all()
         return [{"id": user.id, "name": user.name, "email": user.email} for user in users]
-
-    @classmethod
-    def get_by_id(cls, user_id: int):
-        """
-        Retrieves a user by their ID if they are active.
-        Returns a dictionary or None if not found.
-        """
-        user = cls.query.filter_by(id=user_id, active=True).first()
-        return {"id": user.id, "name": user.name, "email": user.email, "active": user.active} if user else None
 
     @classmethod
     def get_by_email(cls, email: str):
