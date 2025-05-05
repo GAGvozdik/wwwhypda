@@ -102,30 +102,39 @@ const Account: React.FC = () => {
     };
 
     return (
-        <div
-            className={styles.authForm}
-            style={{
-                color: 'var(--tree-text)',
-                fontSize: '2vh',
-                fontFamily: 'Afacad_Flux !important',
+        <div 
+            style={{    
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%',
             }}
         >
-            <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>
-                Your Account
+            <div
+                className={styles.authForm}
+                style={{
+                    color: 'var(--tree-text)',
+                    fontSize: '2vh',
+                    fontFamily: 'Afacad_Flux !important',
+                }}
+            >
+                <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>
+                    Your Account
+                </div>
+                <div style={{ margin: '5vh' }}>
+                    {isLoading && <LoadIcon size={60}/>}
+                    {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
+                    {userData && (
+                        <div>
+                            <div>Name: {userData.name}</div>
+                            <div>Email: {userData.email}</div>
+                        </div>
+                    )}
+                </div>
+                <button onClick={handleLogout} className={styles.submitButton}>
+                    Log Out
+                </button>
             </div>
-            <div style={{ margin: '5vh' }}>
-                {isLoading && <LoadIcon size={60}/>}
-                {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
-                {userData && (
-                    <div>
-                        <div>Name: {userData.name}</div>
-                        <div>Email: {userData.email}</div>
-                    </div>
-                )}
-            </div>
-            <button onClick={handleLogout} className={styles.submitButton}>
-                Log Out
-            </button>
         </div>
     );
 };
