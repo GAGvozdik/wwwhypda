@@ -128,7 +128,9 @@ const UserSuggestions: React.FC = () => {
             headerName: 'Status',
             field: 'status',
             flex: 1,
-            valueGetter: () => 'New', // или вычисление по другим условиям
+            valueFormatter: (params: any) => {
+                return params.value || '—'; // Показывает статус или тире, если null/undefined
+            },
         },
 
         {
@@ -136,16 +138,19 @@ const UserSuggestions: React.FC = () => {
             field: 'actions',
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
+
                     <Tooltip title="Del request">
                         <IconButton onClick={() => delMySubmission(data.id)}>
                             <DeleteIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
+
                     <Tooltip title="Edit request">
                         <IconButton onClick={handleClick}>
                             <EditIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
+
                 </div>
             ),
 
