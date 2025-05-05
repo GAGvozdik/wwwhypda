@@ -15,6 +15,7 @@ import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { Link } from 'react-router-dom';
+import { useModal } from '../../modal/modalContext';
 
 const InputSuggestions: React.FC = () => {
 
@@ -33,7 +34,7 @@ const InputSuggestions: React.FC = () => {
                 withCredentials: true,
             });
             setAllSuggestions(response.data.data);
-            console.log(response.data.data);
+            console.log('get_input_suggestions', response.data.data);
 
         } catch (error: any) {
             setError(error.response?.data?.error || 'Error fetching suggestions data');
@@ -102,12 +103,21 @@ const InputSuggestions: React.FC = () => {
             headerName: 'Link to view',
             field: 'status',
             flex: 1,
-            cellRenderer: () => (
+            cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                     <Tooltip title="Tap to view">
-                        <Link to="/input" className={styles.link}>
-                            Tap to view
-                        </Link>
+                        <div 
+                        className={styles.link} 
+                        onClick={() => handleClick(data.id)} 
+                        role="button" 
+                        tabIndex={0} 
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') handleClick(data.id);
+                        }}
+                        >
+                        Tap to view
+                        </div>
+
                     </Tooltip>
                 </div>
             ),
@@ -126,6 +136,53 @@ const InputSuggestions: React.FC = () => {
         marginTop: '0vh', 
         marginBottom: '0vh',
     }), []);    
+
+    
+    const { openModal, closeModal } = useModal();
+    const navigate = useNavigate();
+    
+    const handleClick = async (id: number) => {
+        try {
+            const response = await axios.get(`http://localhost:5000/input/get_input_by_id/${id}`, {
+                withCredentials: true
+            });
+            const data = response.data;
+
+            openModal(
+                'Are you sure you want to start editing?',
+                'All current sample data will be permanently erased!',
+                'Go to editing',
+                () => {
+                    localStorage.removeItem("generalInfoData");
+                    localStorage.removeItem("measurementsTableData");
+                    localStorage.removeItem("sampleMeasurementTableData");
+                    localStorage.removeItem("siteInfoTableData");
+                    localStorage.removeItem("sourceTableData");
+                    localStorage.removeItem('activeStep');
+
+                    try {
+                        localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                        localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                        localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                        localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                        localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                        localStorage.setItem("activeStep", "0");
+
+                        console.log("Данные успешно записаны в localStorage.");
+                    } catch (e) {
+                        console.error("Ошибка при сохранении в localStorage:", e);
+                    }
+
+                    navigate('/input');
+                }
+            );
+
+        } catch (err) {
+            console.error("Ошибка при получении полной структуры input по id:", err);
+        }
+    };
+
+
 
     return (
         <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important'}}>
