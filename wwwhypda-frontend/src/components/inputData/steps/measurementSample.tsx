@@ -171,9 +171,7 @@ const MeasurementSampleTable = () => {
         const saved = localStorage.getItem("sampleMeasurementTableData");
         try {
             return saved ? JSON.parse(saved) : [
-                { id: 1, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
-                { id: 2, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" },
-                { id: 3, smpl_name: "", rock_type: "- undefined -", scale: "- undefined -", fracturation_degree: "- undefined -", Sample_comment: "" }
+                { id: 1, smpl_name: "", rock_type: "", scale: "", fracturation_degree: "", Sample_comment: "" },
             ];
         } catch (e) {
             console.error("Error parsing localStorage:", e);

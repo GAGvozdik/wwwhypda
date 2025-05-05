@@ -84,6 +84,22 @@ input::placeholder {
 }
 
 
+.link{
+    color: var(--tree-text);
+    text-decoration: underline;
+    font-family: Afacad_Flux !important;
+    transition: 0.5s;
+    font-weight: 600;
+    font-size: 2.5vh;
+}
+
+.link:hover {
+    // color: var(--submit-button-text-hover);
+    text-decoration: none;
+    transition: 0.5s;
+    font-weight: 300;
+}
+
 .submitButton {
     background-color: var(--menu);
     color: var(--submit-button-text);
@@ -105,22 +121,6 @@ input::placeholder {
     justify-content: center;
     align-items: center;
     transition: 0.5s;
-}
-
-.link{
-    color: var(--tree-text);
-    text-decoration: underline;
-    font-family: Afacad_Flux !important;
-    transition: 0.5s;
-    font-weight: 600;
-    font-size: 2.5vh;
-}
-
-.link:hover {
-    // color: var(--submit-button-text-hover);
-    text-decoration: none;
-    transition: 0.5s;
-    font-weight: 300;
 }
 
 .submitButton:hover {
