@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import styles from './stepper.module.scss';
 
-import { styled } from '@mui/material/styles';
+
 import { StepIconProps } from '@mui/material/StepIcon';
 import Check from '@mui/icons-material/Check';
 
@@ -16,49 +16,20 @@ import GeneralInfo from './steps/generalInfo';
 import SourceInfo from './steps/sourceInfo';
 import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
-import {sendAllDataToServer} from './steps';
+import {sendAllDataToServer, CustomStepIconRoot, StepNumberCircle} from './steps';
 import { useModal } from '../modal/modalContext';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
+const isEditable = true;
+
 const stepComponents = [
-    <SiteInfo />,
-    <GeneralInfo />,
-    <SourceInfo />,
-    <MeasurementSample />,
-    <Measurements />,
+    <SiteInfo isEditable={isEditable}/>,
+    <GeneralInfo isEditable={isEditable}/>,
+    <SourceInfo isEditable={isEditable}/>,
+    <MeasurementSample isEditable={isEditable}/>,
+    <Measurements isEditable={isEditable}/>,
 ];
-
-const CustomStepIconRoot = styled('div')<{ ownerState: { active?: boolean; completed?: boolean } }>(
-  ({ ownerState }) => ({
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: '50%',
-    width: '4vh',
-    height: '4vh',
-    fontSize: '2vh',
-    fontFamily: 'Afacad_Flux',
-    color: 'var(--step-color-active)', 
-    transition: '0.8s',
-  })
-);
-
-const StepNumberCircle = styled('div')<{ ownerState: { active?: boolean } }>(
-  ({ ownerState }) => ({
-    width: '4vh',
-    height: '4vh',
-    borderRadius: '50%',
-    backgroundColor: ownerState.active ? 'var(--step-color-active)' : 'var(--step-color)', // Красный, если шаг активен
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '2vh',
-    color: 'var(--step-text)', 
-    fontWeight: ownerState.active ? 'bold' : '',
-    transition: '0.8s',
-  })
-);
 
 function CustomStepIcon(props: StepIconProps) {
     const { active, completed, className, icon } = props;
@@ -74,13 +45,11 @@ function CustomStepIcon(props: StepIconProps) {
     );
 }
 
-
 export default function CustomStepper() {
     const [activeStep, setActiveStep] = React.useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
         return savedStep !== null ? Number(savedStep) : 0;
     });
-
 
     const handleClick = () => {
         openModal(
@@ -91,11 +60,10 @@ export default function CustomStepper() {
         );
     };
 
-    const { openModal, closeModal } = useModal();
+    const { openModal } = useModal();
 
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
-    const isStepOptional = (step: number) => step === 1;
     const isStepSkipped = (step: number) => skipped.has(step);
 
     const handleNext = () => {

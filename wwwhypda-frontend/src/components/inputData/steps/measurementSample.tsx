@@ -74,12 +74,12 @@ interface RockTypeData {
     status_name: string | null; 
 }
 
+type MeasurementSampleTableProps = {
+    isEditable: boolean;
+};
 
-// const rockTypeValues = ["- undefined -", "sand", "marl", "basalt"];
-// const scaleValues = ["- undefined -", "middle", "large", "low"];
-// const fracturationDegreeValues = ["- undefined -", "val 1", "val 2", "val 3"];
 
-const MeasurementSampleTable = () => {
+function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "44.5vh", 
@@ -88,7 +88,7 @@ const MeasurementSampleTable = () => {
         marginBottom: '17.5vh',
     }), []);    
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [scale, setScale] = useState<Scale[]>([]);
@@ -116,9 +116,9 @@ const MeasurementSampleTable = () => {
 
             try {
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
-                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations', {withCredentials: true, headers: {"X-CSRF-TOKEN": csrfToken,},}),
-                    axios.get<Scale[]>('http://localhost:5000/api/scales', {withCredentials: true, headers: {"X-CSRF-TOKEN": csrfToken,},}),
-                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type', {withCredentials: true, headers: {"X-CSRF-TOKEN": csrfToken},})
+                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations', {withCredentials: true}),
+                    axios.get<Scale[]>('http://localhost:5000/api/scales', {withCredentials: true}),
+                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type', {withCredentials: true})
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {
@@ -217,14 +217,14 @@ const MeasurementSampleTable = () => {
         { 
             headerName: "smpl_name", 
             field: "smpl_name", 
-            editable: true, 
+            editable: isEditable, 
             flex: 1, 
             singleClickEdit: false 
         },
         { 
             headerName: "rock_type", 
             field: "rock_type", 
-            editable: true, 
+            editable: isEditable, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
             cellEditorParams: { values: rocksNames }, 
@@ -240,7 +240,7 @@ const MeasurementSampleTable = () => {
         { 
             headerName: "scale", 
             field: "scale", 
-            editable: true, 
+            editable: isEditable, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
             cellEditorParams: { values: scales }, 
@@ -256,7 +256,7 @@ const MeasurementSampleTable = () => {
         { 
             headerName: "fracturation_degree", 
             field: "fracturation_degree", 
-            editable: true, 
+            editable: isEditable, 
             flex: 1, 
             cellEditor: "agSelectCellEditor", 
             cellEditorParams: { values: fracturations }, 
@@ -272,7 +272,7 @@ const MeasurementSampleTable = () => {
         { 
             headerName: "Sample_comment", 
             field: "Sample_comment", 
-            editable: true, 
+            editable: isEditable, 
             flex: 1, 
             singleClickEdit: false 
         }
@@ -280,7 +280,7 @@ const MeasurementSampleTable = () => {
 
     const defaultColDef = useMemo<ColDef>(() => {
         return {
-            editable: true,
+            editable: isEditable,
             flex: 1,
             suppressMenu: true,
             suppressSorting: true,
@@ -327,6 +327,7 @@ const MeasurementSampleTable = () => {
                             height={'3.5vh'}
                         >
                             <button
+                                disabled={!isEditable}
                                 onClick={addRow}
                                 className={styles.submitButton}
                                 style={{
@@ -349,6 +350,7 @@ const MeasurementSampleTable = () => {
                             height={'3.5vh'}
                         >
                             <button
+                                disabled={!isEditable}
                                 onClick={deleteRow}
                                 className={styles.submitButton}
                                 style={{
@@ -377,9 +379,6 @@ const MeasurementSampleTable = () => {
                         />
                     </SingleSkeleton>
 
-
-
-        
         </div>
     );
 };

@@ -41,8 +41,13 @@ const defaultRowData: SiteRow[] = [
     { field: "latitude", value: "", description: "" }
 ];
 
-const SiteInfo = () => {
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+
+type SiteInfoProps = {
+    isEditable: boolean;
+};
+
+function  SiteInfo({isEditable= true}: SiteInfoProps) {
+
     const containerStyle = useMemo(() => ({
         width: "100%",
         height: "50vh",
@@ -81,10 +86,7 @@ const SiteInfo = () => {
             }
             try {
                 const response = await axios.get<Country[]>('http://localhost:5000/api/countries', {
-                                    withCredentials: true,
-                    headers: {
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
+                    withCredentials: true,
                 });
 
                 if (!response.data || response.data.length === 0) {
@@ -138,7 +140,7 @@ const SiteInfo = () => {
         { field: "field", editable: false, flex: 1 },
         {
             field: "value",
-            editable: true,
+            editable: isEditable,
             singleClickEdit: true,
             flex: 1,
             
@@ -152,7 +154,7 @@ const SiteInfo = () => {
     ], [countryNames]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
-        editable: true,
+        editable: isEditable,
         flex: 1,
         suppressMenu: true,
         suppressSorting: true,
