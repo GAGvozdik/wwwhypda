@@ -188,8 +188,6 @@ export default function Measurements() {
         try {
             return saved ? JSON.parse(saved) : [
                 { id: 1, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
-                { id: 2, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
-                { id: 3, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" }
             ];
         } catch (e) {
             console.error("Ошибка при парсинге localStorage:", e);
@@ -218,7 +216,6 @@ export default function Measurements() {
         },
         { headerName: "The measurement value", field: "value", editable: true, flex: 1 },
         { headerName: "The error", field: "error", editable: true, flex: 1 },
-        { headerName: "shuiosehuiesrhhuipgerhuiogaerhuio", field: "units", editable: true, flex: 1 },
         { 
             headerName: "Quality", field: "quality", editable: true, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: qualityNames },

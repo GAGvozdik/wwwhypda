@@ -17,6 +17,7 @@ export default function MainWindow() {
     // useTokenRefresh(); 
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+
     let isOpenNow = useSelector((state: State) => state.open);  
 
     const widthLessThan650 = useMediaQuery({ maxWidth: 700 });

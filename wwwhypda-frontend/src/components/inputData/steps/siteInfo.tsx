@@ -48,6 +48,7 @@ const SiteInfo = () => {
         height: "50vh",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0vh',
+        // fontSize: '26px',  
     }), []);
 
     const [error, setError] = useState<string | null>(null);
@@ -72,7 +73,6 @@ const SiteInfo = () => {
 
     useEffect(() => {
         const fetchCountries = async () => {
-
             const csrfToken = getCookie('csrf_access_token');
 
             if (!csrfToken) {
@@ -107,6 +107,21 @@ const SiteInfo = () => {
         localStorage.setItem("siteInfoTableData", JSON.stringify(tableData));
     }, [tableData]);
 
+    useEffect(() => {
+        // Перезагружаем данные из localStorage, если они были удалены
+        const saved = localStorage.getItem("siteInfoTableData");
+        if (saved) {
+            try {
+                setTableData(JSON.parse(saved));
+            } catch (e) {
+                console.error("Failed to parse localStorage data:", e);
+                setTableData(defaultRowData);
+            }
+        } else {
+            setTableData(defaultRowData); // Если нет данных, то используем дефолтные
+        }
+    }, []);  // Этот useEffect сработает при монтировании компонента
+
     const getErrorMessage = (error: any): string => {
         if (error.response) {
             return `HTTP error! status: ${error.response.status}, data: ${error.response.data}`;
@@ -126,13 +141,14 @@ const SiteInfo = () => {
             editable: true,
             singleClickEdit: true,
             flex: 1,
+            
             cellEditorSelector: (params) => {
                 return params.data.field === "country_name"
                     ? { component: "agSelectCellEditor", params: { values: countryNames } }
                     : { component: "agTextCellEditor" };
             }
         },
-        { field: "description", editable: false, flex: 2 }
+        { field: "description", editable: false, flex: 2, cellStyle: { fontSize: '4vh' }, }
     ], [countryNames]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
@@ -140,7 +156,8 @@ const SiteInfo = () => {
         flex: 1,
         suppressMenu: true,
         suppressSorting: true,
-        headerComponentParams: { suppressHeader: true }
+        headerComponentParams: { suppressHeader: true },
+        headerClass: 'custom-header',  // Класс для заголовков
     }), []);
 
     const themeDarkBlue = useStepsTheme();
@@ -152,28 +169,31 @@ const SiteInfo = () => {
         setTableData(updatedData);
     };
 
+const gridOptions = useMemo(() => ({
+    defaultColDef: {
+        cellStyle: { fontSize: '56px' },  // Устанавливаем размер шрифта для всех ячеек
+        headerClass: 'custom-header',     // Класс для заголовков
+    }
+}), []);
     return (
         <div style={containerStyle}>
-
             <div style={{
                 color: "var(--tree-text)",
-                // textAlign: "center",
                 fontSize: '3vh',
                 height: '10vh',
                 margin: '1vh 0vh 1vh 0vh',
-
                 display: 'flex',
                 justifyContent: 'center',
                 alignContent: 'center',
                 justifyItems: 'center',
                 alignItems: 'center',
-
             }}>
                 Site Information
             </div>
 
             <SingleSkeleton loading={loading} error={error}>
                 <AgGridReact
+    gridOptions={gridOptions} 
                     theme={themeDarkBlue}
                     rowData={tableData}
                     columnDefs={columnDefs}

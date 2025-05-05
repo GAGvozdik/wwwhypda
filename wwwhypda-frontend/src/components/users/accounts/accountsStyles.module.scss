@@ -1,0 +1,43 @@
+
+.submitButton {
+    background-color: var(--menu) !important;
+    color: var(--submit-button-text) !important;
+    padding: 1vh !important;
+    
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    box-sizing: border-box !important;  
+    font-family: Afacad_Flux !important;
+    font-size: var(--button-font-size) !important;
+    width: 10vh !important;
+    // margin-left: 10% !important; 
+    // margin-right: 10% !important; 
+    transition: 0.5s !important;
+}
+
+
+// .submitButton:hover {
+//     transition: 0.5s !important;
+//     color: var(--submit-button-text-hover) !important;
+//     background-color: var(--submit-button-hover) !important;
+// }
+
+.submitButton:disabled {
+    color: var(--submit-button-text) !important;
+    background-color: var(--submit-button-hover) !important;
+}
+.submitButton:active  {
+    transition: 0.5s !important;
+    background-color: var(--submit-button-active) !important;
+    color: var(--submit-button-text) !important;
+    transition: 0.5s !important;
+}
+
+
+.treeText{
+    color: var(--step-color) !important;
+    font-family: Afacad_Flux !important;
+    font-size: var(--main-font-size) !important;
+}
+

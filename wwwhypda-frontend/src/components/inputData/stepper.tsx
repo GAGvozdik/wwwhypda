@@ -17,7 +17,7 @@ import SourceInfo from './steps/sourceInfo';
 import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
 import {sendAllDataToServer} from './steps';
-import BasicModal from './../modal/basicModal';
+import { useModal } from '../modal/modalContext';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
@@ -81,6 +81,18 @@ export default function CustomStepper() {
         return savedStep !== null ? Number(savedStep) : 0;
     });
 
+
+    const handleClick = () => {
+        openModal(
+            'Do you want to submit data??', // Title
+            '', // Description
+            'Send', // Action button text
+            () => { handleReset(); }
+        );
+    };
+
+    const { openModal, closeModal } = useModal();
+
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
     const isStepOptional = (step: number) => step === 1;
@@ -105,11 +117,15 @@ export default function CustomStepper() {
     };
 
     const handleReset = () => {
-        setActiveStep(0);
-
         sendAllDataToServer();
-
+        localStorage.removeItem("generalInfoData");
+        localStorage.removeItem("measurementsTableData");
+        localStorage.removeItem("sampleMeasurementTableData");
+        localStorage.removeItem("siteInfoTableData");
+        localStorage.removeItem("sourceTableData");
         localStorage.removeItem('activeStep');
+        console.log("sourceTableData", localStorage.removeItem("sourceTableData"))
+        setActiveStep(0);
     };
 
     return (
@@ -146,15 +162,14 @@ export default function CustomStepper() {
 
                         <Box sx={{ flex: '1 1 auto' }} />
 
-
-                        <BasicModal>
                             <Button
-                                onClick={handleReset}
+                                onClick={handleClick}
                                 className={styles.submitButton}
+                                style={{ minWidth: 120 }}
                             >
-                                Send
+                                Submit
                             </Button>
-                        </BasicModal>
+
                     </Box>
 
                 </React.Fragment>

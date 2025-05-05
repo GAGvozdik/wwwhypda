@@ -1,4 +1,4 @@
-import styles from '../menu.module.scss'; 
+import styles from '../menu.module.scss';
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
@@ -40,20 +40,41 @@ const SourceInfo = () => {
 
     const [tableData, setTableData] = useState(defaultRowData);
 
-    // Загружаем данные из localStorage при монтировании
-    useEffect(() => {
+    // Функция для загрузки данных из localStorage
+    const loadTableData = () => {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed)) {
                     setTableData(parsed);
+                    console.log('table updated from localStorage');
                 }
             } catch (e) {
                 console.error("Failed to parse saved table data", e);
             }
+        } else {
+            // Если данных нет в localStorage, сбрасываем на дефолтные
+            setTableData(defaultRowData);
         }
-    }, []);
+    };
+
+    // Загружаем данные при монтировании
+    useEffect(() => {
+        loadTableData();
+    }, []); // Только при первом рендере
+
+    // Слушаем изменения localStorage в других вкладках/компонентах
+    useEffect(() => {
+        const handleStorageChange = () => {
+            loadTableData();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []); // Слушатель добавляется только один раз
 
     // Обновляем значение и сохраняем в localStorage
     const handleCellValueChanged = useCallback((params: any) => {
@@ -111,7 +132,6 @@ const SourceInfo = () => {
                     onCellValueChanged={handleCellValueChanged}
                 />
             </div>
-
         </div>
     );
 };

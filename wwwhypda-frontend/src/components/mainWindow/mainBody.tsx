@@ -40,62 +40,71 @@ import ForgotPassword from '../users/auth/forgotPassword';
 
 import SuperuserAccount from '../users/accounts/superuser';
 import SuperProtectedRoute from '../users/routes/superProtectedRoute';
+import { ModalProvider } from '../modal/modalContext';
 
 export default function MainMenu() {
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+    const modalRootRef = useRef<HTMLDivElement>(null);
 
     return (
-        <div className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/search" element={<Search />} />
-                {/* <Route path="/contribute" element={<Contribute />} /> */}
-                <Route path="/documents" element={<Documents />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/notfound" element={<NotFound />} /> 
+        <div ref={modalRootRef} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
 
-                {/* <Route path="/account" element={
-                    <AppProvider>
-                        <Account onSignIn={handleSignIn} />
-                    </AppProvider>
-                } />  */}
-
-                <Route 
-                    path="/account" 
-                    element={<ProtectedRoute><Account /></ProtectedRoute>} 
-                />
-                <Route 
-                    path="/superaccount" 
-                    element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
-                />
-
-                
-                {/* <Route
-                    path="/input"
-                    element={<InputPage />}
-                /> */}
-
-                <Route
-                    path="/input"
-                    element={
-                        <ProtectedRoute>
-                            <InputPage />
-                        </ProtectedRoute>
-                    }
-                />
-
-                <Route
-                    path="/contribute"
-                    element={<Contribute />}
-                />
-
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                <ModalProvider modalRootRef={modalRootRef}>
 
 
-            </Routes>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/search" element={<Search />} />
+                        {/* <Route path="/contribute" element={<Contribute />} /> */}
+                        <Route path="/documents" element={<Documents />} />
+                        <Route path="/about" element={<About />} />
+                        <Route path="/notfound" element={<NotFound />} /> 
+
+                        {/* <Route path="/account" element={
+                            <AppProvider>
+                                <Account onSignIn={handleSignIn} />
+                            </AppProvider>
+                        } />  */}
+
+                        <Route 
+                            path="/account" 
+                            element={<ProtectedRoute><Account /></ProtectedRoute>} 
+                        />
+                        <Route 
+                            path="/superaccount" 
+                            element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
+                        />
+
+                        
+                        {/* <Route
+                            path="/input"
+                            element={<InputPage />}
+                        /> */}
+
+                        <Route
+                            path="/input"
+                            element={
+                                <ProtectedRoute>
+                                    <InputPage />
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/contribute"
+                            element={<Contribute />}
+                        />
+
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/register" element={<Register />} />
+                            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+
+                    </Routes>
+
+                </ModalProvider>
+
         </div>
     )
 };
