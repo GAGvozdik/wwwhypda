@@ -105,7 +105,7 @@ def refresh():
         new_access_token = create_access_token(
             identity=identity,
             additional_claims={"is_superuser": is_superuser},
-            expires_delta=timedelta(minutes=20)
+            expires_delta=timedelta(minutes=60)
         )
 
         response = jsonify(message="Access token refreshed")

@@ -3,9 +3,33 @@ import jwt
 from inputData.inputDataModels import InputData
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
-
+from flask_cors import CORS
 
 input_bp = Blueprint("input", __name__, url_prefix="/input")
+
+
+CORS(input_bp, supports_credentials=True, resources={
+    r"/delete_submission/*": {
+        "origins": "http://localhost:3000",
+        "methods": ["DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+    }
+})
+
+
+
+
+@input_bp.route("/delete_submission/<int:submission_id>", methods=["DELETE"])
+@jwt_required()
+def delete_submission(submission_id):
+    current_user_id = get_jwt_identity()
+    success = InputData.delete_by_id_if_owned(submission_id, current_user_id)
+    
+    if success:
+        return jsonify({"message": "Submission was deleted sucessfully"}), 200
+    else:
+        return jsonify({"message": "Deletion failed. The record was not found or does not belong to you."}), 403
+
 
 @input_bp.route("/submit", methods=["POST"])
 @jwt_required()
@@ -31,3 +55,5 @@ def get_my_data():
 def get_input_suggestions():
     data = InputData.get_input_suggestions()
     return jsonify({"data": data}), 200
+
+
