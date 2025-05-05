@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from './../users.module.scss';
+import styles from './accountsStyles.module.scss';
+// import styles from '../../inputData/stepper.module.scss';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Logout } from '../../../redux/actions';
@@ -17,6 +18,8 @@ import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { Link } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
+import { useModal } from '../../modal/modalContext';
 
 const UserSuggestions: React.FC = () => {
 
@@ -71,6 +74,7 @@ const UserSuggestions: React.FC = () => {
                 withCredentials: true,
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
+                    // "X-CSRF-TOKEN": '$ehuufeoihifeohie%^&%^&V*8b$',
                 },
             });
 
@@ -86,6 +90,27 @@ const UserSuggestions: React.FC = () => {
         }
     };
 
+
+    const handleClick = () => {
+        openModal(
+            'Are you sure you want to start editing?', // Title
+            'All current sample data will be permanently erased!', // Description
+            'Go to editing', // Action button text
+            () => {
+                
+
+                localStorage.removeItem("generalInfoData");
+                localStorage.removeItem("measurementsTableData");
+                localStorage.removeItem("sampleMeasurementTableData");
+                localStorage.removeItem("siteInfoTableData");
+                localStorage.removeItem("sourceTableData");
+                localStorage.removeItem('activeStep');
+            
+            }
+        );
+    };
+
+    const { openModal, closeModal } = useModal();
 
 
     const columnDefs = useMemo(() => [
@@ -117,9 +142,7 @@ const UserSuggestions: React.FC = () => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="Edit request">
-                        <IconButton onClick={() => {
-                            // Обработчик редактирования
-                        }}>
+                        <IconButton onClick={handleClick}>
                             <EditIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
@@ -129,24 +152,7 @@ const UserSuggestions: React.FC = () => {
             minWidth: 200,
             maxWidth: 300
         },
-        {
-            headerName: 'Link to view',
-            field: 'status',
-            flex: 1,
-            cellRenderer: () => (
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Tap to view">
-                        <Link to="/input" className={styles.link}>
-                            Tap to view
-                        </Link>
-                    </Tooltip>
-                </div>
-            ),
-            minWidth: 200,
-            maxWidth: 300
-        },
     ], []);
-
 
     const themeDarkBlue = useStepsTheme();
 
