@@ -31,35 +31,8 @@ const UserSuggestions: React.FC = () => {
         fetchMySubmissions();
     }, []);
 
+    const navigate = useNavigate();
 
-
-    const fetchMySubmissions = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get("http://localhost:5000/input/my_submissions", {
-            withCredentials: true, 
-            });
-
-            console.log("My notes:", response.data);
-            setAllSuggestions(response.data);
-
-        } catch (error: any) {
-            console.error("Error in my_submissions recieving:", error.response?.data || error.message);
-            setError(error.message)
-            return [];
-        }
-        finally {
-            setIsLoading(false);
-        }
-    };
-
-    function getCsrfTokenFromCookie() {
-        const csrf = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrf_token='))
-        ?.split('=')[1];
-        return csrf || '';
-    }
 
     const delMySubmission = async (submissionId: number) => {
         try {
@@ -90,14 +63,42 @@ const UserSuggestions: React.FC = () => {
         }
     };
 
+    function getCsrfTokenFromCookie() {
+        const csrf = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf_token='))
+        ?.split('=')[1];
+        return csrf || '';
+    }
 
-    const handleClick = () => {
+
+
+    const fetchMySubmissions = async () => {
+        try {
+            setIsLoading(true);
+            const response = await axios.get("http://localhost:5000/input/my_submissions", {
+            withCredentials: true, 
+            });
+
+            console.log("My notes:", response.data);
+            setAllSuggestions(response.data);
+
+        } catch (error: any) {
+            console.error("Error in my_submissions recieving:", error.response?.data || error.message);
+            setError(error.message)
+            return [];
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleClick = (data: any) => {
         openModal(
             'Are you sure you want to start editing?', // Title
             'All current sample data will be permanently erased!', // Description
             'Go to editing', // Action button text
             () => {
-                
 
                 localStorage.removeItem("generalInfoData");
                 localStorage.removeItem("measurementsTableData");
@@ -106,6 +107,24 @@ const UserSuggestions: React.FC = () => {
                 localStorage.removeItem("sourceTableData");
                 localStorage.removeItem('activeStep');
             
+                try {
+                    localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                    localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                    localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                    localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                    localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                    localStorage.setItem("activeStep", "0"); // сбрасываем шаг на начало
+
+                    // Если хочешь перейти на другую страницу:
+                    // navigate("/input/edit");
+
+                    console.log("Данные успешно записаны в localStorage.");
+                } catch (e) {
+                    console.error("Ошибка при сохранении в localStorage:", e);
+                }
+
+                navigate('/input');    
+
             }
         );
     };
@@ -146,7 +165,7 @@ const UserSuggestions: React.FC = () => {
                     </Tooltip>
 
                     <Tooltip title="Edit request">
-                        <IconButton onClick={handleClick}>
+                        <IconButton onClick={() => handleClick(data)}>
                             <EditIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
