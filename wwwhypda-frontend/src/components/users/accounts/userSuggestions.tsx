@@ -15,48 +15,80 @@ import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { Link } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const InputSuggestions: React.FC = () => {
+const UserSuggestions: React.FC = () => {
 
     const [allSuggestions, setAllSuggestions] = useState<any[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        getSuggestionsData();
+        fetchMySubmissions();
     }, []);
 
-    const getSuggestionsData = async () => {
+
+
+    const fetchMySubmissions = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get('http://localhost:5000/input/get_input_suggestions', {
-                withCredentials: true,
+            const response = await axios.get("http://localhost:5000/input/my_submissions", {
+            withCredentials: true, 
             });
-            setAllSuggestions(response.data.data);
-            console.log(allSuggestions);
+
+            console.log("My notes:", response.data);
+            setAllSuggestions(response.data);
 
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Error fetching suggestions data');
+            console.error("Error in my_submissions recieving:", error.response?.data || error.message);
+            setError(error.message)
+            return [];
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+    function getCsrfTokenFromCookie() {
+        const csrf = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf_token='))
+        ?.split('=')[1];
+        return csrf || '';
+    }
+
+    const delMySubmission = async (submissionId: number) => {
+        try {
+            setIsLoading(true);
+
+            const csrfToken = getCsrfTokenFromCookie();
+            if (!csrfToken) {
+                setError("CSRF token not found in cookie");
+                return;
+            }
+            const response = await axios.delete(`http://localhost:5000/input/delete_submission/${submissionId}`, {
+                withCredentials: true,
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+            });
+
+            console.log("Delete response:", response.data);
+            // Удаляем из таблицы
+            setAllSuggestions(prev => prev.filter(item => item.id !== submissionId));
+
+        } catch (error: any) {
+            console.error("Error deleting submission:", error.response?.data || error.message);
+            setError('Error deleting submission');
         } finally {
             setIsLoading(false);
         }
     };
 
+
+
     const columnDefs = useMemo(() => [
-        {
-            headerName: 'ID',
-            field: 'id',
-            sortable: true,
-            filter: true,
-            flex: 1,
-        },
-        {
-            headerName: 'User ID',
-            field: 'user_id',
-            sortable: true,
-            filter: true,
-            flex: 1,
-        },
         {
             headerName: 'Created At',
             field: 'created_at',
@@ -73,23 +105,27 @@ const InputSuggestions: React.FC = () => {
             flex: 1,
             valueGetter: () => 'New', // или вычисление по другим условиям
         },
+
         {
             headerName: 'Actions',
             field: 'actions',
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Deny request">
-                        <IconButton onClick={() =>{}}>
-                            <CheckCircleOutlineIcon sx={{ color: 'var(--tree-text)' }} />
+                    <Tooltip title="Del request">
+                        <IconButton onClick={() => delMySubmission(data.id)}>
+                            <DeleteIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Submit request">
-                        <IconButton onClick={() => {}}>
-                            <DoDisturbIcon sx={{ color: 'var(--tree-text)' }} />
+                    <Tooltip title="Edit request">
+                        <IconButton onClick={() => {
+                            // Обработчик редактирования
+                        }}>
+                            <EditIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
                 </div>
             ),
+
             minWidth: 200,
             maxWidth: 300
         },
@@ -147,4 +183,4 @@ const InputSuggestions: React.FC = () => {
     );
 };
 
-export default InputSuggestions;
+export default UserSuggestions;
