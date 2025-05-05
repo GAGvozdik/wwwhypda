@@ -34,7 +34,6 @@ const InputSuggestions: React.FC = () => {
                 withCredentials: true,
             });
             setAllSuggestions(response.data.data);
-            console.log('get_input_suggestions', response.data.data);
 
         } catch (error: any) {
             setError(error.response?.data?.error || 'Error fetching suggestions data');

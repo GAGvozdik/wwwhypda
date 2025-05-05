@@ -15,27 +15,12 @@ import {
     SelectEditorModule,
     CellSelectionOptions,
 } from "ag-grid-community";
-
-// import {
-//     CellSelectionModule,
-//     // ClipboardModule,
-//     // ColumnMenuModule,
-//     // ContextMenuModule,
-//     // ExcelExportModule,
-// } from "ag-grid-enterprise";
+import { Tune } from '@mui/icons-material';
 
 ModuleRegistry.registerModules([
     TextEditorModule,
     ClientSideRowModelModule,
     SelectEditorModule,
-
-    // ClipboardModule,
-    // ExcelExportModule,
-    // ColumnMenuModule,
-    // ContextMenuModule,
-    // CellSelectionModule,
-
-    //   ValidationModule /* Development Only */,
 ]);
 
 interface Parameter {
@@ -48,7 +33,6 @@ interface Parameter {
   MaxValue: number;
   MinValue: number;
 }
-
 
 interface Quality {
     id_Quality: number;
@@ -82,8 +66,11 @@ interface MeasurementRow {
     interpretation: string;
     comment: string;
 }
+type MeasurementsProps = {
+    isEditable: boolean;
+};
 
-export default function Measurements() {
+export default function Measurements({isEditable= true}: MeasurementsProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "44.5vh", 
@@ -91,8 +78,6 @@ export default function Measurements() {
         marginTop: '0vh', 
         marginBottom: '17.5vh',
     }), []);   
-
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -111,7 +96,6 @@ export default function Measurements() {
         return null;
     };
 
-
         const fetchData = async () => {
 
             const csrfToken = getCookie('csrf_access_token');
@@ -123,10 +107,10 @@ export default function Measurements() {
 
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
-                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
-                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
-                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
+                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { withCredentials: true}),
+                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { withCredentials: true}),
+                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { withCredentials: true}),
+                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { withCredentials: true}),
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {
@@ -152,11 +136,6 @@ export default function Measurements() {
                 } else {
                     setInterpretationMethod(metodResponse.data);
                 }
-
-                // console.log('parameterResponse:', parameterResponse.data);
-                // console.log('qualityResponse:', qualityResponse.data);
-                // console.log('experimentTypeResponse:', experimentTypeResponse.data);
-                // console.log('metodResponse:', metodResponse.data);
 
             } catch (error: any) {
                 setError(getErrorMessage(error));
@@ -195,7 +174,6 @@ export default function Measurements() {
         }
     });
 
-
     const addRow = () => {
         setTableData((prev) => [...prev, {
             id: prev.length + 1,
@@ -208,36 +186,36 @@ export default function Measurements() {
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
-        { headerName: "The reference to the Sample", field: "sampleRef", editable: true, flex: 1 },
+        { headerName: "The reference to the Sample", field: "sampleRef", editable: isEditable, flex: 1 },
         { 
-            headerName: "The measured parameter", field: "parameter", editable: true, flex: 1, 
+            headerName: "The measured parameter", field: "parameter", editable: isEditable, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: parameterNames },
             valueSetter: (params) => parameterNames.includes(params.newValue) ? (params.data.parameter = params.newValue) : false
         },
-        { headerName: "The measurement value", field: "value", editable: true, flex: 1 },
-        { headerName: "The error", field: "error", editable: true, flex: 1 },
+        { headerName: "The measurement value", field: "value", editable: isEditable, flex: 1 },
+        { headerName: "The error", field: "error", editable: isEditable, flex: 1 },
         { 
-            headerName: "Quality", field: "quality", editable: true, flex: 1, 
+            headerName: "Quality", field: "quality", editable: isEditable, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: qualityNames },
             valueSetter: (params) => qualityNames.includes(params.newValue) ? (params.data.quality = params.newValue) : false
         },
         { 
-            headerName: "The Experimentation type conducted", field: "experimentType", editable: true, flex: 1, 
+            headerName: "The Experimentation type conducted", field: "experimentType", editable: isEditable, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: experimentTypeNames },
             valueSetter: (params) => experimentTypeNames.includes(params.newValue) ? (params.data.experimentType = params.newValue) : false
         },
         { 
-            headerName: "The interpretation of the Experiment_type adopted", field: "interpretation", editable: true, flex: 1, 
+            headerName: "The interpretation of the Experiment_type adopted", field: "interpretation", editable: isEditable, flex: 1, 
             cellEditor: "agSelectCellEditor", cellEditorParams: { values: interpretationMethodNames },
             valueSetter: (params) => interpretationMethodNames.includes(params.newValue) ? (params.data.interpretation = params.newValue) : false
         },
-        { headerName: "Comment", field: "comment", editable: true, flex: 1 }
+        { headerName: "Comment", field: "comment", editable: isEditable, flex: 1 }
     ], [parameterNames, qualityNames, experimentTypeNames, interpretationMethodNames]);
 
 
     const defaultColDef = useMemo<ColDef>(() => {
         return {
-            editable: true,
+            editable: isEditable,
             flex: 1,
             suppressMenu: true,
             suppressSorting: true,
@@ -310,6 +288,7 @@ export default function Measurements() {
                     <button
                         onClick={addRow}
                         className={styles.submitButton}
+                        disabled={!isEditable}
                         style={{
                             margin: '1vh 1vh 1vh 0vh', 
                             width: '10vh', 
@@ -330,6 +309,7 @@ export default function Measurements() {
                     height={'3.5vh'}
                 >
                     <button
+                        disabled={!isEditable}
                         onClick={deleteRow}
                         className={styles.submitButton}
                         style={{

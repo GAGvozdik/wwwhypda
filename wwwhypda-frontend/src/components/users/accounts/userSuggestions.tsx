@@ -80,7 +80,6 @@ const UserSuggestions: React.FC = () => {
             withCredentials: true, 
             });
 
-            console.log("My notes:", response.data);
             setAllSuggestions(response.data);
 
         } catch (error: any) {

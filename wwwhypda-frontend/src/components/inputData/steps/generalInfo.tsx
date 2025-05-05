@@ -33,7 +33,11 @@ interface Environment {
     env_wiki_link: string | null;
 }
 
-const GeneralInfo = () => {
+type GeneralInfoProps = {
+    isEditable: boolean;
+};
+
+function GeneralInfo({isEditable= true}: GeneralInfoProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "50vh", 
@@ -77,8 +81,8 @@ const GeneralInfo = () => {
 
             try {
                 const [envResponse, reviewResponse] = await Promise.all([
-                    axios.get<Environment[]>('http://localhost:5000/api/environments', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
-                    axios.get<Reviews[]>('http://localhost:5000/api/reviews', { withCredentials: true, headers: { "X-CSRF-TOKEN": csrfToken }}),
+                    axios.get<Environment[]>('http://localhost:5000/api/environments', { withCredentials: true }),
+                    axios.get<Reviews[]>('http://localhost:5000/api/reviews', { withCredentials: true }),
                 ]);
 
                 if (!envResponse.data.length) setError("No environment data received from the server.");
@@ -121,7 +125,7 @@ const GeneralInfo = () => {
         { headerName: "Field", field: "field", editable: false, flex: 1 },
         { 
             field: "value", 
-            editable: true, 
+            editable: isEditable, 
             singleClickEdit: true,
             flex: 1,
             cellEditor: "agSelectCellEditor",
@@ -135,7 +139,7 @@ const GeneralInfo = () => {
     ], [environments, reviewLevel]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
-        editable: true,
+        editable: isEditable,
         flex: 1,
     }), []);
 

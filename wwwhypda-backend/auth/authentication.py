@@ -47,7 +47,7 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires = timedelta(minutes=25)
+        access_expires = timedelta(minutes=6 * 60)
         refresh_expires = timedelta(days=1)
 
         # 📌 Добавляем is_superuser в токен
@@ -89,40 +89,47 @@ def check_auth():
 @jwt_required(refresh=True, locations=["cookies"])
 def refresh():
     try:
+        # Получаем идентификатор пользователя из рефреш токена
         identity = get_jwt_identity()
         if not identity:
             raise ValueError("Missing JWT identity")
 
-        # ⚡ Ищем пользователя в БД
+        # Ищем пользователя в базе данных по его идентификатору
         user = User.query.get(identity)
         if not user:
             raise ValueError("User not found")
 
-        # ⚡ Читаем актуальный статус суперпользователя
+        # Извлекаем статус суперпользователя
         is_superuser = user.is_superuser
         print('is_superuser', is_superuser)
-        # ⚡ Генерируем новый access токен
+
+        # Генерируем новый access токен с учётом статуса суперпользователя
         new_access_token = create_access_token(
             identity=identity,
             additional_claims={"is_superuser": is_superuser},
-            expires_delta=timedelta(minutes=120)
+            expires_delta=timedelta(minutes=6 * 60)  # Новый срок действия токена
         )
 
+        # Создаем ответ с новым токеном
         response = jsonify(message="Access token refreshed")
+        
+        # Сохраняем новый access токен в куках
         set_access_cookies(response, new_access_token)
+        
+        # Генерируем новый CSRF токен
         response.set_cookie(
             "csrf_token",
             get_csrf_token(new_access_token),
-            httponly=False,
-            secure=True,
+            httponly=False,  # CSRF токен доступен в JS
+            secure=True,     # Для HTTPS
             samesite="Strict"
         )
+        
         return response
 
     except Exception as e:
         auth_bp.logger.error(f"Error refreshing access token: {e}")
         return jsonify(message="Failed to refresh access token"), 500
-
 
 
 
@@ -133,7 +140,6 @@ def check_super_user():
     user = User.query.get(identity)
     if not user:
         return jsonify(message="User not found"), 404
-
     return jsonify(logged_in=True, user=identity, is_superuser=user.is_super()), 200
 
 
@@ -155,10 +161,6 @@ def logout():
     response = jsonify(message="Logged out")
     unset_jwt_cookies(response)
     return response
-
-
-
-
 
 
 @auth_bp.route("/", methods=["OPTIONS"])
