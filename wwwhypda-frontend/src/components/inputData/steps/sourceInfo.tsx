@@ -28,8 +28,12 @@ const defaultRowData = [
 
 const LOCAL_STORAGE_KEY = "sourceTableData";
 
-const SourceInfo = () => {
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+type SourceInfoProps = {
+    isEditable: boolean;
+};
+
+function SourceInfo({isEditable=true}: SourceInfoProps) {
+
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "50vh", 
@@ -89,12 +93,12 @@ const SourceInfo = () => {
 
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
-        { field: "value", editable: true, flex: 1, singleClickEdit: true },
+        { field: "value", editable: isEditable, flex: 1, singleClickEdit: true },
         { field: "description", editable: false, flex: 2 }
     ], []);
 
     const defaultColDef = useMemo<ColDef>(() => ({
-        editable: true,
+        editable: isEditable,
         flex: 1,
         suppressMenu: true,
         suppressSorting: true,

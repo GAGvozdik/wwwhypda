@@ -4,6 +4,7 @@ import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import { State } from '../../common/types';
 import { useSelector } from 'react-redux';
 import axios from "axios";
+import { styled } from '@mui/material/styles';
 
 // Пример функции для получения CSRF-токена из cookie
 const getCsrfTokenFromCookie = () => {
@@ -29,8 +30,6 @@ export const sendAllDataToServer = async () => {
   }
 };
 
-
-
 const insertData = () => {
   return {
     generalInfoData: JSON.parse(localStorage.getItem("generalInfoData") || "[]"),
@@ -40,7 +39,6 @@ const insertData = () => {
     sourceTableData: JSON.parse(localStorage.getItem("sourceTableData") || "[]"),
   };
 };
-
 
 export const useStepsTheme = () => {
   const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
@@ -56,3 +54,34 @@ export const useStepsTheme = () => {
 
   return theme;
 };
+
+export const CustomStepIconRoot = styled('div')<{ ownerState: { active?: boolean; completed?: boolean } }>(
+  ({ ownerState }) => ({
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: '50%',
+    width: '4vh',
+    height: '4vh',
+    fontSize: '2vh',
+    fontFamily: 'Afacad_Flux',
+    color: 'var(--step-color-active)', 
+    transition: '0.8s',
+  })
+);
+
+export const StepNumberCircle = styled('div')<{ ownerState: { active?: boolean } }>(
+  ({ ownerState }) => ({
+    width: '4vh',
+    height: '4vh',
+    borderRadius: '50%',
+    backgroundColor: ownerState.active ? 'var(--step-color-active)' : 'var(--step-color)',  
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '2vh',
+    color: 'var(--step-text)', 
+    fontWeight: ownerState.active ? 'bold' : '',
+    transition: '0.8s',
+  })
+);
