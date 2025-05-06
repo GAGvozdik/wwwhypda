@@ -21,16 +21,6 @@ import { useModal } from '../modal/modalContext';
 
 const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
 
-const isEditable = true;
-
-const stepComponents = [
-    <SiteInfo isEditable={isEditable}/>,
-    <GeneralInfo isEditable={isEditable}/>,
-    <SourceInfo isEditable={isEditable}/>,
-    <MeasurementSample isEditable={isEditable}/>,
-    <Measurements isEditable={isEditable}/>,
-];
-
 function CustomStepIcon(props: StepIconProps) {
     const { active, completed, className, icon } = props;
 
@@ -45,22 +35,40 @@ function CustomStepIcon(props: StepIconProps) {
     );
 }
 
-export default function CustomStepper() {
+const isEditable = true;
+
+const stepComponents = [
+    <SiteInfo isEditable={isEditable}/>,
+    <GeneralInfo isEditable={isEditable}/>,
+    <SourceInfo isEditable={isEditable}/>,
+    <MeasurementSample isEditable={isEditable}/>,
+    <Measurements isEditable={isEditable}/>,
+];
+
+interface CustomStepperProps {
+    handleClick: () => void;
+}
+
+
+export default function CustomStepper({handleClick}: CustomStepperProps) {
+
     const [activeStep, setActiveStep] = React.useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
         return savedStep !== null ? Number(savedStep) : 0;
     });
 
-    const handleClick = () => {
+
+    const { openModal } = useModal();
+
+    const handleReset = () => {
         openModal(
             'Do you want to submit data??', // Title
             '', // Description
             'Send', // Action button text
-            () => { handleReset(); }
+            () => { handleClick(); }
         );
+        // setActiveStep(0);
     };
-
-    const { openModal } = useModal();
 
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
@@ -84,18 +92,6 @@ export default function CustomStepper() {
         localStorage.setItem('activeStep', newStep.toString());
     };
 
-    const handleReset = () => {
-        sendAllDataToServer();
-        localStorage.removeItem("generalInfoData");
-        localStorage.removeItem("measurementsTableData");
-        localStorage.removeItem("sampleMeasurementTableData");
-        localStorage.removeItem("siteInfoTableData");
-        localStorage.removeItem("sourceTableData");
-        localStorage.removeItem('activeStep');
-        console.log("sourceTableData", localStorage.removeItem("sourceTableData"))
-        setActiveStep(0);
-    };
-
     return (
         <Box sx={{ width: '100%' }} className={styles.treeText}>
             <Stepper activeStep={activeStep}>
@@ -110,11 +106,20 @@ export default function CustomStepper() {
 
             {activeStep === steps.length ? (
                 <React.Fragment>
-                    <Typography sx={{ mt: 2, mb: 1 }}>
+                    <Typography 
+                        sx={{ 
+                            paddingTop: '4vh', 
+                            fontSize: '4vh', 
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            fontFamily: 'Afacad_Flux',
+                            color: 'var(--tree-text)'
+                        }}
+                    >
                         All steps completed - you're finished
                     </Typography>
 
-                    <Box sx={{ minHeight: '46vh' }} /> 
+                    <Box sx={{ minHeight: '41vh' }} /> 
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '12vh' }}>
                         <Button
                             onClick={() => {
@@ -131,7 +136,7 @@ export default function CustomStepper() {
                         <Box sx={{ flex: '1 1 auto' }} />
 
                             <Button
-                                onClick={handleClick}
+                                onClick={handleReset}
                                 className={styles.submitButton}
                                 style={{ minWidth: 120 }}
                             >
