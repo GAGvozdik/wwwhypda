@@ -4,7 +4,7 @@ import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
 
-const InputPage: React.FC = () => {
+const InputPageEdit: React.FC = () => {
 
     const handleReset = () => {
         sendAllDataToServer();
@@ -20,7 +20,7 @@ const InputPage: React.FC = () => {
         <div className={styles.treeText}>
 
             <div style={{ justifyContent: 'center', justifyItems: 'center'}}>
-                <h2>InputPage</h2>
+                <h2>InputPageEdit</h2>
             </div>
 
             <CustomStepper handleClick={handleReset}/>
@@ -28,7 +28,7 @@ const InputPage: React.FC = () => {
     );
 };
 
-export default InputPage;
+export default InputPageEdit;
 
 
 
