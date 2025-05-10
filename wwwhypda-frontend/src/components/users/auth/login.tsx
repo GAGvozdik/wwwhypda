@@ -24,14 +24,14 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await api.post('http://localhost:5000/users/login', {
+            await api.post('/users/login', {
                 email: username,
                 password: password
             }, {
                 withCredentials: true
             });
 
-            const checkResponse = await api.get('http://localhost:5000/users/check', {
+            const checkResponse = await api.get('/users/check', {
                 withCredentials: true
             });
 

@@ -40,7 +40,7 @@ const SuperuserAccount: React.FC = () => {
     const fetchUserData = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get('http://localhost:5000/users/', {
+            const response = await api.get('/users/', {
                 withCredentials: true,
             });
             setUserData(response.data.data);
@@ -53,7 +53,7 @@ const SuperuserAccount: React.FC = () => {
 
     const fetchAllUsers = async () => {
         try {
-            const response = await api.get('http://localhost:5000/admin/get_all_users', {
+            const response = await api.get('/admin/get_all_users', {
                 withCredentials: true,
             });
             setAllUsers(response.data.data);
@@ -82,7 +82,7 @@ const SuperuserAccount: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await api.post('http://localhost:5000/users/logout', {}, {
+            const res = await api.post('/users/logout', {}, {
                 withCredentials: true, // обязательно для куков
                 headers: {
                     'X-CSRF-TOKEN': getCsrfTokenFromCookie(), // если у вас проверяется CSRF
@@ -112,7 +112,7 @@ const SuperuserAccount: React.FC = () => {
         }
 
         try {
-            await api.post(`http://localhost:5000${url}/${userId}`, {}, {
+            await api.post(`${url}/${userId}`, {}, {
                 withCredentials: true,
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
