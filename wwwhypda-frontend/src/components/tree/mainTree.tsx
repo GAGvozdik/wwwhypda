@@ -15,7 +15,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import MenuIcon from '@mui/icons-material/Menu';
 import axios from 'axios';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
-
+import api from '../api';
 
 interface RockTypeData {
     rt_id: number;
@@ -81,7 +81,7 @@ export default function ModelsTreeDrawer() {
     useEffect(() => {
         const fetchRockTypes = async () => {
             try {
-                const response = await axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type');
+                const response = await api.get<RockTypeData[]>('http://localhost:5000/api/rock_type');
 
                 if (!response.data || response.data.length === 0) {
                     setError("No data received from the server.");

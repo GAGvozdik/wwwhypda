@@ -4,6 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import axios from 'axios';
 import { useStepsTheme } from '../steps';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import api from '../../api';
 
 import { 
     ClientSideRowModelModule, 
@@ -81,8 +82,8 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
 
             try {
                 const [envResponse, reviewResponse] = await Promise.all([
-                    axios.get<Environment[]>('http://localhost:5000/api/environments', { withCredentials: true }),
-                    axios.get<Reviews[]>('http://localhost:5000/api/reviews', { withCredentials: true }),
+                    api.get<Environment[]>('http://localhost:5000/api/environments', { withCredentials: true }),
+                    api.get<Reviews[]>('http://localhost:5000/api/reviews', { withCredentials: true }),
                 ]);
 
                 if (!envResponse.data.length) setError("No environment data received from the server.");

@@ -17,6 +17,8 @@ import { useSelector, useDispatch } from 'react-redux';
 // import {MeasurementData, testColumns} from '../../common/types';
 import { DynamicRowData } from '../../common/types'; // Импортируем новый тип
 import SearchResultsTable from './searchResultsTable';
+import api from '../api';
+
 
 interface Parameter {
   id_Parameter: number;
@@ -44,7 +46,7 @@ const Search: React.FC = () => {
     useEffect(() => {
         const fetchParameters = async () => {
             try {
-                const response = await axios.get<Parameter[]>('http://localhost:5000/api/parameters'); 
+                const response = await api.get<Parameter[]>('http://localhost:5000/api/parameters'); 
                 setParameters(response.data);
  
             } catch (error: any) {
@@ -65,7 +67,7 @@ const Search: React.FC = () => {
 
             const fetchParameters = async () => {
                 try {
-                    const response = await axios.get<DynamicRowData[]>(`http://localhost:5000/api/samples/${rt_id}/${selectedValue}`); 
+                    const response = await api.get<DynamicRowData[]>(`http://localhost:5000/api/samples/${rt_id}/${selectedValue}`); 
 
                     const res = response.data.map((item, index) => ({
                         ...item,

@@ -7,6 +7,7 @@ import { State } from '../../../common/types';
 import { useSelector } from 'react-redux';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import api from '../../api';
 
 import {
     ClientSideRowModelModule,
@@ -85,7 +86,7 @@ function  SiteInfo({isEditable= true}: SiteInfoProps) {
                 return;
             }
             try {
-                const response = await axios.get<Country[]>('http://localhost:5000/api/countries', {
+                const response = await api.get<Country[]>('http://localhost:5000/api/countries', {
                     withCredentials: true,
                 });
 
