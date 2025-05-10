@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
+import api from '../../api';
 
 const Login: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -23,14 +24,14 @@ const Login: React.FC = () => {
         setIsLoading(true);
 
         try {
-            await axios.post('http://localhost:5000/users/login', {
+            await api.post('http://localhost:5000/users/login', {
                 email: username,
                 password: password
             }, {
                 withCredentials: true
             });
 
-            const checkResponse = await axios.get('http://localhost:5000/users/check', {
+            const checkResponse = await api.get('http://localhost:5000/users/check', {
                 withCredentials: true
             });
 

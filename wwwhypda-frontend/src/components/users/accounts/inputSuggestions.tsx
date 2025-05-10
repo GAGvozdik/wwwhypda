@@ -16,6 +16,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 import { Link } from 'react-router-dom';
 import { useModal } from '../../modal/modalContext';
+import api from '../../api';
 
 const InputSuggestions: React.FC = () => {
 
@@ -30,7 +31,7 @@ const InputSuggestions: React.FC = () => {
     const getSuggestionsData = async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get('http://localhost:5000/input/get_input_suggestions', {
+            const response = await api.get('http://localhost:5000/input/get_input_suggestions', {
                 withCredentials: true,
             });
             setAllSuggestions(response.data.data);
@@ -142,7 +143,7 @@ const InputSuggestions: React.FC = () => {
     
     const handleClick = async (id: number) => {
         try {
-            const response = await axios.get(`http://localhost:5000/input/get_input_by_id/${id}`, {
+            const response = await api.get(`http://localhost:5000/input/get_input_by_id/${id}`, {
                 withCredentials: true
             });
             const data = response.data;

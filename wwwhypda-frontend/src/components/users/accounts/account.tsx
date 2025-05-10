@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import { Logout } from '../../../redux/actions';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import UserSuggestions from './userSuggestions';
+import api from '../../api';
+
 const Account: React.FC = () => {
 
     const dispatch = useDispatch();
@@ -22,7 +24,7 @@ const Account: React.FC = () => {
     const fetchUserData = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/users/', {
+            const response = await api.get('http://localhost:5000/users/', {
                 withCredentials: true, 
             });
 
@@ -58,7 +60,7 @@ const Account: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await axios.post('http://localhost:5000/users/logout', {}, {
+            const res = await api.post('http://localhost:5000/users/logout', {}, {
                 withCredentials: true, // обязательно для куков
                 headers: {
                     'X-CSRF-TOKEN': getCsrfTokenFromCookie(), // если у вас проверяется CSRF

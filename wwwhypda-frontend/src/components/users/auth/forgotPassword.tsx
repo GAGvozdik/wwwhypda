@@ -6,6 +6,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
 import { Link } from 'react-router-dom';
+import api from '../../api';
 
 const ForgotPassword: React.FC = () => {
     const [email, setEmail] = useState('');
@@ -23,7 +24,7 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/users/request-password-reset', { email });
+            const response = await api.post('http://localhost:5000/users/request-password-reset', { email });
 
             if (response.status === 200) {
                 setError('Code sent to your email.');
@@ -54,7 +55,7 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post('http://localhost:5000/users/confirm-password-reset', {
+            const response = await api.post('http://localhost:5000/users/confirm-password-reset', {
                 email,
                 code,
                 new_password: newPassword,

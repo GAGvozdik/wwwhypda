@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import ErrorMessage from './errorMessage'; // Компонент ошибки
 import UserButton from './userButton';
+import api from '../../api';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -29,7 +30,7 @@ const Register: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post('http://localhost:5000/users/', {
+            const response = await api.post('http://localhost:5000/users/', {
                 name: username,
                 password: password,
                 email: email,
@@ -55,7 +56,7 @@ const Register: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:5000/users/confirm-registration", {
+            const response = await api.post("http://localhost:5000/users/confirm-registration", {
                 email: email,
                 code: confirmationCode,
             });
