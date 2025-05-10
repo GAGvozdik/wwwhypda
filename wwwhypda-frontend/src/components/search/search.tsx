@@ -46,7 +46,7 @@ const Search: React.FC = () => {
     useEffect(() => {
         const fetchParameters = async () => {
             try {
-                const response = await api.get<Parameter[]>('/api/parameters'); 
+                const response = await api.get<Parameter[]>('/rocks/parameters'); 
                 setParameters(response.data);
  
             } catch (error: any) {
@@ -67,7 +67,7 @@ const Search: React.FC = () => {
 
             const fetchParameters = async () => {
                 try {
-                    const response = await api.get<DynamicRowData[]>(`/api/samples/${rt_id}/${selectedValue}`); 
+                    const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`); 
 
                     const res = response.data.map((item, index) => ({
                         ...item,
