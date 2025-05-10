@@ -63,7 +63,7 @@ csp = {
     'script-src': ["'self'"],
     'style-src': ["'self'"],
     'img-src': ["'self'", 'data:'],
-    'connect-src': ["'self'", "http://localhost:3000"],
+    'connect-src': ["'self'", "http://localhost:3000", os.getenv('STATIC_IP')],
     'font-src': ["'self'"],
     'object-src': ["'none'"],
     'frame-src': ["'none'"],
@@ -76,7 +76,7 @@ Talisman(app, content_security_policy=csp)
 CORS(
     app, 
     supports_credentials=True, 
-    origins=["http://localhost:3000"], 
+    origins=["http://localhost:3000", os.getenv('STATIC_IP')], 
     allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"]
 )
 
