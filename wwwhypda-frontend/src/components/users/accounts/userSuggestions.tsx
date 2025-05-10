@@ -44,7 +44,7 @@ const UserSuggestions: React.FC = () => {
                 setError("CSRF token not found in cookie");
                 return;
             }
-            const response = await api.delete(`http://localhost:5000/input/delete_submission/${submissionId}`, {
+            const response = await api.delete(`/input/delete_submission/${submissionId}`, {
                 withCredentials: true,
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
@@ -77,7 +77,7 @@ const UserSuggestions: React.FC = () => {
     const fetchMySubmissions = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get("http://localhost:5000/input/my_submissions", {
+            const response = await api.get("/input/my_submissions", {
             withCredentials: true, 
             });
 

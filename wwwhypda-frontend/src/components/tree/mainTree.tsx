@@ -81,7 +81,7 @@ export default function ModelsTreeDrawer() {
     useEffect(() => {
         const fetchRockTypes = async () => {
             try {
-                const response = await api.get<RockTypeData[]>('http://localhost:5000/api/rock_type');
+                const response = await api.get<RockTypeData[]>('/api/rock_type');
 
                 if (!response.data || response.data.length === 0) {
                     setError("No data received from the server.");

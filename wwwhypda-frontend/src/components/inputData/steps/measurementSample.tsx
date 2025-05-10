@@ -117,9 +117,9 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
 
             try {
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
-                    api.get<Fracturation[]>('http://localhost:5000/api/fracturations', {withCredentials: true}),
-                    api.get<Scale[]>('http://localhost:5000/api/scales', {withCredentials: true}),
-                    api.get<RockTypeData[]>('http://localhost:5000/api/rock_type', {withCredentials: true})
+                    api.get<Fracturation[]>('/api/fracturations', {withCredentials: true}),
+                    api.get<Scale[]>('/api/scales', {withCredentials: true}),
+                    api.get<RockTypeData[]>('/api/rock_type', {withCredentials: true})
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {

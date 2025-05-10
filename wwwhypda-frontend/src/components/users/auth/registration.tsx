@@ -30,7 +30,7 @@ const Register: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const response = await api.post('http://localhost:5000/users/', {
+            const response = await api.post('/users/', {
                 name: username,
                 password: password,
                 email: email,
@@ -56,7 +56,7 @@ const Register: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await api.post("http://localhost:5000/users/confirm-registration", {
+            const response = await api.post("/users/confirm-registration", {
                 email: email,
                 code: confirmationCode,
             });

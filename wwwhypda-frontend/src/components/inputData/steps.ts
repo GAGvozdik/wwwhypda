@@ -17,7 +17,7 @@ export const sendAllDataToServer = async () => {
   const payload = insertData();
 
   try {
-    const response = await api.post("http://localhost:5000/input/submit", payload, {
+    const response = await api.post("/input/submit", payload, {
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN": getCsrfTokenFromCookie(),

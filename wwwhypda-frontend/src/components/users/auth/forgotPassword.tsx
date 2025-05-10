@@ -24,7 +24,7 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await api.post('http://localhost:5000/users/request-password-reset', { email });
+            const response = await api.post('/users/request-password-reset', { email });
 
             if (response.status === 200) {
                 setError('Code sent to your email.');
@@ -55,7 +55,7 @@ const ForgotPassword: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await api.post('http://localhost:5000/users/confirm-password-reset', {
+            const response = await api.post('/users/confirm-password-reset', {
                 email,
                 code,
                 new_password: newPassword,

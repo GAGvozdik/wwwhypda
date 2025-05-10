@@ -13,7 +13,7 @@ const useAuthCheck = (): AuthState => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await api.get('http://localhost:5000/users/check', {
+                const response = await api.get('/users/check', {
                     withCredentials: true,
                 });
 
