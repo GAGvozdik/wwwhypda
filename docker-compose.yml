@@ -20,12 +20,12 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: ./wwwhypda-backend
     networks:
       - dev
 
   frontend:
     build:
-      context: ./frontend
+      context: ./wwwhypda-frontend
     networks:
       - dev
