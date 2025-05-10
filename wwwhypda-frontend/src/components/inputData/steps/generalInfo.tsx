@@ -82,8 +82,8 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
 
             try {
                 const [envResponse, reviewResponse] = await Promise.all([
-                    api.get<Environment[]>('/api/environments', { withCredentials: true }),
-                    api.get<Reviews[]>('/api/reviews', { withCredentials: true }),
+                    api.get<Environment[]>('rocks/environments', { withCredentials: true }),
+                    api.get<Reviews[]>('/rocks/reviews', { withCredentials: true }),
                 ]);
 
                 if (!envResponse.data.length) setError("No environment data received from the server.");

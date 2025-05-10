@@ -6,7 +6,7 @@ from rocks.rocks_models import Source, RockType, Parameter, Sample, Measure, Sca
 from rocks.rocks_models import ExperimentType, Quality, InterpretationMethod
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
-rocks_bp = Blueprint("api", __name__, url_prefix="/api")
+rocks_bp = Blueprint("rocks", __name__, url_prefix="/rocks")
 
 
 @rocks_bp.route('/msg', methods=['POST'])

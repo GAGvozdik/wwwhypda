@@ -108,10 +108,10 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
 
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    api.get<Parameter[]>('/api/parameters', { withCredentials: true}),
-                    api.get<Quality[]>('/api/qualities', { withCredentials: true}),
-                    api.get<ExperimentType[]>('/api/experiment_types', { withCredentials: true}),
-                    api.get<InterpretationMethod[]>('/api/interpretation_methods', { withCredentials: true}),
+                    api.get<Parameter[]>('/rocks/parameters', { withCredentials: true}),
+                    api.get<Quality[]>('/rocks/qualities', { withCredentials: true}),
+                    api.get<ExperimentType[]>('/rocks/experiment_types', { withCredentials: true}),
+                    api.get<InterpretationMethod[]>('/rocks/interpretation_methods', { withCredentials: true}),
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {
