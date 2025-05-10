@@ -86,7 +86,7 @@ function  SiteInfo({isEditable= true}: SiteInfoProps) {
                 return;
             }
             try {
-                const response = await api.get<Country[]>('http://localhost:5000/api/countries', {
+                const response = await api.get<Country[]>('/api/countries', {
                     withCredentials: true,
                 });
 

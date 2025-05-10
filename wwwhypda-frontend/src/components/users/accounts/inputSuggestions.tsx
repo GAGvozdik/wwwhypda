@@ -31,7 +31,7 @@ const InputSuggestions: React.FC = () => {
     const getSuggestionsData = async () => {
         try {
             setIsLoading(true);
-            const response = await api.get('http://localhost:5000/input/get_input_suggestions', {
+            const response = await api.get('/input/get_input_suggestions', {
                 withCredentials: true,
             });
             setAllSuggestions(response.data.data);
@@ -143,7 +143,7 @@ const InputSuggestions: React.FC = () => {
     
     const handleClick = async (id: number) => {
         try {
-            const response = await api.get(`http://localhost:5000/input/get_input_by_id/${id}`, {
+            const response = await api.get(`/input/get_input_by_id/${id}`, {
                 withCredentials: true
             });
             const data = response.data;
