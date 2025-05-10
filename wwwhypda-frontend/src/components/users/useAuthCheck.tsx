@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import api from '../api';
 
 interface AuthState {
     isAuth: boolean | null;
@@ -12,7 +13,7 @@ const useAuthCheck = (): AuthState => {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/users/check', {
+                const response = await api.get('http://localhost:5000/users/check', {
                     withCredentials: true,
                 });
 

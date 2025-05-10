@@ -6,6 +6,7 @@ import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import api from '../../api';
 
 import { 
     ClientSideRowModelModule, 
@@ -107,10 +108,10 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
 
             try {
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    axios.get<Parameter[]>('http://localhost:5000/api/parameters', { withCredentials: true}),
-                    axios.get<Quality[]>('http://localhost:5000/api/qualities', { withCredentials: true}),
-                    axios.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { withCredentials: true}),
-                    axios.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { withCredentials: true}),
+                    api.get<Parameter[]>('http://localhost:5000/api/parameters', { withCredentials: true}),
+                    api.get<Quality[]>('http://localhost:5000/api/qualities', { withCredentials: true}),
+                    api.get<ExperimentType[]>('http://localhost:5000/api/experiment_types', { withCredentials: true}),
+                    api.get<InterpretationMethod[]>('http://localhost:5000/api/interpretation_methods', { withCredentials: true}),
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {

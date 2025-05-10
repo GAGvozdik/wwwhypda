@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import axios from 'axios';
+import api from '../api';
 
 const useTokenRefresh = () => {
     useEffect(() => {
@@ -15,7 +16,7 @@ const useTokenRefresh = () => {
                     return;
                 }
 
-                const response = await axios.post(
+                const response = await api.post(
                     'http://localhost:5000/users/refresh',
                     {},
                     {
@@ -42,7 +43,7 @@ const useTokenRefresh = () => {
 
         const refreshUserData = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/users/check', {
+                const res = await api.get('http://localhost:5000/users/check', {
                     withCredentials: true,
                 });
 

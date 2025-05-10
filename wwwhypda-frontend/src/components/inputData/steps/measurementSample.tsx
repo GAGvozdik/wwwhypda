@@ -6,6 +6,7 @@ import axios from 'axios';
 import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import api from '../../api';
 
 import { 
     ClientSideRowModelModule, 
@@ -116,9 +117,9 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
 
             try {
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
-                    axios.get<Fracturation[]>('http://localhost:5000/api/fracturations', {withCredentials: true}),
-                    axios.get<Scale[]>('http://localhost:5000/api/scales', {withCredentials: true}),
-                    axios.get<RockTypeData[]>('http://localhost:5000/api/rock_type', {withCredentials: true})
+                    api.get<Fracturation[]>('http://localhost:5000/api/fracturations', {withCredentials: true}),
+                    api.get<Scale[]>('http://localhost:5000/api/scales', {withCredentials: true}),
+                    api.get<RockTypeData[]>('http://localhost:5000/api/rock_type', {withCredentials: true})
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {
