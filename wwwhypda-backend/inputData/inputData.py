@@ -7,26 +7,6 @@ from flask_cors import CORS
 
 input_bp = Blueprint("input", __name__, url_prefix="/input")
 
-# CORS(input_bp, supports_credentials=True, resources={
-#     r"/delete_submission/*": {
-#         "origins": "http://localhost:3000",
-#         "methods": ["DELETE", "OPTIONS", "GET", "POST"],
-#         "allow_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"],
-#     },
-#     r"/get_input_suggestions": {
-#         "origins": "http://localhost:3000",
-#         "methods": ["GET", "OPTIONS"],
-#         "allow_headers": ["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"],
-#     }
-# })
-CORS(input_bp, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:3000"}})
-
-
-# @input_bp.route("/get_input_suggestions", methods=["GET"])
-# @jwt_required()
-# def get_input_suggestions():
-#     data = InputData.get_input_suggestions()
-#     return jsonify({"data": data}), 200
 
 @input_bp.route("/get_input_suggestions", methods=["GET"])
 @jwt_required()
