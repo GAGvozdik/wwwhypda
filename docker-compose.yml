@@ -21,6 +21,10 @@ services:
   backend:
     build:
       context: ./wwwhypda-backend
+    
+    env_file:
+      - ./wwwhypda-backend/env.configs
+
     networks:
       - dev
 
