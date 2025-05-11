@@ -17,6 +17,15 @@ services:
     networks:
       - dev
     
+  frontend:
+    build:
+      context: ./wwwhypda-frontend
+
+    env_file:
+      - ./wwwhypda-frontend/.env
+
+    networks:
+      - dev
 
   backend:
     build:
@@ -24,16 +33,6 @@ services:
     
     env_file:
       - ./wwwhypda-backend/env.configs
-
-    networks:
-      - dev
-
-  frontend:
-    build:
-      context: ./wwwhypda-frontend
-
-    env_file:
-      - ./wwwhypda-frontend/.env
 
     networks:
       - dev
