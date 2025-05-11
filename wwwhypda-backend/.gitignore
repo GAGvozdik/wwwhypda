@@ -1,22 +1,17 @@
 __pycache__/
 workEnv/
 .idea/
-SECRET_KEYS/SECRET_KEY.txt
-SECRET_KEYS/JWT_KEY.txt
-SECRET_KEYS/MAIL.txt
-SECRET_KEYS/MAIL_PASSWORD.txt
-SECRET_KEYS/SECRET_KEY.txt
+
 wwhypda.db-shm
 wwhypda.db-wal
 
 venv
 env
 .env
-env.configs
+# env.configs
 
 *.pyc
 static/images/
-env.configs
 authVenv/
 .authVenv
 # Byte-compiled / optimized / DLL files
