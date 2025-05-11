@@ -6,9 +6,9 @@ wwhypda.db-shm
 wwhypda.db-wal
 
 venv
-# env
-# .env
-# env.configs
+env
+.env
+env.configs
 
 *.pyc
 static/images/
