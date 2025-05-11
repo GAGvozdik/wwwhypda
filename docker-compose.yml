@@ -31,5 +31,9 @@ services:
   frontend:
     build:
       context: ./wwwhypda-frontend
+
+    env_file:
+      - ./wwwhypda-frontend/.env
+
     networks:
       - dev
