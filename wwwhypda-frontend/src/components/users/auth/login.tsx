@@ -36,7 +36,7 @@ const Login: React.FC = () => {
             });
 
             const { is_superuser } = checkResponse.data;
-
+            localStorage.removeItem('isSuperuser');
             localStorage.setItem('isSuperuser', JSON.stringify(is_superuser));
 
             navigate(is_superuser ? '/superaccount' : '/account');
