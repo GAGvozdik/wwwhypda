@@ -18,6 +18,7 @@ const Login: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+console.log("BaseURL:", process.env.REACT_APP_BASE_URL);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
