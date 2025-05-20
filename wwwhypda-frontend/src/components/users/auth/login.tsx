@@ -65,7 +65,7 @@ console.log("BaseURL:", process.env.REACT_APP_BASE_URL);
 
 
             <div className={styles.authForm}>
-                <div className={styles.formTitle}>Email Authorization</div>
+                <div className={styles.formTitle}>Authorization</div>
 
                 <form onSubmit={handleLogin}>
                     <div className={styles.autocompleteContainer}>
