@@ -7,7 +7,7 @@ import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 // import Button from './';
 import SearchTableRow from './searchTableRow';
-
+import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import {useEffect, useState, useRef} from 'react';
 import axios from 'axios';
 
@@ -127,84 +127,86 @@ const Search: React.FC = () => {
                 <SearchResultsTable/>
             </div>
 
-            <div 
-                className={`${styles.treeText}`} 
-                style={{    
-                    // margin: '2vh',
-                    // padding: '1vh',
-                    // border: '3px solid var(--border)',
-                    backgroundColor: 'var(--drawer-color)',
-                    borderRadius: '4px',
-                    boxSizing: 'border-box',
-                    height: '82vh',
-                    // overflow: 'scroll',
-                    // overflowY: 'scroll',
-                    overflowY: 'hidden',
-                    gridRowStart: 1, 
-                    gridRowEnd: 1, 
-                    gridColumnStart: 1, 
-                    gridColumnEnd: 2, 
-                }}
-            >
+            <SingleSkeleton loading={loading} error={error} height='82vh'>
                 <div 
-                    className={styles.treeText} 
+                    className={`${styles.treeText}`} 
                     style={{    
-                        marginTop: '2vh',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        fontSize: 'var(--head-font-size)',
-                        textAlign: 'center', 
+                        // margin: '2vh',
+                        // padding: '1vh',
+                        // border: '3px solid var(--border)',
+                        backgroundColor: 'var(--drawer-color)',
+                        borderRadius: '4px',
+                        boxSizing: 'border-box',
+                        height: '82vh',
+                        // overflow: 'scroll',
+                        // overflowY: 'scroll',
+                        overflowY: 'hidden',
+                        gridRowStart: 1, 
+                        gridRowEnd: 1, 
+                        gridColumnStart: 1, 
+                        gridColumnEnd: 2, 
                     }}
                 >
-                    Search in {rt_name}
-                </div>
-
-                <FormControl
-                    style={{    
-                        marginTop: '2vh',       
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                         
-                    }}
-                    component="form" // Добавляем компонент формы
-                    onSubmit={handleSubmit} // Обрабатываем событие отправки формы
-                >
-                    {/* <FormLabel id="demo-radio-buttons-group-label">Parameter</FormLabel> */}
-                    <RadioGroup
-                        aria-labelledby="demo-radio-buttons-group-label"
-                        defaultValue="female"
-                        name="radio-buttons-group"
-                        value={selectedValue}
-                        onChange={(event) => {setSelectedValue(parseInt(event.target.value as string, 10))}}
+                    <div 
+                        className={styles.treeText} 
+                        style={{    
+                            marginTop: '2vh',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            fontSize: 'var(--head-font-size)',
+                            textAlign: 'center', 
+                        }}
                     >
+                        Search in {rt_name}
+                    </div>
 
-                        <table>
-                            <tbody>
+                    <FormControl
+                        style={{    
+                            marginTop: '2vh',       
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            
+                        }}
+                        component="form" // Добавляем компонент формы
+                        onSubmit={handleSubmit} // Обрабатываем событие отправки формы
+                    >
+                        
+                        <RadioGroup
+                            aria-labelledby="demo-radio-buttons-group-label"
+                            defaultValue="female"
+                            name="radio-buttons-group"
+                            value={selectedValue}
+                            onChange={(event) => {setSelectedValue(parseInt(event.target.value as string, 10))}}
+                        >
 
-                                {parameters.map((param) => (
-                                        <SearchTableRow
-                                            name={param.html_code}
-                                            desc={param.param_name}
-                                            unit={param.html_units}
-                                            value={param.id_Parameter} 
-                                            onChange={setSelectedValue} 
-                                            selectedValue={selectedValue} 
-                                        />
-                                    ))}
+                            <table>
+                                <tbody>
 
-                            </tbody>
-                        </table>
-                    </RadioGroup>
+                                    {parameters.map((param) => (
+                                            <SearchTableRow
+                                                name={param.html_code}
+                                                desc={param.param_name}
+                                                unit={param.html_units}
+                                                value={param.id_Parameter} 
+                                                onChange={setSelectedValue} 
+                                                selectedValue={selectedValue} 
+                                            />
+                                        ))}
 
-                    <button type="submit" className={styles.submitButton} style={{width: '30%', marginBottom: '2vh'}}>
-                        Find data
-                    </button>
+                                </tbody>
+                            </table>
+                        </RadioGroup>
 
-                </FormControl>
-                
-            </div>
+                        <button type="submit" className={styles.submitButton} style={{width: '30%', marginBottom: '2vh'}}>
+                            Find data
+                        </button>
+
+                    </FormControl>
+                    
+                </div>
+            </SingleSkeleton>
         </div>
     );
 };
