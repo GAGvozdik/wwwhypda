@@ -16,20 +16,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
             <div 
                 // className={styles.authForm}
                 style={{      
+                    backgroundColor: 'var(--form-color)',
+    
                     alignSelf: 'center',
                     justifySelf: 'center',
+                    height: '40vh',
+
                     width: '45vh',
-                    height: '50%',
-                    marginTop: '15vh',
-                    marginBottom: '3vh',
-                    // borderRadius: '8px',
-                    // border: '3px solid var(--border)',
+                    // margin-top: '15vh',
+                    // margin-bottom: '3vh',
+                    paddingBottom: '2vh',
+                    marginTop: '21vh',
+
+                    borderRadius: '8px',
+                    fontFamily: 'Afacad_Flux !important',
+                    fontSize: 'var(--head-font-size)',
                 }}
             >
-                <SingleSkeleton loading={true}> 
-                    <div></div>
+                <SingleSkeleton loading={true} height='' margin=''> 
+                    <></>
                 </SingleSkeleton>
-            </div>);
+            </div>
+        );
     }
 
     if (!isAuth) {
