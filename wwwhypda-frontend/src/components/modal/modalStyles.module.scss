@@ -34,3 +34,29 @@
     transition: 0.5s !important;
 }
 
+
+.modalDescription {
+    color: var(--tree-text);
+    font-family: Afacad_Flux !important;
+    font-size: 2vh;
+    text-align: center;
+    margin-bottom: 2vh;
+}
+
+// .submitButton {
+//     background-color: var(--accent);
+//     color: white;
+//     font-weight: bold;
+//     &:hover {
+//         background-color: var(--accent-dark);
+//     }
+// }
+
+.modalTitle {
+    color: var(--tree-text);
+    font-family: Afacad_Flux !important;
+    font-size: 4vh;
+    font-weight: 600;
+    text-align: center;
+    margin: 2vh 0;
+}

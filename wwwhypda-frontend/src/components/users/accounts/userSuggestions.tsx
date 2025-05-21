@@ -94,40 +94,48 @@ const UserSuggestions: React.FC = () => {
     };
 
     const handleClick = (data: any) => {
-        openModal(
-            'Are you sure you want to start editing?', // Title
-            'All current sample data will be permanently erased!', // Description
-            'Go to editing', // Action button text
-            () => {
+        openModal({
+            title: 'Are you sure you want to start editing?',
+            description: 'All current sample data will be permanently erased!',
+            buttons: [
+                {
+                    label: 'Go to editing',
+                    onClick: () => {
+                        // Очистка старых данных
+                        localStorage.removeItem("generalInfoData");
+                        localStorage.removeItem("measurementsTableData");
+                        localStorage.removeItem("sampleMeasurementTableData");
+                        localStorage.removeItem("siteInfoTableData");
+                        localStorage.removeItem("sourceTableData");
+                        localStorage.removeItem("activeStep");
 
-                localStorage.removeItem("generalInfoData");
-                localStorage.removeItem("measurementsTableData");
-                localStorage.removeItem("sampleMeasurementTableData");
-                localStorage.removeItem("siteInfoTableData");
-                localStorage.removeItem("sourceTableData");
-                localStorage.removeItem('activeStep');
-            
-                try {
-                    localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
-                    localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
-                    localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
-                    localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
-                    localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
-                    localStorage.setItem("activeStep", "0"); // сбрасываем шаг на начало
+                        try {
+                            // Сохранение новых данных
+                            localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                            localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                            localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                            localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                            localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                            localStorage.setItem("activeStep", "0");
 
-                    // Если хочешь перейти на другую страницу:
-                    // navigate("/input/edit");
+                            console.log("Данные успешно записаны в localStorage.");
+                        } catch (e) {
+                            console.error("Ошибка при сохранении в localStorage:", e);
+                        }
 
-                    console.log("Данные успешно записаны в localStorage.");
-                } catch (e) {
-                    console.error("Ошибка при сохранении в localStorage:", e);
+                        navigate('/edit');
+                    }
+                },
+                {
+                    label: 'Cancel',
+                    onClick: () => {
+                        console.log("Редактирование отменено.");
+                    }
                 }
-
-                navigate('/input');    
-
-            }
-        );
+            ]
+        });
     };
+
 
     const { openModal, closeModal } = useModal();
 
