@@ -3,10 +3,49 @@ import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
+import { useModal } from '../modal/modalContext';
+
 
 const InputPage: React.FC = () => {
 
-    const handleReset = () => {
+    const { openModal } = useModal();
+
+    // const handleReset = () => {
+    //     openModal(
+    //         'Do you want to submit data??', // Title
+    //         '', // Description
+    //         'Send', // Action button text
+    //         () => { handleClick(); }
+    //     );
+    //     // setActiveStep(0);
+    // };
+
+    const handleSomething = () => {
+        openModal({
+            title: "Submit dataset?",
+            description: "",
+            buttons: [
+                {
+                    label: "Submit",
+                    onClick: () => {
+                        handleClick();
+                    },
+                },
+                // {
+                //     label: "Deny",
+                //     onClick: () => console.log("Deny"),
+                // },
+                {
+                    label: "Close",
+                    onClick: () => {},
+                }
+            ]
+        });
+    };
+
+
+
+    const handleClick = () => {
         sendAllDataToServer();
         localStorage.removeItem("generalInfoData");
         localStorage.removeItem("measurementsTableData");
@@ -23,7 +62,7 @@ const InputPage: React.FC = () => {
                 <h2>InputPage</h2>
             </div>
 
-            <CustomStepper handleClick={handleReset}/>
+            <CustomStepper handleClick={handleSomething}/>
         </div>
     );
 };

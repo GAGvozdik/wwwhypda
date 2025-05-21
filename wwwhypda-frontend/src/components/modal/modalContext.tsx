@@ -1,12 +1,35 @@
-// ModalContext.tsx
-import React, { createContext, useContext, useState, ReactNode, RefObject } from 'react';
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    RefObject,
+} from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import styles from './modalStyles.module.scss';
 
+interface ModalButton {
+    label: string;
+    onClick: () => void;
+    variant?: 'primary' | 'secondary'; // на будущее для кастомизации
+}
+
+interface OpenModalOptions {
+    title: string;
+    description?: string;
+    buttons: ModalButton[];
+}
+
 interface ModalContextProps {
-    openModal: (title: string, description: string, actionButtonText: string, onAction: () => void) => void;
+    openModal: (options: OpenModalOptions) => void;
+    legacyOpenModal: (
+        title: string,
+        description: string,
+        actionButtonText: string,
+        onAction: () => void
+    ) => void;
     closeModal: () => void;
 }
 
@@ -20,7 +43,7 @@ const ModalContext = createContext<ModalContextProps | undefined>(undefined);
 export const useModal = () => {
     const context = useContext(ModalContext);
     if (!context) {
-        throw new Error("useModal must be used within a ModalProvider");
+        throw new Error('useModal must be used within a ModalProvider');
     }
     return context;
 };
@@ -29,52 +52,51 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
     const [isOpen, setIsOpen] = useState(false);
     const [modalContent, setModalContent] = useState<ReactNode>(null);
 
-    const openModal = (title: string, description: string, actionButtonText: string, onAction: () => void) => {
+    const openModal = ({ title, description, buttons }: OpenModalOptions) => {
         setModalContent(
             <>
-                <div
-                    style={{
-                        color: 'var(--tree-text)',
-                        fontFamily: 'Afacad_Flux !important',
-                        fontSize: '2.5vh',
-                        margin: '2vh',
-                        textAlign: 'center',
-                        fontWeight: '600',
-                    }}
-                >
-                    {title}
+                <div className={styles.modalTitle}>{title}</div>
+                {description && <div className={styles.modalDescription}>{description}</div>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1vh', marginTop: '2vh' }}>
+                    {buttons.map((btn, idx) => (
+                        <Button
+                            key={idx}
+                            style={{ minWidth: 200 }}
+                            className={styles.submitButton}
+                            onClick={() => {
+                                btn.onClick();
+                                closeModal();
+                            }}
+                        >
+                            {btn.label}
+                        </Button>
+                    ))}
                 </div>
-                <div
-                    style={{
-                        color: 'var(--tree-text)',
-                        fontFamily: 'Afacad_Flux !important',
-                        fontSize: '2vh',
-                        margin: '2vh',
-                        textAlign: 'center',
-                    }}
-                >
-                    {description}
-                </div>
-                <Button
-                    style={{ minWidth: 220 }}
-                    className={styles.submitButton}
-                    onClick={() => {
-                        onAction(); // вызываем переданную функцию
-                        closeModal(); // Закрытие модального окна после действия
-                    }}
-                >
-                    {actionButtonText}
-                </Button>
-                <Button
-                    onClick={closeModal}
-                    style={{ minWidth: 120, marginTop: '2vh' }}
-                    className={styles.submitButton}
-                >
-                    Close
-                </Button>
             </>
         );
         setIsOpen(true);
+    };
+
+    const legacyOpenModal = (
+        title: string,
+        description: string,
+        actionButtonText: string,
+        onAction: () => void
+    ) => {
+        openModal({
+            title,
+            description,
+            buttons: [
+                {
+                    label: actionButtonText,
+                    onClick: onAction,
+                },
+                {
+                    label: 'Close',
+                    onClick: () => {},
+                },
+            ],
+        });
     };
 
     const closeModal = () => {
@@ -83,7 +105,7 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
     };
 
     return (
-        <ModalContext.Provider value={{ openModal, closeModal }}>
+        <ModalContext.Provider value={{ openModal, legacyOpenModal, closeModal }}>
             {children}
             <Modal
                 open={isOpen}

@@ -20,7 +20,7 @@ class InputData(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
-    name = db.Column(db.String(60))
+    name = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='New')
     general_info = db.Column(JSON, nullable=False)
@@ -28,7 +28,8 @@ class InputData(db.Model):
     samples = db.Column(JSON, nullable=False)
     site_info = db.Column(JSON, nullable=False)
     source_info = db.Column(JSON, nullable=False)
-
+    comment = db.Column(db.String(600))
+    
     def to_dict(self):
         return {
             "id": self.id,
@@ -40,7 +41,8 @@ class InputData(db.Model):
             "sampleMeasurementTableData": self.samples,
             "siteInfoTableData": self.site_info,
             "sourceTableData": self.source_info,
-            "status": self.status
+            "status": self.status,
+            "comment": self.comment
         }
 
     @classmethod
@@ -54,13 +56,14 @@ class InputData(db.Model):
 
             entry = cls(
                 user_id=user_id,
-                name=name,  # Добавляем имя
+                name=name,  
                 general_info=data.get('generalInfoData', []),
                 measurements=data.get('measurementsTableData', []),
                 samples=data.get('sampleMeasurementTableData', []),
                 site_info=data.get('siteInfoTableData', []),
                 source_info=data.get('sourceTableData', []),
-                status='New'
+                status='New',
+                comment= '-'
             )
             db.session.add(entry)
             db.session.commit()
@@ -87,7 +90,8 @@ class InputData(db.Model):
                 cls.id,
                 User.name.label("username"),  # Получаем имя пользователя
                 cls.created_at,
-                cls.status
+                cls.status,
+                cls.comment
             ).join(User, User.id == cls.user_id) \
             .order_by(cls.created_at.desc()) \
             .all()
@@ -97,7 +101,8 @@ class InputData(db.Model):
                     "id": row.id,
                     "username": row.username,  # Здесь имя пользователя
                     "created_at": row.created_at.isoformat(),
-                    "status": row.status
+                    "status": row.status,
+                    "comment": row.comment
                 }
                 for row in results
             ]

@@ -58,17 +58,17 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
     });
 
 
-    const { openModal } = useModal();
+    // const { openModal } = useModal();
 
-    const handleReset = () => {
-        openModal(
-            'Do you want to submit data??', // Title
-            '', // Description
-            'Send', // Action button text
-            () => { handleClick(); }
-        );
-        // setActiveStep(0);
-    };
+    // const handleReset = () => {
+    //     openModal(
+    //         'Do you want to submit data??', // Title
+    //         '', // Description
+    //         'Send', // Action button text
+    //         () => { handleClick(); }
+    //     );
+    //     // setActiveStep(0);
+    // };
 
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
@@ -136,7 +136,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                         <Box sx={{ flex: '1 1 auto' }} />
 
                             <Button
-                                onClick={handleReset}
+                                onClick={handleClick}
                                 className={styles.submitButton}
                                 style={{ minWidth: 120 }}
                             >
