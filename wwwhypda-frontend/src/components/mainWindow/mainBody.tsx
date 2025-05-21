@@ -25,11 +25,20 @@ import Home from '../pages/home';
 import About from '../pages/about';
 import NotFound from '../pages/notFound';
 import Contribute from '../pages/contribute';
+
+
+
 import Search from '../search/search';
 import Documents from '../pages/documents';
 
 import Account from '../users/accounts/account';
+
+import InputPageRead from '../pages/InputPageRead';
 import InputPage from '../pages/inputPage'; 
+import InputPageEdit from '../pages/inputPageEdit';
+;
+
+
 import ProtectedRoute from '../users/routes/protectedRoute';
 import Login from '../users/auth/login';
 import Register from '../users/auth/registration';
@@ -49,62 +58,61 @@ export default function MainMenu() {
 
     return (
         <div ref={modalRootRef} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
+            <ModalProvider modalRootRef={modalRootRef}>
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/search" element={<Search />} />
+                    {/* <Route path="/contribute" element={<Contribute />} /> */}
+                    <Route path="/documents" element={<Documents />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/notfound" element={<NotFound />} /> 
 
-                <ModalProvider modalRootRef={modalRootRef}>
+                    {/* <Route path="/account" element={
+                        <AppProvider>
+                            <Account onSignIn={handleSignIn} />
+                        </AppProvider>
+                    } />  */}
 
+                    <Route 
+                        path="/account" 
+                        element={<ProtectedRoute><Account /></ProtectedRoute>} 
+                    />
 
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/search" element={<Search />} />
-                        {/* <Route path="/contribute" element={<Contribute />} /> */}
-                        <Route path="/documents" element={<Documents />} />
-                        <Route path="/about" element={<About />} />
-                        <Route path="/notfound" element={<NotFound />} /> 
+                    <Route 
+                        path="/superaccount" 
+                        element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
+                    />
 
-                        {/* <Route path="/account" element={
-                            <AppProvider>
-                                <Account onSignIn={handleSignIn} />
-                            </AppProvider>
-                        } />  */}
+                    <Route 
+                        path="/check_suggestions" 
+                        element={<SuperProtectedRoute><InputPageRead /></SuperProtectedRoute>} 
+                    />
 
-                        <Route 
-                            path="/account" 
-                            element={<ProtectedRoute><Account /></ProtectedRoute>} 
-                        />
-                        <Route 
-                            path="/superaccount" 
-                            element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
-                        />
+                    <Route 
+                        path="/edit" 
+                        element={<ProtectedRoute><InputPageEdit /></ProtectedRoute>} 
+                    />
 
-                        
-                        {/* <Route
-                            path="/input"
-                            element={<InputPage />}
-                        /> */}
+                    <Route
+                        path="/input"
+                        element={
+                            <ProtectedRoute>
+                                <InputPage />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                        <Route
-                            path="/input"
-                            element={
-                                <ProtectedRoute>
-                                    <InputPage />
-                                </ProtectedRoute>
-                            }
-                        />
+                    <Route
+                        path="/contribute"
+                        element={<Contribute />}
+                    />
 
-                        <Route
-                            path="/contribute"
-                            element={<Contribute />}
-                        />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
 
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/register" element={<Register />} />
-                            <Route path="/forgot-password" element={<ForgotPassword />} />
-
-
-                    </Routes>
-
-                </ModalProvider>
-
+                </Routes>
+            </ModalProvider>
         </div>
     )
 };

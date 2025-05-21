@@ -148,39 +148,52 @@ const InputSuggestions: React.FC = () => {
             });
             const data = response.data;
 
-            openModal(
-                'Are you sure you want to start editing?',
-                'All current sample data will be permanently erased!',
-                'Go to editing',
-                () => {
-                    localStorage.removeItem("generalInfoData");
-                    localStorage.removeItem("measurementsTableData");
-                    localStorage.removeItem("sampleMeasurementTableData");
-                    localStorage.removeItem("siteInfoTableData");
-                    localStorage.removeItem("sourceTableData");
-                    localStorage.removeItem('activeStep');
+            openModal({
+                title: 'Are you sure you want to start editing?',
+                description: 'All current sample data will be permanently erased!',
+                buttons: [
+                    {
+                        label: 'Go to editing',
+                        onClick: () => {
+                            // Очистка текущих данных
+                            localStorage.removeItem("generalInfoData");
+                            localStorage.removeItem("measurementsTableData");
+                            localStorage.removeItem("sampleMeasurementTableData");
+                            localStorage.removeItem("siteInfoTableData");
+                            localStorage.removeItem("sourceTableData");
+                            localStorage.removeItem('activeStep');
 
-                    try {
-                        localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
-                        localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
-                        localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
-                        localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
-                        localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
-                        localStorage.setItem("activeStep", "0");
+                            try {
+                                // Сохраняем новые данные
+                                localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                                localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                                localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                                localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                                localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                                localStorage.setItem("activeStep", "0");
 
-                        console.log("Данные успешно записаны в localStorage.");
-                    } catch (e) {
-                        console.error("Ошибка при сохранении в localStorage:", e);
+                                console.log("Данные успешно записаны в localStorage.");
+                            } catch (e) {
+                                console.error("Ошибка при сохранении в localStorage:", e);
+                            }
+
+                            navigate('/check_suggestions');
+                        }
+                    },
+                    {
+                        label: 'Cancel',
+                        onClick: () => {
+                            console.log("Редактирование отменено.");
+                        }
                     }
+                ]
+            });
 
-                    navigate('/input');
-                }
-            );
-
-        } catch (err) {
-            console.error("Ошибка при получении полной структуры input по id:", err);
+        } catch (error) {
+            console.error("Ошибка при получении данных:", error);
         }
     };
+
 
 
 

@@ -27,23 +27,24 @@ from common_defenitions import mail, db
 from sqlalchemy import text
 from flask import current_app
 
-def add_status_column_if_not_exists():
+def add_status_column_if_not_exists(column_name='name'):
+    
     try:
         # Проверим наличие колонки 'name' в таблице input_data
         result = db.session.execute(text("PRAGMA table_info(input_data);"))
         columns = [row[1] for row in result]  # row[1] — это имя колонки
 
-        if "name" not in columns:
+        if "column_name" not in columns:
             db.session.execute(
-                text("ALTER TABLE input_data ADD COLUMN name VARCHAR(60)")
+                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(20)")
             )
             db.session.commit()
-            current_app.logger.info("✅ Column 'name' successfully added.")
+
         else:
-            current_app.logger.info("ℹ️ Column 'name' already exists.")
+            current_app.logger.info(f"ℹ️ Column {column_name} already exists.")
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"❌ Failed to add 'name' column: {e}")
+        current_app.logger.error(f"❌ Failed to add {column_name} column: {e}")
 
 # TODO: Add reCAPTCHA
 # TODO: Add request limiting (maybe reCAPTCHA will help)
@@ -156,6 +157,6 @@ def not_found(e):
 # === Main Entry ===
 if __name__ == "__main__":
     with app.app_context():
-        add_status_column_if_not_exists()
+        # add_status_column_if_not_exists()
         db.create_all()
     app.run(host="0.0.0.0", port=5000, debug=True)
