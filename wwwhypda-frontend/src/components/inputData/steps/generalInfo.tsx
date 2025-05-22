@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useStepsTheme } from '../steps';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
-import { getCookie } from '../../../common/types';
+import { getCsrfTokenFromCookie } from '../../../common/types';
 
 import { 
     ClientSideRowModelModule, 
@@ -70,7 +70,7 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
 
 
         const fetchData = async () => {
-            const csrfToken = getCookie('csrf_access_token');
+            const csrfToken = getCsrfTokenFromCookie();
             if (!csrfToken) {
                 setError("CSRF token not found in cookie");
                 return;
