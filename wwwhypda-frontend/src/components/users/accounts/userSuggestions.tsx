@@ -21,6 +21,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
 import { useModal } from '../../modal/modalContext';
 import api from '../../api';
+import { getCsrfTokenFromCookie } from '../../../common/types';
 
 const UserSuggestions: React.FC = () => {
 
@@ -64,13 +65,7 @@ const UserSuggestions: React.FC = () => {
         }
     };
 
-    function getCsrfTokenFromCookie() {
-        const csrf = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrf_token='))
-        ?.split('=')[1];
-        return csrf || '';
-    }
+
 
 
 

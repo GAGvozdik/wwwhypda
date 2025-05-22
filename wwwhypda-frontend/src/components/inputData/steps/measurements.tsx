@@ -7,6 +7,7 @@ import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
+import { getCookie } from '../../../common/types';
 
 import { 
     ClientSideRowModelModule, 
@@ -90,12 +91,6 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
     // При загрузке компонента
     useEffect(() => {
 
-    const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-        return null;
-    };
 
         const fetchData = async () => {
 

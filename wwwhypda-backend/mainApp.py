@@ -27,7 +27,7 @@ from common_defenitions import mail, db
 from sqlalchemy import text
 from flask import current_app
 
-def add_status_column_if_not_exists(column_name='name'):
+def add_status_column_if_not_exists(column_name='comment'):
     
     try:
         # Проверим наличие колонки 'name' в таблице input_data
@@ -36,7 +36,7 @@ def add_status_column_if_not_exists(column_name='name'):
 
         if "column_name" not in columns:
             db.session.execute(
-                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(20)")
+                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(600)")
             )
             db.session.commit()
 

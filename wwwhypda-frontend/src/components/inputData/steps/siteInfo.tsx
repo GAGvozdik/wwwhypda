@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
+import { getCookie } from '../../../common/types';
 
 import {
     ClientSideRowModelModule,
@@ -70,12 +71,7 @@ function  SiteInfo({isEditable= true}: SiteInfoProps) {
         }
     });
 
-    const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-        return null;
-    };
+
 
     useEffect(() => {
         const fetchCountries = async () => {

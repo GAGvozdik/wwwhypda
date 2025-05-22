@@ -87,3 +87,29 @@ export interface LogoutAction extends Action {
     [key: string]: any;
 }
 
+export const getCookie = (name: string): string | null => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
+    return null;
+};
+
+// Вспомогательная функция для удаления всех кук
+export function clearAllCookies() {
+    document.cookie.split(";").forEach((c) => {
+        document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+    });
+};
+// Вспомогательная функция, если надо получить csrf_token из cookie
+export function getCsrfTokenFromCookie() {
+    const csrf = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrf_token='))
+    ?.split('=')[1];
+    return csrf || '';
+};
+
+
+

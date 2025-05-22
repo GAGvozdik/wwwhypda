@@ -7,6 +7,7 @@ import { Logout } from '../../../redux/actions';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import UserSuggestions from './userSuggestions';
 import api from '../../api';
+import { getCsrfTokenFromCookie } from '../../../common/types';
 
 const Account: React.FC = () => {
 
@@ -49,14 +50,6 @@ const Account: React.FC = () => {
         });
     }
 
-    // Вспомогательная функция, если надо получить csrf_token из cookie
-    function getCsrfTokenFromCookie() {
-        const csrf = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrf_token='))
-        ?.split('=')[1];
-        return csrf || '';
-    }
 
     const handleLogout = async () => {
         try {

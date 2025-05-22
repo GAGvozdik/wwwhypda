@@ -35,7 +35,7 @@ export default function MainMenu() {
         dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
     };
 
-    const isSuperuser = JSON.parse(localStorage.getItem('isSuperuser') || 'false');
+    const isSuperuser = localStorage.getItem('isSuperuser');
     console.log('isSuperuser in main menu', isSuperuser);
 
     return (

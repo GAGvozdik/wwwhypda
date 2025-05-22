@@ -58,8 +58,15 @@ const InputPage: React.FC = () => {
     return (
         <div className={styles.treeText}>
 
-            <div style={{ justifyContent: 'center', justifyItems: 'center'}}>
-                <h2>InputPage</h2>
+            <div style={{ 
+                    justifyContent: 'center', 
+                    justifyItems: 'center',
+                    fontFamily: 'Afacad_Flux !important',
+                    fontSize: '5vh',
+                    padding: '1vh'
+                }}
+            >
+                InputPage
             </div>
 
             <CustomStepper handleClick={handleSomething}/>
