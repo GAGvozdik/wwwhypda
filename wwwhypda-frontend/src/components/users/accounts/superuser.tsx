@@ -14,6 +14,8 @@ import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import InputSuggestions from './inputSuggestions';
 import api from '../../api';
+import { getCsrfTokenFromCookie, clearAllCookies, getCookie } from '../../../common/types';
+
 
 const SuperuserAccount: React.FC = () => {
 
@@ -24,13 +26,7 @@ const SuperuserAccount: React.FC = () => {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // Чтение cookie по имени
-    const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-        return null;
-    };
+
 
     useEffect(() => {
         fetchUserData();
@@ -62,23 +58,7 @@ const SuperuserAccount: React.FC = () => {
         }
     };
 
-    // Вспомогательная функция для удаления всех кук
-    function clearAllCookies() {
-        document.cookie.split(";").forEach((c) => {
-            document.cookie = c
-            .replace(/^ +/, "")
-            .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
-        });
-    }
 
-    // Вспомогательная функция, если надо получить csrf_token из cookie
-    function getCsrfTokenFromCookie() {
-        const csrf = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('csrf_token='))
-        ?.split('=')[1];
-        return csrf || '';
-    }
 
     const handleLogout = async () => {
         try {

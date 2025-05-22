@@ -36,8 +36,6 @@ import Account from '../users/accounts/account';
 import InputPageRead from '../pages/InputPageRead';
 import InputPage from '../pages/inputPage'; 
 import InputPageEdit from '../pages/inputPageEdit';
-;
-
 
 import ProtectedRoute from '../users/routes/protectedRoute';
 import Login from '../users/auth/login';
