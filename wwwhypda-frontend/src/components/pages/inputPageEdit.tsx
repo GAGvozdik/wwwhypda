@@ -5,7 +5,6 @@ import CustomStepper from '../inputData/stepper';
 import {sendAllDataToServer} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
 
-
 const InputPageEdit: React.FC = () => {
 
     const { openModal } = useModal();
@@ -22,11 +21,11 @@ const InputPageEdit: React.FC = () => {
 
     const handleSomething = () => {
         openModal({
-            title: "Submit dataset?",
+            title: "Submit your changes?",
             description: "",
             buttons: [
                 {
-                    label: "Submit",
+                    label: "Submit editings",
                     onClick: () => {
                         handleClick();
                     },
@@ -43,8 +42,6 @@ const InputPageEdit: React.FC = () => {
         });
     };
 
-
-
     const handleClick = () => {
         sendAllDataToServer();
         localStorage.removeItem("generalInfoData");
@@ -58,8 +55,16 @@ const InputPageEdit: React.FC = () => {
     return (
         <div className={styles.treeText}>
 
-            <div style={{ justifyContent: 'center', justifyItems: 'center'}}>
-                <h2>InputPageEdit</h2>
+            <div style={{ 
+
+                    justifyContent: 'center', 
+                    justifyItems: 'center',
+                    fontFamily: 'Afacad_Flux !important',
+                    fontSize: '5vh',
+                    padding: '1vh'
+                }}
+            >
+                InputPageEdit
             </div>
 
             <CustomStepper handleClick={handleSomething}/>
@@ -68,12 +73,3 @@ const InputPageEdit: React.FC = () => {
 };
 
 export default InputPageEdit;
-
-
-
-
-
-
-
-
-

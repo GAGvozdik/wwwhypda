@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useStepsTheme } from '../steps';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
+import { getCookie } from '../../../common/types';
 
 import { 
     ClientSideRowModelModule, 
@@ -66,12 +67,7 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
             ]);
         }
 
-    const getCookie = (name: string): string | null => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop()!.split(';').shift() || null;
-        return null;
-    };
+
 
         const fetchData = async () => {
             const csrfToken = getCookie('csrf_access_token');

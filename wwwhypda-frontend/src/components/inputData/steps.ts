@@ -6,12 +6,8 @@ import { useSelector } from 'react-redux';
 import axios from "axios";
 import { styled } from '@mui/material/styles';
 import api from '../api';
+import { getCsrfTokenFromCookie } from '../../common/types';
 
-// Пример функции для получения CSRF-токена из cookie
-const getCsrfTokenFromCookie = () => {
-  const match = document.cookie.match(/csrf_token=([^;]+)/);
-  return match ? match[1] : "";
-};
 
 export const sendAllDataToServer = async () => {
   const payload = insertData();

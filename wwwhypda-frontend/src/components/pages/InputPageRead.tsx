@@ -55,8 +55,15 @@ const InputPageRead: React.FC = () => {
     return (
         <div className={styles.treeText}>
 
-            <div style={{ justifyContent: 'center', justifyItems: 'center'}}>
-                <h2>InputPageRead</h2>
+            <div style={{ 
+                    justifyContent: 'center', 
+                    justifyItems: 'center',
+                    fontFamily: 'Afacad_Flux !important',
+                    fontSize: '5vh',
+                    padding: '1vh'
+                }}
+            >
+                InputPageRead
             </div>
 
             <CustomStepper handleClick={handleSomething}/>
