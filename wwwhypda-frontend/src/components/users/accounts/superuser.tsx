@@ -14,7 +14,7 @@ import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import InputSuggestions from './inputSuggestions';
 import api from '../../api';
-import { getCsrfTokenFromCookie, clearAllCookies, getCookie } from '../../../common/types';
+import { getCsrfTokenFromCookie, clearAllCookies } from '../../../common/types';
 
 
 const SuperuserAccount: React.FC = () => {
@@ -85,7 +85,7 @@ const SuperuserAccount: React.FC = () => {
 
 
     const performAction = async (url: string, userId: number) => {
-        const csrfToken = getCookie('csrf_access_token');
+        const csrfToken = getCsrfTokenFromCookie();
         if (!csrfToken) {
             setError("CSRF token not found in cookie");
             return;

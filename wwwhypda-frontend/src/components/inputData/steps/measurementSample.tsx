@@ -7,7 +7,7 @@ import { State } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
-import { getCookie } from '../../../common/types';
+import { getCsrfTokenFromCookie } from '../../../common/types';
 
 import { 
     ClientSideRowModelModule, 
@@ -104,7 +104,7 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
         const fetchData = async () => {
 
             
-            const csrfToken = getCookie('csrf_access_token');
+            const csrfToken = getCsrfTokenFromCookie();
 
             if (!csrfToken) {
                 setError("CSRF token not found in cookie");
