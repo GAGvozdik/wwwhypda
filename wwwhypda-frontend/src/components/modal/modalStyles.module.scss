@@ -17,11 +17,11 @@
 }
 
 
-// .submitButton:hover {
-//     transition: 0.5s !important;
-//     color: var(--submit-button-text-hover) !important;
-//     background-color: var(--submit-button-hover) !important;
-// }
+.submitButton:hover {
+    transition: 0.5s !important;
+    color: var(--submit-button-text-hover) !important;
+    background-color: var(--submit-button-hover) !important;
+}
 
 .submitButton:disabled {
     color: var(--submit-button-text) !important;
