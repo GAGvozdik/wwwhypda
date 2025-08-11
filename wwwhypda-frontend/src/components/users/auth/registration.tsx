@@ -62,7 +62,8 @@ const Register: React.FC = () => {
             });
 
             if (response.status === 200) {
-                navigate("/login");  // ✅ Перенаправление после успешного подтверждения
+                const successMessage = response.data.message || 'Account successfully activated';
+                navigate('/login', { state: { message: successMessage } });
             } else {
                 setError(response.data.message || "Invalid confirmation code.");
                 setIsError(true); // Устанавливаем ошибку
