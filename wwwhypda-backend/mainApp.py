@@ -109,6 +109,9 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
+# Включаем режим тестирования, чтобы тестовые эндпоинты работали
+app.config['TESTING'] = True
+
 # === Initialize extensions ===
 mail.init_app(app)
 db.init_app(app)
@@ -137,6 +140,12 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(rocks_bp)
 app.register_blueprint(input_bp)
+
+# Условно регистрируем Blueprint с тестовыми эндпоинтами
+# Он будет доступен только если приложение запущено в режиме тестирования
+if app.config.get("TESTING"):
+    from auth.testing_endpoints import testing_bp
+    app.register_blueprint(testing_bp)
 
 swaggerui_blueprint = get_swaggerui_blueprint(
     os.getenv('SWAGGER_URL'),
