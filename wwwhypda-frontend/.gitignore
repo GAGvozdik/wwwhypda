@@ -11,13 +11,6 @@
 # testing
 /coverage
 
-# Cypress artifacts
-/cypress/downloads/
-/cypress/screenshots/
-/cypress/videos/
-/cypress/reports/
-cypress.run.json
-
 # production
 /build
 
