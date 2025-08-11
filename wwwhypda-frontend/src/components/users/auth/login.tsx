@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import UserButton from './userButton';
@@ -17,8 +17,17 @@ const Login: React.FC = () => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
-console.log("BaseURL:", process.env.REACT_APP_BASE_URL);
+    // Проверяем, есть ли сообщение из редиректа (например, после регистрации)
+    useEffect(() => {
+        if (location.state?.message) {
+            setError(location.state.message);
+            setIsError(false); // Устанавливаем isError в false для успешного сообщения (зеленый цвет)
+            // Очищаем state из location, чтобы сообщение не появлялось снова при обновлении страницы
+            navigate(location.pathname, { replace: true, state: {} });
+        }
+    }, [location, navigate]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
