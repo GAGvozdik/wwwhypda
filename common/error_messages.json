@@ -1,0 +1,16 @@
+{
+  "password_invalid": "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+  "password_required": "Password is required.",
+  "passwords_do_not_match": "Passwords do not match!",
+  "email_invalid": "Email is invalid. Expected format: example@domain.com",
+  "email_required": "Email is required.",
+  "name_invalid_format": "Name can only contain letters, numbers, spaces, hyphens, and apostrophes.",
+  "name_length": "Name must be between 3 and 30 characters long.",
+  "name_required": "Name is required.",
+  "name_must_be_string": "Name must be a string.",
+  "user_already_exists": "User already exists",
+  "registration_failed": "Registration failed. Please try again.",
+  "confirmation_failed": "Confirmation failed. Please try again.",
+  "invalid_confirmation_code": "Invalid confirmation code.",
+  "account_activated": "Account successfully activated"
+}
