@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
-import ErrorMessage from './errorMessage'; // Компонент ошибки
+import ErrorMessage from './errorMessage';
 import UserButton from './userButton';
 import api from '../../api';
+import messages from '../../../common/error_messages.json';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -16,15 +16,15 @@ const Register: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [step, setStep] = useState(1);
-    const [isError, setIsError] = useState<boolean>(false); // Флаг для ошибки
+    const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const handleRegister = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-            setError("Passwords do not match!");
-            setIsError(true); // Устанавливаем ошибку
+            setError(messages.passwords_do_not_match);
+            setIsError(true);
             return;
         }
 
@@ -38,14 +38,24 @@ const Register: React.FC = () => {
 
             if (response.status === 201) {
                 setError(response.data.message);
-                setIsError(false); // Устанавливаем успешный ответ
+                setIsError(false);
                 console.log(response.data.message);
                 setStep(2);
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || "Registration failed. Please try again.");
-            setIsError(true); // Устанавливаем ошибку
-            console.log(err.response?.data?.message || "Registration failed. Please try again.");
+            if (err.response?.data) {
+                if (err.response.data.message) {
+                    setError(err.response.data.message);
+                } else {
+                    const errorMessages = Object.values(err.response.data);
+                    const displayError = errorMessages.length > 0 ? errorMessages[0] : messages.registration_failed;
+                    setError(displayError as string);
+                }
+            } else {
+                setError(messages.registration_failed);
+            }
+            setIsError(true);
+            console.log(err.response?.data || messages.registration_failed);
         } finally {
             setIsLoading(false);
         }
@@ -62,15 +72,15 @@ const Register: React.FC = () => {
             });
 
             if (response.status === 200) {
-                const successMessage = response.data.message || 'Account successfully activated';
+                const successMessage = response.data.message || messages.account_activated;
                 navigate('/login', { state: { message: successMessage } });
             } else {
-                setError(response.data.message || "Invalid confirmation code.");
-                setIsError(true); // Устанавливаем ошибку
+                setError(response.data.message || messages.invalid_confirmation_code);
+                setIsError(true);
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || "Confirmation failed. Please try again.");
-            setIsError(true); // Устанавливаем ошибку
+            setError(err.response?.data?.message || messages.confirmation_failed);
+            setIsError(true);
         } finally {
             setIsLoading(false);
         }
@@ -122,7 +132,6 @@ const Register: React.FC = () => {
                             required
                         />
 
-                        {/* Передаем параметр isError, чтобы изменить цвет */}
                         <ErrorMessage error={error} isError={isError} />
 
                         <UserButton text="Register" isLoading={isLoading} />
@@ -148,7 +157,6 @@ const Register: React.FC = () => {
                             required
                         />
 
-                        {/* Передаем параметр isError, чтобы изменить цвет */}
                         <ErrorMessage error={error} isError={isError} />
 
                         <UserButton text="Confirm" isLoading={isLoading} />

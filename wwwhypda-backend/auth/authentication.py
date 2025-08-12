@@ -204,9 +204,8 @@ def add_user():
         # Validate user data
         validation_result = validate_user(**user_data)
         if validation_result is not True:
-            # Преобразуем ошибки в одну строку
-            error_message = " | ".join(f"{field}: {msg}" for field, msg in validation_result.items())
-            return jsonify(message=error_message, data=None, error="Validation error"), 400
+            # Return the dictionary of validation errors directly
+            return jsonify(validation_result), 400
 
         # Check if the user already exists
         existing_user = User.query.filter_by(email=user_data["email"]).first()
