@@ -28,6 +28,29 @@ def get_confirmation_code_for_testing():
 
     return jsonify(confirmation_code=confirmation_code.code), 200
 
+@testing_bp.route("/get-password-reset-code", methods=["GET"])
+def get_password_reset_code_for_testing():
+    """
+    An endpoint available only in testing mode to retrieve a user's password reset code.
+    """
+    if not current_app.config.get('TESTING'):
+        return jsonify(message="This endpoint is only available in testing mode."), 404
+
+    email = request.args.get('email')
+    if not email:
+        return jsonify(message="Email parameter is required."), 400
+
+    # Находим последний код для указанного email
+    password_reset_code = ConfirmationCode.query.filter_by(
+        email=email,
+        type='password_reset'
+    ).order_by(ConfirmationCode.created_at.desc()).first()
+
+    if not password_reset_code:
+        return jsonify(message="No password reset code found for this email."), 404
+
+    return jsonify(reset_code=password_reset_code.code), 200
+
 @testing_bp.route('/config', methods=['POST'])
 def configure_test_session():
     if not current_app.config.get('TESTING'):
