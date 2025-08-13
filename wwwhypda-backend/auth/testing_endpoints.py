@@ -1,5 +1,4 @@
-
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 from auth.auth_models import ConfirmationCode
 
 # Создаем новый Blueprint специально для тестовых эндпоинтов
@@ -28,3 +27,14 @@ def get_confirmation_code_for_testing():
         return jsonify(message="No confirmation code found for this email."), 404
 
     return jsonify(confirmation_code=confirmation_code.code), 200
+
+@testing_bp.route('/config', methods=['POST'])
+def configure_test_session():
+    if not current_app.config.get('TESTING'):
+        return jsonify(message="This endpoint is only available in testing mode."), 404
+
+    data = request.json
+    if 'ACCESS_EXPIRES_SECONDS' in data:
+        session['ACCESS_EXPIRES_SECONDS'] = data['ACCESS_EXPIRES_SECONDS']
+    
+    return jsonify(message="Test configuration updated."), 200
