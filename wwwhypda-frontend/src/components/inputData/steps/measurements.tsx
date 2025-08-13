@@ -3,11 +3,12 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
 import axios from 'axios';
-import { State } from '../../../common/types';
+import { State, MeasurementRow, SampleMeasurementRow } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
+import { UpdateMeasurementsData, UpdateSampleMeasurementData } from '../../../redux/actions';
 
 import { 
     ClientSideRowModelModule, 
@@ -56,18 +57,6 @@ interface InterpretationMethod {
     int_meth_status: number;
 }
 
-interface MeasurementRow {
-    id: number;
-    sampleRef: string;
-    parameter: string;
-    value: string;
-    error: string;
-    units: string;
-    quality: string;
-    experimentType: string;
-    interpretation: string;
-    comment: string;
-}
 type MeasurementsProps = {
     isEditable: boolean;
 };
@@ -88,6 +77,10 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
     const [experimentType, setExperimentType] = useState<ExperimentType[]>([]);
     const [interpretationMethod, setInterpretationMethod] = useState<InterpretationMethod[]>([]);
     
+    const dispatch = useDispatch();
+    const tableData = useSelector((state: State) => state.measurementsTableData);
+    const sampleMeasurementTableData = useSelector((state: State) => state.sampleMeasurementTableData);
+
     // При загрузке компонента
     useEffect(() => {
 
@@ -158,27 +151,27 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
     const experimentTypeNames = useMemo(() => experimentType.map(s => s.exp_name), [experimentType]);
     const interpretationMethodNames = useMemo(() => interpretationMethod.map(s => s.int_meth_name), [interpretationMethod]);
 
-    const [tableData, setTableData] = useState<MeasurementRow[]>(() => {
-        const saved = localStorage.getItem("measurementsTableData");
-        try {
-            return saved ? JSON.parse(saved) : [
-                { id: 1, sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: "" },
-            ];
-        } catch (e) {
-            console.error("Ошибка при парсинге localStorage:", e);
-            return [];
-        }
-    });
-
     const addRow = () => {
-        setTableData((prev) => [...prev, {
-            id: prev.length + 1,
+        const newRow: MeasurementRow = {
+            id: tableData.length + 1,
             sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: ""
-        }]);
+        };
+        dispatch(UpdateMeasurementsData([...tableData, newRow]));
+
+        const newSampleRow: SampleMeasurementRow = {
+            id: sampleMeasurementTableData.length + 1,
+            smpl_name: "",
+            rock_type: "- undefined -",
+            scale: "- undefined -",
+            fracturation_degree: "- undefined -",
+            Sample_comment: ""
+        };
+        dispatch(UpdateSampleMeasurementData([...sampleMeasurementTableData, newSampleRow]));
     };
 
     const deleteRow = () => {
-        setTableData((prev) => prev.slice(0, -1));
+        dispatch(UpdateMeasurementsData(tableData.slice(0, -1)));
+        dispatch(UpdateSampleMeasurementData(sampleMeasurementTableData.slice(0, -1)));
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -228,27 +221,12 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
         };
     }, []);
 
-    useEffect(() => {
-        const savedTableData = localStorage.getItem("measurementsTableData");
-        if (savedTableData) {
-            try {
-                setTableData(JSON.parse(savedTableData));
-            } catch (e) {
-                console.error("Ошибка при разборе сохранённых данных:", e);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-            localStorage.setItem("measurementsTableData", JSON.stringify(tableData));
-        }, [tableData]);
-
         const handleCellValueChanged = (event: any) => {
         const updatedData = [...tableData];
         const rowIndex = updatedData.findIndex(row => row.id === event.data.id);
         if (rowIndex !== -1) {
             updatedData[rowIndex] = { ...event.data };
-            setTableData(updatedData);
+            dispatch(UpdateMeasurementsData(updatedData));
         }
     };
 
@@ -339,11 +317,3 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
         </div>
     );
 };
-
-
-
-
-
-
-
-

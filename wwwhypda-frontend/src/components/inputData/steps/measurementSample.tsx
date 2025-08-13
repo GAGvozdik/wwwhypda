@@ -3,11 +3,12 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
 import axios from 'axios';
-import { State } from '../../../common/types';
+import { State, SampleMeasurementRow, MeasurementRow } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
+import { UpdateSampleMeasurementData, UpdateMeasurementsData } from '../../../redux/actions';
 
 import { 
     ClientSideRowModelModule, 
@@ -51,16 +52,6 @@ export interface Scale {
     scale_descr?: string | null;
 }
 
-interface SampleRow {
-    id: number;
-    smpl_name: string;
-    rock_type: string;
-    scale: string;
-    fracturation_degree: string;
-    Sample_comment: string;
-}
-
-
 interface RockTypeData {
     rt_id: number;
     rt_name: string;
@@ -97,7 +88,9 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
     const [fracturation, setFracturation] = useState<Fracturation[]>([]);
     const [rocksData, setRocksData] = useState<RockTypeData[]>([]);
 
-
+    const dispatch = useDispatch();
+    const tableData = useSelector((state: State) => state.sampleMeasurementTableData);
+    const measurementsTableData = useSelector((state: State) => state.measurementsTableData);
 
 
     useEffect(() => {
@@ -164,43 +157,34 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
     const fracturations = useMemo(() => fracturation.map(f => f.fracturation_degree), [fracturation]);
     const rocksNames = useMemo(() => rocksData.map(r => r.rt_name), [rocksData]);
 
-    const [tableData, setTableData] = useState<SampleRow[]>(() => {
-        const saved = localStorage.getItem("sampleMeasurementTableData");
-        try {
-            return saved ? JSON.parse(saved) : [
-                { id: 1, smpl_name: "", rock_type: "", scale: "", fracturation_degree: "", Sample_comment: "" },
-            ];
-        } catch (e) {
-            console.error("Error parsing localStorage:", e);
-            return [];
-        }
-    });
-
-
-    useEffect(() => {
-        localStorage.setItem("sampleMeasurementTableData", JSON.stringify(tableData));
-    }, [tableData]);
-
     const handleCellValueChanged = (params: any) => {
         const updatedData = tableData.map((row) =>
             row.id === params.data.id ? { ...params.data } : row
         );
-        setTableData(updatedData);
+        dispatch(UpdateSampleMeasurementData(updatedData));
     };
 
     const addRow = () => {
-        setTableData(prev => [...prev, {
-            id: prev.length + 1,
+        const newRow: SampleMeasurementRow = {
+            id: tableData.length + 1,
             smpl_name: "",
             rock_type: "- undefined -",
             scale: "- undefined -",
             fracturation_degree: "- undefined -",
             Sample_comment: ""
-        }]);
+        };
+        dispatch(UpdateSampleMeasurementData([...tableData, newRow]));
+
+        const newMeasurementRow: MeasurementRow = {
+            id: measurementsTableData.length + 1,
+            sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: ""
+        };
+        dispatch(UpdateMeasurementsData([...measurementsTableData, newMeasurementRow]));
     };
 
     const deleteRow = () => {
-        setTableData(prev => prev.slice(0, -1));
+        dispatch(UpdateSampleMeasurementData(tableData.slice(0, -1)));
+        dispatch(UpdateMeasurementsData(measurementsTableData.slice(0, -1)));
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
