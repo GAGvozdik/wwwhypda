@@ -4,3 +4,4 @@
 4) create react tests using gemini?
 
 
+добавить в тест неверный код подтверждения
