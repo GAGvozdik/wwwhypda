@@ -28,7 +28,7 @@ const ForgotPassword: React.FC = () => {
             const response = await api.post('/users/request-password-reset', { email });
 
             if (response.status === 200) {
-                setError('Code sent to your email.');
+                setError(response.data.message || 'Code sent to your email.');
                 setIsError(false); // Сообщение об успешной отправке
                 setStep(2); // Переход на шаг ввода кода
                 setResendTimer(30);
@@ -183,7 +183,7 @@ const ForgotPassword: React.FC = () => {
                             required
                         />
                         <ErrorMessage 
-                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : error}
+                            error={isError ? error : (resendTimer > 0 ? `Resend code in ${resendTimer}s` : error)}
                             isError={isError} 
                         />
                         <UserButton
