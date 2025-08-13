@@ -6,6 +6,28 @@ import { ColDef } from "ag-grid-community";
 
 export type DynamicRowData = Record<string, unknown>;
 
+export interface SampleMeasurementRow {
+    id: number;
+    smpl_name: string;
+    rock_type: string;
+    scale: string;
+    fracturation_degree: string;
+    Sample_comment: string;
+}
+
+export interface MeasurementRow {
+    id: number;
+    sampleRef: string;
+    parameter: string;
+    value: string;
+    error: string;
+    units: string;
+    quality: string;
+    experimentType: string;
+    interpretation: string;
+    comment: string;
+}
+
 export function generateColumns(data: DynamicRowData[]): ColDef[] {
     if (!data || data.length === 0) return [];
 
@@ -36,6 +58,8 @@ export interface State {
     currentRTName: string;
     currentTableData: DynamicRowData[]; // <-- Переименовал для логичности
     token: string | null;
+    sampleMeasurementTableData: SampleMeasurementRow[];
+    measurementsTableData: MeasurementRow[];
 }
 
 
@@ -43,6 +67,18 @@ export interface UpdateTableDataAction extends Action {
     type: 'UPDATE_TABLE_DATA';
     payload: DynamicRowData[];
     [key: string]: any; // <-- Добавляем индексную сигнатуру
+}
+
+export interface UpdateSampleMeasurementDataAction extends Action {
+    type: 'UPDATE_SAMPLE_MEASUREMENT_DATA';
+    payload: SampleMeasurementRow[];
+    [key: string]: any;
+}
+
+export interface UpdateMeasurementsDataAction extends Action {
+    type: 'UPDATE_MEASUREMENTS_DATA';
+    payload: MeasurementRow[];
+    [key: string]: any;
 }
 
 

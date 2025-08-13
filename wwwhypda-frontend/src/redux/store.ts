@@ -9,6 +9,8 @@ const initialState: State = {
     currentRTName: '',
     currentTableData: [], // <-- Обновляем состояние
     token: null,
+    sampleMeasurementTableData: JSON.parse(localStorage.getItem('sampleMeasurementTableData') || '[]'),
+    measurementsTableData: JSON.parse(localStorage.getItem('measurementsTableData') || '[]'),
 };
 
 
@@ -37,6 +39,12 @@ const reducer = (state: State = initialState, action: Action): State => {
 
         case 'LOGOUT':
             return { ...state, token: '' };
+
+        case 'UPDATE_SAMPLE_MEASUREMENT_DATA':
+            return { ...state, sampleMeasurementTableData: action.payload };
+
+        case 'UPDATE_MEASUREMENTS_DATA':
+            return { ...state, measurementsTableData: action.payload };
 
         default:
         return state;

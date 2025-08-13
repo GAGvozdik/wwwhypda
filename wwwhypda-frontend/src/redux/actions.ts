@@ -5,6 +5,10 @@ import {
     UpdateRTNameAction,
     DynamicRowData,
     UpdateTableDataAction,
+    SampleMeasurementRow,
+    MeasurementRow,
+    UpdateSampleMeasurementDataAction,
+    UpdateMeasurementsDataAction,
 } from '../common/types';
 
 import { UpdateTokenAction, LogoutAction } from '../common/types';
@@ -16,6 +20,16 @@ export const UpdateToken = (token: string): UpdateTokenAction => ({
 
 export const UpdateTableData = (data: DynamicRowData[]): UpdateTableDataAction => ({
     type: 'UPDATE_TABLE_DATA',
+    payload: data,
+});
+
+export const UpdateSampleMeasurementData = (data: SampleMeasurementRow[]): UpdateSampleMeasurementDataAction => ({
+    type: 'UPDATE_SAMPLE_MEASUREMENT_DATA',
+    payload: data,
+});
+
+export const UpdateMeasurementsData = (data: MeasurementRow[]): UpdateMeasurementsDataAction => ({
+    type: 'UPDATE_MEASUREMENTS_DATA',
     payload: data,
 });
 
