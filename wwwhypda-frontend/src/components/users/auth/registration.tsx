@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
@@ -6,6 +6,7 @@ import ErrorMessage from './errorMessage';
 import UserButton from './userButton';
 import api from '../../api';
 import messages from '../../../common/error_messages.json';
+import { Height } from '@mui/icons-material';
 
 const Register: React.FC = () => {
     const [username, setUsername] = useState('');
@@ -61,6 +62,8 @@ const Register: React.FC = () => {
         }
     };
 
+
+
     const confirmRegistration = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -85,6 +88,47 @@ const Register: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    const [resendTimer, setResendTimer] = useState(0);
+
+    const handleResendCode = async () => {
+        if (resendTimer > 0) return; // Prevent spamming
+
+        setIsLoading(true);
+        try {
+            const response = await api.post("/users/resend-confirmation", { email });
+
+            if (response.status === 200) {
+                setError(response.data.message || "A new confirmation code has been sent to your email.");
+                setIsError(false);
+                setResendTimer(60); // 60 seconds cooldown
+            } else {
+                setError(response.data.message || "Failed to resend the confirmation code.");
+                setIsError(true);
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Error while resending the confirmation code.");
+            setIsError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Countdown effect
+    useEffect(() => {
+        let interval: NodeJS.Timeout | undefined;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [resendTimer]);
+
+
+
 
     return (
         <div 
@@ -157,7 +201,20 @@ const Register: React.FC = () => {
                             required
                         />
 
-                        <ErrorMessage error={error} isError={isError} />
+                        <ErrorMessage 
+                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : null}
+                            isError={isError} 
+                        />
+
+                                {/* error + "Resend code in " + resendTimer.toString() + 's' */}
+
+                        <UserButton
+                            text="Resend Code"
+                            isLoading={isLoading || resendTimer > 0}
+                            onclick={handleResendCode}
+                            disabled={resendTimer > 0}
+                        />
+                        <div style={{height: '1vh'}}></div>
 
                         <UserButton text="Confirm" isLoading={isLoading} />
                     </form>
