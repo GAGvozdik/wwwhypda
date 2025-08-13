@@ -13,32 +13,20 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
     if (isAuth === null) {
         return (
-            <div 
-                // className={styles.authForm}
-                style={{      
-                    backgroundColor: 'var(--form-color)',
-    
-                    alignSelf: 'center',
-                    justifySelf: 'center',
-                    height: '40vh',
-
-                    width: '45vh',
-                    // margin-top: '15vh',
-                    // margin-bottom: '3vh',
-                    paddingBottom: '2vh',
-                    marginTop: '21vh',
-
-                    borderRadius: '8px',
-                    fontFamily: 'Afacad_Flux !important',
-                    fontSize: 'var(--head-font-size)',
-                }}
-            >
-                <SingleSkeleton loading={true} height='' margin=''> 
-                    <></>
-                </SingleSkeleton>
+            <div className={styles.skeletonContainer}>
+                <div 
+                    className={styles.skeletonAuthForm}
+                    style={{ height: '40vh' }}
+                >
+                    <SingleSkeleton loading={true} height='' margin=''> 
+                        <></>
+                    </SingleSkeleton>
+                </div>
             </div>
         );
     }
+    const delay = (ms: number) => { const end = Date.now() + ms; while (Date.now() < end) {} };
+    // delay(1000);
 
     if (!isAuth) {
         return <Navigate to="/login" />;
