@@ -39,7 +39,7 @@ type GeneralInfoProps = {
     isEditable: boolean;
 };
 
-function GeneralInfo({isEditable= true}: GeneralInfoProps) {
+function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "50vh", 
@@ -56,8 +56,9 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
 
     // При загрузке компонента
     useEffect(() => {
+        
         const savedData = localStorage.getItem('generalInfoData');
-        if (savedData) {
+        if (savedData && JSON.parse(savedData).length > 0) {
             setTableData(JSON.parse(savedData));
         } else {
             // Если нет сохранённых данных — берём дефолтные
@@ -66,6 +67,8 @@ function GeneralInfo({isEditable= true}: GeneralInfoProps) {
                 { field: "review_level", value: "", description: "the levels of reviews endured by the measurements" }
             ]);
         }
+
+        console.log(tableData);
 
 
 
