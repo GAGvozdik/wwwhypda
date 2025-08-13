@@ -91,6 +91,9 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 # JWT configuration with HttpOnly cookie storage
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+app.config['ACCESS_EXPIRES_SECONDS'] = int(os.getenv('ACCESS_EXPIRES_SECONDS', 21600))
+app.config['REFRESH_EXPIRES_SECONDS'] = int(os.getenv('REFRESH_EXPIRES_SECONDS', 86400))
+
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_NAME'] =  'jwt'
 app.config['JWT_COOKIE_SECURE'] = False  # Set True in production (with HTTPS)
@@ -109,8 +112,10 @@ app.config['MAIL_USE_SSL'] = True
 app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
 app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
-# Включаем режим тестирования, чтобы тестовые эндпоинты работали
-app.config['TESTING'] = True
+app.config['TESTING'] = os.getenv('TESTING', 'False').lower() in ('true', '1', 't')
+
+if app.config['TESTING']:
+    app.config['ACCESS_EXPIRES_SECONDS'] = 3
 
 # === Initialize extensions ===
 mail.init_app(app)
