@@ -59,6 +59,7 @@ const Register: React.FC = () => {
             console.log(err.response?.data || messages.registration_failed);
         } finally {
             setIsLoading(false);
+            setIsError(true);
         }
     };
 
@@ -101,7 +102,7 @@ const Register: React.FC = () => {
             if (response.status === 200) {
                 setError(response.data.message || "A new confirmation code has been sent to your email.");
                 setIsError(false);
-                setResendTimer(60); // 60 seconds cooldown
+                setResendTimer(30); // 60 seconds cooldown
             } else {
                 setError(response.data.message || "Failed to resend the confirmation code.");
                 setIsError(true);
