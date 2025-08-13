@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, session
 import jwt
 import time
 import uuid
@@ -47,8 +47,11 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires = timedelta(minutes=6 * 60)
-        refresh_expires = timedelta(days=1)
+        access_expires_seconds = session.get('ACCESS_EXPIRES_SECONDS', current_app.config.get('ACCESS_EXPIRES_SECONDS', 21600))
+        refresh_expires_seconds = current_app.config.get('REFRESH_EXPIRES_SECONDS', 86400)
+
+        access_expires = timedelta(seconds=access_expires_seconds)
+        refresh_expires = timedelta(seconds=refresh_expires_seconds)
 
         # 📌 Добавляем is_superuser в токен
         access_token = create_access_token(
@@ -104,10 +107,11 @@ def refresh():
         print('is_superuser', is_superuser)
 
         # Генерируем новый access токен с учётом статуса суперпользователя
+        access_expires_seconds = current_app.config.get('ACCESS_EXPIRES_SECONDS', 21600)
         new_access_token = create_access_token(
             identity=identity,
             additional_claims={"is_superuser": is_superuser},
-            expires_delta=timedelta(minutes=6 * 60)  # Новый срок действия токена
+            expires_delta=timedelta(seconds=access_expires_seconds)  # Новый срок действия токена
         )
 
         # Создаем ответ с новым токеном
@@ -307,4 +311,3 @@ def update_user():
         return jsonify(message="Invalid data, you can only update your account name!", error="Bad Request"), 400
     except Exception as e:
         return jsonify(message="Failed to update account", error=str(e)), 400
-    
