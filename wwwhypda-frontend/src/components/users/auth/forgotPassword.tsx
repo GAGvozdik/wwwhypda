@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import styles from '../users.module.scss';
@@ -18,6 +18,7 @@ const ForgotPassword: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState<boolean>(false); // Флаг для ошибки
     const navigate = useNavigate();
+    const [resendTimer, setResendTimer] = useState(0);
 
     const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,6 +31,7 @@ const ForgotPassword: React.FC = () => {
                 setError('Code sent to your email.');
                 setIsError(false); // Сообщение об успешной отправке
                 setStep(2); // Переход на шаг ввода кода
+                setResendTimer(30);
             }
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -42,6 +44,41 @@ const ForgotPassword: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    const handleResendCode = async () => {
+        if (resendTimer > 0) return; // Prevent spamming
+
+        setIsLoading(true);
+        try {
+            const response = await api.post("/users/request-password-reset", { email });
+
+            if (response.status === 200) {
+                setError(response.data.message || "A new confirmation code has been sent to your email.");
+                setIsError(false);
+                setResendTimer(30); // 30 seconds cooldown
+            } else {
+                setError(response.data.message || "Failed to resend the confirmation code.");
+                setIsError(true);
+            }
+        } catch (err: any) {
+            setError(err.response?.data?.message || "Error while resending the confirmation code.");
+            setIsError(true);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout | undefined;
+        if (resendTimer > 0) {
+            interval = setInterval(() => {
+                setResendTimer((prev) => prev - 1);
+            }, 1000);
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [resendTimer]);
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -145,8 +182,17 @@ const ForgotPassword: React.FC = () => {
                             className={styles.inputField}
                             required
                         />
-                        {/* Передаем флаг isError */}
-                        <ErrorMessage error={error} isError={isError} />
+                        <ErrorMessage 
+                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : error}
+                            isError={isError} 
+                        />
+                        <UserButton
+                            text="Resend Code"
+                            isLoading={isLoading || resendTimer > 0}
+                            onclick={handleResendCode}
+                            disabled={resendTimer > 0}
+                        />
+                        <div style={{height: '1vh'}}></div>
                         <UserButton
                             text='Reset Password'
                             isLoading={isLoading}
