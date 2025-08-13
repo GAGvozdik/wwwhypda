@@ -47,7 +47,7 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
     // Функция для загрузки данных из localStorage
     const loadTableData = () => {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (saved) {
+        if (saved && JSON.parse(saved).length > 0) {
             try {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed)) {
