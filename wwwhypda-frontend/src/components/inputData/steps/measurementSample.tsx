@@ -177,7 +177,15 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
 
         const newMeasurementRow: MeasurementRow = {
             id: measurementsTableData.length + 1,
-            sampleRef: "", parameter: "", value: "", error: "", units: "", quality: "", experimentType: "", interpretation: "", comment: ""
+            sampleRef: "", 
+            parameter: "", 
+            value: "", 
+            error: "", 
+            units: "", 
+            quality: "", 
+            experimentType: "", 
+            interpretation: "", 
+            comment: ""
         };
         dispatch(UpdateMeasurementsData([...measurementsTableData, newMeasurementRow]));
     };

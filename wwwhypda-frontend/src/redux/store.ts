@@ -51,7 +51,13 @@ const reducer = (state: State = initialState, action: Action): State => {
     }
 };
 
-const store = createStore<State, Action, {}>(reducer); 
+const store = createStore<State, Action, {}, {}>(reducer); 
+
+store.subscribe(() => {
+    const state = store.getState();
+    localStorage.setItem('sampleMeasurementTableData', JSON.stringify(state.sampleMeasurementTableData));
+    localStorage.setItem('measurementsTableData', JSON.stringify(state.measurementsTableData));
+});
 
 export default store;
 
