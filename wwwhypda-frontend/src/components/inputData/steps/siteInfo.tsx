@@ -82,7 +82,10 @@ function  SiteInfo({isEditable=true}: SiteInfoProps) {
                 return;
             }
             try {
-                const response = await api.get<Country[]>('/rocks/countries', {
+                                const response = await api.get<Country[]>('/rocks/countries', {
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
                     withCredentials: true,
                 });
 
