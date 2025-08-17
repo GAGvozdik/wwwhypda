@@ -48,9 +48,9 @@ export default function MainMenu() {
             >
                 <IconButton className={`${styles.drawerButton}`} style={{}}>
                     {isOpenNow ? 
-                        <MenuIcon className={styles.drawerIcon}/>
+                        <MenuIcon className={styles.drawerIcon} data-testid="MenuIcon"/>
                             : 
-                        <ClearIcon className={styles.drawerIcon} />
+                        <ClearIcon className={styles.drawerIcon} data-testid="ClearIcon" />
                     }  
                 </IconButton>
             </MenuButtuon>
