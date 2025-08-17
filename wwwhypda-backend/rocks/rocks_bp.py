@@ -1,13 +1,30 @@
 from flask import Blueprint, request, jsonify, current_app
 import jwt
-# from rocks_models import db, User
 from rocks.rocks_models import Country, Review, Environment, Fracturation
 from rocks.rocks_models import Source, RockType, Parameter, Sample, Measure, Scale
 from rocks.rocks_models import ExperimentType, Quality, InterpretationMethod
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
+import requests
+import os
+
 rocks_bp = Blueprint("rocks", __name__, url_prefix="/rocks")
 
+
+def verify_recaptcha():
+    recaptcha_token = request.headers.get('X-Recaptcha-Token')
+    if not recaptcha_token:
+        return False, jsonify(message="reCAPTCHA token is missing"), 400
+
+    secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
+    verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
+    response = requests.post(verification_url)
+    result = response.json()
+
+    if not result.get('success') or result.get('score', 0.0) < 0.5:
+        return False, jsonify(message="reCAPTCHA verification failed"), 401
+    
+    return True, None, None
 
 @rocks_bp.route('/msg', methods=['POST'])
 def get_msg():
@@ -83,14 +100,19 @@ def api_rock_type():
 
 @rocks_bp.route('/parameters', methods=['GET'])
 def get_parameters():
+    success, response, status_code = verify_recaptcha()
+    if not success:
+        return response, status_code
     parameters = Parameter.getParameters()
     return jsonify(parameters)
 
 @rocks_bp.route('/samples/<int:rt_id>/<int:id_Parameter>')
 def get_samples(rt_id, id_Parameter):
+    success, response, status_code = verify_recaptcha()
+    if not success:
+        return response, status_code
     samples = Sample.getSamplesByRockType(rt_id)
     sample_ids = [sample['id_Sample'] for sample in samples]
     measures = Measure.getMeasuresBySampleIdAndParam(sample_ids, id_Parameter)
     
     return jsonify(measures)
-
