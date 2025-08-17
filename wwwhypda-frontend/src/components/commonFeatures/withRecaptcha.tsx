@@ -10,15 +10,19 @@ const withRecaptcha = <P extends object>(WrappedComponent: React.ComponentType<P
     const isCypressTest = process.env.REACT_APP_CYPRESS_TEST === 'true';
 
     if (isCypressTest) {
-        const dummyExecuteRecaptcha = async (action?: string) => {
-            console.log(`[Test Mode] reCAPTCHA executed for action: ${action}`);
-            return 'test-token';
-        };
-        return <WrappedComponent {...props} executeRecaptcha={dummyExecuteRecaptcha} />;
+      const dummyExecuteRecaptcha = async (action?: string) => {
+        console.log(`[Test Mode] reCAPTCHA executed for action: ${action}`);
+        return 'test-token';
+      };
+      return <WrappedComponent {...props} executeRecaptcha={dummyExecuteRecaptcha} />;
+    }
+    
+    const ComponentWithRecaptcha: React.FC<P> = (innerProps) => {
+        const { executeRecaptcha } = useGoogleReCaptcha();
+        return <WrappedComponent {...innerProps} executeRecaptcha={executeRecaptcha} />;
     }
 
-    const { executeRecaptcha } = useGoogleReCaptcha();
-    return <WrappedComponent {...props} executeRecaptcha={executeRecaptcha} />;
+    return <ComponentWithRecaptcha {...props} />;
   };
 
   return WithRecaptchaComponent;
