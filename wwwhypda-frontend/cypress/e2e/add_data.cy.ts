@@ -26,20 +26,23 @@ describe('Add Data Flow', () => {
         code: confirmationCode,
       }).its('status').should('eq', 200);
     });
+
+    // Login via UI
+    cy.visit('http://localhost:3000/login');
+    cy.get('input[placeholder="Email"]').type(uniqueEmail);
+    cy.get('input[placeholder="Password"]').type(password);
+    cy.get('button').contains('Login').click();
+    cy.url().should('include', '/account');
   });
 
   it('should redirect unauthenticated user to login page', () => {
+    // We need to clear cookies to simulate an unauthenticated user
+    cy.clearCookies();
     cy.visit('http://localhost:3000/input');
     cy.url().should('include', '/login');
   });
 
   it('should allow authenticated user to see the add data page', () => {
-    // Programmatically log in
-    cy.request('POST', 'http://localhost:5000/users/login', {
-      email: uniqueEmail,
-      password: password,
-    }).its('status').should('eq', 200);
-
     cy.visit('http://localhost:3000/input');
 
     // Check for a unique element on the InputPage to confirm access
