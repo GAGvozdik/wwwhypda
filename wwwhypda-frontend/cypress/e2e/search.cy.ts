@@ -18,16 +18,13 @@ describe('Search Flow', () => {
     cy.wait('@getRockTypes').its('response.statusCode').should('eq', 200);
 
     // 3. In the side menu, click on "generic earth material" to expand it
-    cy.contains('[class*="treeItem"]', 'generic earth material').click();
+    cy.contains('.MuiTreeItem-content', 'generic earth material').click();
 
     // 4. Click on "Sand"
-    cy.contains('[class*="treeItem"]', 'Sand').click();
+    cy.contains('.MuiTreeItem-content', 'Sand').click();
 
     // 5. In the search panel, select the "porosity" parameter
-    // We find the row containing "Porosity" and click the radio button in it
-    cy.contains('td', 'Porosity').parent('tr').within(() => {
-      cy.get('input[type="radio"]').click();
-    });
+    cy.contains('td', 'porosity', { matchCase: false }).parent('tr').find('input[type="radio"]').click();
 
     // 6. Click the "Find data" button
     cy.get('button').contains('Find data').click();
