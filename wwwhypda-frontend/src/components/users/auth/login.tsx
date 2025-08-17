@@ -1,42 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
 import api from '../../api';
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
-const Login: React.FC = () => {
+const LoginForm: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
     const [isError, setIsError] = useState<boolean>(false);
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const { executeRecaptcha } = useGoogleReCaptcha();
 
-    // Проверяем, есть ли сообщение из редиректа (например, после регистрации)
     useEffect(() => {
         if (location.state?.message) {
             setError(location.state.message);
-            setIsError(false); // Устанавливаем isError в false для успешного сообщения (зеленый цвет)
-            // Очищаем state из location, чтобы сообщение не появлялось снова при обновлении страницы
+            setIsError(false);
             navigate(location.pathname, { replace: true, state: {} });
         }
     }, [location, navigate]);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleLogin = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+
+        if (!executeRecaptcha) {
+            setError('Recaptcha not available');
+            setIsLoading(false);
+            return;
+        }
+
+        const token = await executeRecaptcha('login');
 
         try {
             await api.post('/users/login', {
                 email: username,
-                password: password
+                password: password,
+                recaptcha_token: token,
             }, {
                 withCredentials: true
             });
@@ -46,7 +53,6 @@ const Login: React.FC = () => {
             });
 
             const { is_superuser } = checkResponse.data;
-            localStorage.removeItem('isSuperuser');
             localStorage.setItem('isSuperuser', JSON.stringify(is_superuser));
 
             navigate(is_superuser ? '/superaccount' : '/account');
@@ -58,11 +64,10 @@ const Login: React.FC = () => {
             setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
             setIsError(true);
         }
-    };
+    }, [executeRecaptcha, username, password, navigate]);
 
 
     return (
-    
         <div 
             style={{    
                 display: 'flex',
@@ -71,8 +76,6 @@ const Login: React.FC = () => {
                 height: '100%',
             }}
         >
-
-
             <div className={styles.authForm}>
                 <div className={styles.formTitle}>Authorization</div>
 
@@ -121,6 +124,20 @@ const Login: React.FC = () => {
                 </div>
             </div>
         </div>
+    );
+};
+
+const Login: React.FC = () => {
+    const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+
+    if (!recaptchaSiteKey) {
+        return <div>reCAPTCHA site key not found in environment variables.</div>;
+    }
+
+    return (
+        <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+            <LoginForm />
+        </GoogleReCaptchaProvider>
     );
 };
 
