@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
-import CircularProgress from '@mui/material/CircularProgress';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
-import { Link } from 'react-router-dom';
 import api from '../../api';
+import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
-const ForgotPassword: React.FC = () => {
+const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [email, setEmail] = useState('');
     const [code, setCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -16,46 +15,49 @@ const ForgotPassword: React.FC = () => {
     const [step, setStep] = useState(1);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isError, setIsError] = useState<boolean>(false); // Флаг для ошибки
+    const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
     const [resendTimer, setResendTimer] = useState(0);
 
-    const handleSendCode = async (e: React.FormEvent) => {
+    const handleSendCode = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!executeRecaptcha) return;
         setIsLoading(true);
 
         try {
-            const response = await api.post('/users/request-password-reset', { email });
+            const token = await executeRecaptcha('request_password_reset');
+            const response = await api.post('/users/request-password-reset', { email, recaptcha_token: token });
 
             if (response.status === 200) {
                 setError(response.data.message || 'Code sent to your email.');
-                setIsError(false); // Сообщение об успешной отправке
-                setStep(2); // Переход на шаг ввода кода
+                setIsError(false);
+                setStep(2);
                 setResendTimer(30);
             }
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message); // Сообщение об ошибке от сервера
+                setError(error.response.data.message);
             } else {
                 setError('Failed to send reset code. Please try again.');
             }
-            setIsError(true); // Сообщение об ошибке
+            setIsError(true);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [email, executeRecaptcha]);
 
-    const handleResendCode = async () => {
-        if (resendTimer > 0) return; // Prevent spamming
+    const handleResendCode = useCallback(async () => {
+        if (resendTimer > 0 || !executeRecaptcha) return;
 
         setIsLoading(true);
         try {
-            const response = await api.post("/users/request-password-reset", { email });
+            const token = await executeRecaptcha('resend_password_reset');
+            const response = await api.post("/users/request-password-reset", { email, recaptcha_token: token });
 
             if (response.status === 200) {
                 setError(response.data.message || "A new confirmation code has been sent to your email.");
                 setIsError(false);
-                setResendTimer(30); // 30 seconds cooldown
+                setResendTimer(30);
             } else {
                 setError(response.data.message || "Failed to resend the confirmation code.");
                 setIsError(true);
@@ -66,7 +68,7 @@ const ForgotPassword: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [email, executeRecaptcha, resendTimer]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout | undefined;
@@ -80,22 +82,26 @@ const ForgotPassword: React.FC = () => {
         };
     }, [resendTimer]);
 
-    const handleResetPassword = async (e: React.FormEvent) => {
+    const handleResetPassword = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (newPassword !== confirmPassword) {
             setError('Passwords do not match!');
-            setIsError(true); // Сообщение об ошибке
+            setIsError(true);
             return;
         }
+
+        if (!executeRecaptcha) return;
 
         setIsLoading(true);
 
         try {
+            const token = await executeRecaptcha('confirm_password_reset');
             const response = await api.post('/users/confirm-password-reset', {
                 email,
                 code,
                 new_password: newPassword,
+                recaptcha_token: token,
             });
 
             if (response.status === 200) {
@@ -105,15 +111,15 @@ const ForgotPassword: React.FC = () => {
             }
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
-                setError(error.response.data.message); // Сообщение об ошибке от сервера
+                setError(error.response.data.message);
             } else {
                 setError('Failed to reset password. Please try again.');
             }
-            setIsError(true); // Сообщение об ошибке
+            setIsError(true);
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [email, code, newPassword, confirmPassword, navigate, executeRecaptcha]);
 
     return (
         <div 
@@ -137,7 +143,6 @@ const ForgotPassword: React.FC = () => {
                             className={styles.inputField}
                             required
                         />
-                        {/* Передаем флаг isError */}
                         <ErrorMessage error={error} isError={isError} />
                         <UserButton
                             text='Send Code'
@@ -204,4 +209,4 @@ const ForgotPassword: React.FC = () => {
     );
 };
 
-export default ForgotPassword;
+export default withRecaptcha(ForgotPassword);
