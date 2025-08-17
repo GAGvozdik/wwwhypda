@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-// import styles from '../menu.module.scss';
 import styles from './treeStyles.module.scss';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';                 
@@ -16,6 +15,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import axios from 'axios';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import api from '../api';
+import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
 interface RockTypeData {
     rt_id: number;
@@ -53,7 +53,6 @@ const buildTree = (data: RockTypeData[]): JSX.Element[] => {
 
         return (
             <CustomTreeItem
-                // sx={{ float: 'left'}}
                 key={node.rt_id}
                 name={node.rt_name}
                 rt_id={node.rt_id.toFixed()}
@@ -69,7 +68,7 @@ const buildTree = (data: RockTypeData[]): JSX.Element[] => {
 };
 
 
-export default function ModelsTreeDrawer() {
+const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [treeData, setTreeData] = useState<RockTypeData[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -77,26 +76,27 @@ export default function ModelsTreeDrawer() {
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
     const isOpenNow = useSelector((state: State) => state.open);
 
-    // Загружаем данные
     useEffect(() => {
         const fetchRockTypes = async () => {
-            try {
-                const response = await api.get<RockTypeData[]>('/rocks/rock_type');
+            if (executeRecaptcha) {
+                try {
+                    const token = await executeRecaptcha('rock_type');
+                    const response = await api.get<RockTypeData[]>('/rocks/rock_type', { headers: { 'X-Recaptcha-Token': token } });
 
-                if (!response.data || response.data.length === 0) {
-                    setError("No data received from the server.");
-                } else {
-                    setTreeData(response.data);
+                    if (!response.data || response.data.length === 0) {
+                        setError("No data received from the server.");
+                    } else {
+                        setTreeData(response.data);
+                    }
+                } catch (error: any) {
+                    setError(getErrorMessage(error));
                 }
-            } catch (error: any) {
-                setError(getErrorMessage(error));
             }
         };
 
         fetchRockTypes();
-    }, []);
+    }, [executeRecaptcha]);
 
-    // Отслеживаем загрузку
     useEffect(() => {
         if (treeData.length > 0 || error) {
             setLoading(false);
@@ -113,7 +113,7 @@ export default function ModelsTreeDrawer() {
         }
     };
 
-    const tree = buildTree(treeData); // твоя функция построения дерева
+    const tree = buildTree(treeData);
 
     return (
         <div className={
@@ -126,7 +126,6 @@ export default function ModelsTreeDrawer() {
             style={{
                 backgroundColor: 'var(--drawer-color)',
                 height: '100%',
-                // borderRadius: '5px',
                 overflowY: 'auto',
                 overflowX: 'hidden',
             }}>
@@ -148,11 +147,6 @@ export default function ModelsTreeDrawer() {
             </div>
         </div>
     );
-}
+};
 
-
-
-
-
-
-
+export default withRecaptcha(ModelsTreeDrawer);

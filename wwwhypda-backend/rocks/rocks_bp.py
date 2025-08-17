@@ -95,6 +95,9 @@ def api_anonce():
 
 @rocks_bp.route('/rock_type', methods=['GET']) 
 def api_rock_type():
+    success, response, status_code = verify_recaptcha()
+    if not success:
+        return response, status_code
     results = RockType.getRockTypes()
     return jsonify(results)
 
