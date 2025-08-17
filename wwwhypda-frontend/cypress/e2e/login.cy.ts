@@ -90,4 +90,19 @@ describe('Login Flow', () => {
     // Assert that the user is redirected to the login page
     cy.url().should('include', '/login');
   });
+
+  it('should fail to login without a reCAPTCHA token (bot attack simulation)', () => {
+    cy.request({
+      method: 'POST',
+      url: 'http://localhost:5000/users/login',
+      body: {
+        email: uniqueEmail,
+        password: password,
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      expect(response.status).to.eq(400);
+      expect(response.body.message).to.eq('reCAPTCHA token is missing');
+    });
+  });
 });
