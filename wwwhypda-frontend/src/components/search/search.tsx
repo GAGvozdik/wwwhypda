@@ -1,21 +1,15 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from "./searchStyles.module.scss";
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
+import RadioGroup from '@mui/material/RadioGroup';
 import SearchTableRow from './searchTableRow';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
-import {useEffect, useState, useRef} from 'react';
-import axios from 'axios';
-import { UpdateTableData, } from '../../redux/actions';
-import { State, UpdateTableDataAction } from '../../common/types';
+import { UpdateTableData } from '../../redux/actions';
+import { State, UpdateTableDataAction, DynamicRowData } from '../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
-import { DynamicRowData } from '../../common/types';
 import SearchResultsTable from './searchResultsTable';
 import api from '../api';
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
 interface Parameter {
   id_Parameter: number;
@@ -28,7 +22,7 @@ interface Parameter {
   MinValue: number;
 }
 
-const SearchForm: React.FC = () => {
+const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     let rt_id = useSelector((state: State) => state.currentRTID);  
     let rt_name = useSelector((state: State) => state.currentRTName);  
 
@@ -37,22 +31,20 @@ const SearchForm: React.FC = () => {
     const [parameters, setParameters] = useState<Parameter[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const { executeRecaptcha } = useGoogleReCaptcha();
 
     useEffect(() => {
         const fetchParameters = async () => {
-            if (!executeRecaptcha) {
-                return;
-            }
-            const token = await executeRecaptcha('parameters');
-            try {
-                const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } }); 
-                setParameters(response.data);
- 
-            } catch (error: any) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
+            if (executeRecaptcha) {
+                try {
+                    const token = await executeRecaptcha('parameters');
+                    const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } }); 
+                    setParameters(response.data);
+     
+                } catch (error: any) {
+                    setError(error.message);
+                } finally {
+                    setLoading(false);
+                }
             }
         };
         fetchParameters();
@@ -190,18 +182,4 @@ const SearchForm: React.FC = () => {
     );
 };
 
-const Search: React.FC = () => {
-    const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
-
-    if (!recaptchaSiteKey) {
-        return <div>reCAPTCHA site key not found in environment variables.</div>;
-    }
-
-    return (
-        <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
-            <SearchForm />
-        </GoogleReCaptchaProvider>
-    );
-};
-
-export default Search;
+export default withRecaptcha(Search);
