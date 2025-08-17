@@ -11,3 +11,10 @@
     transform: rotate(360deg);
   }
 }
+
+.grecaptcha-badge {
+    bottom: 0.3vh !important;
+    right: 0.3vh !important;
+    transform: scale(1) !important;
+    /* transform-origin: bottom right !important; */
+}
