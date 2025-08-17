@@ -1,24 +1,21 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styles from "./searchStyles.module.scss";
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
-// import Button from './';
 import SearchTableRow from './searchTableRow';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import {useEffect, useState, useRef} from 'react';
 import axios from 'axios';
-
 import { UpdateTableData, } from '../../redux/actions';
 import { State, UpdateTableDataAction } from '../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
-// import {MeasurementData, testColumns} from '../../common/types';
-import { DynamicRowData } from '../../common/types'; // Импортируем новый тип
+import { DynamicRowData } from '../../common/types';
 import SearchResultsTable from './searchResultsTable';
 import api from '../api';
-
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 interface Parameter {
   id_Parameter: number;
@@ -31,22 +28,25 @@ interface Parameter {
   MinValue: number;
 }
 
-const Search: React.FC = () => {
-
+const SearchForm: React.FC = () => {
     let rt_id = useSelector((state: State) => state.currentRTID);  
     let rt_name = useSelector((state: State) => state.currentRTName);  
 
     const dispatch = useDispatch();
     
     const [parameters, setParameters] = useState<Parameter[]>([]);
-
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const { executeRecaptcha } = useGoogleReCaptcha();
 
     useEffect(() => {
         const fetchParameters = async () => {
+            if (!executeRecaptcha) {
+                return;
+            }
+            const token = await executeRecaptcha('parameters');
             try {
-                const response = await api.get<Parameter[]>('/rocks/parameters'); 
+                const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } }); 
                 setParameters(response.data);
  
             } catch (error: any) {
@@ -56,18 +56,17 @@ const Search: React.FC = () => {
             }
         };
         fetchParameters();
-    }, []);
+    }, [executeRecaptcha]);
 
-    const [selectedValue, setSelectedValue] = useState<number | null>(null); // Состояние для выбранного параметра
+    const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault(); // Предотвращаем перезагрузку страницы
-        if (selectedValue !== null) {
-            console.log(`Selected Parameter ID: ${selectedValue}`); // Выводим в консоль
-
+    const handleSubmit = useCallback(async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (selectedValue !== null && executeRecaptcha) {
+            const token = await executeRecaptcha('search');
             const fetchParameters = async () => {
                 try {
-                    const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`); 
+                    const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } }); 
 
                     const res = response.data.map((item, index) => ({
                         ...item,
@@ -75,8 +74,6 @@ const Search: React.FC = () => {
                     }));
 
                     dispatch<UpdateTableDataAction>(UpdateTableData(res));
-
-                    console.log(res);
 
                 } catch (error: any) {
                     setError(error.message);
@@ -86,38 +83,27 @@ const Search: React.FC = () => {
             };
             fetchParameters();
         }
-    };
+    }, [selectedValue, executeRecaptcha, rt_id, dispatch]);
 
     return (
         <div 
             className={`${styles.treeText}`} 
             style={{    
-
                 height: '100%',
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gridTemplateRows: '1fr',
-                // boxSizing: 'border-box',
-                // overflow: 'scroll',
-                // overflowY: 'scroll',
                 paddingTop: '2vh',
                 gap: '2vh',
-                
             }}
         >
             <div 
                 className={`${styles.treeText}`} 
                 style={{    
-                    // margin: '2vh',
-                    // padding: '1vh',
-                    // border: '3px solid var(--border)',
                     backgroundColor: 'var(--drawer-color)',
                     borderRadius: '8px',
                     boxSizing: 'border-box',
                     height: '82vh',
-                    // width: '90vh',
-                    // overflow: 'scroll',
-                    // overflowY: 'scroll',
                     gridRowStart: 1, 
                     gridRowEnd: 1, 
                     gridColumnStart: 2, 
@@ -131,15 +117,10 @@ const Search: React.FC = () => {
                 <div 
                     className={`${styles.treeText}`} 
                     style={{    
-                        // margin: '2vh',
-                        // padding: '1vh',
-                        // border: '3px solid var(--border)',
                         backgroundColor: 'var(--drawer-color)',
                         borderRadius: '4px',
                         boxSizing: 'border-box',
                         height: '82vh',
-                        // overflow: 'scroll',
-                        // overflowY: 'scroll',
                         overflowY: 'hidden',
                         gridRowStart: 1, 
                         gridRowEnd: 1, 
@@ -167,10 +148,9 @@ const Search: React.FC = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            
                         }}
-                        component="form" // Добавляем компонент формы
-                        onSubmit={handleSubmit} // Обрабатываем событие отправки формы
+                        component="form"
+                        onSubmit={handleSubmit}
                     >
                         
                         <RadioGroup
@@ -183,9 +163,9 @@ const Search: React.FC = () => {
 
                             <table>
                                 <tbody>
-
                                     {parameters.map((param) => (
                                             <SearchTableRow
+                                                key={param.id_Parameter}
                                                 name={param.html_code}
                                                 desc={param.param_name}
                                                 unit={param.html_units}
@@ -194,7 +174,6 @@ const Search: React.FC = () => {
                                                 selectedValue={selectedValue} 
                                             />
                                         ))}
-
                                 </tbody>
                             </table>
                         </RadioGroup>
@@ -211,13 +190,18 @@ const Search: React.FC = () => {
     );
 };
 
+const Search: React.FC = () => {
+    const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
+
+    if (!recaptchaSiteKey) {
+        return <div>reCAPTCHA site key not found in environment variables.</div>;
+    }
+
+    return (
+        <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
+            <SearchForm />
+        </GoogleReCaptchaProvider>
+    );
+};
+
 export default Search;
-
-
-
-// {
-
-
-// }
-
-

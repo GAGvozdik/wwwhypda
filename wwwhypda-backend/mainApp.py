@@ -78,7 +78,7 @@ CORS(
     app, 
     supports_credentials=True, 
     origins=["http://localhost:3000", os.getenv('STATIC_IP')], 
-    allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie"]
+    allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie", "X-Recaptcha-Token"]
 )
 
 # talisman = Talisman(app)
