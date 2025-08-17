@@ -5,27 +5,10 @@ describe('Add Data Flow', () => {
   const password = 'Password123!';
 
   beforeEach(() => {
-    // Create a new user for each test that requires authentication
     uniqueId = Date.now();
     uniqueUsername = `testuser${uniqueId}`;
     uniqueEmail = `${uniqueUsername}@example.com`;
-
-    cy.request('POST', 'http://localhost:5000/users/', {
-      name: uniqueUsername,
-      email: uniqueEmail,
-      password: password,
-    }).its('status').should('eq', 201);
-
-    cy.request({
-      method: 'GET',
-      url: `http://localhost:5000/testing/get-confirmation-code?email=${uniqueEmail}`,
-    }).then((response) => {
-      const confirmationCode = response.body.confirmation_code;
-      cy.request('POST', 'http://localhost:5000/users/confirm-registration', {
-        email: uniqueEmail,
-        code: confirmationCode,
-      }).its('status').should('eq', 200);
-    });
+    cy.createNewUser(uniqueEmail, uniqueUsername, password);
 
     // Login via UI
     cy.visit('http://localhost:3000/login');

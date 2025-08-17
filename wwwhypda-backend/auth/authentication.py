@@ -162,6 +162,18 @@ def confirm_registration():
         if not data or "email" not in data or "code" not in data:
             return jsonify(message="Please provide email and code", error="Bad request"), 400
         
+        recaptcha_token = data.get('recaptcha_token')
+        if not recaptcha_token:
+            return jsonify(message="reCAPTCHA token is missing"), 400
+
+        secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
+        verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
+        response = requests.post(verification_url)
+        result = response.json()
+
+        if not result.get('success') or result.get('score', 0.0) < 0.5:
+            return jsonify(message="reCAPTCHA verification failed"), 401
+
         email = data["email"]
         code = data["code"]
 
@@ -184,6 +196,21 @@ def add_user():
         if not user_data:
             return jsonify(message="Please provide user details", data=None, error="Bad request"), 400
 
+        recaptcha_token = user_data.get('recaptcha_token')
+        if not recaptcha_token:
+            return jsonify(message="reCAPTCHA token is missing"), 400
+
+        secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
+        verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
+        response = requests.post(verification_url)
+        result = response.json()
+
+        if not result.get('success') or result.get('score', 0.0) < 0.5:
+            return jsonify(message="reCAPTCHA verification failed"), 401
+
+        # Remove recaptcha_token before validation
+        user_data.pop('recaptcha_token', None)
+
         validation_result = validate_user(**user_data)
         if validation_result is not True:
             return jsonify(validation_result), 400
@@ -198,6 +225,7 @@ def add_user():
             with current_app.app_context():
                 msg = Message("Activate your account", sender=current_app.config["MAIL_USERNAME"], recipients=[user_data["email"]])
                 msg.body = f"Your activation code: {confirmation_code.code}"
+                print(confirmation_code.code)
                 mail.send(msg)
         except Exception as e:
             return jsonify(message="Mail server is broken", error=str(e)), 202
@@ -227,6 +255,7 @@ def request_password_reset():
             with current_app.app_context():
                 msg = Message("Password Reset Code", sender=current_app.config["MAIL_USERNAME"], recipients=[email])
                 msg.body = f"Your password reset code: {confirmation_code.code}"
+                print(confirmation_code.code)
                 mail.send(msg)
 
         except Exception as e:
@@ -284,6 +313,18 @@ def resend_confirmation():
         data = request.json
         if not data or "email" not in data:
             return jsonify(message="Please provide an email", error="Bad request", data=None), 400
+
+        recaptcha_token = data.get('recaptcha_token')
+        if not recaptcha_token:
+            return jsonify(message="reCAPTCHA token is missing"), 400
+
+        secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
+        verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
+        response = requests.post(verification_url)
+        result = response.json()
+
+        if not result.get('success') or result.get('score', 0.0) < 0.5:
+            return jsonify(message="reCAPTCHA verification failed"), 401
 
         email = data["email"]
 

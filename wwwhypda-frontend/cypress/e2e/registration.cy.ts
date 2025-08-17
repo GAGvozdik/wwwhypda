@@ -8,13 +8,17 @@ describe('Registration Flow', () => {
     const password = 'Password123!';
 
     cy.intercept('POST', '**/users/').as('registerRequest');
+    cy.intercept('POST', '**/users/confirm-registration').as('confirmRequest');
+
     cy.visit('http://localhost:3000/register');
 
     cy.get('input[placeholder="Username"]').type(uniqueUsername);
     cy.get('input[placeholder="Email"]').type(uniqueEmail);
     cy.get('input[placeholder="Password"]').type(password);
     cy.get('input[placeholder="Confirm Password"]').type(password);
-    cy.get('button').contains('Register').click({ force: true });
+    cy.get('button').contains('Register').click();
+
+    cy.pause();
 
     cy.wait('@registerRequest').its('response.statusCode').should('eq', 201);
     cy.get('input[placeholder="Confirmation Code"]').should('be.visible');
@@ -30,6 +34,8 @@ describe('Registration Flow', () => {
       cy.get('input[placeholder="Confirmation Code"]').type(confirmationCode);
       cy.get('button').contains('Confirm').click();
 
+      cy.wait('@confirmRequest').its('response.statusCode').should('eq', 200);
+
       cy.url().should('include', '/login');
       cy.contains(messages.account_activated).should('be.visible');
     });
@@ -42,7 +48,7 @@ describe('Registration Flow', () => {
     cy.get('input[placeholder="Email"]').type(`test${Date.now()}@example.com`);
     cy.get('input[placeholder="Password"]').type('Password123!');
     cy.get('input[placeholder="Confirm Password"]').type('Password123!');
-    cy.get('button').contains('Register').click({ force: true });
+    cy.get('button').contains('Register').click();
 
     cy.contains(messages.name_invalid_format).should('be.visible');
   });
@@ -54,7 +60,7 @@ describe('Registration Flow', () => {
     cy.get('input[placeholder="Email"]').type(`test${Date.now()}@example.com`);
     cy.get('input[placeholder="Password"]').type('123');
     cy.get('input[placeholder="Confirm Password"]').type('123');
-    cy.get('button').contains('Register').click({ force: true });
+    cy.get('button').contains('Register').click();
 
     cy.contains(messages.password_invalid).should('be.visible');
   });
@@ -65,19 +71,28 @@ describe('Registration Flow', () => {
     const existingEmail = `${uniqueUsername}@example.com`;
     const password = 'Password123!';
 
-    cy.request('POST', 'http://localhost:5000/users/', {
-      name: uniqueUsername,
-      email: existingEmail,
-      password: password,
-    }).its('status').should('eq', 201);
+    cy.intercept('POST', '**/users/').as('registerRequest');
 
+    // Create the first user via UI
+    cy.visit('http://localhost:3000/register');
+    cy.get('input[placeholder="Username"]').type(uniqueUsername);
+    cy.get('input[placeholder="Email"]').type(existingEmail);
+    cy.get('input[placeholder="Password"]').type(password);
+    cy.get('input[placeholder="Confirm Password"]').type(password);
+    cy.get('button').contains('Register').click();
+    
+    cy.wait('@registerRequest').its('response.statusCode').should('eq', 201);
+    cy.get('input[placeholder="Confirmation Code"]').should('be.visible');
+
+    // Try to register again with the same email
     cy.visit('http://localhost:3000/register');
     cy.get('input[placeholder="Email"]').type(existingEmail);
     cy.get('input[placeholder="Username"]').type('anotheruser');
     cy.get('input[placeholder="Password"]').type(password);
     cy.get('input[placeholder="Confirm Password"]').type(password);
-    cy.get('button').contains('Register').click({ force: true });
+    cy.get('button').contains('Register').click();
 
+    cy.wait('@registerRequest').its('response.statusCode').should('eq', 409);
     cy.contains(messages.user_already_exists).should('be.visible');
   });
 });

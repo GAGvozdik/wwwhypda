@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
@@ -6,9 +6,9 @@ import ErrorMessage from './errorMessage';
 import UserButton from './userButton';
 import api from '../../api';
 import messages from '../../../common/error_messages.json';
-import { Height } from '@mui/icons-material';
+import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
-const Register: React.FC = () => {
+const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -20,7 +20,7 @@ const Register: React.FC = () => {
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const handleRegister = async (e: React.FormEvent) => {
+    const handleRegister = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
@@ -29,18 +29,23 @@ const Register: React.FC = () => {
             return;
         }
 
+        if (!executeRecaptcha) {
+            return;
+        }
+
         setIsLoading(true);
         try {
+            const token = await executeRecaptcha('register');
             const response = await api.post('/users/', {
                 name: username,
                 password: password,
                 email: email,
+                recaptcha_token: token,
             });
 
             if (response.status === 201) {
                 setError(response.data.message);
                 setIsError(false);
-                console.log(response.data.message);
                 setStep(2);
             }
         } catch (err: any) {
@@ -56,23 +61,24 @@ const Register: React.FC = () => {
                 setError(messages.registration_failed);
             }
             setIsError(true);
-            console.log(err.response?.data || messages.registration_failed);
         } finally {
             setIsLoading(false);
-            setIsError(true);
         }
-    };
+    }, [executeRecaptcha, username, password, confirmPassword, email]);
 
-
-
-    const confirmRegistration = async (e: React.FormEvent) => {
+    const confirmRegistration = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!executeRecaptcha) {
+            return;
+        }
         setIsLoading(true);
 
         try {
+            const token = await executeRecaptcha('confirm_registration');
             const response = await api.post("/users/confirm-registration", {
                 email: email,
                 code: confirmationCode,
+                recaptcha_token: token,
             });
 
             if (response.status === 200) {
@@ -88,21 +94,22 @@ const Register: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [executeRecaptcha, email, confirmationCode, navigate]);
 
     const [resendTimer, setResendTimer] = useState(0);
 
-    const handleResendCode = async () => {
-        if (resendTimer > 0) return; // Prevent spamming
+    const handleResendCode = useCallback(async () => {
+        if (resendTimer > 0 || !executeRecaptcha) return;
 
         setIsLoading(true);
         try {
-            const response = await api.post("/users/resend-confirmation", { email });
+            const token = await executeRecaptcha('resend_code');
+            const response = await api.post("/users/resend-confirmation", { email, recaptcha_token: token });
 
             if (response.status === 200) {
                 setError(response.data.message || "A new confirmation code has been sent to your email.");
                 setIsError(false);
-                setResendTimer(30); // 60 seconds cooldown
+                setResendTimer(30);
             } else {
                 setError(response.data.message || "Failed to resend the confirmation code.");
                 setIsError(true);
@@ -113,9 +120,8 @@ const Register: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [executeRecaptcha, email, resendTimer]);
 
-    // Countdown effect
     useEffect(() => {
         let interval: NodeJS.Timeout | undefined;
         if (resendTimer > 0) {
@@ -127,9 +133,6 @@ const Register: React.FC = () => {
             if (interval) clearInterval(interval);
         };
     }, [resendTimer]);
-
-
-
 
     return (
         <div 
@@ -203,11 +206,9 @@ const Register: React.FC = () => {
                         />
 
                         <ErrorMessage 
-                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : null}
+                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : error}
                             isError={isError} 
                         />
-
-                                {/* error + "Resend code in " + resendTimer.toString() + 's' */}
 
                         <UserButton
                             text="Resend Code"
@@ -225,4 +226,4 @@ const Register: React.FC = () => {
     );
 };
 
-export default Register;
+export default withRecaptcha(Register);
