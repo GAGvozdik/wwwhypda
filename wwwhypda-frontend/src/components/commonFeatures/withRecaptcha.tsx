@@ -1,5 +1,5 @@
 import React from 'react';
-import { GoogleReCaptchaProvider, useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 export interface WithRecaptchaProps {
   executeRecaptcha?: (action?: string) => Promise<string>;
@@ -17,22 +17,8 @@ const withRecaptcha = <P extends object>(WrappedComponent: React.ComponentType<P
         return <WrappedComponent {...props} executeRecaptcha={dummyExecuteRecaptcha} />;
     }
 
-    const recaptchaSiteKey = process.env.REACT_APP_RECAPTCHA_SITE_KEY;
-
-    if (!recaptchaSiteKey) {
-        return <div>reCAPTCHA site key not found in environment variables.</div>;
-    }
-
-    const InnerComponent: React.FC<P> = (props) => {
-        const { executeRecaptcha } = useGoogleReCaptcha();
-        return <WrappedComponent {...props} executeRecaptcha={executeRecaptcha} />;
-    };
-
-    return (
-        <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}>
-            <InnerComponent {...props} />
-        </GoogleReCaptchaProvider>
-    );
+    const { executeRecaptcha } = useGoogleReCaptcha();
+    return <WrappedComponent {...props} executeRecaptcha={executeRecaptcha} />;
   };
 
   return WithRecaptchaComponent;
