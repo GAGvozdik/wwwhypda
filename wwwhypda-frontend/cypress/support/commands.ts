@@ -18,7 +18,7 @@ Cypress.Commands.add('createNewUser', (email, username, password) => {
   cy.get('input[placeholder="Email"]').type(email);
   cy.get('input[placeholder="Password"]').type(password);
   cy.get('input[placeholder="Confirm Password"]').type(password);
-  cy.get('button').contains('Register').click();
+    cy.get('button').contains('Register').click();
 
   cy.wait('@registerRequest').its('response.statusCode').should('eq', 201);
   cy.get('input[placeholder="Confirmation Code"]').should('be.visible');
