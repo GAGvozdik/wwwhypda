@@ -42,10 +42,10 @@ type GeneralInfoProps = {
 function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "46vh", 
+        height: "55vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
-        marginBottom: '5vh',
+        marginBottom: '1vh',
     }), []);    
 
     const [error, setError] = useState<string | null>(null);

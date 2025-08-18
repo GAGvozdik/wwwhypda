@@ -36,7 +36,7 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
 
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "46vh", 
+        height: "51vh", 
         ["--ag-background-color"]: "var(--table-color)",
         marginTop: '0vh', 
         marginBottom: '5vh',
