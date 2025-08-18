@@ -86,9 +86,11 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                 break;
             case 3:
                 dispatch(ClearSampleMeasurementData());
+                dispatch(ClearMeasurementsData());
                 break;
             case 4:
                 dispatch(ClearMeasurementsData());
+                dispatch(ClearSampleMeasurementData());
                 break;
             default:
                 break;
