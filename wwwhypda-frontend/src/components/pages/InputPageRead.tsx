@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
@@ -9,6 +9,7 @@ import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptc
 const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const { openModal } = useModal();
+    const [isLoading, setIsLoading] = useState(false);
 
     // const handleReset = () => {
     //     openModal(
@@ -51,13 +52,21 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     };
 
     const handleSubmitData = async (token: string) => {
-        sendAllDataToServer(token);
-        localStorage.removeItem("generalInfoData");
-        localStorage.removeItem("measurementsTableData");
-        localStorage.removeItem("sampleMeasurementTableData");
-        localStorage.removeItem("siteInfoTableData");
-        localStorage.removeItem("sourceTableData");
-        localStorage.removeItem('activeStep');
+        setIsLoading(true);
+        try {
+            await sendAllDataToServer(token);
+            localStorage.removeItem("generalInfoData");
+            localStorage.removeItem("measurementsTableData");
+            localStorage.removeItem("sampleMeasurementTableData");
+            localStorage.removeItem("siteInfoTableData");
+            localStorage.removeItem("sourceTableData");
+            localStorage.removeItem('activeStep');
+        } catch (error) {
+            console.error("Error submitting data:", error);
+            // Optionally, display an error message to the user
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -74,7 +83,7 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 InputPageRead
             </div>
 
-            <CustomStepper handleClick={handleSomething}/>
+            <CustomStepper handleClick={handleSomething} isLoading={isLoading}/>
         </div>
     );
 };
