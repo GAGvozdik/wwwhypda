@@ -5,7 +5,7 @@ import uuid
 from auth.auth_models import db, User, ConfirmationCode
 from auth.validate import validate_email_and_password, validate_user, validate_password
 from flask_mail import Message
-from common_defenitions import mail
+from common_defenitions import mail, verify_recaptcha
 from datetime import datetime, timedelta, timezone
 from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
@@ -21,22 +21,7 @@ import os
 
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
-def verify_recaptcha(recaptcha_token):
-    if current_app.config.get('TESTING') and recaptcha_token == 'test-token':
-        return True, None
-    
-    if not recaptcha_token:
-        return False, (jsonify(message="reCAPTCHA token is missing"), 400)
 
-    secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
-    verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
-    response = requests.post(verification_url)
-    result = response.json()
-
-    if not result.get('success') or result.get('score', 0.0) < 0.5:
-        return False, (jsonify(message="reCAPTCHA verification failed"), 401)
-    
-    return True, None
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
