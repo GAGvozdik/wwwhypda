@@ -5,9 +5,10 @@ import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
+import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
 
-const InputPage: React.FC = () => {
+const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const { openModal } = useModal();
     const navigate = useNavigate();
@@ -22,7 +23,14 @@ const InputPage: React.FC = () => {
     //     // setActiveStep(0);
     // };
 
-    const handleSomething = () => {
+    const handleSomething = async () => {
+        if (!executeRecaptcha) {
+            console.error('Recaptcha not available'); // Or show an error message to the user
+            return;
+        }
+
+        const token = await executeRecaptcha('submit_data'); // Execute reCAPTCHA here
+
         openModal({
             title: "Submit dataset?",
             description: "",
@@ -30,7 +38,7 @@ const InputPage: React.FC = () => {
                 {
                     label: "Submit",
                     onClick: () => {
-                        handleClick();
+                        handleSubmitData(token);
                     },
                 },
                 // {
@@ -47,8 +55,8 @@ const InputPage: React.FC = () => {
 
 
 
-    const handleClick = () => {
-        sendAllDataToServer();
+    const handleSubmitData = async (token: string) => {
+        sendAllDataToServer(token); // Pass the token
         localStorage.removeItem("generalInfoData");
         localStorage.removeItem("measurementsTableData");
         localStorage.removeItem("sampleMeasurementTableData");
@@ -77,7 +85,7 @@ const InputPage: React.FC = () => {
     );
 };
 
-export default InputPage;
+export default withRecaptcha(InputPage);
 
 
 

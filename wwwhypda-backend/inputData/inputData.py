@@ -4,6 +4,7 @@ from inputData.inputDataModels import InputData
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
 from flask_cors import CORS
+from common_defenitions import verify_recaptcha
 
 input_bp = Blueprint("input", __name__, url_prefix="/input")
 
@@ -48,8 +49,16 @@ def delete_submission(submission_id):
 @input_bp.route("/submit", methods=["POST"])
 @jwt_required()
 def submit_data():
+    data = request.json
+    if not data:
+        return jsonify(message="Invalid request data"), 400
+    recaptcha_token = data.get('recaptcha_token')
+    is_valid, error_response = verify_recaptcha(recaptcha_token)
+    if not is_valid:
+        return error_response
+
     current_user_id = get_jwt_identity()
-    payload = request.get_json()
+    payload = data # Use 'data' as payload since it contains all request body
 
     saved_entry = InputData.save_submission(current_user_id, payload)
     if saved_entry:
