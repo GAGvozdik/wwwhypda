@@ -9,6 +9,7 @@ import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import { UpdateSampleMeasurementData, UpdateMeasurementsData } from '../../../redux/actions';
+import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
 import { 
     ClientSideRowModelModule, 
@@ -72,7 +73,7 @@ type MeasurementSampleTableProps = {
 };
 
 
-function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps) {
+const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "44.5vh", 
@@ -105,10 +106,22 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
             }
 
             try {
+                if (!executeRecaptcha) {
+                    setError("Recaptcha not available.");
+                    setLoading(false);
+                    return;
+                }
+                const token = await executeRecaptcha('get_sample_data');
+
+                const config = {
+                    headers: { 'X-Recaptcha-Token': token },
+                    withCredentials: true
+                };
+
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
-                    api.get<Fracturation[]>('/rocks/fracturations', {withCredentials: true}),
-                    api.get<Scale[]>('/rocks/scales', {withCredentials: true}),
-                    api.get<RockTypeData[]>('/rocks/rock_type', {withCredentials: true})
+                    api.get<Fracturation[]>('/rocks/fracturations', config),
+                    api.get<Scale[]>('/rocks/scales', config),
+                    api.get<RockTypeData[]>('/rocks/rock_type', config)
                 ]);
 
                 if (!envResponse.data || envResponse.data.length === 0) {
@@ -372,4 +385,4 @@ function MeasurementSampleTable({isEditable= true}: MeasurementSampleTableProps)
     );
 };
 
-export default MeasurementSampleTable;
+export default withRecaptcha(MeasurementSampleTable);
