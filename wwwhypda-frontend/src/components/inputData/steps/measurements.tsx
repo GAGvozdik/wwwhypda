@@ -65,10 +65,10 @@ type MeasurementsProps = {
 const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "44vh", 
+        height: "50.5vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
-        marginBottom: '7vh',
+        marginBottom: '5.5vh',
     }), []);   
 
     const [error, setError] = useState<string | null>(null);

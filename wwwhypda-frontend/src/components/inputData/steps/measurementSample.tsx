@@ -76,10 +76,10 @@ type MeasurementSampleTableProps = {
 const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "44vh", 
+        height: "50.5vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
-        marginBottom: '6.5vh',
+        marginBottom: '5.5vh',
     }), []);    
 
 

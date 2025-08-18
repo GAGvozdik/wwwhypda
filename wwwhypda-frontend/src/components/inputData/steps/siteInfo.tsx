@@ -52,7 +52,7 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
 
     const containerStyle = useMemo(() => ({
         width: "100%",
-        height: "50vh",
+        height: "55vh",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0vh',
         // fontSize: '26px',  
