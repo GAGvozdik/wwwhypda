@@ -25,7 +25,7 @@ const steps = [
     { label: 'Step 1', title: 'Site Information' },
     { label: 'Step 2', title: 'General information about measurements' },
     { label: 'Step 3', title: 'Source Information' },
-    { label: 'Step 4', title: 'Measurement “Sample” (the borehole, the sample, or the borehole section where the measurement was performed)' },
+    { label: 'Step 4', title: 'Measurement Sample Details' },
     { label: 'Step 5', title: 'Measurements' },
 ];
 
@@ -211,7 +211,9 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
 
 
                     </div>
-                    {stepComponents[activeStep]}
+                    <Box sx={{ minHeight: '50vh' }}> {/* Set a consistent height for step content */}
+                        {stepComponents[activeStep]}
+                    </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
                         <Button
                             disabled={activeStep === 0}
