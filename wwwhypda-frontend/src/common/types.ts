@@ -81,6 +81,16 @@ export interface UpdateMeasurementsDataAction extends Action {
     [key: string]: any;
 }
 
+export interface ClearSampleMeasurementDataAction extends Action {
+    type: 'CLEAR_SAMPLE_MEASUREMENT_DATA';
+    [key: string]: any;
+}
+
+export interface ClearMeasurementsDataAction extends Action {
+    type: 'CLEAR_MEASUREMENTS_DATA';
+    [key: string]: any;
+}
+
 
 export interface Action {
     type: string;

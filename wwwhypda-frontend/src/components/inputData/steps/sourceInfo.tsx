@@ -32,19 +32,18 @@ type SourceInfoProps = {
     isEditable: boolean;
 };
 
-function SourceInfo({isEditable=true}: SourceInfoProps) {
+const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
 
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "46vh", 
-        "--ag-background-color": "var(--table-color)", 
+        ["--ag-background-color"]: "var(--table-color)",
         marginTop: '0vh', 
         marginBottom: '5vh',
     }), []);    
 
     const [tableData, setTableData] = useState(defaultRowData);
 
-    // Функция для загрузки данных из localStorage
     const loadTableData = () => {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (saved && JSON.parse(saved).length > 0) {
@@ -52,35 +51,19 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed)) {
                     setTableData(parsed);
-                    console.log('table updated from localStorage');
                 }
             } catch (e) {
                 console.error("Failed to parse saved table data", e);
             }
         } else {
-            // Если данных нет в localStorage, сбрасываем на дефолтные
-            setTableData(defaultRowData);
+            setTableData([...defaultRowData]);
         }
     };
 
-    // Загружаем данные при монтировании
     useEffect(() => {
         loadTableData();
-    }, []); // Только при первом рендере
+    }, []);
 
-    // Слушаем изменения localStorage в других вкладках/компонентах
-    useEffect(() => {
-        const handleStorageChange = () => {
-            loadTableData();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-        };
-    }, []); // Слушатель добавляется только один раз
-
-    // Обновляем значение и сохраняем в localStorage
     const handleCellValueChanged = useCallback((params: any) => {
         const updated = [...tableData];
         updated[params.node.rowIndex] = {
@@ -109,8 +92,6 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
 
     return (
         <div style={containerStyle}>
-            
-
             <div style={{height: '50vh'}}>
                 <AgGridReact
                     theme={themeDarkBlue}
@@ -119,6 +100,10 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
                     defaultColDef={defaultColDef}
                     headerHeight={0}
                     onCellValueChanged={handleCellValueChanged}
+                    suppressColumnVirtualisation={true}
+                    suppressRowHoverHighlight={true}
+                    suppressNoRowsOverlay={true}
+                    suppressMenuHide={true}
                 />
             </div>
         </div>
