@@ -48,7 +48,7 @@ type SiteInfoProps = {
     isEditable: boolean;
 };
 
-function  SiteInfo({isEditable=true}: SiteInfoProps) {
+function SiteInfo({isEditable=true}: SiteInfoProps) {
 
     const containerStyle = useMemo(() => ({
         width: "100%",
