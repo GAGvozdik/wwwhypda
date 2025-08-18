@@ -20,6 +20,7 @@ import {sendAllDataToServer, CustomStepIconRoot, StepNumberCircle} from './steps
 import { useModal } from '../modal/modalContext';
 import { useDispatch } from 'react-redux';
 import { ClearSampleMeasurementData, ClearMeasurementsData } from '../../redux/actions';
+import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
 const steps = [
     { label: 'Step 1', title: 'Site Information' },
@@ -49,7 +50,7 @@ interface CustomStepperProps {
     handleClick: () => void;
 }
 
-export default function CustomStepper({handleClick}: CustomStepperProps) {
+function CustomStepper({handleClick, executeRecaptcha}: CustomStepperProps & WithRecaptchaProps) {
 
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -164,7 +165,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                         <Box sx={{ flex: '1 1 auto' }} />
 
                             <Button
-                                onClick={handleClick}
+                                onClick={() => handleClick()}
                                 className={styles.submitButton}
                                 style={{ width: '120px' }}
                             >
@@ -236,4 +237,6 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
         </Box>
     );
 }
+
+export default withRecaptcha(CustomStepper);
 
