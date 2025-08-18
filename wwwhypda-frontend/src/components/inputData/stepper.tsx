@@ -146,8 +146,8 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                         All steps completed - you're finished
                     </Typography>
 
-                    <Box sx={{ minHeight: '41vh' }} /> 
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
+                    <Box sx={{ height: '54vh' }} /> 
+                    <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '1vh' }}>
                         <Button
                             onClick={() => {
                                 const lastStep = steps.length - 1;
@@ -156,6 +156,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                             }}
                             className={styles.submitButton}
                             sx={{ mr: 1 }}
+                            style={{ width: '120px' }}
                         >
                             Back
                         </Button>
@@ -165,7 +166,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                             <Button
                                 onClick={handleClick}
                                 className={styles.submitButton}
-                                style={{ minWidth: 120 }}
+                                style={{ width: '120px' }}
                             >
                                 Submit
                             </Button>
@@ -211,7 +212,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
 
 
                     </div>
-                    <Box sx={{ minHeight: '50vh' }}> {/* Set a consistent height for step content */}
+                    <Box sx={{ minHeight: '50vh' }}>
                         {stepComponents[activeStep]}
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
