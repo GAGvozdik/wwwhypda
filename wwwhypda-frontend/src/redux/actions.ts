@@ -9,6 +9,8 @@ import {
     MeasurementRow,
     UpdateSampleMeasurementDataAction,
     UpdateMeasurementsDataAction,
+    ClearSampleMeasurementDataAction,
+    ClearMeasurementsDataAction,
 } from '../common/types';
 
 import { UpdateTokenAction, LogoutAction } from '../common/types';
@@ -55,4 +57,12 @@ export const UpdateRTID = (currentRTID: string): UpdateRTIDAction => ({
 export const UpdateRTName = (currentRTName: string): UpdateRTNameAction => ({
     type: 'UPDATE_RTNAME',
     payload: currentRTName,
+});
+
+export const ClearSampleMeasurementData = (): ClearSampleMeasurementDataAction => ({
+    type: 'CLEAR_SAMPLE_MEASUREMENT_DATA'
+});
+
+export const ClearMeasurementsData = (): ClearMeasurementsDataAction => ({
+    type: 'CLEAR_MEASUREMENTS_DATA'
 });

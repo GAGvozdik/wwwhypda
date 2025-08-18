@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -18,6 +18,8 @@ import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
 import {sendAllDataToServer, CustomStepIconRoot, StepNumberCircle} from './steps';
 import { useModal } from '../modal/modalContext';
+import { useDispatch } from 'react-redux';
+import { ClearSampleMeasurementData, ClearMeasurementsData } from '../../redux/actions';
 
 const steps = [
     { label: 'Step 1', title: 'Site Information' },
@@ -43,38 +45,55 @@ function CustomStepIcon(props: StepIconProps) {
 
 const isEditable = true;
 
-const stepComponents = [
-    <SiteInfo isEditable={isEditable}/>,
-    <GeneralInfo isEditable={isEditable}/>,
-    <SourceInfo isEditable={isEditable}/>,
-    <MeasurementSample isEditable={isEditable}/>,
-    <Measurements isEditable={isEditable}/>,
-];
-
 interface CustomStepperProps {
     handleClick: () => void;
 }
 
-
 export default function CustomStepper({handleClick}: CustomStepperProps) {
 
-    const [activeStep, setActiveStep] = React.useState<number>(() => {
+    const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
         return savedStep !== null ? Number(savedStep) : 0;
     });
 
+    const [siteInfoKey, setSiteInfoKey] = useState(0);
+    const [generalInfoKey, setGeneralInfoKey] = useState(0);
+    const [sourceInfoKey, setSourceInfoKey] = useState(0);
 
-    // const { openModal } = useModal();
+    const stepComponents = [
+        <SiteInfo key={siteInfoKey} isEditable={isEditable}/>,
+        <GeneralInfo key={generalInfoKey} isEditable={isEditable}/>,
+        <SourceInfo key={sourceInfoKey} isEditable={isEditable}/>,
+        <MeasurementSample isEditable={isEditable}/>,
+        <Measurements isEditable={isEditable}/>,
+    ];
 
-    // const handleReset = () => {
-    //     openModal(
-    //         'Do you want to submit data??', // Title
-    //         '', // Description
-    //         'Send', // Action button text
-    //         () => { handleClick(); }
-    //     );
-    //     // setActiveStep(0);
-    // };
+    const dispatch = useDispatch();
+
+    const handleClearAll = () => {
+        switch (activeStep) {
+            case 0:
+                localStorage.removeItem("siteInfoTableData");
+                setSiteInfoKey(prevKey => prevKey + 1);
+                break;
+            case 1:
+                localStorage.removeItem("generalInfoData");
+                setGeneralInfoKey(prevKey => prevKey + 1);
+                break;
+            case 2:
+                localStorage.removeItem("sourceTableData");
+                setSourceInfoKey(prevKey => prevKey + 1);
+                break;
+            case 3:
+                dispatch(ClearSampleMeasurementData());
+                break;
+            case 4:
+                dispatch(ClearMeasurementsData());
+                break;
+            default:
+                break;
+        }
+    };
 
     const [skipped, setSkipped] = React.useState(new Set<number>());
 
@@ -159,10 +178,10 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                         <div style={{ flex: 1 }}></div> {/* Left spacer */}
                         <div 
                             style={{
-                                flex: 2,
+                                flex: 5,
                                 color: "var(--tree-text)",
                                 textAlign: "center",
-                                fontSize: '3.5vh'
+                                fontSize: '3vh'
                             }}
                         >
                             {steps[activeStep].title}
@@ -177,7 +196,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                         }}
                         >
                         <Button
-                            onClick={() => { /* TODO: Implement clear all logic */ }}
+                            onClick={handleClearAll}
                             className={styles.submitButton}
                             style={{ 
                                 maxHeight: '4vh',   // высота в vh

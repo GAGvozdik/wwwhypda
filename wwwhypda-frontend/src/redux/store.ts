@@ -46,6 +46,12 @@ const reducer = (state: State = initialState, action: Action): State => {
         case 'UPDATE_MEASUREMENTS_DATA':
             return { ...state, measurementsTableData: action.payload };
 
+        case 'CLEAR_SAMPLE_MEASUREMENT_DATA':
+            return { ...state, sampleMeasurementTableData: [] };
+
+        case 'CLEAR_MEASUREMENTS_DATA':
+            return { ...state, measurementsTableData: [] };
+
         default:
         return state;
     }
