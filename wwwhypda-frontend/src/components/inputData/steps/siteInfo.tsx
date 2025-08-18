@@ -52,9 +52,10 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
 
     const containerStyle = useMemo(() => ({
         width: "100%",
-        height: "55vh",
+        height: "56vh",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0vh',
+        marginBottom: '-1vh',
         // fontSize: '26px',  
     }), []);
 
