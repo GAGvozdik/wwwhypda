@@ -16,7 +16,7 @@ ModuleRegistry.registerModules([
     ClientSideRowModelModule
 ]);
 
-const defaultRowData = [
+const getDefaultRowData = () => [
     { field: "authors", value: "", description: "the source authors (i.e.: Ankeny M.D.,M. Ahmed, T.C. Kaspar, and R. Horton)" },
     { field: "title", value: "", description: "the source title (i.e. Simple field for determining unsaturated hydraulic conductivity)" },
     { field: "source", value: "", description: "the source (i.e. Journal of Contaminant Hydrology, Vol. 91, Issues 3-4, 14 May 2007)" },
@@ -42,7 +42,7 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
         marginBottom: '5vh',
     }), []);    
 
-    const [tableData, setTableData] = useState(defaultRowData);
+    const [tableData, setTableData] = useState(getDefaultRowData());
 
     const loadTableData = () => {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -56,7 +56,7 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
                 console.error("Failed to parse saved table data", e);
             }
         } else {
-            setTableData([...defaultRowData]);
+            setTableData(getDefaultRowData());
         }
     };
 
@@ -100,10 +100,10 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
                     defaultColDef={defaultColDef}
                     headerHeight={0}
                     onCellValueChanged={handleCellValueChanged}
-                    suppressColumnVirtualisation={true}
-                    suppressRowHoverHighlight={true}
-                    suppressNoRowsOverlay={true}
-                    suppressMenuHide={true}
+                    // suppressColumnVirtualisation={true}
+                    // suppressRowHoverHighlight={true}
+                    // suppressNoRowsOverlay={true}
+                    // suppressMenuHide={true}
                 />
             </div>
         </div>
