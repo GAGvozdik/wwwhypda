@@ -76,10 +76,10 @@ type MeasurementSampleTableProps = {
 const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "44.5vh", 
+        height: "44vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
-        marginBottom: '17.5vh',
+        marginBottom: '6.5vh',
     }), []);    
 
 
@@ -302,22 +302,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
     return (
         <div style={containerStyle}>
             
-                    <div 
-                        style={{
-                            color: "var(--tree-text)",
-                            textAlign: "center",
-                            fontSize: '3vh',
-                            height: '10vh',
-                            margin: '1vh 0vh 1vh 0vh',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignContent: 'center',
-                            justifyItems: 'center',
-                            alignItems: 'center',
-                        }}
-                    >
-                        Measurement “Sample” (the borehole, the sample, or the borehole section where the measurement was performed)
-                    </div>
+                    
 
                     <div style={{display: 'flex'}}>
 
