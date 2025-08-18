@@ -42,7 +42,7 @@ type GeneralInfoProps = {
 function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "50vh", 
+        height: "46vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '5vh',
@@ -148,22 +148,7 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     return (
         <div style={containerStyle}>
 
-            <div 
-                style={{
-                    color: "var(--tree-text)",
-                    textAlign: "center",
-                    fontSize: '3vh',
-                    height: '10vh',
-                    margin: '1vh 0vh 1vh 0vh',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignContent: 'center',
-                    justifyItems: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                General information about measurements
-            </div>
+            
 
             <SingleSkeleton loading={loading} error={error} height={'50vh'}>
                 <div style={{height: '50vh'}}>

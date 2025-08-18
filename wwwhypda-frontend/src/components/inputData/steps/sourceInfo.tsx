@@ -36,7 +36,7 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
 
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
-        height: "50vh", 
+        height: "46vh", 
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '5vh',
@@ -109,22 +109,7 @@ function SourceInfo({isEditable=true}: SourceInfoProps) {
 
     return (
         <div style={containerStyle}>
-            <div 
-                style={{
-                    color: "var(--tree-text)",
-                    textAlign: "center",
-                    fontSize: '3vh',
-                    height: '10vh',
-                    margin: '1vh 0vh 1vh 0vh',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignContent: 'center',
-                    justifyItems: 'center',
-                    alignItems: 'center',
-                }}
-            >
-                Source of information (Info about the paper or the technical report that contains the measurements)
-            </div>
+            
 
             <div style={{height: '50vh'}}>
                 <AgGridReact

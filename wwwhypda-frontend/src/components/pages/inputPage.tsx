@@ -59,14 +59,14 @@ const InputPage: React.FC = () => {
         <div className={styles.treeText}>
 
             <div style={{ 
+                    display: 'flex',
                     justifyContent: 'center', 
-                    justifyItems: 'center',
                     fontFamily: 'Afacad_Flux !important',
                     fontSize: '5vh',
                     padding: '1vh'
                 }}
             >
-                InputPage
+                INPUT PAGE
             </div>
 
             <CustomStepper handleClick={handleSomething}/>

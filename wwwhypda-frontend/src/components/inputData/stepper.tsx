@@ -19,7 +19,13 @@ import Measurements from './steps/measurements';
 import {sendAllDataToServer, CustomStepIconRoot, StepNumberCircle} from './steps';
 import { useModal } from '../modal/modalContext';
 
-const steps = ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5'];
+const steps = [
+    { label: 'Step 1', title: 'Site Information' },
+    { label: 'Step 2', title: 'General information about measurements' },
+    { label: 'Step 3', title: 'Source Information' },
+    { label: 'Step 4', title: 'Measurement “Sample” (the borehole, the sample, or the borehole section where the measurement was performed)' },
+    { label: 'Step 5', title: 'Measurements' },
+];
 
 function CustomStepIcon(props: StepIconProps) {
     const { active, completed, className, icon } = props;
@@ -95,10 +101,10 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
     return (
         <Box sx={{ width: '100%' }} className={styles.treeText}>
             <Stepper activeStep={activeStep}>
-                {steps.map((label) => (
-                    <Step key={label}>
+                {steps.map((step) => (
+                    <Step key={step.label}>
                         <StepLabel StepIconComponent={CustomStepIcon}>
-                            <div className={styles.treeText}>{label}</div>
+                            <div className={styles.treeText}>{step.label}</div>
                         </StepLabel>
                     </Step>
                 ))}
@@ -120,7 +126,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                     </Typography>
 
                     <Box sx={{ minHeight: '41vh' }} /> 
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '12vh' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
                         <Button
                             onClick={() => {
                                 const lastStep = steps.length - 1;
@@ -149,8 +155,43 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
             ) : (
 
                 <React.Fragment>
+                    <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 0' }}>
+                        <div style={{ flex: 1 }}></div> {/* Left spacer */}
+                        <div 
+                            style={{
+                                flex: 2,
+                                color: "var(--tree-text)",
+                                textAlign: "center",
+                                fontSize: '3.5vh'
+                            }}
+                        >
+                            {steps[activeStep].title}
+                        </div>
+
+                        <div 
+                        style={{ 
+                            flex: 1, 
+                            display: 'flex', 
+                            justifyContent: 'flex-end', 
+                            alignItems: 'center'   // центрируем по высоте
+                        }}
+                        >
+                        <Button
+                            onClick={() => { /* TODO: Implement clear all logic */ }}
+                            className={styles.submitButton}
+                            style={{ 
+                                maxHeight: '4vh',   // высота в vh
+                                minWidth: '15vh'    // ширина в vh
+                            }}
+                        >
+                            Clear all
+                        </Button>
+                        </div>
+
+
+                    </div>
                     {stepComponents[activeStep]}
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '12vh' }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
                         <Button
                             disabled={activeStep === 0}
                             onClick={handleBack}
