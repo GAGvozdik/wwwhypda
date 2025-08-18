@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
@@ -12,6 +12,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const { openModal } = useModal();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
 
     // const handleReset = () => {
     //     openModal(
@@ -56,14 +57,22 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
 
     const handleSubmitData = async (token: string) => {
-        sendAllDataToServer(token); // Pass the token
-        localStorage.removeItem("generalInfoData");
-        localStorage.removeItem("measurementsTableData");
-        localStorage.removeItem("sampleMeasurementTableData");
-        localStorage.removeItem("siteInfoTableData");
-        localStorage.removeItem("sourceTableData");
-        localStorage.removeItem('activeStep');
-        navigate('/account'); // Assuming '/account' is the user's account page route
+        setIsLoading(true);
+        try {
+            await sendAllDataToServer(token); // Await the completion
+            localStorage.removeItem("generalInfoData");
+            localStorage.removeItem("measurementsTableData");
+            localStorage.removeItem("sampleMeasurementTableData");
+            localStorage.removeItem("siteInfoTableData");
+            localStorage.removeItem("sourceTableData");
+            localStorage.removeItem('activeStep');
+            navigate('/account'); // Assuming '/account' is the user's account page route
+        } catch (error) {
+            console.error("Error submitting data:", error);
+            // Optionally, display an error message to the user
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -80,7 +89,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 INPUT PAGE
             </div>
 
-            <CustomStepper handleClick={handleSomething}/>
+            <CustomStepper handleClick={handleSomething} isLoading={isLoading}/>
         </div>
     );
 };

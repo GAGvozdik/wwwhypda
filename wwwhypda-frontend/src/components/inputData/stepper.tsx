@@ -48,9 +48,10 @@ const isEditable = true;
 
 interface CustomStepperProps {
     handleClick: () => void;
+    isLoading: boolean;
 }
 
-function CustomStepper({handleClick, executeRecaptcha}: CustomStepperProps & WithRecaptchaProps) {
+function CustomStepper({handleClick, executeRecaptcha, isLoading}: CustomStepperProps & WithRecaptchaProps) {
 
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -168,6 +169,7 @@ function CustomStepper({handleClick, executeRecaptcha}: CustomStepperProps & Wit
                                 onClick={() => handleClick()}
                                 className={styles.submitButton}
                                 style={{ width: '120px' }}
+                                disabled={isLoading} // Disable when loading
                             >
                                 Submit
                             </Button>
