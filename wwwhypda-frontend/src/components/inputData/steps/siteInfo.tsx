@@ -179,19 +179,7 @@ const gridOptions = useMemo(() => ({
 }), []);
     return (
         <div style={containerStyle}>
-            <div style={{
-                color: "var(--tree-text)",
-                fontSize: '3vh',
-                height: '10vh',
-                margin: '1vh 0vh 1vh 0vh',
-                display: 'flex',
-                justifyContent: 'center',
-                alignContent: 'center',
-                justifyItems: 'center',
-                alignItems: 'center',
-            }}>
-                Site Information
-            </div>
+            
 
             <SingleSkeleton loading={loading} error={error}>
                 <AgGridReact
