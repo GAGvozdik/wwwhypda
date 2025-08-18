@@ -92,7 +92,7 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
 
     return (
         <div style={containerStyle}>
-            <div style={{height: '50vh'}}>
+            <div style={{height: '56vh'}}>
                 <AgGridReact
                     theme={themeDarkBlue}
                     rowData={tableData}

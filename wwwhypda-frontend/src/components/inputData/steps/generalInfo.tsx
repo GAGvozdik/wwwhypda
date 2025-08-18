@@ -148,7 +148,7 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     return (
         <div style={containerStyle}>
             <SingleSkeleton loading={loading} error={error} height={'50vh'}>
-                <div style={{height: '50vh'}}>
+                <div style={{height: '56vh'}}>
                     <AgGridReact
                         theme={themeDarkBlue}
                         rowData={tableData}

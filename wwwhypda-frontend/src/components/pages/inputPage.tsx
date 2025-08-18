@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
@@ -9,6 +10,7 @@ import { useModal } from '../modal/modalContext';
 const InputPage: React.FC = () => {
 
     const { openModal } = useModal();
+    const navigate = useNavigate();
 
     // const handleReset = () => {
     //     openModal(
@@ -53,6 +55,7 @@ const InputPage: React.FC = () => {
         localStorage.removeItem("siteInfoTableData");
         localStorage.removeItem("sourceTableData");
         localStorage.removeItem('activeStep');
+        navigate('/account'); // Assuming '/account' is the user's account page route
     };
 
     return (
