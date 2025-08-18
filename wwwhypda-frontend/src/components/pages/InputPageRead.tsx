@@ -4,8 +4,9 @@ import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
+import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
-const InputPageRead: React.FC = () => {
+const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const { openModal } = useModal();
 
@@ -19,7 +20,14 @@ const InputPageRead: React.FC = () => {
     //     // setActiveStep(0);
     // };
 
-    const handleSomething = () => {
+    const handleSomething = async () => {
+        if (!executeRecaptcha) {
+            console.error('Recaptcha not available'); // Or show an error message to the user
+            return;
+        }
+
+        const token = await executeRecaptcha('submit_data'); // Execute reCAPTCHA here
+
         openModal({
             title: "Submit dataset?",
             description: "",
@@ -27,7 +35,7 @@ const InputPageRead: React.FC = () => {
                 {
                     label: "Submit",
                     onClick: () => {
-                        handleClick();
+                        handleSubmitData(token);
                     },
                 },
                 // {
@@ -42,8 +50,8 @@ const InputPageRead: React.FC = () => {
         });
     };
 
-    const handleClick = () => {
-        sendAllDataToServer();
+    const handleSubmitData = async (token: string) => {
+        sendAllDataToServer(token);
         localStorage.removeItem("generalInfoData");
         localStorage.removeItem("measurementsTableData");
         localStorage.removeItem("sampleMeasurementTableData");
@@ -71,7 +79,7 @@ const InputPageRead: React.FC = () => {
     );
 };
 
-export default InputPageRead;
+export default withRecaptcha(InputPageRead);
 
 
 
