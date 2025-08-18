@@ -171,19 +171,17 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
         setTableData(updatedData);
     };
 
-const gridOptions = useMemo(() => ({
-    defaultColDef: {
-        cellStyle: { fontSize: '56px' },  // Устанавливаем размер шрифта для всех ячеек
-        headerClass: 'custom-header',     // Класс для заголовков
-    }
-}), []);
+    const gridOptions = useMemo(() => ({
+        defaultColDef: {
+            cellStyle: { fontSize: '56px' },  // Устанавливаем размер шрифта для всех ячеек
+            headerClass: 'custom-header',     // Класс для заголовков
+        }
+    }), []);
     return (
         <div style={containerStyle}>
-            
-
             <SingleSkeleton loading={loading} error={error}>
                 <AgGridReact
-    gridOptions={gridOptions} 
+                    gridOptions={gridOptions} 
                     theme={themeDarkBlue}
                     rowData={tableData}
                     columnDefs={columnDefs}

@@ -81,7 +81,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
                 setGeneralInfoKey(prevKey => prevKey + 1);
                 break;
             case 2:
-                localStorage.removeItem("sourceTableData");
+                localStorage.setItem("sourceTableData", "[]");
                 setSourceInfoKey(prevKey => prevKey + 1);
                 break;
             case 3:
@@ -95,7 +95,7 @@ export default function CustomStepper({handleClick}: CustomStepperProps) {
         }
     };
 
-    const [skipped, setSkipped] = React.useState(new Set<number>());
+    const [skipped, setSkipped] = useState(new Set<number>());
 
     const isStepSkipped = (step: number) => skipped.has(step);
 
