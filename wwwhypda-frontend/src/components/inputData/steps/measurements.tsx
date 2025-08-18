@@ -9,6 +9,7 @@ import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import { UpdateMeasurementsData, UpdateSampleMeasurementData } from '../../../redux/actions';
+import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
 import { 
     ClientSideRowModelModule, 
@@ -61,7 +62,7 @@ type MeasurementsProps = {
     isEditable: boolean;
 };
 
-export default function Measurements({isEditable= true}: MeasurementsProps) {
+const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
     const containerStyle = useMemo(() => ({ 
         width: "100%", 
         height: "44.5vh", 
@@ -95,11 +96,23 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
             }
 
             try {
+                if (!executeRecaptcha) {
+                    setError("Recaptcha not available.");
+                    setLoading(false);
+                    return;
+                }
+                const token = await executeRecaptcha('get_measurement_data');
+
+                const config = {
+                    headers: { 'X-Recaptcha-Token': token },
+                    withCredentials: true
+                };
+
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
-                    api.get<Parameter[]>('/rocks/parameters', { withCredentials: true}),
-                    api.get<Quality[]>('/rocks/qualities', { withCredentials: true}),
-                    api.get<ExperimentType[]>('/rocks/experiment_types', { withCredentials: true}),
-                    api.get<InterpretationMethod[]>('/rocks/interpretation_methods', { withCredentials: true}),
+                    api.get<Parameter[]>('/rocks/parameters', config),
+                    api.get<Quality[]>('/rocks/qualities', config),
+                    api.get<ExperimentType[]>('/rocks/experiment_types', config),
+                    api.get<InterpretationMethod[]>('/rocks/interpretation_methods', config),
                 ]);
 
                 if (!parameterResponse.data || parameterResponse.data.length === 0) {
@@ -317,3 +330,5 @@ export default function Measurements({isEditable= true}: MeasurementsProps) {
         </div>
     );
 };
+
+export default withRecaptcha(Measurements);
