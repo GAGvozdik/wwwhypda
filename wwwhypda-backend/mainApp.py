@@ -52,9 +52,9 @@ def add_status_column_if_not_exists(column_name='comment'):
 # TODO: Check csrf token verification
 
 # Load environment variables
-load_dotenv(dotenv_path='env.configs')
-
 basedir = os.path.abspath(os.path.dirname(__file__))
+dotenv_path = os.path.join(basedir, 'env.configs')
+load_dotenv(dotenv_path=dotenv_path)
 
 app = Flask(__name__)
 

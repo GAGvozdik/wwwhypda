@@ -7,24 +7,12 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
 import requests
 import os
+from common_defenitions import verify_recaptcha
 
 rocks_bp = Blueprint("rocks", __name__, url_prefix="/rocks")
 
 
-def verify_recaptcha():
-    recaptcha_token = request.headers.get('X-Recaptcha-Token')
-    if not recaptcha_token:
-        return False, jsonify(message="reCAPTCHA token is missing"), 400
 
-    secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
-    verification_url = f"https://www.google.com/recaptcha/api/siteverify?secret={secret_key}&response={recaptcha_token}"
-    response = requests.post(verification_url)
-    result = response.json()
-
-    if not result.get('success') or result.get('score', 0.0) < 0.5:
-        return False, jsonify(message="reCAPTCHA verification failed"), 401
-    
-    return True, None, None
 
 @rocks_bp.route('/msg', methods=['POST'])
 def get_msg():
@@ -95,25 +83,28 @@ def api_anonce():
 
 @rocks_bp.route('/rock_type', methods=['GET']) 
 def api_rock_type():
-    success, response, status_code = verify_recaptcha()
+    recaptcha_token = request.headers.get('X-Recaptcha-Token')
+    success, error_response = verify_recaptcha(recaptcha_token)
     if not success:
-        return response, status_code
+        return error_response
     results = RockType.getRockTypes()
     return jsonify(results)
 
 @rocks_bp.route('/parameters', methods=['GET'])
 def get_parameters():
-    success, response, status_code = verify_recaptcha()
+    recaptcha_token = request.headers.get('X-Recaptcha-Token')
+    success, error_response = verify_recaptcha(recaptcha_token)
     if not success:
-        return response, status_code
+        return error_response
     parameters = Parameter.getParameters()
     return jsonify(parameters)
 
 @rocks_bp.route('/samples/<int:rt_id>/<int:id_Parameter>')
 def get_samples(rt_id, id_Parameter):
-    success, response, status_code = verify_recaptcha()
+    recaptcha_token = request.headers.get('X-Recaptcha-Token')
+    success, error_response = verify_recaptcha(recaptcha_token)
     if not success:
-        return response, status_code
+        return error_response
     samples = Sample.getSamplesByRockType(rt_id)
     sample_ids = [sample['id_Sample'] for sample in samples]
     measures = Measure.getMeasuresBySampleIdAndParam(sample_ids, id_Parameter)
