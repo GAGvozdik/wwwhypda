@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
@@ -9,6 +10,7 @@ import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptc
 const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const { openModal } = useModal();
+    const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
     // const handleReset = () => {
@@ -61,6 +63,7 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             localStorage.removeItem("siteInfoTableData");
             localStorage.removeItem("sourceTableData");
             localStorage.removeItem('activeStep');
+            navigate('/account'); // Added redirection
         } catch (error) {
             console.error("Error submitting data:", error);
             // Optionally, display an error message to the user

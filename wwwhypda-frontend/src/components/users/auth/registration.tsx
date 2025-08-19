@@ -148,18 +148,18 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 {step === 1 && (
                     <form onSubmit={handleRegister}>
                         <input
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            className={styles.inputField}
-                            required
-                        />
-                        <input
                             type="email"
                             placeholder="Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            className={styles.inputField}
+                            required
+                        />
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             className={styles.inputField}
                             required
                         />
