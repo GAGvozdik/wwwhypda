@@ -167,11 +167,11 @@ const UserSuggestions: React.FC = () => {
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Edit request">
+                    {/* <Tooltip title="Edit request">
                         <IconButton onClick={() => handleClick(data)}>
                             <EditIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
-                    </Tooltip>
+                    </Tooltip> */}
 
                 </div>
             ),
