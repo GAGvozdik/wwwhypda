@@ -203,6 +203,8 @@ def add_user():
             with current_app.app_context():
                 msg = Message("Activate your account", sender=current_app.config["MAIL_USERNAME"], recipients=[user_data["email"]])
                 msg.body = f"Your activation code: {confirmation_code.code}"
+                if current_app.config["DEBUG"] == True:
+                    print(msg.body)
                 mail.send(msg)
         except Exception as e:
             return jsonify(message="Mail server is broken", error=str(e)), 202
@@ -236,6 +238,8 @@ def request_password_reset():
             with current_app.app_context():
                 msg = Message("Password Reset Code", sender=current_app.config["MAIL_USERNAME"], recipients=[email])
                 msg.body = f"Your password reset code: {confirmation_code.code}"
+                if current_app.config["DEBUG"] == True:
+                    print(msg.body)
                 mail.send(msg)
 
         except Exception as e:
@@ -321,6 +325,8 @@ def resend_confirmation():
                     recipients=[email]
                 )
                 msg.body = f"Your new activation code: {confirmation_code.code}"
+                if current_app.config["DEBUG"] == True:
+                    print(msg.body)
                 mail.send(msg)
         except Exception as e:
             return jsonify(message="Mail server is broken", error=str(e), data=None), 202
