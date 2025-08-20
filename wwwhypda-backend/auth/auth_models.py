@@ -7,6 +7,7 @@ import random
 from common_defenitions import db
 
 class User(db.Model):
+    __bind_key__ = 'users_db'
     """
     Represents a user in the system.
     Includes authentication, activation, and password management functionalities.
@@ -214,6 +215,8 @@ class User(db.Model):
         return False
 
 class ConfirmationCode(db.Model):
+    __bind_key__ = 'users_db'
+
     """
     Represents a confirmation code for user activation or password reset.
     """

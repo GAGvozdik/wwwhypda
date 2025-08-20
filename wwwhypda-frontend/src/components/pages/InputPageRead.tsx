@@ -76,14 +76,16 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     justifyContent: 'center', 
                     justifyItems: 'center',
                     fontFamily: 'Afacad_Flux !important',
+                    alignItems: 'center',
+                    textAlign: 'center',
                     fontSize: '5vh',
                     padding: '1vh'
                 }}
             >
-                InputPageRead
+                Data reading
             </div>
 
-            <CustomStepper handleClick={handleSomething} isLoading={isLoading}/>
+            <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={false}/>
         </div>
     );
 };

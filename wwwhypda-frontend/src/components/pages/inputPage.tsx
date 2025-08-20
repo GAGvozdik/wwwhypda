@@ -89,7 +89,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 INPUT PAGE
             </div>
 
-            <CustomStepper handleClick={handleSomething} isLoading={isLoading}/>
+            <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={true}/>
         </div>
     );
 };

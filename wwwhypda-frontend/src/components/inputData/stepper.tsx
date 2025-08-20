@@ -44,14 +44,13 @@ function CustomStepIcon(props: StepIconProps) {
     );
 }
 
-const isEditable = true;
-
 interface CustomStepperProps {
     handleClick: () => void;
     isLoading: boolean;
+    isEditable: boolean;
 }
 
-function CustomStepper({handleClick, executeRecaptcha, isLoading}: CustomStepperProps & WithRecaptchaProps) {
+function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: CustomStepperProps & WithRecaptchaProps) {
 
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
