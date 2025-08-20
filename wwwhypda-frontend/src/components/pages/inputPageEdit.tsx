@@ -81,13 +81,14 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     justifyItems: 'center',
                     fontFamily: 'Afacad_Flux !important',
                     fontSize: '5vh',
-                    padding: '1vh'
+                    padding: '1vh',
+                    textAlign: 'center'
                 }}
             >
                 InputPageEdit
             </div>
 
-            <CustomStepper handleClick={handleSomething} isLoading={isLoading}/>
+            <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={true}/>
         </div>
     );
 };

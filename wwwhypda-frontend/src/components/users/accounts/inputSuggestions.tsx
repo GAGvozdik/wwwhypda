@@ -177,7 +177,7 @@ const InputSuggestions: React.FC = () => {
                                 console.error("Ошибка при сохранении в localStorage:", e);
                             }
 
-                            navigate('/check_suggestions');
+                            navigate('/edit');
                         }
                     },
                     {
