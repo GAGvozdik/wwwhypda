@@ -82,13 +82,13 @@ export default function MainMenu() {
                     />
 
                     <Route 
-                        path="/check_suggestions" 
-                        element={<SuperProtectedRoute><InputPageRead /></SuperProtectedRoute>} 
+                        path="/read" 
+                        element={<ProtectedRoute><InputPageRead /></ProtectedRoute>} 
                     />
 
                     <Route 
                         path="/edit" 
-                        element={<ProtectedRoute><InputPageEdit /></ProtectedRoute>} 
+                        element={<SuperProtectedRoute><InputPageEdit /></SuperProtectedRoute>} 
                     />
 
                     <Route

@@ -22,6 +22,7 @@ import Button from '@mui/material/Button';
 import { useModal } from '../../modal/modalContext';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 const UserSuggestions: React.FC = () => {
 
@@ -90,11 +91,11 @@ const UserSuggestions: React.FC = () => {
 
     const handleClick = (data: any) => {
         openModal({
-            title: 'Are you sure you want to start editing?',
-            description: 'All current sample data will be permanently erased!',
+            title: 'Are you sure you want to start reading your data?',
+            description: 'All current sample data in add data page will be permanently erased!',
             buttons: [
                 {
-                    label: 'Go to editing',
+                    label: 'Go to reading',
                     onClick: () => {
                         // Очистка старых данных
                         localStorage.removeItem("generalInfoData");
@@ -118,7 +119,7 @@ const UserSuggestions: React.FC = () => {
                             console.error("Ошибка при сохранении в localStorage:", e);
                         }
 
-                        navigate('/edit');
+                        navigate('/read');
                     }
                 },
                 {
@@ -161,17 +162,17 @@ const UserSuggestions: React.FC = () => {
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
 
-                    <Tooltip title="Del request">
+                    <Tooltip title="Delete your data">
                         <IconButton onClick={() => delMySubmission(data.id)}>
                             <DeleteIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
 
-                    {/* <Tooltip title="Edit request">
+                    <Tooltip title="Read your data">
                         <IconButton onClick={() => handleClick(data)}>
-                            <EditIcon sx={{ color: 'var(--tree-text)' }} />
+                            <AutoStoriesIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
-                    </Tooltip> */}
+                    </Tooltip>
 
                 </div>
             ),

@@ -16,6 +16,8 @@ from flask import current_app
 from auth.auth_models import User
 
 class InputData(db.Model):
+    __bind_key__ = 'users_db'
+
     __tablename__ = 'input_data'
 
     id = db.Column(db.Integer, primary_key=True)

@@ -56,7 +56,13 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 dotenv_path = os.path.join(basedir, 'env.configs')
 load_dotenv(dotenv_path=dotenv_path)
 
-app = Flask(__name__)
+app = Flask(__name__, instance_relative_config=True)
+
+# Ensure the instance folder exists
+try:
+    os.makedirs(app.instance_path, exist_ok=True)
+except OSError:
+    pass
 
 # === Security Configuration ===
 csp = {
@@ -85,7 +91,13 @@ CORS(
 # logging.basicConfig(level=logging.DEBUG)
 
 # === Configs ===
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'wwhypda.db')
+main_db_filename = os.getenv('MAIN_DATABASE_FILENAME', 'wwhypda.db')
+users_db_filename = os.getenv('USERS_DATABASE_FILENAME', 'users_data.db')
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, main_db_filename)
+app.config['SQLALCHEMY_BINDS'] = {
+    'users_db': 'sqlite:///' + os.path.join(app.instance_path, users_db_filename)
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
