@@ -29,6 +29,6 @@ describe('Add Data Flow', () => {
     cy.visit('http://localhost:3000/input');
 
     // Check for a unique element on the InputPage to confirm access
-    cy.contains('div', 'InputPage').should('be.visible'); 
+    cy.contains('div', 'INPUT PAGE').should('be.visible'); 
   });
 });
