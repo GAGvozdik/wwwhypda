@@ -68,8 +68,6 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
             ]);
         }
 
-        console.log(tableData);
-
 
 
         const fetchData = async () => {
@@ -81,8 +79,14 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
 
             try {
                 const [envResponse, reviewResponse] = await Promise.all([
-                    api.get<Environment[]>('rocks/environments', { withCredentials: true }),
-                    api.get<Reviews[]>('/rocks/reviews', { withCredentials: true }),
+                    api.get<Environment[]>('rocks/environments', {
+                        headers: { 'X-CSRF-TOKEN': csrfToken },
+                        withCredentials: true
+                    }),
+                    api.get<Reviews[]>('/rocks/reviews', {
+                        headers: { 'X-CSRF-TOKEN': csrfToken },
+                        withCredentials: true
+                    }),
                 ]);
 
                 if (!envResponse.data.length) setError("No environment data received from the server.");

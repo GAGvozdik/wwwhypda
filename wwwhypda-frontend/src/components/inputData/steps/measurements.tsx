@@ -251,7 +251,7 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
             <div style={{display: 'flex'}}>
 
                 <SingleSkeleton 
-                    loading={loading}
+                    loading={loading || !isEditable}
                     error={error}
                     margin={'1vh 1vh 1vh 0vh'}
                     width={'10vh'}
@@ -274,7 +274,7 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
                 </SingleSkeleton>
 
                 <SingleSkeleton 
-                    loading={loading}
+                    loading={loading || !isEditable}
                     error={error}
                     margin={'1vh 1vh 1vh 0vh'}
                     width={'10vh'}
