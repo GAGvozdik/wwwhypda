@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
-import {sendAllDataToServer} from '../inputData/steps';
+import {completeSubmission} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
 import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
@@ -13,23 +13,13 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
-    // const handleReset = () => {
-    //     openModal(
-    //         'Do you want to submit data??', // Title
-    //         '', // Description
-    //         'Send', // Action button text
-    //         () => { handleClick(); }
-    //     );
-    //     // setActiveStep(0);
-    // };
-
     const handleSomething = async () => {
         if (!executeRecaptcha) {
-            console.error('Recaptcha not available'); // Or show an error message to the user
+            console.error('Recaptcha not available');
             return;
         }
 
-        const token = await executeRecaptcha('submit_data'); // Execute reCAPTCHA here
+        const token = await executeRecaptcha('submit_data');
 
         openModal({
             title: "Submit your changes?",
@@ -41,10 +31,6 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         handleSubmitData(token);
                     },
                 },
-                // {
-                //     label: "Deny",
-                //     onClick: () => console.log("Deny"),
-                // },
                 {
                     label: "Close",
                     onClick: () => {},
@@ -55,18 +41,25 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const handleSubmitData = async (token: string) => {
         setIsLoading(true);
+        const submissionId = localStorage.getItem("submissionId");
+        if (!submissionId) {
+            console.error("Submission ID is not available.");
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            await sendAllDataToServer(token);
+            await completeSubmission(submissionId);
             localStorage.removeItem("generalInfoData");
             localStorage.removeItem("measurementsTableData");
             localStorage.removeItem("sampleMeasurementTableData");
             localStorage.removeItem("siteInfoTableData");
             localStorage.removeItem("sourceTableData");
             localStorage.removeItem('activeStep');
-            navigate('/account'); // Added redirection
+            localStorage.removeItem('submissionId');
+            navigate('/account');
         } catch (error) {
             console.error("Error submitting data:", error);
-            // Optionally, display an error message to the user
         } finally {
             setIsLoading(false);
         }

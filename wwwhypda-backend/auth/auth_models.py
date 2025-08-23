@@ -30,7 +30,7 @@ class User(db.Model):
         Returns a dictionary or None if not found.
         """
         user = cls.query.filter_by(id=user_id, active=True).first()
-        return {"id": user.id, "name": user.name, "email": user.email, "active": user.active} if user else None
+        return {"id": user.id, "name": user.name, "email": user.email, "active": user.active, "is_superuser": user.is_superuser} if user else None
 
 
     def set_password(self, password):
@@ -283,4 +283,3 @@ class ConfirmationCode(db.Model):
             'created_at': self.created_at,
             'type': self.type
         }
-    

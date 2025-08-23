@@ -50,11 +50,11 @@ class InputData(db.Model):
     @classmethod
     def save_submission(cls, user_id: int, data: dict):
         try:
-            user = User.get_by_id(user_id)  # Получаем имя пользователя
+            user = User.get_by_id(user_id)
             if user:
-                name = user["name"]  # Имя пользователя из результата
+                name = user["name"]
             else:
-                name = "Unknown"  # Если пользователя нет, ставим "Unknown"
+                name = "Unknown"
 
             entry = cls(
                 user_id=user_id,
@@ -90,7 +90,7 @@ class InputData(db.Model):
         try:
             results = db.session.query(
                 cls.id,
-                User.name.label("username"),  # Получаем имя пользователя
+                User.name.label("username"),
                 cls.created_at,
                 cls.status,
                 cls.comment
@@ -101,7 +101,7 @@ class InputData(db.Model):
             return [
                 {
                     "id": row.id,
-                    "username": row.username,  # Здесь имя пользователя
+                    "username": row.username,
                     "created_at": row.created_at.isoformat(),
                     "status": row.status,
                     "comment": row.comment
@@ -118,7 +118,7 @@ class InputData(db.Model):
         try:
             entry = cls.query.filter_by(id=entry_id, user_id=user_id).first()
             if not entry:
-                return False  # Либо не существует, либо не принадлежит пользователю
+                return False
 
             db.session.delete(entry)
             db.session.commit()
@@ -127,3 +127,18 @@ class InputData(db.Model):
             current_app.logger.error(f"[DB ERROR] (delete_by_id_if_owned) Failed to delete InputData id={entry_id}: {e}")
             db.session.rollback()
             return False
+
+    @classmethod
+    def set_status(cls, id: int, status: str):
+        try:
+            entry = cls.query.filter_by(id=id).first()
+            if not entry:
+                return None
+            
+            entry.status = status
+            db.session.commit()
+            return entry.to_dict()
+        except SQLAlchemyError as e:
+            current_app.logger.error(f"[DB ERROR] Failed to set status for InputData id={id}: {e}")
+            db.session.rollback()
+            return None
