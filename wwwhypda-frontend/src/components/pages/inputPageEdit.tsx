@@ -57,7 +57,7 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             localStorage.removeItem("sourceTableData");
             localStorage.removeItem('activeStep');
             localStorage.removeItem('submissionId');
-            navigate('/account');
+            navigate('/superaccount');
         } catch (error) {
             console.error("Error submitting data:", error);
         } finally {
