@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Stepper from '@mui/material/Stepper';
 import Step from '@mui/material/Step';
@@ -21,6 +22,7 @@ import { useModal } from '../modal/modalContext';
 import { useDispatch } from 'react-redux';
 import { ClearSampleMeasurementData, ClearMeasurementsData } from '../../redux/actions';
 import withRecaptcha, { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
+import SingleSkeleton from '../commonFeatures/singleSkeleton';
 
 const steps = [
     { label: 'Step 1', title: 'Site Information' },
@@ -51,6 +53,8 @@ interface CustomStepperProps {
 }
 
 function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: CustomStepperProps & WithRecaptchaProps) {
+
+    const navigate = useNavigate();
 
     const [activeStep, setActiveStep] = useState<number>(() => {
         const savedStep = localStorage.getItem('activeStep');
@@ -119,6 +123,33 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
         setActiveStep(newStep);
         localStorage.setItem('activeStep', newStep.toString());
     };
+
+    const handleNextOrFinish = () => {
+        if (activeStep === steps.length - 1) {
+            if (!isEditable) {
+                navigate('/account');
+            } else {
+                handleNext();
+            }
+        } else {
+            handleNext();
+        }
+    };
+
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key === 'activeStep') {
+                const savedStep = localStorage.getItem('activeStep');
+                setActiveStep(savedStep !== null ? Number(savedStep) : 0);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
 
     return (
         <Box sx={{ width: '100%' }} className={styles.treeText}>
@@ -200,16 +231,24 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
                             alignItems: 'center'   // центрируем по высоте
                         }}
                         >
-                        <Button
-                            onClick={handleClearAll}
-                            className={styles.submitButton}
-                            style={{ 
-                                maxHeight: '4vh',   // высота в vh
-                                minWidth: '15vh'    // ширина в vh
-                            }}
+                        <SingleSkeleton
+                            loading={!isEditable}
+                            margin={'0'}
+                            width={'15vh'}
+                            height={'4vh'}
                         >
-                            Clear all
-                        </Button>
+                            <Button
+                                onClick={handleClearAll}
+                                className={styles.submitButton}
+                                disabled={!isEditable}
+                                style={{ 
+                                    maxHeight: '4vh',   // высота в vh
+                                    minWidth: '15vh'    // ширина в vh
+                                }}
+                            >
+                                Clear all
+                            </Button>
+                        </SingleSkeleton>
                         </div>
 
 
@@ -229,7 +268,7 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
 
                         <Box sx={{ flex: '1 1 auto' }} />
 
-                        <Button onClick={handleNext} className={styles.submitButton}>
+                        <Button onClick={handleNextOrFinish} className={styles.submitButton}>
                             {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                         </Button>
                     </Box>

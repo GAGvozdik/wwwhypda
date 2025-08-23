@@ -307,7 +307,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
                     <div style={{display: 'flex'}}>
 
                         <SingleSkeleton 
-                            loading={loading}
+                            loading={loading || !isEditable}
                             error={error}
                             margin={'1vh 1vh 1vh 0vh'}
                             width={'10vh'}
@@ -330,7 +330,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
                         </SingleSkeleton>
 
                         <SingleSkeleton 
-                            loading={loading}
+                            loading={loading || !isEditable}
                             error={error}
                             margin={'1vh 1vh 1vh 0vh'}
                             width={'10vh'}
