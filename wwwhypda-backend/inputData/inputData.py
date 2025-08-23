@@ -1,10 +1,11 @@
 from flask import Blueprint, request, jsonify, current_app
 import jwt
-from inputData.inputDataModels import InputData
+from inputData.inputDataModels import InputData, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import time 
 from flask_cors import CORS
 from common_defenitions import verify_recaptcha
+from auth.auth_models import User
 
 input_bp = Blueprint("input", __name__, url_prefix="/input")
 
@@ -21,24 +22,52 @@ def get_input_suggestions():
         current_app.logger.error(f"Error in get_input_suggestions: {e}")
         return jsonify({"error": str(e)}), 500
 
-@input_bp.route("/get_input_by_id/<int:input_id>", methods=["GET"])
+@input_bp.route("/get_input_by_id/<int:id>", methods=["GET"])
 @jwt_required()
-def get_input_by_id(input_id):
+def get_input_by_id(id):
     try:
-        input_data = InputData.query.filter_by(id=input_id).first()
+        input_data = InputData.query.filter_by(id=id).first()
         if not input_data:
             return jsonify({"error": "Not found"}), 404
-        return jsonify(input_data.to_dict()), 200  # важно, чтобы .to_dict() возвращал всю нужную структуру
+        return jsonify(input_data.to_dict()), 200
     except Exception as e:
         current_app.logger.error(f"Error in get_input_by_id: {e}")
         return jsonify({"error": str(e)}), 500
 
 
-@input_bp.route("/delete_submission/<int:submission_id>", methods=["DELETE"])
+@input_bp.route("/in_editing/<int:id>", methods=["POST"])
 @jwt_required()
-def delete_submission(submission_id):
+def in_editing(id):
     current_user_id = get_jwt_identity()
-    success = InputData.delete_by_id_if_owned(submission_id, current_user_id)
+    user = User.get_by_id(current_user_id)
+    if not user or not user.get('is_superuser'):
+        return jsonify(message="Unauthorized"), 403
+
+    updated_entry = InputData.set_status(id, 'In editing')
+    if updated_entry:
+        return jsonify(message="Status updated to In editing", data=updated_entry), 200
+    return jsonify(message="Failed to update status"), 500
+
+
+@input_bp.route("/complete/<int:id>", methods=["POST"])
+@jwt_required()
+def complete_submission(id):
+    current_user_id = get_jwt_identity()
+    user = User.get_by_id(current_user_id)
+    if not user or not user.get('is_superuser'):
+        return jsonify(message="Unauthorized"), 403
+
+    updated_entry = InputData.set_status(id, 'completed')
+    if updated_entry:
+        return jsonify(message="Status updated to completed", data=updated_entry), 200
+    return jsonify(message="Failed to update status"), 500
+
+
+@input_bp.route("/delete_submission/<int:id>", methods=["DELETE"])
+@jwt_required()
+def delete_submission(id):
+    current_user_id = get_jwt_identity()
+    success = InputData.delete_by_id_if_owned(id, current_user_id)
     
     if success:
         return jsonify({"message": "Submission was deleted sucessfully"}), 200
@@ -58,7 +87,7 @@ def submit_data():
         return error_response
 
     current_user_id = get_jwt_identity()
-    payload = data # Use 'data' as payload since it contains all request body
+    payload = data
 
     saved_entry = InputData.save_submission(current_user_id, payload)
     if saved_entry:
@@ -72,5 +101,3 @@ def get_my_data():
     current_user_id = get_jwt_identity()
     data = InputData.get_user_submissions(current_user_id)
     return jsonify(data), 200
-
-

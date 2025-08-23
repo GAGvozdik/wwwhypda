@@ -3,7 +3,7 @@ import styles from './../users.module.scss';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Logout } from '../../../redux/actions';
-import { State } from '../../../common/types';
+import { State, getCsrfTokenFromCookie } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -148,42 +148,50 @@ const InputSuggestions: React.FC = () => {
             });
             const data = response.data;
 
+            const handleGoToEditing = async () => {
+                try {
+                    await api.post(`/input/in_editing/${id}`, {}, {
+                        headers: {
+                            'X-CSRF-TOKEN': getCsrfTokenFromCookie()
+                        },
+                        withCredentials: true
+                    });
+                    localStorage.removeItem("generalInfoData");
+                    localStorage.removeItem("measurementsTableData");
+                    localStorage.removeItem("sampleMeasurementTableData");
+                    localStorage.removeItem("siteInfoTableData");
+                    localStorage.removeItem("sourceTableData");
+                    localStorage.removeItem('activeStep');
+
+                    localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                    localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                    localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                    localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                    localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                    localStorage.setItem("activeStep", "0");
+                    localStorage.setItem("submissionId", String(id));
+
+                    navigate(`/edit`);
+                    closeModal();
+                    getSuggestionsData();
+                } catch (error) {
+                    console.error("Error in handleGoToEditing:", error);
+                }
+            };
+
             openModal({
                 title: 'Are you sure you want to start editing?',
                 description: 'All current sample data will be permanently erased!',
                 buttons: [
                     {
                         label: 'Go to editing',
-                        onClick: () => {
-                            // Очистка текущих данных
-                            localStorage.removeItem("generalInfoData");
-                            localStorage.removeItem("measurementsTableData");
-                            localStorage.removeItem("sampleMeasurementTableData");
-                            localStorage.removeItem("siteInfoTableData");
-                            localStorage.removeItem("sourceTableData");
-                            localStorage.removeItem('activeStep');
-
-                            try {
-                                // Сохраняем новые данные
-                                localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
-                                localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
-                                localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
-                                localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
-                                localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
-                                localStorage.setItem("activeStep", "0");
-
-                                console.log("Данные успешно записаны в localStorage.");
-                            } catch (e) {
-                                console.error("Ошибка при сохранении в localStorage:", e);
-                            }
-
-                            navigate('/edit');
-                        }
+                        onClick: handleGoToEditing
                     },
                     {
                         label: 'Cancel',
                         onClick: () => {
-                            console.log("Редактирование отменено.");
+                            getSuggestionsData();
+                            closeModal();
                         }
                     }
                 ]
