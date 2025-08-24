@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import styles from './stepper.module.scss';
 
-
 import { StepIconProps } from '@mui/material/StepIcon';
 import Check from '@mui/icons-material/Check';
 
@@ -179,6 +178,7 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
                     </Typography>
 
                     <Box sx={{ height: '54vh' }} /> 
+
                     <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '1vh' }}>
                         <Button
                             onClick={() => {
@@ -231,24 +231,24 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
                             alignItems: 'center'   // центрируем по высоте
                         }}
                         >
-                        <SingleSkeleton
-                            loading={!isEditable}
-                            margin={'0'}
-                            width={'15vh'}
-                            height={'4vh'}
-                        >
-                            <Button
-                                onClick={handleClearAll}
-                                className={styles.submitButton}
-                                disabled={!isEditable}
-                                style={{ 
-                                    maxHeight: '4vh',   // высота в vh
-                                    minWidth: '15vh'    // ширина в vh
-                                }}
+                            <SingleSkeleton
+                                loading={isLoading}
+                                margin={'0'}
+                                width={'15vh'}
+                                height={'4vh'}
                             >
-                                Clear all
-                            </Button>
-                        </SingleSkeleton>
+                                <Button
+                                    onClick={handleClearAll}
+                                    className={styles.submitButton}
+                                    disabled={!isEditable}
+                                    style={{ 
+                                        maxHeight: '4vh',   // высота в vh
+                                        minWidth: '15vh'    // ширина в vh
+                                    }}
+                                >
+                                    Clear all
+                                </Button>
+                            </SingleSkeleton>
                         </div>
 
 
