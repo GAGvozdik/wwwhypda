@@ -210,7 +210,7 @@ function CustomStepper({handleClick, executeRecaptcha, isLoading, isEditable}: C
             ) : (
 
                 <React.Fragment>
-                    <div style={{ display: 'flex', alignItems: 'center', padding: '1rem 0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', padding: '1vh 0' }}>
                         <div style={{ flex: 1 }}></div> {/* Left spacer */}
                         <div 
                             style={{

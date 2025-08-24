@@ -15,6 +15,6 @@
 .grecaptcha-badge {
     bottom: 0.3vh !important;
     right: 0.3vh !important;
-    transform: scale(1) !important;
+    transform: scale(0.8) !important;
     /* transform-origin: bottom right !important; */
 }
