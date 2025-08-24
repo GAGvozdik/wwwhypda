@@ -23,6 +23,7 @@ const InputSuggestions: React.FC = () => {
     const [allSuggestions, setAllSuggestions] = useState<any[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [userData, setUserData] = useState<any>(null);
 
     useEffect(() => {
         getSuggestionsData();
@@ -156,6 +157,7 @@ const InputSuggestions: React.FC = () => {
             });
             const data = response.data;
 
+
             const handleGoToEditing = async () => {
                 try {
                     await api.post(`/input/in_editing/${id}`, {}, {
@@ -187,23 +189,87 @@ const InputSuggestions: React.FC = () => {
                 }
             };
 
-            openModal({
-                title: 'Are you sure you want to start editing?',
-                description: 'All current sample data will be permanently erased!',
-                buttons: [
-                    {
-                        label: 'Go to editing',
-                        onClick: handleGoToEditing
-                    },
-                    {
-                        label: 'Cancel',
-                        onClick: () => {
-                            getSuggestionsData();
-                            closeModal();
+            try {
+                const response = await api.get('/users/', {
+                    withCredentials: true,
+                });
+                setUserData(response.data.data);
+            } catch (error: any) {
+                setError(error.response?.data?.error || 'Error fetching user data');
+            } finally {
+                setIsLoading(false);
+            }
+
+            if ((data.editing_by == null) || (data.editing_by == userData.name)){
+                console.log('1 condition is true');
+                openModal({
+                    title: 'Are you sure you want to start editing?',
+                    description: 'All current sample data will be permanently erased!',
+                    buttons: [
+                        {
+                            label: 'Go to editing',
+                            onClick: handleGoToEditing
+                        },
+                        {
+                            label: 'Cancel',
+                            onClick: () => {
+                                getSuggestionsData();
+                                closeModal();
+                            }
                         }
-                    }
-                ]
-            });
+                    ]
+                });
+            } else if (data.editing_by == 'Completed') {
+                console.log('2 condition is true');
+                openModal({
+                    title: 'Are you sure you want to start reading your data?',
+                    description: 'This data set have been checked by one superuser. You can only read this data. All current sample data in add data page will be permanently erased if you go to read!',
+                    buttons: [
+                        {
+                            label: 'Go to reading',
+                            onClick: () => {
+                                // Очистка старых данных
+                                localStorage.removeItem("generalInfoData");
+                                localStorage.removeItem("measurementsTableData");
+                                localStorage.removeItem("sampleMeasurementTableData");
+                                localStorage.removeItem("siteInfoTableData");
+                                localStorage.removeItem("sourceTableData");
+                                localStorage.removeItem("activeStep");
+
+                                try {
+                                    // Сохранение новых данных
+                                    localStorage.setItem("generalInfoData", JSON.stringify(data.generalInfoData));
+                                    localStorage.setItem("measurementsTableData", JSON.stringify(data.measurementsTableData));
+                                    localStorage.setItem("sampleMeasurementTableData", JSON.stringify(data.sampleMeasurementTableData));
+                                    localStorage.setItem("siteInfoTableData", JSON.stringify(data.siteInfoTableData));
+                                    localStorage.setItem("sourceTableData", JSON.stringify(data.sourceTableData));
+                                    localStorage.setItem("activeStep", "0");
+
+                                    console.log("Данные успешно записаны в localStorage.");
+                                } catch (e) {
+                                    console.error("Ошибка при сохранении в localStorage:", e);
+                                }
+
+                                navigate('/read');
+                            }
+                        },
+                        {
+                            label: 'Cancel',
+                            onClick: () => {
+                                console.log("Редактирование отменено.");
+                            }
+                        }
+                    ]
+                });
+
+            } else {
+                console.log('3 condition is true');
+                openModal({
+                    title: `You can\`t edit this data! Please wait ...`,
+                    description: `This data set is editing by ${data.editing_by}`,
+                    buttons: []
+                });
+            }
 
         } catch (error) {
             console.error("Ошибка при получении данных:", error);

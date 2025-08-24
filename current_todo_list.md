@@ -8,7 +8,7 @@
 
 5. add a way to add user suggestions in wwwhypda database in right way (not like a current way)
 
-6. create test to check superuser login bug
+6. after superuser submit data navigate to account instead superaccount
 
 7. add status "in process of checking by admins" and "in process of checking by admins NOW" with modal window with warning message, to prevent editing at the same time
 
