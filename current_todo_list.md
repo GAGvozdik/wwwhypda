@@ -1,12 +1,12 @@
-1. add captcha to input table steps
+1. add a way to add user suggestions in wwwhypda database in right way (not like a current way)
 
-2. add an opportunity to verify email for users, who registered and non verifyed
+2. add captcha to input table steps ??
 
-3. add bun field
+3. add an opportunity to verify email for users, who registered and non verifyed ??
 
-4. fix double load on resend code
+4. add bun field ??
 
-5. add a way to add user suggestions in wwwhypda database in right way (not like a current way)
+5. ~~fix double load on resend code~~
 
 6. ~~divide databases~~
 

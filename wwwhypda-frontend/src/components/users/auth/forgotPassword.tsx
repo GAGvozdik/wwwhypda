@@ -15,6 +15,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [step, setStep] = useState(1);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
     const [resendTimer, setResendTimer] = useState(0);
@@ -49,7 +50,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const handleResendCode = useCallback(async () => {
         if (resendTimer > 0 || !executeRecaptcha) return;
 
-        setIsLoading(true);
+        setIsResending(true);
         try {
             const token = await executeRecaptcha('resend_password_reset');
             const response = await api.post("/users/request-password-reset", { email, recaptcha_token: token });
@@ -66,7 +67,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setError(err.response?.data?.message || "Error while resending the confirmation code.");
             setIsError(true);
         } finally {
-            setIsLoading(false);
+            setIsResending(false);
         }
     }, [email, executeRecaptcha, resendTimer]);
 
@@ -193,7 +194,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
                         <UserButton
                             text="Resend Code"
-                            isLoading={isLoading || resendTimer > 0}
+                            isLoading={isResending || resendTimer > 0}
                             onclick={handleResendCode}
                             disabled={resendTimer > 0}
                         />
