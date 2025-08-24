@@ -1,4 +1,5 @@
-import styles from '../../menu.module.scss'; 
+// import styles from '../../menu.module.scss'; 
+import styles from '../stepper.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
@@ -10,6 +11,7 @@ import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import { UpdateMeasurementsData, UpdateSampleMeasurementData } from '../../../redux/actions';
 import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
+import Button from '@mui/material/Button';
 
 import { 
     ClientSideRowModelModule, 
@@ -251,36 +253,36 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
             <div style={{display: 'flex'}}>
 
                 <SingleSkeleton 
-                    loading={loading || !isEditable}
+                    loading={loading}
                     error={error}
                     margin={'1vh 1vh 1vh 0vh'}
-                    width={'10vh'}
+                    width={'15vh'}
                     height={'3.5vh'}
                 >
-                    <button
+                    <Button
                         onClick={addRow}
                         className={styles.submitButton}
                         disabled={!isEditable}
                         style={{
                             margin: '1vh 1vh 1vh 0vh', 
-                            width: '10vh', 
+                            width: '17vh !important', 
                             height: '3.5vh', 
                             fontSize: '1.5vh', 
                             padding: '0vh'
                         }}
                     >
                         Add Row
-                    </button>
+                    </Button>
                 </SingleSkeleton>
 
                 <SingleSkeleton 
-                    loading={loading || !isEditable}
+                    loading={loading}
                     error={error}
                     margin={'1vh 1vh 1vh 0vh'}
-                    width={'10vh'}
+                    width={'15vh'}
                     height={'3.5vh'}
                 >
-                    <button
+                    <Button
                         disabled={!isEditable}
                         onClick={deleteRow}
                         className={styles.submitButton}
@@ -288,12 +290,12 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
                             margin: '1vh 1vh 1vh 0vh', 
                             width: '10vh', 
                             height: '3.5vh', 
-                            fontSize: '1.5vh', 
+                            fontSize: '0.5vh', 
                             padding: '0vh'
                         }}
                     >
                         Delete Row
-                    </button>
+                    </Button>
                 </SingleSkeleton>
             </div>
 
