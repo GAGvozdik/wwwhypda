@@ -73,7 +73,13 @@ export default function MainMenu() {
 
                     <Route 
                         path="/account" 
-                        element={<ProtectedRoute><Account /></ProtectedRoute>} 
+                        element={
+                            <ProtectedRoute>
+                                <SuperProtectedRoute redirectIfSuperuser={true}>
+                                    <Account />
+                                </SuperProtectedRoute>
+                            </ProtectedRoute>
+                        } 
                     />
 
                     <Route 
