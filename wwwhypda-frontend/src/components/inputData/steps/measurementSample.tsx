@@ -1,4 +1,5 @@
-import styles from '../../menu.module.scss'; 
+// import styles from '../../menu.module.scss'; 
+import styles from '../stepper.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
@@ -10,6 +11,7 @@ import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import { UpdateSampleMeasurementData, UpdateMeasurementsData } from '../../../redux/actions';
 import withRecaptcha, { WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
+import Button from '@mui/material/Button';
 
 import { 
     ClientSideRowModelModule, 
@@ -302,69 +304,68 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
     return (
         <div style={containerStyle}>
             
-                    
+            
 
-                    <div style={{display: 'flex'}}>
+            <div style={{display: 'flex'}}>
+                <SingleSkeleton 
+                    loading={loading}
+                    error={error}
+                    margin={'1vh 1vh 1vh 0vh'}
+                    width={'15vh'}
+                    height={'3.5vh'}
+                >
+                    <Button
+                        onClick={addRow}
+                        className={styles.submitButton}
+                        disabled={!isEditable}
+                        style={{
+                            margin: '1vh 1vh 1vh 0vh', 
+                            width: '17vh !important', 
+                            height: '3.5vh', 
+                            fontSize: '1.5vh', 
+                            padding: '0vh'
+                        }}
+                    >
+                        Add Row
+                    </Button>
+                </SingleSkeleton>
 
-                        <SingleSkeleton 
-                            loading={loading || !isEditable}
-                            error={error}
-                            margin={'1vh 1vh 1vh 0vh'}
-                            width={'10vh'}
-                            height={'3.5vh'}
-                        >
-                            <button
-                                disabled={!isEditable}
-                                onClick={addRow}
-                                className={styles.submitButton}
-                                style={{
-                                    margin: '1vh 1vh 1vh 0vh', 
-                                    width: '10vh', 
-                                    height: '3.5vh', 
-                                    fontSize: '1.5vh', 
-                                    padding: '0vh'
-                                }}
-                            >
-                                Add Row
-                            </button>
-                        </SingleSkeleton>
+                <SingleSkeleton 
+                    loading={loading}
+                    error={error}
+                    margin={'1vh 1vh 1vh 0vh'}
+                    width={'15vh'}
+                    height={'3.5vh'}
+                >
+                    <Button
+                        disabled={!isEditable}
+                        onClick={deleteRow}
+                        className={styles.submitButton}
+                        style={{
+                            margin: '1vh 1vh 1vh 0vh', 
+                            width: '10vh', 
+                            height: '3.5vh', 
+                            fontSize: '0.5vh', 
+                            padding: '0vh'
+                        }}
+                    >
+                        Delete Row
+                    </Button>
+                </SingleSkeleton>
+            </div>
 
-                        <SingleSkeleton 
-                            loading={loading || !isEditable}
-                            error={error}
-                            margin={'1vh 1vh 1vh 0vh'}
-                            width={'10vh'}
-                            height={'3.5vh'}
-                        >
-                            <button
-                                disabled={!isEditable}
-                                onClick={deleteRow}
-                                className={styles.submitButton}
-                                style={{
-                                    margin: '1vh 1vh 1vh 0vh', 
-                                    width: '10vh', 
-                                    height: '3.5vh', 
-                                    fontSize: '1.5vh', 
-                                    padding: '0vh'
-                                }}
-                            >
-                                Delete Row
-                            </button>
-                        </SingleSkeleton>
-                    </div>
-
-                    <SingleSkeleton loading={loading} error={error}>
-                        <AgGridReact
-                            theme={themeDarkBlue}
-                            rowData={tableData}
-                            columnDefs={columnDefs}
-                            defaultColDef={defaultColDef}
-                            tooltipShowDelay={0}
-                            headerHeight={40}
-                            cellSelection={cellSelection}
-                            onCellValueChanged={handleCellValueChanged}
-                        />
-                    </SingleSkeleton>
+            <SingleSkeleton loading={loading} error={error}>
+                <AgGridReact
+                    theme={themeDarkBlue}
+                    rowData={tableData}
+                    columnDefs={columnDefs}
+                    defaultColDef={defaultColDef}
+                    tooltipShowDelay={0}
+                    headerHeight={40}
+                    cellSelection={cellSelection}
+                    onCellValueChanged={handleCellValueChanged}
+                />
+            </SingleSkeleton>
 
         </div>
     );
