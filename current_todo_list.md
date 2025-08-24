@@ -15,3 +15,5 @@
 8. ~~make unactive clear data buton & add/remove row buttons in reading mode + del submit step~~
 
 9. Why account page exists, after superusers log in? and redirect to account page from edit after submit data  
+
+10. fix double load on resend code

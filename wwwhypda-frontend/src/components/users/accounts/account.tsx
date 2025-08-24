@@ -101,7 +101,7 @@ const Account: React.FC = () => {
 
 
                 <div style={{ margin: '5vh' }}>
-                    {isLoading && <LoadIcon size={60}/>}
+                    {isLoading && <LoadIcon size={34}/>}
                     {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
                     {userData && (
                         <div>
