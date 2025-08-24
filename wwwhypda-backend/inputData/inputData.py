@@ -43,7 +43,7 @@ def in_editing(id):
     if not user or not user.get('is_superuser'):
         return jsonify(message="Unauthorized"), 403
 
-    updated_entry = InputData.set_status(id, 'In editing')
+    updated_entry = InputData.set_status(id, 'In editing', user.get('name'))
     if updated_entry:
         return jsonify(message="Status updated to In editing", data=updated_entry), 200
     return jsonify(message="Failed to update status"), 500
@@ -57,7 +57,7 @@ def complete_submission(id):
     if not user or not user.get('is_superuser'):
         return jsonify(message="Unauthorized"), 403
 
-    updated_entry = InputData.set_status(id, 'completed')
+    updated_entry = InputData.set_status(id, 'completed', None)
     if updated_entry:
         return jsonify(message="Status updated to completed", data=updated_entry), 200
     return jsonify(message="Failed to update status"), 500
@@ -101,3 +101,5 @@ def get_my_data():
     current_user_id = get_jwt_identity()
     data = InputData.get_user_submissions(current_user_id)
     return jsonify(data), 200
+
+

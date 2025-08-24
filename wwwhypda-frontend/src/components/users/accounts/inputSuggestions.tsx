@@ -80,6 +80,14 @@ const InputSuggestions: React.FC = () => {
             },
         },
         {
+            headerName: 'Editing By',
+            field: 'editing_by',
+            flex: 1,
+            valueFormatter: (params: any) => {
+                return params.value || '—'; // Показывает статус или тире, если null/undefined
+            },
+        },
+        {
             headerName: 'Actions',
             field: 'actions',
             cellRenderer: ({ data }: any) => (

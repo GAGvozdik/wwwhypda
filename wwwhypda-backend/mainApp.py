@@ -20,23 +20,24 @@ from inputData.inputData import input_bp
 from auth.authentication import auth_bp
 from auth.admin.admin import admin_bp
 from rocks.rocks_bp import rocks_bp
+from inputData.inputDataModels import InputData
 
 # from rocks.rocks_models import db
 # from auth.auth_models import db  # потенциально дублирование, оставь один из них
 from common_defenitions import mail, db
-from sqlalchemy import text
+from sqlalchemy import text, inspect
 from flask import current_app
 
-def add_status_column_if_not_exists(column_name='comment'):
+def add_column_if_not_exists(column_name='editing_by'):
     
     try:
         # Проверим наличие колонки 'name' в таблице input_data
         result = db.session.execute(text("PRAGMA table_info(input_data);"))
         columns = [row[1] for row in result]  # row[1] — это имя колонки
 
-        if "column_name" not in columns:
+        if column_name not in columns:
             db.session.execute(
-                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(600)")
+                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(50)")
             )
             db.session.commit()
 
@@ -45,6 +46,8 @@ def add_status_column_if_not_exists(column_name='comment'):
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(f"❌ Failed to add {column_name} column: {e}")
+
+
 
 # TODO: Add reCAPTCHA
 # TODO: Add request limiting (maybe reCAPTCHA will help)
@@ -58,11 +61,6 @@ load_dotenv(dotenv_path=dotenv_path)
 
 app = Flask(__name__, instance_relative_config=True)
 
-# Ensure the instance folder exists
-try:
-    os.makedirs(app.instance_path, exist_ok=True)
-except OSError:
-    pass
 
 # === Security Configuration ===
 csp = {
@@ -88,7 +86,7 @@ CORS(
 )
 
 # talisman = Talisman(app)
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 # === Configs ===
 main_db_filename = os.getenv('MAIN_DATABASE_FILENAME', 'wwhypda.db')
@@ -183,6 +181,8 @@ def not_found(e):
 # === Main Entry ===
 if __name__ == "__main__":
     with app.app_context():
-        # add_status_column_if_not_exists()
-        db.create_all()
+        # db.create_all()
+        db.create_all(bind_key='users_db')
+
+        # add_column_if_not_exists()
     app.run(host="0.0.0.0", port=5000, debug=True)
