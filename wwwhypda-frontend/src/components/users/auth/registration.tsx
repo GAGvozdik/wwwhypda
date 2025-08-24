@@ -16,6 +16,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [confirmationCode, setConfirmationCode] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
     const [step, setStep] = useState(1);
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -101,7 +102,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const handleResendCode = useCallback(async () => {
         if (resendTimer > 0 || !executeRecaptcha) return;
 
-        setIsLoading(true);
+        setIsResending(true);
         try {
             const token = await executeRecaptcha('resend_code');
             const response = await api.post("/users/resend-confirmation", { email, recaptcha_token: token });
@@ -118,7 +119,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setError(err.response?.data?.message || "Error while resending the confirmation code.");
             setIsError(true);
         } finally {
-            setIsLoading(false);
+            setIsResending(false);
         }
     }, [executeRecaptcha, email, resendTimer]);
 
@@ -212,7 +213,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
                         <UserButton
                             text="Resend Code"
-                            isLoading={isLoading || resendTimer > 0}
+                            isLoading={isResending || resendTimer > 0}
                             onclick={handleResendCode}
                             disabled={resendTimer > 0}
                         />
