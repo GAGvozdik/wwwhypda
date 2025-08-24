@@ -66,7 +66,12 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             localStorage.removeItem("siteInfoTableData");
             localStorage.removeItem("sourceTableData");
             localStorage.removeItem('activeStep');
-            navigate('/account'); // Assuming '/account' is the user's account page route
+            const isSuperuser = localStorage.getItem('isSuperuser') === 'true';
+            if (isSuperuser) {
+                navigate('/superaccount');
+            } else {
+                navigate('/account');
+            }
         } catch (error) {
             console.error("Error submitting data:", error);
             // Optionally, display an error message to the user
