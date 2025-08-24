@@ -26,7 +26,7 @@
 
 .submitButton:disabled {
     color: var(--submit-button-text) !important;
-    background-color: var(--submit-button-hover) !important;
+    background-color: var(--submit-button-unactive) !important;
 }
 .submitButton:active  {
     transition: 0.5s !important;
