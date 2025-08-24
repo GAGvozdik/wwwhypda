@@ -25,6 +25,7 @@ class InputData(db.Model):
     name = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.String(20), default='New')
+    editing_by = db.Column(db.String(100), nullable=True)
     general_info = db.Column(JSON, nullable=False)
     measurements = db.Column(JSON, nullable=False)
     samples = db.Column(JSON, nullable=False)
@@ -44,6 +45,7 @@ class InputData(db.Model):
             "siteInfoTableData": self.site_info,
             "sourceTableData": self.source_info,
             "status": self.status,
+            "editing_by": self.editing_by,
             "comment": self.comment
         }
 
@@ -93,6 +95,7 @@ class InputData(db.Model):
                 User.name.label("username"),
                 cls.created_at,
                 cls.status,
+                cls.editing_by,
                 cls.comment
             ).join(User, User.id == cls.user_id) \
             .order_by(cls.created_at.desc()) \
@@ -104,6 +107,7 @@ class InputData(db.Model):
                     "username": row.username,
                     "created_at": row.created_at.isoformat(),
                     "status": row.status,
+                    "editing_by": row.editing_by,
                     "comment": row.comment
                 }
                 for row in results
@@ -129,13 +133,14 @@ class InputData(db.Model):
             return False
 
     @classmethod
-    def set_status(cls, id: int, status: str):
+    def set_status(cls, id: int, status: str, editing_by: str = None):
         try:
             entry = cls.query.filter_by(id=id).first()
             if not entry:
                 return None
             
             entry.status = status
+            entry.editing_by = editing_by
             db.session.commit()
             return entry.to_dict()
         except SQLAlchemyError as e:
