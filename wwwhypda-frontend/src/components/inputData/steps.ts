@@ -29,7 +29,12 @@ export const sendAllDataToServer = async (recaptchaToken: string) => {
 
 export const completeSubmission = async (id: string) => {
   try {
-    const response = await api.post(`/input/complete/${id}`);
+    const response = await api.post(`/input/complete/${id}`, {}, {
+        headers: {
+            'X-CSRF-TOKEN': getCsrfTokenFromCookie()
+        },
+        withCredentials: true 
+    });
     console.log("Submission completed:", response.data);
   } catch (error: any) {
     console.error("Error completing submission:", error.response?.data || error.message);
