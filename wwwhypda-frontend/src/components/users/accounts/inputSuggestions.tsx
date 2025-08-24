@@ -189,18 +189,25 @@ const InputSuggestions: React.FC = () => {
                 }
             };
 
+            let currentUserData = null;
             try {
                 const response = await api.get('/users/', {
                     withCredentials: true,
                 });
-                setUserData(response.data.data);
+                currentUserData = response.data.data;
+                setUserData(currentUserData);
             } catch (error: any) {
                 setError(error.response?.data?.error || 'Error fetching user data');
-            } finally {
-                setIsLoading(false);
+                console.error("Could not fetch user data, aborting handleClick.", error);
+                return; 
             }
 
-            if ((data.editing_by == null) || (data.editing_by == userData.name)){
+            if (!currentUserData) {
+                console.error("User data is null after fetch, aborting.");
+                return;
+            }
+
+            if ((data.editing_by == null) || (data.editing_by == currentUserData.name)){
                 console.log('1 condition is true');
                 openModal({
                     title: 'Are you sure you want to start editing?',
@@ -265,7 +272,7 @@ const InputSuggestions: React.FC = () => {
             } else {
                 console.log('3 condition is true');
                 openModal({
-                    title: `You can\`t edit this data! Please wait ...`,
+                    title: `You can\'t edit this data! Please wait ...`,
                     description: `This data set is editing by ${data.editing_by}`,
                     buttons: []
                 });
