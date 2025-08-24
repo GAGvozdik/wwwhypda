@@ -57,7 +57,7 @@ def complete_submission(id):
     if not user or not user.get('is_superuser'):
         return jsonify(message="Unauthorized"), 403
 
-    updated_entry = InputData.set_status(id, 'completed', None)
+    updated_entry = InputData.set_status(id, 'Completed', None)
     if updated_entry:
         return jsonify(message="Status updated to completed", data=updated_entry), 200
     return jsonify(message="Failed to update status"), 500

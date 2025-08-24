@@ -207,26 +207,8 @@ const InputSuggestions: React.FC = () => {
                 return;
             }
 
-            if ((data.editing_by == null) || (data.editing_by == currentUserData.name)){
-                console.log('1 condition is true');
-                openModal({
-                    title: 'Are you sure you want to start editing?',
-                    description: 'All current sample data will be permanently erased!',
-                    buttons: [
-                        {
-                            label: 'Go to editing',
-                            onClick: handleGoToEditing
-                        },
-                        {
-                            label: 'Cancel',
-                            onClick: () => {
-                                getSuggestionsData();
-                                closeModal();
-                            }
-                        }
-                    ]
-                });
-            } else if (data.editing_by == 'Completed') {
+
+            if (data.status == 'Completed') {
                 console.log('2 condition is true');
                 openModal({
                     title: 'Are you sure you want to start reading your data?',
@@ -269,12 +251,40 @@ const InputSuggestions: React.FC = () => {
                     ]
                 });
 
+            } else if ((data.editing_by == null) || (data.editing_by == currentUserData.name)){
+                console.log('1 condition is true');
+                openModal({
+                    title: 'Are you sure you want to start editing?',
+                    description: 'All current sample data will be permanently erased!',
+                    buttons: [
+                        {
+                            label: 'Go to editing',
+                            onClick: handleGoToEditing
+                        },
+                        {
+                            label: 'Cancel',
+                            onClick: () => {
+                                getSuggestionsData();
+                                closeModal();
+                            }
+                        }
+                    ]
+                });
+            
+
             } else {
                 console.log('3 condition is true');
                 openModal({
                     title: `You can\'t edit this data! Please wait ...`,
                     description: `This data set is editing by ${data.editing_by}`,
-                    buttons: []
+                    buttons: [
+                        {
+                            label: 'Cancel',
+                            onClick: () => {
+                                console.log("Редактирование отменено.");
+                            }
+                        }
+                    ]
                 });
             }
 

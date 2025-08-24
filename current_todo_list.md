@@ -17,3 +17,5 @@
 9. Why account page exists, after superusers log in? and redirect to account page from edit after submit data  
 
 10. fix double load on resend code
+
+11. change unactive buttons style in reading mode
