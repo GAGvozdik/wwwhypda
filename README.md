@@ -6,30 +6,37 @@
    Create a new file named `env.configs` in folder with `mainApp.py` and write into:
 
    > MAIN_DATABASE_FILENAME = 'wwhypda.db'
+   > 
    > USERS_DATABASE_FILENAME = 'users_data.db'
    > 
    > MAIL_SERVER = 'smtp.gmail.com'
+   >
    > MAIL_PORT = '465'
    > 
    > MAIL_USERNAME = 'your_gmail_email@gmail.com'
+   > 
    > MAIL_PASSWORD = 'your gmail api key'
    > 
    > SECRET_KEY = 'your_random_secret_key'
    > 
    > JWT_SECRET_KEY = 'your_random_secret_key'
+   > 
    > JWT_ACCESS_COOKIE_NAME = 'jwt'
    > 
    > RECAPTCHA_SECRET_KEY = 'your_google_recaptcha_secret_key'
    > 
    > SWAGGER_URL = '/swagger' 
+   > 
    > API_URL = '/static/swagger.json' 
    > 
    > STATIC_IP = 'http://192.168.154.231'
    > 
    > ACCESS_EXPIRES_SECONDS=21600
+   > 
    > REFRESH_EXPIRES_SECONDS=86400
    > 
    > TESTING=False
+   > 
    > DEBUG = True
 
 3. Set up the mail server. To get mail code to set up a mail server using gmail:
