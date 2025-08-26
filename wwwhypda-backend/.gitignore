@@ -5,6 +5,7 @@ workEnv/
 wwhypda.db-shm
 wwhypda.db-wal
 
+
 venv
 env
 .env

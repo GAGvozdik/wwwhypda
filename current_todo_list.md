@@ -1,3 +1,10 @@
+DNS and others sertificates
+domain info
+Test in docker
+Fix instructions
+create docker image
+del users db from github
+
 1. add a way to add user suggestions in wwwhypda database in right way (not like a current way)
 
 2. add captcha to input table steps ??
