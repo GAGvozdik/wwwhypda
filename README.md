@@ -61,7 +61,14 @@
 
    :warning: **Warning:** DON'T SHOW YOUR SECRET KEYS TO ANYONE AND DON'T SEND IT TO GITHUB !!!
 
-3. Create your google recaptcha key using instruction (https://developers.google.com/recaptcha). Then set your api key in env.configs
+3. Create your google recaptcha key using instruction (https://developers.google.com/recaptcha). 
+   Then set your api key in env.configs and set syte key in wwwhypda\wwwhypda-frontend\.env that should looks like that:
+
+   > REACT_APP_BASE_URL=http://localhost:5000/
+   >
+   > REACT_APP_RECAPTCHA_SITE_KEY=your_app_recaptcha_site_key
+   >
+   > REACT_APP_CYPRESS_TEST=false
 
 4. Run the back-end. In your terminal, inside the cloned `wwhypda`
    folder, first move to the folder `wwhypda-backend`:
