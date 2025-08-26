@@ -1,4 +1,4 @@
-DNS and others sertificates
+DNS and SSL/TLS sertificates and smth with let's encrypt
 domain info
 Test in docker
 Fix instructions
