@@ -1,3 +1,5 @@
+окей вот тут я убрал из .env baseurl и это было ошибкой, лучше вынести эту зависимость в ощий файл конфигов
+
 DNS and SSL/TLS sertificates and smth with let's encrypt
 domain info
 Test in docker
