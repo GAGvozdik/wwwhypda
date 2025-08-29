@@ -1,7 +1,7 @@
 FROM node:alpine as build
 
 COPY package.json package.json
-RUN npm install --production
+RUN npm install --omit=dev
 COPY . .
 RUN npm run build
 
