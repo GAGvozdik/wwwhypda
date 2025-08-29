@@ -4,6 +4,7 @@ Test in docker
 Fix instructions
 create docker image
 del users db from github
+del api keys from git history
 
 1. add a way to add user suggestions in wwwhypda database in right way (not like a current way)
 
