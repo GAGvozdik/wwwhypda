@@ -155,7 +155,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
                             <table>
                                 <tbody>
-                                    {parameters.map((param) => (
+                                    {(parameters || []).map((param) => (
                                             <SearchTableRow
                                                 key={param.id_Parameter}
                                                 name={param.html_code}
