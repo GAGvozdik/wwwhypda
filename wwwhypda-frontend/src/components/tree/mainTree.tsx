@@ -35,6 +35,10 @@ interface RockTypeData {
 
 const buildTree = (data: RockTypeData[]): JSX.Element[] => {
     
+    if (!Array.isArray(data)) {
+        return []; 
+    }
+
     const nodeMap: { [key: number]: RockTypeData } = {};
     data.forEach(node => nodeMap[node.rt_id] = node);
 
