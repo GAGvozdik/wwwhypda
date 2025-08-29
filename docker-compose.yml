@@ -29,7 +29,8 @@ services:
 
   backend:
     build:
-      context: ./wwwhypda-backend
+      context: .
+      dockerfile: ./wwwhypda-backend/Dockerfile
     
     env_file:
       - ./wwwhypda-backend/env.configs
