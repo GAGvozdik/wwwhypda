@@ -5,7 +5,7 @@ services:
   nginx:
     image: nginx:stable-alpine
     ports:
-      - "80:80"
+      - "8080:80"
       # !!! for https
       # - "443:443"
     volumes:
