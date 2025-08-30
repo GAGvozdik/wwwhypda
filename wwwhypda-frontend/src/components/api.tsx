@@ -4,7 +4,7 @@ const getBaseURL = () => {
   if (process.env.NODE_ENV === 'production') {
     return '/api';
   }
-  return '/';
+  return 'http://localhost:5000';
 };
 
 const api = axios.create({
