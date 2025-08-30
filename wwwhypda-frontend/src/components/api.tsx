@@ -1,15 +1,14 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
-  if (process.env.NODE_ENV === 'production') {
-    return '/api';
+  if (window.location.hostname === 'localhost') {
+    return process.env.REACT_APP_BASE_URL_LOCAL;
   }
-  return '/';
+  return process.env.REACT_APP_BASE_URL_DOCKER;
 };
 
 const api = axios.create({
   baseURL: getBaseURL(),
 });
-
 
 export default api;
