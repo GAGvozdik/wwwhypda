@@ -5,7 +5,7 @@ domain info
 Test in docker
 Fix instructions
 create docker image
-~~del users db from github~~
+del users db from github
 del api keys from git history
 protect add row and del row using recaptcha
 add function deny dataset in superuser account
