@@ -6,4 +6,4 @@ RUN pip install -r requirements.txt
 COPY common /common
 COPY wwwhypda-backend/ .
 
-CMD [ "python", "mainApp.py" ]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "mainApp:app"]
