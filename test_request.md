@@ -1,33 +1,49 @@
-(workEnv) PS C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend> pip install -r requirements.txt  
-ERROR: Exception:
-Traceback (most recent call last):
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\cli\base_command.py", line 180, in exc_logging_wrapper
-    status = run_func(*args)
-             ^^^^^^^^^^^^^^^
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\cli\req_command.py", line 245, in wrapper
-    return func(self, options, args)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\commands\install.py", line 342, in run
-    reqs = self.get_requirements(args, options, finder, session)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\cli\req_command.py", line 433, in get_requirements
-    for parsed_req in parse_requirements(
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\req\req_file.py", line 156, in parse_requirements
-    for parsed_line in parser.parse(filename, constraint):
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\req\req_file.py", line 337, in parse
-    yield from self._parse_and_recurse(filename, constraint)
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\req\req_file.py", line 342, in _parse_and_recurse
-    for line in self._parse_file(filename, constraint):
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\req\req_file.py", line 373, in _parse_file
-    _, content = get_file_content(filename, self._session)
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\req\req_file.py", line 551, in get_file_content
-    content = auto_decode(f.read())
-              ^^^^^^^^^^^^^^^^^^^^^
-  File "C:\Users\gvozd\Desktop\01_programs\full_stack\18_whypda\wwwhypda\wwwhypda-backend\workEnv\Lib\site-packages\pip\_internal\utils\encoding.py", line 26, in auto_decode
-    return data[len(bom) :].decode(encoding)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-UnicodeDecodeError: 'utf-16-le' codec can't decode byte 0x0a in position 1084: truncated data
-
-[notice] A new release of pip is available: 24.0 -> 25.2
-[notice] To update, run: python.exe -m pip install --upgrade pip
+backend-1   | [2025-08-30 10:19:44 +0000] [7] [ERROR] Exception in worker process
+backend-1   | Traceback (most recent call last):
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+backend-1   |     worker.init_process()
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+backend-1   |     self.load_wsgi()
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+backend-1   |     self.wsgi = self.app.wsgi()
+backend-1   |                 ^^^^^^^^^^^^^^^
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+backend-1   |     self.callable = self.load()
+backend-1   |                     ^^^^^^^^^^^
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+backend-1   |     return self.load_wsgiapp()
+backend-1   |            ^^^^^^^^^^^^^^^^^^^
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+backend-1   |     return util.import_app(self.app_uri)
+backend-1   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1   |   File "/usr/local/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+backend-1   |     mod = importlib.import_module(module)
+backend-1   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1   |   File "/usr/local/lib/python3.11/importlib/__init__.py", line 126, in import_module
+backend-1   |     return _bootstrap._gcd_import(name[level:], package, level)
+backend-1   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend-1   |   File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+backend-1   |   File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+backend-1   |   File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+backend-1   |   File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+backend-1   |   File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+backend-1   |   File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+backend-1   |   File "/mainApp.py", line 5, in <module>
+backend-1   |     from flask_swagger_ui import get_swaggerui_blueprint
+backend-1   | ModuleNotFoundError: No module named 'flask_swagger_ui'
+backend-1   | [2025-08-30 10:19:44 +0000] [7] [INFO] Worker exiting (pid: 7)
+backend-1   | [2025-08-30 10:19:44 +0000] [1] [ERROR] Worker (pid:7) exited with code 3
+backend-1   | [2025-08-30 10:19:44 +0000] [1] [ERROR] Shutting down: Master
+backend-1   | [2025-08-30 10:19:44 +0000] [1] [ERROR] Reason: Worker failed to boot.
+backend-1 exited with code 3
+nginx-1     | /docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+nginx-1     | /docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+nginx-1     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+nginx-1     | 10-listen-on-ipv6-by-default.sh: info: IPv6 listen already enabled
+nginx-1     | /docker-entrypoint.sh: Sourcing /docker-entrypoint.d/15-local-resolvers.envsh
+nginx-1     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/20-envsubst-on-templates.sh
+nginx-1     | /docker-entrypoint.sh: Launching /docker-entrypoint.d/30-tune-worker-processes.sh
+nginx-1     | /docker-entrypoint.sh: Configuration complete; ready for start up
+nginx-1     | 2025/08/30 10:19:49 [emerg] 1#1: host not found in upstream "backend" in /etc/nginx/nginx.conf:19
+nginx-1     | nginx: [emerg] host not found in upstream "backend" in /etc/nginx/nginx.conf:19
+nginx-1 exited with code 1

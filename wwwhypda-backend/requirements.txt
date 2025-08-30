@@ -6,3 +6,4 @@ Flask-Talisman
 Flask-SQLAlchemy
 Flask-Mail
 gunicorn
+flask-swagger-ui
