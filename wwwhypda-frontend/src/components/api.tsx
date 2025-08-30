@@ -1,12 +1,12 @@
 import axios from 'axios';
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isDevMode = process.env.DEV_MODE === "true";
 
 const getBaseURL = () => {
-  if (isProduction) {
-    return '/api';
+  if (isDevMode) {
+    return process.env.REACT_APP_BASE_URL_DOCKER;
   }
-  return process.env.REACT_APP_BASE_URL_LOCAL;
+  return '/api';
 };
 
 const api = axios.create({
