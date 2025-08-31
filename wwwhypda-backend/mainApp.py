@@ -83,7 +83,7 @@ csp = {
     'worker-src': ["'self'"],
     'form-action': ["'self'"]
 }
-Talisman(app, content_security_policy=csp)
+Talisman(app, content_security_policy=csp, force_https=False)
 
 # CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
 CORS(
