@@ -64,14 +64,22 @@ app = Flask(__name__, instance_relative_config=True)
 
 # === Security Configuration ===
 csp = {
-    'default-src': ["'self'"],
-    'script-src': ["'self'"],
-    'style-src': ["'self'"],
+    'default-src': "'self'",
+    'script-src': [
+        "'self'",
+        "https://www.google.com/recaptcha/",
+        "https://www.gstatic.com/recaptcha/"
+    ],
+    'frame-src': [
+        "'self'",
+        "https://www.google.com/recaptcha/",
+        "https://www.gstatic.com/recaptcha/"
+    ],
+    'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:'],
     'connect-src': ["'self'", "http://localhost:3000"],
     'font-src': ["'self'"],
     'object-src': ["'none'"],
-    'frame-src': ["'none'"],
     'worker-src': ["'self'"],
     'form-action': ["'self'"]
 }
