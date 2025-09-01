@@ -10,6 +10,7 @@ venv
 env
 .env
 env.configs
+env.dev
 
 *.pyc
 static/images/
@@ -188,4 +189,5 @@ cython_debug/
 .ruff_cache/
 
 # PyPI configuration file
-.pypirc
+.pypircenv.dev 
+env.prod
