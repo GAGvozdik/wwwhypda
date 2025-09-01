@@ -33,7 +33,7 @@ services:
       dockerfile: ./wwwhypda-backend/Dockerfile
     
     env_file:
-      - ./wwwhypda-backend/env.configs
+      - ./wwwhypda-backend/env.prod
 
     networks:
       - dev

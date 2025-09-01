@@ -54,10 +54,12 @@ def add_column_if_not_exists(column_name='editing_by'):
 # TODO: Check expiration of reset password code
 # TODO: Check csrf token verification
 
-# Load environment variables
+# Load environment variables for development if 'env.dev' exists.
+# In production (Docker), environment variables are set by docker-compose.
 basedir = os.path.abspath(os.path.dirname(__file__))
-dotenv_path = os.path.join(basedir, 'env.configs')
-load_dotenv(dotenv_path=dotenv_path)
+dev_config_path = os.path.join(basedir, 'env.dev')
+if os.path.exists(dev_config_path):
+    load_dotenv(dotenv_path=dev_config_path)
 
 app = Flask(__name__, instance_relative_config=True)
 

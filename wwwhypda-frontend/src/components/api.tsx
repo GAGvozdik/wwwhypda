@@ -1,9 +1,7 @@
 import axios from 'axios';
 
-console.log("Executing updated api.tsx file - v3. If you see this, the build is working.");
-
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.REACT_APP_API_BASE_URL,
 });
 
 export default api;
