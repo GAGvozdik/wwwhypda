@@ -68,6 +68,12 @@ def login():
 @auth_bp.route('/check', methods=['GET'])
 @jwt_required()
 def check_auth():
+    # reCAPTCHA v3 verification
+    recaptcha_token = request.headers.get('X-Recaptcha-Token')
+    is_valid, error_response = verify_recaptcha(recaptcha_token)
+    if not is_valid:
+        return error_response
+
     identity = get_jwt_identity()
     claims = get_jwt()
     return jsonify(
