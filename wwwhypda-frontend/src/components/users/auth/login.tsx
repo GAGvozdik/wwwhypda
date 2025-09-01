@@ -45,8 +45,12 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 withCredentials: true
             });
 
+            const checkToken = await executeRecaptcha('check_auth_after_login');
             const checkResponse = await api.get('/users/check', {
-                withCredentials: true
+                withCredentials: true,
+                headers: {
+                    'X-Recaptcha-Token': checkToken,
+                },
             });
 
             const { is_superuser } = checkResponse.data;

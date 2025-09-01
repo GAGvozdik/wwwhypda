@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import api from '../api';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 interface AuthState {
     isAuth: boolean | null;
@@ -9,12 +9,22 @@ interface AuthState {
 
 const useAuthCheck = (): AuthState => {
     const [auth, setAuth] = useState<AuthState>({ isAuth: null, isSuperuser: null });
+    const { executeRecaptcha } = useGoogleReCaptcha();
 
     useEffect(() => {
         const checkAuth = async () => {
+            if (!executeRecaptcha) {
+                console.error("ReCAPTCHA not available yet");
+                return;
+            }
+
             try {
+                const token = await executeRecaptcha('check_auth');
                 const response = await api.get('/users/check', {
                     withCredentials: true,
+                    headers: {
+                        'X-Recaptcha-Token': token,
+                    },
                 });
 
                 setAuth({
@@ -27,7 +37,7 @@ const useAuthCheck = (): AuthState => {
         };
 
         checkAuth();
-    }, []); // Вызывается только один раз при монтировании компонента
+    }, [executeRecaptcha]);
 
     return auth;
 };
