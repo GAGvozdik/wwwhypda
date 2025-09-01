@@ -22,7 +22,7 @@ services:
       context: ./wwwhypda-frontend
 
     env_file:
-      - ./wwwhypda-frontend/.env
+      - ./wwwhypda-frontend/.env.production
 
     networks:
       - dev
