@@ -8,6 +8,11 @@ const Contribute: React.FC = () => {
     return (
         <div className={styles.treeText}>
             <h2>Contribute</h2>
+
+            <div style={{ color: 'red', fontSize:'8vh', fontFamily: 'Afacad_Flux !important;'}}>
+
+            </div>
+
         </div>
     );
 };
