@@ -1,3 +1,11 @@
 /* body {
     height: 1000px;
 } */
+
+
+.grecaptcha-badge {
+    bottom: 0.3vh !important;
+    right: 0.3vh !important;
+    transform: scale(0.9) !important;
+    /* transform-origin: bottom right !important; */
+}
