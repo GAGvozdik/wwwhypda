@@ -67,6 +67,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
                     defaultColDef={defaultColDef}
                     pagination={true}
                     paginationPageSize={10}
+                    paginationPageSizeSelector={[10, 20, 50, 100]}
                 />
             </div>
 
