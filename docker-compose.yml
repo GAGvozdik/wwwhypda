@@ -19,10 +19,10 @@ services:
     
   frontend:
     build:
-      context: ./wwwhypda-frontend
+      context: ./wwwhypda-frontendV2
 
     env_file:
-      - ./wwwhypda-frontend/.env.production
+      - ./wwwhypda-frontendV2/.env.production
 
     networks:
       - dev

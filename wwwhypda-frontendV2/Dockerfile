@@ -1,13 +1,16 @@
 # Stage 1: Build the React application
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Install system dependencies needed for native bindings on Alpine
+RUN apk add --no-cache libc6-compat
+
+# Copy package.json
 COPY package*.json ./
 
-# Install all dependencies. Use npm ci for speed and reliability
-RUN npm ci
+# Install dependencies. Using npm install instead of npm ci since we deleted package-lock.json
+RUN npm install
 
 # Copy the rest of the application source code
 COPY . .
@@ -22,7 +25,7 @@ FROM nginx:stable-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy the built application from the builder stage
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port 3000
 EXPOSE 3000

@@ -3,12 +3,24 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
-// import reportWebVitals from './reportWebVitals';
-import "./components/menu.module.scss";
+import { ModuleRegistry } from 'ag-grid-community';
+import { ClientSideRowModelModule, PaginationModule, ValidationModule } from 'ag-grid-community';
+
 import { Provider } from 'react-redux';
 import store from './redux/store';
-// import App from './App.tsx'
 import App from './App';
+
+// СТРОГО ЗАКОММЕНТИРОВАНО:
+// import { AllEnterpriseModules } from 'ag-grid-enterprise';
+// ModuleRegistry.registerModules(AllEnterpriseModules);
+
+ModuleRegistry.registerModules([
+    ClientSideRowModelModule,
+    PaginationModule,
+    ValidationModule
+]);
+
+// import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
