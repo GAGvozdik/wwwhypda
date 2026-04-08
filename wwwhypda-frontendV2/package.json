@@ -20,6 +20,7 @@
     "ag-grid-react": "^35.2.0",
     "axios": "^1.14.0",
     "cypress": "^15.13.0",
+    "gsap": "^3.14.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-google-recaptcha": "^3.1.0",

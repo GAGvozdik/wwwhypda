@@ -1,0 +1,145 @@
+.hero {
+  width: 100%;
+  padding: 4vh 2vw;
+  display: flex;
+  justify-content: center;
+  box-sizing: border-box;
+
+  font-family: "Afacad_Flux", sans-serif;
+}
+
+.heroInner {
+  width: min(1100px, 100%);
+  display: grid;
+  gap: 2vh;
+}
+
+.heroBadge {
+  width: fit-content;
+  padding: 0.4em 0.9em;
+  border-radius: 999px;
+
+  font-size: var(--menu-font-size);
+  color: var(--logo-color);
+
+  border: 1px solid var(--border);
+  background: var(--form-color);
+}
+
+.heroTitle {
+  margin: 0;
+  max-width: 20ch;
+
+  font-size: calc(var(--head-font-size) * 2);
+  line-height: 1.1;
+
+  color: var(--start-page-text);
+}
+
+.heroSubtitle {
+  margin: 0;
+  max-width: 70ch;
+
+  font-size: calc(var(--main-font-size) * 1.2);
+  line-height: 1.6;
+
+  color: var(--start-page-text);
+  opacity: 0.85;
+}
+
+.heroActions {
+  display: flex;
+  gap: 1vw;
+  flex-wrap: wrap;
+}
+.primaryButton {
+  font-family: "Afacad_Flux", sans-serif !important;
+  font-size: calc(var(--button-font-size) * 1.6);
+  width: 13rem;
+  height: 3rem;
+  background-color: var(--start-button) !important;
+  color: var(--start-button-text) !important;
+
+  border-radius: 4px;
+  padding: 0.6vh 1.2vw;
+
+  transition: 0.3s !important;
+}
+
+/* hover */
+.primaryButton:hover {
+  background-color: var(--start-button-hover) !important;
+  color: var(--start-button-text) !important;
+}
+
+/* active */
+.primaryButton:active {
+  background-color: var(--start-button-active) !important;
+  color: var(--start-button-text) !important;
+}
+
+/* ===== SECONDARY ===== */
+
+.secondaryButton {
+  font-family: "Afacad_Flux", sans-serif !important;
+  font-size: calc(var(--button-font-size) * 1.6);
+
+  background-color: transparent !important;
+  color: var(--start-page-text) !important;
+  width: 10rem;
+  height: 3rem;
+  border: 1px solid var(--border) !important;
+  border-radius: 4px;
+  padding: 0.6vh 1.2vw;
+
+  transition: 0.3s !important;
+}
+
+/* hover */
+.secondaryButton:hover {
+  background-color: var(--menu-hover) !important;
+  color: var(--start-page-text) !important;
+}
+
+/* active */
+.secondaryButton:active {
+  background-color: var(--submit-button-active) !important;
+}
+.heroGrid {
+  margin-top: 2vh;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1vw;
+}
+
+.featureCard {
+  padding: 1.5vh 1vw;
+  border-radius: 1vh;
+
+  background: var(--form-color);
+  border: 1px solid var(--border);
+}
+
+.featureTitle {
+  margin: 0 0 0.7vh;
+
+  font-size: var(--menu-font-size);
+  color: var(--start-page-text);
+}
+
+.featureText {
+  margin: 0;
+
+  font-size: calc(var(--main-font-size) * 1.2);
+  color: var(--start-page-text);
+  opacity: 0.8;
+}
+
+/* 📱 адаптив */
+@media (max-width: 900px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+

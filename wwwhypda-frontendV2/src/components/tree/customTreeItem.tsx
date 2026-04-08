@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import type { UpdateRTIDAction, UpdateRTNameAction } from '../../common/types';
 import { useDispatch } from 'react-redux';
 import { UpdateRTID, UpdateRTName } from '../../redux/actions';
-import {useState} from 'react';
+// import {useState} from 'react';
 
 interface CustomTreeItemProps {
     children?: React.ReactNode;
@@ -20,18 +20,33 @@ interface CustomTreeItemProps {
 
 const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, path, name, rt_id, rt_name}) => {
 
-    const [localRTID, setRTID] = useState(rt_id); 
-    const [localRTName, setRTName] = useState(rt_name); 
-
     const dispatch = useDispatch();
 
-    const toggleTheme = () => {
-        setRTID(localRTID); 
-        dispatch<UpdateRTIDAction>(UpdateRTID(localRTID)); 
 
-        setRTName(localRTName); 
-        dispatch<UpdateRTNameAction>(UpdateRTName(localRTName)); 
-    };
+    // const toggleTheme = (e: React.MouseEvent) => {
+    //     e.stopPropagation();
+    //     dispatch<UpdateRTIDAction>(UpdateRTID(rt_id));
+    //     dispatch<UpdateRTNameAction>(UpdateRTName(rt_name));
+    //     console.log('ci rt_name = ', rt_name);
+    // };
+    // const toggleTheme = () => {
+    //     dispatch<UpdateRTIDAction>(UpdateRTID(rt_id));
+    //     dispatch<UpdateRTNameAction>(UpdateRTName(rt_name));
+    //     console.log('ci rt_name = ', rt_name);
+    // };
+
+const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
+    const clickedTreeItem = (e.target as HTMLElement).closest('[role="treeitem"]');
+
+    if (clickedTreeItem !== e.currentTarget) {
+        return;
+    }
+
+    dispatch<UpdateRTIDAction>(UpdateRTID(rt_id));
+    dispatch<UpdateRTNameAction>(UpdateRTName(rt_name));
+    console.log('ci rt_name = ', rt_name);
+};
+
 
     return (
         <>

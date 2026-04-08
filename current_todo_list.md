@@ -36,3 +36,6 @@ add recaptcha to menu serfing
 12. ~~add google recaptcha~~
 
 13. ~~add tests cypress for registration, login and password reset~~
+
+шрифты в таблицах не применились
+надо после добавления данных стереть локал сторадж

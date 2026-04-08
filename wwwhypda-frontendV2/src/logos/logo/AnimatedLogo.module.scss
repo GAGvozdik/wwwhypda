@@ -1,0 +1,33 @@
+.logoWrapper {
+  width: 100%;
+  height: 13vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-sizing: border-box;
+//   background-color: green;
+}
+
+.logoWrapper #logo-webbab {
+  display: block;
+  width: 42rem;
+  height: auto;
+  max-width: 95vw;
+  overflow: visible;
+}
+
+.logoWrapper #logo-webbab .word {
+  fill: var(--logo-color);
+  opacity: 0;
+}
+
+.logoWrapper #logo-webbab #mask #alpha {
+  fill: var(--logo-color);
+}
+
+.logoWrapper #iso {
+  fill: var(--logo-color);
+  opacity: 0;
+  mask: url(#mask);
+}
