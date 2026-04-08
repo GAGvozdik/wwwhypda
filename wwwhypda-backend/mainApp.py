@@ -63,11 +63,6 @@ if os.path.exists(dev_config_path):
 
 app = Flask(__name__, instance_relative_config=True)
 
-# === Environment Configuration ===
-allowed_origins_raw = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173')
-allowed_origins = [origin.strip() for origin in allowed_origins_raw.split(',')]
-is_production = os.getenv('FLASK_ENV') == 'production' or not os.path.exists(dev_config_path)
-
 # === Security Configuration ===
 csp = {
     'default-src': "'self'",
@@ -83,7 +78,7 @@ csp = {
     ],
     'style-src': ["'self'", "'unsafe-inline'"],
     'img-src': ["'self'", 'data:'],
-    'connect-src': ["'self'", "https://www.google.com", "https://stats.g.doubleclick.net"] + allowed_origins,
+    'connect-src': ["'self'", "https://www.google.com", "http://localhost:3000", "http://localhost:5173"],
     'font-src': ["'self'"],
     'object-src': ["'none'"],
     'worker-src': ["'self'"],
@@ -95,7 +90,7 @@ Talisman(app, content_security_policy=csp, force_https=False)
 CORS(
     app, 
     supports_credentials=True, 
-    origins=allowed_origins, 
+    origins=["http://localhost:8080", "http://localhost:3000", "http://localhost:5173"], 
     allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie", "X-Recaptcha-Token"]
 )
 
@@ -120,7 +115,7 @@ app.config['REFRESH_EXPIRES_SECONDS'] = int(os.getenv('REFRESH_EXPIRES_SECONDS',
 
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_NAME'] =  'jwt'
-app.config['JWT_COOKIE_SECURE'] = is_production  # Set True in production (with HTTPS)
+app.config['JWT_COOKIE_SECURE'] = False  # Set True in production (with HTTPS)
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 app.config['JWT_COOKIE_HTTPONLY'] = True
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True

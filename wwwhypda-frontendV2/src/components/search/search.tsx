@@ -34,6 +34,10 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
+        console.log('rt_name = ', rt_name);
+    }, [rt_name, rt_id]);
+
+    useEffect(() => {
         const fetchParameters = async () => {
             if (executeRecaptcha) {
                 try {
@@ -60,7 +64,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             const fetchParameters = async () => {
                 try {
                     const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } }); 
-
+                    console.log(`/rocks/samples/${rt_id}/${selectedValue}`)
                     const res = response.data.map((item, index) => ({
                         ...item,
                         id: index + 1 
@@ -76,7 +80,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             };
             fetchParameters();
         }
-    }, [selectedValue, executeRecaptcha, rt_id, dispatch]);
+    }, [selectedValue, executeRecaptcha, rt_id]);
 
     return (
         <div 
