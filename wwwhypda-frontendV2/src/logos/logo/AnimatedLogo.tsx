@@ -96,7 +96,7 @@ const AnimatedLogo: React.FC = () => {
       logoCircle: logoCircleRefs.current,
       logoEllipse: logoEllipseRefs.current,
       revealRects: revealRefs.current,
-      timer: 0.9,
+      timer: 2.2,
     };
 
     gsap.set(self.isoLogo, {
