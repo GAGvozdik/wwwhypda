@@ -88,7 +88,8 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     justifyContent: 'center', 
                     fontFamily: 'Afacad_Flux !important',
                     fontSize: '5vh',
-                    padding: '1vh'
+                    padding: '1vh',
+                    
                 }}
             >
                 INPUT PAGE
