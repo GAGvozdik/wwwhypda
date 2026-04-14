@@ -161,6 +161,7 @@ const SuperuserAccount: React.FC = () => {
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '0vh',
+        "--ag-font-family": "Afacad_Flux"
     }), []);    
 
     return (

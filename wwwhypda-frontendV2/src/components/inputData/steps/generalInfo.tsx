@@ -48,6 +48,7 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '1vh',
+        "--ag-font-family": "Afacad_Flux"
     }), []);    
 
     const [error, setError] = useState<string | null>(null);

@@ -58,6 +58,7 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
         marginTop: '0vh',
         marginBottom: '-1vh',
         // fontSize: '26px',  
+        "--ag-font-family": "Afacad_Flux"
     }), []);
 
     const [error, setError] = useState<string | null>(null);

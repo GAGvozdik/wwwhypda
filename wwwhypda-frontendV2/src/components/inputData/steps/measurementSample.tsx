@@ -83,6 +83,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
         "--ag-background-color": "var(--table-color)", 
         marginTop: '0vh', 
         marginBottom: '5.5vh',
+        "--ag-font-family": "Afacad_Flux"
     }), []);    
 
 
