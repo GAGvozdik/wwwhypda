@@ -5,17 +5,17 @@ import jwt
 import time
 import uuid
 from auth.auth_models import db, User, ConfirmationCode
-from auth.validate import validate_email_and_password, validate_user, validate_password
+from auth.validate import validate_email_and_password, validate_user, validate_password, admin_required
 from flask_mail import Message
 from common_defenitions import mail
 from datetime import datetime, timedelta, timezone
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import get_jwt_identity
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 @admin_bp.route("/get_all_users", methods=["GET"])
-@jwt_required()
+@admin_required()
 def get_all_users():
     current_user = get_jwt_identity()
     """
@@ -28,7 +28,7 @@ def get_all_users():
 
 
 @admin_bp.route("/activate/<int:user_id>", methods=["POST"])
-@jwt_required()
+@admin_required()
 def activate_user(user_id):
     current_user = get_jwt_identity()
     success = User.activate_user_by_id(user_id)
@@ -37,7 +37,7 @@ def activate_user(user_id):
     return jsonify(message="User not found", error="Not Found"), 404
 
 @admin_bp.route("/<int:user_id>", methods=["POST"])
-@jwt_required()
+@admin_required()
 def promote_to_superuser(user_id):
     current_user = get_jwt_identity()
     """
@@ -50,7 +50,7 @@ def promote_to_superuser(user_id):
         return jsonify(message="User not found", error="Not Found"), 404
 
 @admin_bp.route("/deactivate/<int:user_id>", methods=["POST"])
-@jwt_required()
+@admin_required()
 def deactivate_user(user_id):
     current_user = get_jwt_identity()
     """
@@ -65,7 +65,7 @@ def deactivate_user(user_id):
 
 
 @admin_bp.route("/remove-super/<int:user_id>", methods=["POST"])
-@jwt_required()
+@admin_required()
 def remove_superuser_status(user_id):
     current_user = get_jwt_identity()
     """

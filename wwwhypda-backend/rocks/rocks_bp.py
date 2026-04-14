@@ -12,15 +12,6 @@ from common_defenitions import verify_recaptcha
 rocks_bp = Blueprint("rocks", __name__, url_prefix="/rocks")
 
 
-
-
-@rocks_bp.route('/msg', methods=['POST'])
-def get_msg():
-    data = request.json  
-    time.sleep(4)  
-    return str(data['query'])  
-
-
 @rocks_bp.route('/countries', methods=['GET'])
 @jwt_required()
 def get_countries():
