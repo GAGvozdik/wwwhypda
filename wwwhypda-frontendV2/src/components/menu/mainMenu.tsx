@@ -69,7 +69,7 @@ export default function MainMenu() {
                 Search
             </MenuButtuon>
             
-            <MenuButtuon 
+            {/* <MenuButtuon 
                 className={`${styles.contributeItem} ${styles.menuButton}`} 
                 path={'contribute'}
             >
@@ -81,7 +81,7 @@ export default function MainMenu() {
                 path={'documents'}
             >
                 Documents
-            </MenuButtuon>
+            </MenuButtuon> */}
 
             <MenuButtuon 
                 className={` ${styles.menuButton}`} 
