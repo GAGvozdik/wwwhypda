@@ -145,7 +145,7 @@ jwt = JWTManager(app)
 def rotate_csrf_token(response):
     if request.method in ["POST", "PUT", "DELETE"] and response.status_code == 200:
         try:
-            access_token = request.cookies.get("access_token_cookie")
+            access_token = request.cookies.get("jwt")
             if access_token:
                 csrf_token = get_csrf_token(access_token)
                 response.set_cookie(

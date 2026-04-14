@@ -294,7 +294,7 @@ def update_user():
     try:
         user_data = request.json
         if "name" in user_data:
-            updated_user = User.update(current_user["id"], user_data["name"])
+            updated_user = User.update(current_user, user_data["name"])
             return jsonify(message="Successfully updated account", data=updated_user), 200
         return jsonify(message="Invalid data, you can only update your account name!", error="Bad Request"), 400
     except Exception as e:
