@@ -21,8 +21,10 @@ def admin_required():
             verify_jwt_in_request()
             claims = get_jwt()
             if claims.get("is_superuser"):
+                print("superuser")
                 return fn(*args, **kwargs)
             else:
+                print("not superuser")
                 return jsonify(msg="Admins only!"), 403
 
         return decorator
