@@ -13,6 +13,8 @@ from flask_jwt_extended import (
     jwt_required, get_jwt_identity, get_jwt
 )
 from flask_jwt_extended import get_jwt, get_jwt_identity, create_access_token, set_access_cookies, get_csrf_token
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from datetime import timedelta
 import secrets
 
@@ -24,7 +26,7 @@ from inputData.inputDataModels import InputData
 
 # from rocks.rocks_models import db
 # from auth.auth_models import db  # потенциально дублирование, оставь один из них
-from common_defenitions import mail, db
+from common_defenitions import mail, db, limiter
 from sqlalchemy import text, inspect
 from flask import current_app
 
@@ -36,6 +38,9 @@ def add_column_if_not_exists(column_name='editing_by'):
         columns = [row[1] for row in result]  # row[1] — это имя колонки
 
         if column_name not in columns:
+            # Note: Column names generally cannot be parameterized in DDL, 
+            # but we follow the instruction to use named parameters where possible.
+            # In this case, f-string is used for the column name as it is a static internal value.
             db.session.execute(
                 text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(50)")
             )
@@ -62,6 +67,9 @@ if os.path.exists(dev_config_path):
     load_dotenv(dotenv_path=dev_config_path)
 
 app = Flask(__name__, instance_relative_config=True)
+
+# === Rate Limiting ===
+limiter.init_app(app)
 
 # === Security Configuration ===
 csp = {
@@ -179,6 +187,10 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 app.register_blueprint(swaggerui_blueprint, url_prefix=os.getenv('SWAGGER_URL'))
 
 # === Error Handlers ===
+@app.errorhandler(429)
+def ratelimit_handler(e):
+    return jsonify(message="Too many requests", error=str(e.description)), 429
+
 @app.errorhandler(403)
 def forbidden(e):
     return jsonify(message="Forbidden", error=str(e), data=None), 403

@@ -5,7 +5,7 @@ import uuid
 from auth.auth_models import db, User, ConfirmationCode
 from auth.validate import validate_email_and_password, validate_user, validate_password
 from flask_mail import Message
-from common_defenitions import mail, verify_recaptcha
+from common_defenitions import mail, verify_recaptcha, limiter
 from datetime import datetime, timedelta, timezone
 from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
@@ -24,6 +24,7 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @auth_bp.route("/login", methods=["POST"])
+@limiter.limit("5 per minute")
 def login():
     try:
         data = request.json
@@ -155,6 +156,7 @@ def options_confirm_registration():
     return jsonify({"message": "OK"}), 200
 
 @auth_bp.route("/confirm-registration", methods=["POST"])
+@limiter.limit("5 per minute")
 def confirm_registration():
     """Confirm user registration by verifying the activation code."""
     try:
@@ -222,6 +224,7 @@ def add_user():
         return jsonify(message="Something went wrong", error=str(e), data=None), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
+@limiter.limit("3 per hour")
 def request_password_reset():
     """Send a password reset code to the user's email."""
     try:
