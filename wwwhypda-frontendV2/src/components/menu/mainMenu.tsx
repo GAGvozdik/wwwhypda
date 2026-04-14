@@ -92,11 +92,11 @@ export default function MainMenu() {
             </MenuButtuon>
 
 
-            <div className={`${styles.helpItem} ${styles.menuLabel}`}>
+            {/* <div className={`${styles.helpItem} ${styles.menuLabel}`}>
                 <IconButton>
                     <HelpOutlineIcon className={styles.themeIcon}/>
                 </IconButton>
-            </div>
+            </div> */}
 
             <div className={`${styles.themeItem} ${styles.menuLabel}`}>
                 <IconButton onClick={toggleTheme}>
@@ -108,11 +108,11 @@ export default function MainMenu() {
                 </IconButton>
             </div> 
             
-            <div className={`${styles.languageItem} ${styles.menuLabel}`}>
+            {/* <div className={`${styles.languageItem} ${styles.menuLabel}`}>
                 <IconButton>
                     <LanguageIcon className={styles.themeIcon}/>
                 </IconButton>
-            </div>
+            </div> */}
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
                 <Link to={
