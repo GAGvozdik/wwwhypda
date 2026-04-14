@@ -9,6 +9,8 @@ we avoid circular imports when splitting the application into multiple modules.
 
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 import requests
 import time
@@ -20,6 +22,7 @@ from flask import current_app, jsonify
 
 mail = Mail()  # Mail instance for handling email-related functionality.
 db = SQLAlchemy()  # SQLAlchemy instance for database interactions.
+limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"], storage_uri="memory://")
 
 
 def verify_recaptcha(recaptcha_token, retries=3, delay=1):
