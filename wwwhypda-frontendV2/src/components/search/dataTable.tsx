@@ -22,6 +22,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
             "--ag-background-color": "var(--table-color)",
             color: 'var(--tree-text)',
             // color: '--tree-text',
+        "--ag-font-family": "Afacad_Flux"
         }),
         []
     );

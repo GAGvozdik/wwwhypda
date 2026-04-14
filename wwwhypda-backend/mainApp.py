@@ -141,9 +141,6 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 
 app.config['TESTING'] = os.getenv('TESTING', 'False').lower() in ('true', '1', 't')
 
-if app.config['TESTING']:
-    app.config['ACCESS_EXPIRES_SECONDS'] = 3
-
 # === Initialize extensions ===
 mail.init_app(app)
 db.init_app(app)
