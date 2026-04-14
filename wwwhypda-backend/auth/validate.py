@@ -2,6 +2,9 @@
 import re
 import json
 import os
+from functools import wraps
+from flask import jsonify
+from flask_jwt_extended import get_jwt, verify_jwt_in_request
 
 # Construct the absolute path to the JSON file
 # This goes up two directories from validate.py (auth -> wwwhypda-backend -> root) and then into common/
@@ -10,6 +13,21 @@ json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 
 # Load error messages from the JSON file
 with open(json_path, 'r') as f:
     messages = json.load(f)
+
+def admin_required():
+    def wrapper(fn):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            verify_jwt_in_request()
+            claims = get_jwt()
+            if claims.get("is_superuser"):
+                return fn(*args, **kwargs)
+            else:
+                return jsonify(msg="Admins only!"), 403
+
+        return decorator
+
+    return wrapper
 
 def validate(data, regex):
     """Custom Validator"""
