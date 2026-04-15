@@ -24,7 +24,7 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @auth_bp.route("/login", methods=["POST"])
-@limiter.limit("20 per minute")
+@limiter.limit("200 per hour")
 def login():
     try:
         data = request.json
@@ -224,7 +224,7 @@ def add_user():
         return jsonify(message="Something went wrong", error=str(e), data=None), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
-@limiter.limit("5 per hour")
+@limiter.limit("15 per hour")
 def request_password_reset():
     """Send a password reset code to the user's email."""
     try:

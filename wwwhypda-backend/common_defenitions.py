@@ -22,7 +22,7 @@ from flask import current_app, jsonify
 
 mail = Mail()  # Mail instance for handling email-related functionality.
 db = SQLAlchemy()  # SQLAlchemy instance for database interactions.
-limiter = Limiter(key_func=get_remote_address, default_limits=["200 per day", "50 per hour"], storage_uri="memory://")
+limiter = Limiter(key_func=get_remote_address, default_limits=["40000 per day", "6800 per hour"], storage_uri="memory://")
 
 
 def verify_recaptcha(recaptcha_token, retries=3, delay=1):
