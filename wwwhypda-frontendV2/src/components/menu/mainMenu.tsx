@@ -14,8 +14,8 @@ import { Link } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import ClearIcon from '@mui/icons-material/Clear';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import LanguageIcon from '@mui/icons-material/Language';
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+// import LanguageIcon from '@mui/icons-material/Language';
+// import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 // import useAuthCheck from '../users/useAuthCheck';
 
 export default function MainMenu() {
