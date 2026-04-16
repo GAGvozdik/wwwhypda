@@ -50,16 +50,30 @@ export default function MainWindow() {
             <MainTree />
 
             <div className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
-            <div style={{fontWeight: '300'}}>This website was created by Gvozdik G. and A. Comunian.</div>
-            <a 
-                href="https://github.com/GAGvozdik/wwwhypda" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}
-            >
-                <GitHubIcon />
-                https://github.com/GAGvozdik/wwwhypda
-            </a>
+                <div style={{fontWeight: '300'}}>This website was created by Gvozdik G. and A. Comunian.</div>
+                
+                
+                <a 
+                    href="https://github.com/GAGvozdik/wwwhypda" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}
+                >
+                    <GitHubIcon />
+                    https://github.com/GAGvozdik/wwwhypda
+                </a>
+
+                <div style={{fontWeight: '300'}}>
+                    This site is protected by reCAPTCHA and the Google:
+                </div>
+
+                <a href="https://policies.google.com/terms" className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}>
+                     Terms of Service
+                </a>
+                <a href="https://policies.google.com/privacy" className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}>
+                    Privacy Policy,
+                </a>
+
             </div>
             
         </div>
