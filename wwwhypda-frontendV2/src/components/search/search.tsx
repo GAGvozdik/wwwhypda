@@ -32,6 +32,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [parameters, setParameters] = useState<Parameter[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     useEffect(() => {
         console.log('rt_name = ', rt_name);
@@ -39,6 +40,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     useEffect(() => {
         const fetchParameters = async () => {
+            setLoading(true);
             if (executeRecaptcha) {
                 try {
                     const token = await executeRecaptcha('parameters');
@@ -60,6 +62,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
         if (selectedValue !== null && executeRecaptcha) {
+            setIsSearching(true);
             const token = await executeRecaptcha('search');
             const fetchParameters = async () => {
                 try {
@@ -76,6 +79,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     setError(error.message);
                 } finally {
                     setLoading(false);
+                    setIsSearching(false);
                 }
             };
             fetchParameters();
@@ -94,6 +98,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 gap: '2vh',
             }}
         >
+           
             <div 
                 className={`${styles.treeText}`} 
                 style={{    
@@ -107,24 +112,28 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     gridColumnEnd: 2, 
                 }}
             >
-                <SearchResultsTable/>
+                <SingleSkeleton loading={isSearching} error={error} height='82vh' isLoadIcon={true}>
+                    <SearchResultsTable/>
+                </SingleSkeleton>
             </div>
+            
 
-            <SingleSkeleton loading={loading} error={error} height='82vh'>
-                <div 
-                    className={`${styles.treeText}`} 
-                    style={{    
-                        backgroundColor: 'var(--drawer-color)',
-                        borderRadius: '4px',
-                        boxSizing: 'border-box',
-                        height: '82vh',
-                        overflowY: 'hidden',
-                        gridRowStart: 1, 
-                        gridRowEnd: 1, 
-                        gridColumnStart: 1, 
-                        gridColumnEnd: 2, 
-                    }}
-                >
+        
+            <div 
+                className={`${styles.treeText}`} 
+                style={{    
+                    backgroundColor: 'var(--drawer-color)',
+                    borderRadius: '4px',
+                    boxSizing: 'border-box',
+                    height: '82vh',
+                    overflowY: 'hidden',
+                    gridRowStart: 1, 
+                    gridRowEnd: 1, 
+                    gridColumnStart: 1, 
+                    gridColumnEnd: 2, 
+                }}
+            >
+                <SingleSkeleton loading={loading} error={error} height='82vh' isLoadIcon={true}>
                     <div 
                         className={styles.treeText} 
                         style={{    
@@ -180,9 +189,9 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         </button>
 
                     </FormControl>
-                    
-                </div>
-            </SingleSkeleton>
+                </SingleSkeleton>
+            </div>
+
         </div>
     );
 };

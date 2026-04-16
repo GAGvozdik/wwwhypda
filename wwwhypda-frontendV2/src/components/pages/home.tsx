@@ -3,10 +3,14 @@ import styles from './home.module.scss';
 import AnimatedLogo from '../../logos/logo/AnimatedLogo';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
-
+import { useDispatch } from 'react-redux';
+import { UpdateOpenClose } from '../../redux/actions';
+import type { UpdateOpenCloseAction } from '../../common/types';
 const Home: React.FC = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+    // let isOpenNow = useSelector((state: State) => state.open);  
 
     return (
         <div className={styles.treeText}>
@@ -29,7 +33,13 @@ const Home: React.FC = () => {
                 </p>
 
                 <div className={styles.heroActions}>
-                <Button onClick={() => {navigate('/search')}} className={styles.primaryButton}>Get Started</Button>
+                <Button 
+                    onClick={() => {dispatch<UpdateOpenCloseAction>(UpdateOpenClose(false)); navigate('/search')}} 
+                    className={styles.primaryButton}
+                >
+                    Get Started
+                </Button>
+                
                 {/* <Button className={styles.secondaryButton}>Explore</Button> */}
                 </div>
 
