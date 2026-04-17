@@ -33,6 +33,15 @@
 .themeIcon{
     color: var(--icons);
     transition: 1.5s ease;
+    height: 100%;
+    // min-height: 20px;
+    // min-width: 20px;
+    // font-size: 20px;
+
+    // @media (max-width: 1000px) {
+    //     min-height: 20px;
+    //     min-width: 20px;
+    // }
 }
 
 .mainMenuItems {

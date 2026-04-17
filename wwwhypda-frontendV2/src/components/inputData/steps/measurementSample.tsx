@@ -4,12 +4,14 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
 // import axios from 'axios';
-import type { State, SampleMeasurementRow, MeasurementRow } from '../../../common/types';
+// import type { MeasurementRow } from '../../../common/types';
+import type { State, SampleMeasurementRow } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
-import { UpdateSampleMeasurementData, UpdateMeasurementsData } from '../../../redux/actions';
+// import { UpdateMeasurementsData } from '../../../redux/actions';
+import { UpdateSampleMeasurementData } from '../../../redux/actions';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import Button from '@mui/material/Button';
@@ -95,7 +97,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
 
     const dispatch = useDispatch();
     const tableData = useSelector((state: State) => state.sampleMeasurementTableData);
-    const measurementsTableData = useSelector((state: State) => state.measurementsTableData);
+    // const measurementsTableData = useSelector((state: State) => state.measurementsTableData);
 
 
     useEffect(() => {
@@ -192,24 +194,24 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
         };
         dispatch(UpdateSampleMeasurementData([...tableData, newRow]));
 
-        const newMeasurementRow: MeasurementRow = {
-            id: measurementsTableData.length + 1,
-            sampleRef: "", 
-            parameter: "", 
-            value: "", 
-            error: "", 
-            units: "", 
-            quality: "", 
-            experimentType: "", 
-            interpretation: "", 
-            comment: ""
-        };
-        dispatch(UpdateMeasurementsData([...measurementsTableData, newMeasurementRow]));
+        // const newMeasurementRow: MeasurementRow = {
+        //     id: measurementsTableData.length + 1,
+        //     sampleRef: "", 
+        //     parameter: "", 
+        //     value: "", 
+        //     error: "", 
+        //     units: "", 
+        //     quality: "", 
+        //     experimentType: "", 
+        //     interpretation: "", 
+        //     comment: ""
+        // };
+        // dispatch(UpdateMeasurementsData([...measurementsTableData, newMeasurementRow]));
     };
 
     const deleteRow = () => {
         dispatch(UpdateSampleMeasurementData(tableData.slice(0, -1)));
-        dispatch(UpdateMeasurementsData(measurementsTableData.slice(0, -1)));
+        // dispatch(UpdateMeasurementsData(measurementsTableData.slice(0, -1)));
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [

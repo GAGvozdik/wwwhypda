@@ -133,7 +133,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     gridColumnEnd: 2, 
                 }}
             >
-                <SingleSkeleton loading={loading} error={error} height='82vh' isLoadIcon={true}>
+                <SingleSkeleton loading={loading} error={error} height='82vh'>
                     <div 
                         className={styles.treeText} 
                         style={{    
