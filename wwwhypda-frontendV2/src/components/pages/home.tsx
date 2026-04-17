@@ -27,7 +27,7 @@ const Home: React.FC = () => {
                 </h1>
 
                 <p className={styles.heroSubtitle}>
-                WWWHYPDA helps researchers and engineers collect, organize, and expand
+                WWHYPDA helps researchers and engineers collect, organize, and expand
                 structured datasets of hydrogeological samples and their physical
                 parameters.
                 </p>
