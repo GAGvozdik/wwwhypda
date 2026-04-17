@@ -90,7 +90,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         <div 
             className={`${styles.treeText}`} 
             style={{    
-                height: '100%',
+                height: '82vh',
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gridTemplateRows: '1fr',
@@ -106,6 +106,8 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     borderRadius: '8px',
                     boxSizing: 'border-box',
                     height: '82vh',
+                    overflowY: 'auto',
+                    // marginBottom: '2vh',
                     gridRowStart: 1, 
                     gridRowEnd: 1, 
                     gridColumnStart: 2, 
@@ -126,7 +128,8 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     borderRadius: '4px',
                     boxSizing: 'border-box',
                     height: '82vh',
-                    overflowY: 'hidden',
+                    overflowY: 'auto',
+                    // marginBottom: '2vh',
                     gridRowStart: 1, 
                     gridRowEnd: 1, 
                     gridColumnStart: 1, 
