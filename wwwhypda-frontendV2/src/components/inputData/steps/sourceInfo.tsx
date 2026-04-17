@@ -40,7 +40,8 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
         ["--ag-background-color"]: "var(--table-color)",
         marginTop: '0vh', 
         marginBottom: '5vh',
-        "--ag-font-family": "Afacad_Flux"
+        "--ag-font-family": "Afacad_Flux",
+        "--ag-font-size": 'var(--tree-font-size)'
     }), []);    
 
     const [tableData, setTableData] = useState(getDefaultRowData());
