@@ -27,6 +27,7 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
                     alignItems: 'center',
                     justifyContent: 'center',
                     position: 'relative',
+                    // overflowY: 'auto'
                 }}
             >
             <Skeleton
