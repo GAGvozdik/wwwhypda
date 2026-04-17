@@ -57,7 +57,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
         XLSX.writeFile(workbook, "table_data.xlsx");
     };
-
+    const reversedColumns = [...columns].reverse();
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%", color: '--tree-text' }}>
             {/* Таблица */}
@@ -65,7 +65,8 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
                 <AgGridReact
                     theme={themeDarkBlue}
                     rowData={rows}
-                    columnDefs={columns}
+                    columnDefs={reversedColumns}
+                    // columnDefs={columns}
                     defaultColDef={defaultColDef}
                     pagination={true}
                     paginationPageSize={10}

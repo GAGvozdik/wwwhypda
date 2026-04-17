@@ -11,7 +11,7 @@ const SearchResultsTable: React.FC = () => {
 
     // Генерируем колонки динамически на основе данных
     const columns = generateColumns(rows);
-
+    console.log(columns);
     return (
         <>
             <DataTable rows={rows as DynamicRowData[]} columns={columns} />
