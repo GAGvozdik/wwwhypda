@@ -145,6 +145,10 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             onChange={(e) => setEmail(e.target.value)}
                             className={styles.inputField}
                             required
+                            name="email"
+                            list="emailSuggestions"
+                            autoComplete="username"
+
                         />
                         <ErrorMessage error={error} isError={isError} />
                         <UserButton

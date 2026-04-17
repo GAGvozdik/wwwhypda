@@ -155,6 +155,9 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className={styles.inputField}
+                            name="email"
+                            list="emailSuggestions"
+                            autoComplete="username"
                             required
                         />
                         <input
@@ -171,6 +174,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className={styles.inputField}
+                            autoComplete="new-password"
+                            name="password"
                             required
                         />
                         <input
@@ -179,6 +184,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className={styles.inputField}
+                            autoComplete="new-password"
+                            name="password"
                             required
                         />
 

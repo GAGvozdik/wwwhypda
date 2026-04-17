@@ -85,11 +85,13 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 <form onSubmit={handleLogin}>
                     <div className={styles.autocompleteContainer}>
                         <input
-                            type="text"
+                            type="email"
                             placeholder="Email"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className={styles.inputField}
+                            name="email"
+                            autoComplete="username"
                             required
                             list="emailSuggestions"
                         />
