@@ -4,12 +4,14 @@ import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
 // import axios from 'axios';
-import type { State, MeasurementRow, SampleMeasurementRow } from '../../../common/types';
+// import type { SampleMeasurementRow } from '../../../common/types';
+import type { State, MeasurementRow } from '../../../common/types';
 import { useSelector, useDispatch } from 'react-redux'
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
-import { UpdateMeasurementsData, UpdateSampleMeasurementData } from '../../../redux/actions';
+import { UpdateMeasurementsData } from '../../../redux/actions';
+// import { UpdateSampleMeasurementData } from '../../../redux/actions';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 import Button from '@mui/material/Button';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
@@ -96,13 +98,13 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
             const csrfToken = getCsrfTokenFromCookie();
 
             if (!csrfToken) {
-                setError("CSRF token not found in cookie");
+                setError("Something went wrong. Please refresh the page and try again.");
                 return;
             }
 
             try {
                 if (!executeRecaptcha) {
-                    setError("Recaptcha not available.");
+                    setError("Сaptcha not available.");
                     setLoading(false);
                     return;
                 }
@@ -176,20 +178,20 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
         };
         dispatch(UpdateMeasurementsData([...tableData, newRow]));
 
-        const newSampleRow: SampleMeasurementRow = {
-            id: sampleMeasurementTableData.length + 1,
-            smpl_name: "",
-            rock_type: "- undefined -",
-            scale: "- undefined -",
-            fracturation_degree: "- undefined -",
-            Sample_comment: ""
-        };
-        dispatch(UpdateSampleMeasurementData([...sampleMeasurementTableData, newSampleRow]));
+        // const newSampleRow: SampleMeasurementRow = {
+        //     id: sampleMeasurementTableData.length + 1,
+        //     smpl_name: "",
+        //     rock_type: "- undefined -",
+        //     scale: "- undefined -",
+        //     fracturation_degree: "- undefined -",
+        //     Sample_comment: ""
+        // };
+        // dispatch(UpdateSampleMeasurementData([...sampleMeasurementTableData, newSampleRow]));
     };
 
     const deleteRow = () => {
         dispatch(UpdateMeasurementsData(tableData.slice(0, -1)));
-        dispatch(UpdateSampleMeasurementData(sampleMeasurementTableData.slice(0, -1)));
+        // dispatch(UpdateSampleMeasurementData(sampleMeasurementTableData.slice(0, -1)));
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
@@ -286,7 +288,8 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
                     height={'3.5vh'}
                 >
                     <Button
-                        disabled={!isEditable}
+                        disabled={!isEditable == true ? true : (tableData.length > sampleMeasurementTableData.length) ? false : true }
+                        // disabled={!isEditable == true ? false : (tableData.length > sampleMeasurementTableData.length) ? tableData.length == 0 ? false : true : false }
                         onClick={deleteRow}
                         className={styles.submitButton}
                         style={{

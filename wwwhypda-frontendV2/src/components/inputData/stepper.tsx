@@ -92,11 +92,11 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
                 break;
             case 3:
                 dispatch(ClearSampleMeasurementData());
-                dispatch(ClearMeasurementsData());
+                // dispatch(ClearMeasurementsData());
                 break;
             case 4:
                 dispatch(ClearMeasurementsData());
-                dispatch(ClearSampleMeasurementData());
+                // dispatch(ClearSampleMeasurementData());
                 break;
             default:
                 break;
