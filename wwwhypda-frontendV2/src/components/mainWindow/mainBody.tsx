@@ -26,8 +26,8 @@ import Home from '../pages/home';
 import About from '../pages/about';
 import NotFound from '../pages/notFound';
 import Contribute from '../pages/contribute';
-
-
+import PrivacyPolicy from '../pages/privacyPolicy';
+import UserAgreement from '../pages/userAgreement';
 
 import Search from '../search/search';
 import Documents from '../pages/documents';
@@ -65,6 +65,8 @@ export default function MainMenu() {
                     <Route path="/documents" element={<Documents />} />
                     <Route path="/about" element={<About />} />
                     <Route path="/notfound" element={<NotFound />} /> 
+                    <Route path="/privacy-policy" element={<PrivacyPolicy />} /> 
+                    <Route path="/user-agreement" element={<UserAgreement />} /> 
 
                     {/* <Route path="/account" element={
                         <AppProvider>

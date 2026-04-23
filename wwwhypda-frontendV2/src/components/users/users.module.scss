@@ -29,6 +29,28 @@
 }
 
 
+.policyLink{
+    text-decoration: underline;
+    color: var(--tree-text);
+    transition: 0.5s;
+    display: inline-flex;
+    align-items: center;
+    font-family: Afacad_Flux !important;
+    font-size: var(--under-menu-font-size);
+    font-weight: 300;
+    gap: 1vh;
+}
+
+.policyLink:hover{
+    transition: 0.5s;
+    font-weight: 600;
+}
+
+.policyLink:active{
+    text-decoration: none;
+    transition: 0.5s;
+}
+
 
 .errorMessage {
     font-size: 2vh;

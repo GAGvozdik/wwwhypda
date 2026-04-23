@@ -182,49 +182,81 @@ def confirm_registration():
     except Exception as e:
         return jsonify(message="Something went wrong", error=str(e)), 500
     
+
+# проверить капчу
+# вынести лимиты в конфиг
+# сделать сообщение об исчерпании лимитов
+# Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:5000/users/. (Reason: CORS request did not succeed). Status code: (null).
+# ошибка при попытке сгенерировать нового пользователя
+# в политику добавить про то что я использую почту gmail и капчу
+
 @auth_bp.route("/", methods=["POST"])
+@limiter.limit("5 per minute")
+@limiter.limit("50 per hour")
 def add_user():
-    """Register a new user and send an activation email."""
+    """Register a new user and send an activation email (enumeration-safe)."""
     try:
         user_data = request.json
         if not user_data:
-            return jsonify(message="Please provide user details", data=None, error="Bad request"), 400
+            return jsonify(
+                message="Please provide user details",
+                error="Bad request",
+                data=None
+            ), 400
 
         is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'))
         if not is_valid:
             return error_response
 
-        # Remove recaptcha_token before validation
         user_data.pop('recaptcha_token', None)
 
         validation_result = validate_user(**user_data)
         if validation_result is not True:
             return jsonify(validation_result), 400
 
-        existing_user = User.query.filter_by(email=user_data["email"]).first()
-        if existing_user:
-            return jsonify(message="User already exists", error="Conflict", data=None), 409
+        email = user_data["email"]
 
-        confirmation_code = ConfirmationCode.create_code(user_data["email"], "registration")
+        existing_user = User.query.filter_by(email=email).first()
 
-        try:
-            with current_app.app_context():
-                msg = Message("Activate your account", sender=current_app.config["MAIL_USERNAME"], recipients=[user_data["email"]])
-                msg.body = f"Your activation code: {confirmation_code.code}"
-                if current_app.config["DEBUG"] == True:
-                    print(msg.body)
-                mail.send(msg)
-        except Exception as e:
-            return jsonify(message="Mail server is broken", error=str(e)), 202
+        # 👉 ВСЕГДА создаём/обновляем код
+        confirmation_code = ConfirmationCode.create_code(email, "registration")
 
-        user = User.create(**user_data)
+        if not existing_user:
+            try:
+                with current_app.app_context():
+                    msg = Message(
+                        "Activate your account",
+                        sender=current_app.config["MAIL_USERNAME"],
+                        recipients=[email],
+                    )
+                    msg.body = f"Your activation code: {confirmation_code.code}"
 
-        return jsonify(message="Successfully created new user. Please check your email for activation.", data=None), 201
+                    if current_app.config["DEBUG"]:
+                        print(msg.body)
+                    else:
+                        mail.send(msg)
+            except Exception:
+                pass
+            User.create(**user_data)
+        else:
+            if current_app.config["DEBUG"]:
+                print('user already exists')
+
+        # 👉 ВСЕГДА одинаковый ответ
+        return jsonify(
+            message="If an account with this email exists, a confirmation code has been sent."
+        ), 200
+
     except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e), data=None), 500
+        return jsonify(
+            message="Something went wrong",
+            error=str(e),
+            data=None
+        ), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
-@limiter.limit("15 per hour")
+@limiter.limit("5 per minute")
+@limiter.limit("50 per hour")
 def request_password_reset():
     """Send a password reset code to the user's email."""
     try:
