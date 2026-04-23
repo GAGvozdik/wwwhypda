@@ -26,20 +26,18 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["40000 per day", 
 
 
 def verify_recaptcha(recaptcha_token, retries=3, delay=1):
-    """Verifies a reCAPTCHA token with Google's API with retry logic."""
-    
-    # Bypass verification in testing mode if a specific test token is provided.
     if current_app.config.get('TESTING') and recaptcha_token == 'test-token':
         return True, None
 
     if not recaptcha_token:
-        return False, (jsonify(message="reCAPTCHA token is missing"), 400)
+        return False, (jsonify(message="Verification failed"), 400)
 
     secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
     if not secret_key:
-        return False, (jsonify(message="Server configuration error"), 500)
+        logger.error("RECAPTCHA_SECRET_KEY is missing")
+        return False, (jsonify(message="Verification failed"), 400)
 
-    verification_url = f"https://www.google.com/recaptcha/api/siteverify"
+    verification_url = "https://www.google.com/recaptcha/api/siteverify"
     payload = {
         'secret': secret_key,
         'response': recaptcha_token
@@ -48,16 +46,19 @@ def verify_recaptcha(recaptcha_token, retries=3, delay=1):
     for attempt in range(retries):
         try:
             response = requests.post(verification_url, data=payload, timeout=5)
-            response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+            response.raise_for_status()
             result = response.json()
 
             if result.get('success') and result.get('score', 0.0) >= 0.5:
                 return True, None
             else:
-                return False, (jsonify(message="reCAPTCHA verification failed"), 401)
-                
-        except requests.exceptions.RequestException:
+                logger.warning(f"Recaptcha failed: {result}")
+                return False, (jsonify(message="Verification failed"), 400)
+
+        except requests.exceptions.RequestException as e:
+            logger.exception("Recaptcha request failed")
+
             if attempt < retries - 1:
                 time.sleep(delay)
             else:
-                return False, (jsonify(message="Error verifying reCAPTCHA"), 500)
+                return False, (jsonify(message="Verification failed"), 400)

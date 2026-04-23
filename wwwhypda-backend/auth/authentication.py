@@ -24,7 +24,7 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @auth_bp.route("/login", methods=["POST"])
-@limiter.limit("200 per hour")
+@limiter.limit("10 per minute")
 def login():
     try:
         data = request.json
@@ -156,7 +156,8 @@ def options_confirm_registration():
     return jsonify({"message": "OK"}), 200
 
 @auth_bp.route("/confirm-registration", methods=["POST"])
-@limiter.limit("20 per minute")
+@limiter.limit("2 per minute")
+@limiter.limit("20 per hour")
 def confirm_registration():
     """Confirm user registration by verifying the activation code."""
     try:
@@ -183,16 +184,10 @@ def confirm_registration():
         return jsonify(message="Something went wrong", error=str(e)), 500
     
 
-# проверить капчу
-# вынести лимиты в конфиг
-# сделать сообщение об исчерпании лимитов
-# Cross-Origin Request Blocked: The Same Origin Policy disallows reading the remote resource at http://localhost:5000/users/. (Reason: CORS request did not succeed). Status code: (null).
-# ошибка при попытке сгенерировать нового пользователя
 # в политику добавить про то что я использую почту gmail и капчу
-
 @auth_bp.route("/", methods=["POST"])
-@limiter.limit("5 per minute")
-@limiter.limit("50 per hour")
+@limiter.limit("2 per minute")
+@limiter.limit("20 per hour")
 def add_user():
     """Register a new user and send an activation email (enumeration-safe)."""
     try:
@@ -255,8 +250,8 @@ def add_user():
         ), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
-@limiter.limit("5 per minute")
-@limiter.limit("50 per hour")
+@limiter.limit("10 per minute")
+@limiter.limit("20 per hour")
 def request_password_reset():
     """Send a password reset code to the user's email."""
     try:
@@ -337,42 +332,45 @@ def update_user():
     
 @auth_bp.route("/resend-confirmation", methods=["POST"])
 def resend_confirmation():
-    """Resend a confirmation code to an existing inactive user."""
     try:
         data = request.json
         if not data or "email" not in data:
-            return jsonify(message="Please provide an email", error="Bad request", data=None), 400
+            return jsonify(message="Invalid request", data=None), 400
 
         is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
         if not is_valid:
             return error_response
 
+        if current_app.config["DEBUG"]:
+            print("RECAPTCHA RESULT:", is_valid)
+
         email = data["email"]
 
         user = User.query.filter_by(email=email).first()
-        if not user:
-            return jsonify(message="User not found", error="Not Found", data=None), 404
 
-        if user.active:
-            return jsonify(message="Account is already activated", error="Conflict", data=None), 409
+        # ⚠️ Никаких ранних return'ов
+        if user and not user.active:
+            confirmation_code = ConfirmationCode.create_code(email, "registration")
 
-        confirmation_code = ConfirmationCode.create_code(email, "registration")
-
-        try:
-            with current_app.app_context():
+            try:
                 msg = Message(
                     "Your new activation code",
                     sender=current_app.config["MAIL_USERNAME"],
                     recipients=[email]
                 )
                 msg.body = f"Your new activation code: {confirmation_code.code}"
-                if current_app.config["DEBUG"] == True:
+
+                if current_app.config["DEBUG"]:
                     print(msg.body)
+
                 mail.send(msg)
-        except Exception as e:
-            return jsonify(message="Mail server is broken", error=str(e), data=None), 202
+            except Exception:
+                pass  # ❗ не палим ошибку наружу
 
-        return jsonify(message="A new confirmation code has been sent to your email.", data=None), 200
+        # ✅ Всегда одинаковый ответ
+        return jsonify(
+            message="If the account exists, a confirmation code has been sent."
+        ), 200
 
-    except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e), data=None), 500
+    except Exception:
+        return jsonify(message="Something went wrong"), 500
