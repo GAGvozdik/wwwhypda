@@ -1,0 +1,34 @@
+.container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+
+  font-family: "Afacad_Flux";
+  font-size: var(--main-font-size);
+  color: var(--tree-text);
+}
+
+.title {
+  font-size: var(--head-font-size);
+  margin-bottom: 1.5rem;
+}
+
+.sectionTitle {
+  font-size: var(--menu-font-size);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.text {
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.list {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.listItem {
+  margin-bottom: 0.5rem;
+}

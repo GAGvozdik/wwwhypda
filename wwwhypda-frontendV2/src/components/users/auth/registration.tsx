@@ -8,6 +8,8 @@ import api from '../../api';
 import messages from '../../../common/error_messages.json';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
+import CustomCheckbox from '../../commonFeatures/customCheckbox';
+import { validateRegistration } from './validation';
 
 const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [username, setUsername] = useState('');
@@ -21,6 +23,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [step, setStep] = useState(1);
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [isChecked, setIsChecked] = useState(false);
+
 
     const handleRegister = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,6 +39,19 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             return;
         }
 
+        const validatRes: string | null = validateRegistration(username, email, password);
+
+        if (validatRes != null) {
+            setIsError(true);
+            setError(validatRes);
+            return;
+        }
+        if (!isChecked) {
+            setError("Please agree to the Privacy Policy and the User Agreement.");
+            setIsError(true);
+            return;
+        }
+
         setIsLoading(true);
         try {
             const token = await executeRecaptcha('register');
@@ -45,7 +62,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 recaptcha_token: token,
             });
 
-            if (response.status === 201) {
+            if (response.status === 200 || response.status === 201) {
                 setError(response.data.message);
                 setIsError(false);
                 setStep(2);
@@ -66,13 +83,22 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [executeRecaptcha, username, password, confirmPassword, email]);
+    }, [executeRecaptcha, username, password, confirmPassword, email, isChecked]);
 
     const confirmRegistration = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
         if (!executeRecaptcha) {
             return;
         }
+
+        const validatRes: string | null = validateRegistration(username, email, password);
+
+        if (validatRes != null) {
+            setIsError(true);
+            setError(validatRes);
+            return;
+        }
+        setIsError(false);
         setIsLoading(true);
 
         try {
@@ -190,6 +216,41 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
 
                         <ErrorMessage error={error} isError={isError} />
+
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            width: '80%',
+                            marginLeft: 'auto',
+                            marginRight: 'auto',
+                            marginTop: '0.6rem',
+                            marginBottom: '0.6rem',
+                            // fontSize: 'calc(var(--standard-font-size) * 0.85)',
+                            color: 'var(--tree-text)',
+                            fontFamily: 'Afacad_Flux !important',
+                            fontSize: 'var(--under-menu-font-size)',
+                        }}>
+                            <CustomCheckbox
+                                isChecked={isChecked}
+                                color={isError && !isChecked ? 'rgba(var(--error-text), 1)' : undefined}
+                                onChange={setIsChecked}
+                            />
+                            <div style={{ marginLeft: '0.5rem' }}>
+                                <span>I agree with the </span>
+                                <div>
+                                    <Link to="/privacy-policy" className={styles.policyLink}>
+                                        Privacy Policy
+                                    </Link>
+                                </div>
+                                <div>
+                                    <span>and </span>
+                                    <Link to="/user-agreement" className={styles.policyLink}>
+                                        User Agreement
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+
 
                         <UserButton text="Register" isLoading={isLoading} />
 
