@@ -88,7 +88,8 @@ csp = {
     'worker-src': ["'self'"],
     'form-action': ["'self'"]
 }
-Talisman(app, content_security_policy=csp, force_https=False)
+force_https = os.getenv('FORCE_HTTPS', 'False').lower() == 'true'
+Talisman(app, content_security_policy=csp, force_https=force_https)
 
 # CORS configuration
 CORS(
@@ -123,7 +124,7 @@ app.config['REFRESH_EXPIRES_SECONDS'] = int(os.getenv('REFRESH_EXPIRES_SECONDS',
 
 app.config['JWT_TOKEN_LOCATION'] = ['cookies']
 app.config['JWT_ACCESS_COOKIE_NAME'] =  'jwt'
-app.config['JWT_COOKIE_SECURE'] = False  # Set True in production (with HTTPS)
+app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False').lower() == 'true'
 app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
 app.config['JWT_COOKIE_HTTPONLY'] = True
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
@@ -203,4 +204,5 @@ if __name__ == "__main__":
     #     db.create_all()
     #     db.create_all(bind_key='users_db')
     #     add_column_if_not_exists()
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
