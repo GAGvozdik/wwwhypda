@@ -2,6 +2,8 @@ __pycache__/
 workEnv/
 .idea/
 
+migrate_v5.py
+
 wwhypda.db-shm
 wwhypda.db-wal
 instance\users_data.db
