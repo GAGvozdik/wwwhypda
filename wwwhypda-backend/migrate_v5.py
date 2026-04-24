@@ -4,16 +4,23 @@ import psycopg2
 import re
 from dotenv import load_dotenv
 
-# Загрузка переменных
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, 'env.dev'))
 
-# ПРИНУДИТЕЛЬНО для локального запуска
-os.environ['DB_HOST'] = 'localhost'
+# 1. Если переменные уже есть в окружении Docker — используем их.
+# 2. Если скрипт запущен вручную — пробуем загрузить env.prod.
+# 3. Если env.prod нет — пробуем env.dev.
+
+env_prod_path = os.path.join(basedir, 'env.prod')
+env_dev_path = os.path.join(basedir, 'env.dev')
+
+if os.path.exists(env_prod_path):
+    load_dotenv(env_prod_path, override=False)
+elif os.path.exists(env_dev_path):
+    load_dotenv(env_dev_path, override=False)
 
 DB_USER = os.getenv('DB_USER', 'postgres')
 DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-DB_HOST = 'localhost'
+DB_HOST = os.getenv('DB_HOST', 'localhost')
 DB_PORT = os.getenv('DB_PORT', '5432')
 MAIN_DB_NAME = os.getenv('MAIN_DB_NAME', 'wwhypda')
 USERS_DB_NAME = os.getenv('USERS_DB_NAME', 'users_db')
@@ -47,6 +54,7 @@ def clean_sql_definition(sql, table_name):
 
 def migrate_db(sqlite_path, dbname):
     print(f"\n>>> Миграция {dbname}")
+    print(f"DEBUG: Connecting to host={DB_HOST}, user={DB_USER}, db={dbname}")
     sl_conn = sqlite3.connect(sqlite_path)
     sl_cur = sl_conn.cursor()
     
