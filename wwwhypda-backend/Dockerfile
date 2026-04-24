@@ -6,6 +6,12 @@ RUN addgroup --system app && adduser --system --ingroup app app
 # работаем из корня (как у тебя было)
 WORKDIR /
 
+# системные зависимости для psycopg2
+RUN apt-get update && apt-get install -y \
+    libpq-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 # зависимости
 COPY wwwhypda-backend/requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
