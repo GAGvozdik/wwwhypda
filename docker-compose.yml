@@ -2,6 +2,29 @@ networks:
   dev:
 
 services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    networks:
+      - dev
+
+  dbgate:
+    image: dbgate/dbgate
+    restart: unless-stopped
+    ports:
+      - "8081:3000"
+    networks:
+      - dev
+
   frontend:
     build:
       context: ./wwwhypda-frontendV2
@@ -23,6 +46,8 @@ services:
     env_file:
       - ./wwwhypda-backend/env.prod
     restart: unless-stopped
+    depends_on:
+      - db
     networks:
       - dev
 
@@ -43,3 +68,4 @@ services:
 
 volumes:
   frontend_dist:
+  postgres_data:

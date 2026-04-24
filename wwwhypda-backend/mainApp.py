@@ -33,19 +33,15 @@ from flask import current_app
 def add_column_if_not_exists(column_name='editing_by'):
     
     try:
-        # Проверим наличие колонки 'name' в таблице input_data
-        result = db.session.execute(text("PRAGMA table_info(input_data);"))
-        columns = [row[1] for row in result]  # row[1] — это имя колонки
+        inspector = inspect(db.engine)
+        columns = [c['name'] for c in inspector.get_columns('input_data')]
 
         if column_name not in columns:
-            # Note: Column names generally cannot be parameterized in DDL, 
-            # but we follow the instruction to use named parameters where possible.
-            # In this case, f-string is used for the column name as it is a static internal value.
             db.session.execute(
                 text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(50)")
             )
             db.session.commit()
-
+            current_app.logger.info(f"✅ Column {column_name} added to input_data.")
         else:
             current_app.logger.info(f"ℹ️ Column {column_name} already exists.")
     except Exception as e:
@@ -106,12 +102,16 @@ CORS(
 logging.basicConfig(level=logging.INFO)
 
 # === Configs ===
-main_db_filename = os.getenv('MAIN_DATABASE_FILENAME', 'wwhypda.db')
-users_db_filename = os.getenv('USERS_DATABASE_FILENAME', 'users_data.db')
+DB_USER = os.getenv('DB_USER', 'postgres')
+DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
+DB_HOST = os.getenv('DB_HOST', 'db')
+DB_PORT = os.getenv('DB_PORT', '5432')
+MAIN_DB_NAME = os.getenv('MAIN_DB_NAME', 'wwhypda')
+USERS_DB_NAME = os.getenv('USERS_DB_NAME', 'users_db')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, main_db_filename)
+app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{MAIN_DB_NAME}'
 app.config['SQLALCHEMY_BINDS'] = {
-    'users_db': 'sqlite:///' + os.path.join(app.instance_path, users_db_filename)
+    'users_db': f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{USERS_DB_NAME}'
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
@@ -198,9 +198,9 @@ def not_found(e):
 
 # === Main Entry ===
 if __name__ == "__main__":
-    with app.app_context():
-        # db.create_all()
-        # db.create_all(bind_key='users_db')
-        # add_column_if_not_exists()
-        pass
+    # Tables are created by migration script to preserve schema exactly
+    # with app.app_context():
+    #     db.create_all()
+    #     db.create_all(bind_key='users_db')
+    #     add_column_if_not_exists()
     app.run(host="0.0.0.0", port=5000, debug=True)
