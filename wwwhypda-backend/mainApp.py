@@ -103,17 +103,36 @@ CORS(
 logging.basicConfig(level=logging.INFO)
 
 # === Configs ===
-DB_USER = os.getenv('DB_USER', 'postgres')
-DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-DB_HOST = os.getenv('DB_HOST', 'db')
-DB_PORT = os.getenv('DB_PORT', '5432')
-MAIN_DB_NAME = os.getenv('MAIN_DB_NAME', 'wwhypda')
-USERS_DB_NAME = os.getenv('USERS_DB_NAME', 'users_db')
+DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{MAIN_DB_NAME}'
-app.config['SQLALCHEMY_BINDS'] = {
-    'users_db': f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{USERS_DB_NAME}'
-}
+if DB_ENGINE == 'postgres':
+    DB_USER = os.getenv('DB_USER', 'postgres')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
+    DB_HOST = os.getenv('DB_HOST', 'db')
+    DB_PORT = os.getenv('DB_PORT', '5432')
+    MAIN_DB_NAME = os.getenv('MAIN_DB_NAME', 'wwhypda')
+    USERS_DB_NAME = os.getenv('USERS_DB_NAME', 'users_db')
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{MAIN_DB_NAME}'
+    )
+    app.config['SQLALCHEMY_BINDS'] = {
+        'users_db': (
+            f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{USERS_DB_NAME}'
+        )
+    }
+
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f"sqlite:///{os.path.join(basedir, 'instance', 'wwhypda.db')}"
+    )
+    app.config['SQLALCHEMY_BINDS'] = {
+        'users_db': (
+            f"sqlite:///{os.path.join(basedir, 'instance', 'users_data.db')}"
+        )
+    }
+
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
