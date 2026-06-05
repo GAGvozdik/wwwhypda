@@ -51,20 +51,20 @@ services:
     networks:
       - dev
 
-  migrate:
-    profiles:
-      - migrate
-    build:
-      context: .
-      dockerfile: ./wwwhypda-backend/Dockerfile
-    env_file:
-      - ./wwwhypda-backend/env.prod
-    command: python /migrate_v5.py
-    depends_on:
-      - db
-    networks:
-      - dev
-    restart: "no"
+  # migrate:
+  #   profiles:
+  #     - migrate
+  #   build:
+  #     context: .
+  #     dockerfile: ./wwwhypda-backend/Dockerfile
+  #   env_file:
+  #     - ./wwwhypda-backend/env.prod
+  #   command: python /migrate_v5.py
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - dev
+  #   restart: "no"
 
   nginx:
     image: nginx:stable-alpine
