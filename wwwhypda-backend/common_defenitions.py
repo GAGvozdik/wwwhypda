@@ -45,7 +45,10 @@ def verify_recaptcha(recaptcha_token):
             result = response.json()
             if result.get("success") and result.get("score", 0) >= config["RECAPTCHA_MIN_SCORE"]:
                 return True, None
-            current_app.logger.warning("CAPTCHA verification rejected")
+            current_app.logger.warning(
+                "CAPTCHA verification rejected: success=%s score=%s minimum=%s errors=%s hostname=%s action=%s",
+                result.get("success"), result.get("score"), config["RECAPTCHA_MIN_SCORE"],
+                result.get("error-codes", []), result.get("hostname"), result.get("action"))
             return failure()
         except (requests.exceptions.RequestException, ValueError):
             current_app.logger.warning("CAPTCHA verification request failed")
