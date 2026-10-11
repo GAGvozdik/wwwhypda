@@ -194,3 +194,5 @@ cython_debug/
 # PyPI configuration file
 .pypircenv.dev 
 env.prod
+
+!env.dev

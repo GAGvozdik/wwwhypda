@@ -8,4 +8,4 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-RUN npm run build
+# Compose builds with the selected environment at container startup.

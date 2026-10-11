@@ -14,3 +14,14 @@ TASKS.md
 nginx.conf
 wwwhypda-backend/.env.dev
 wwwhypda-backend/.env.prod
+
+# Private deployment configuration.
+/docker-compose.prod.yml
+/nginx.conf
+/nginx_subdomain.conf
+/.env
+/.env.production
+/.env.*.local
+/wwwhypda-backend/env.prod
+/wwwhypda-frontendV2/.env.production
+/wwwhypda-frontendV2/Dockerfile.prod
