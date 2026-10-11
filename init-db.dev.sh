@@ -31,3 +31,16 @@ ALTER TABLE IF EXISTS public."Contact" RENAME TO contact;
 ALTER TABLE IF EXISTS public."Site_info" RENAME TO site_info;
 ALTER TABLE IF EXISTS public."Measure_group" RENAME TO measure_group;
 SQL
+
+# Restore missing auto-increment defaults from the historical auth dump.
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname users_db <<'SQL'
+CREATE SEQUENCE IF NOT EXISTS public.users_id_seq OWNED BY public.users.id;
+ALTER TABLE public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq');
+SELECT setval('public.users_id_seq', COALESCE((SELECT MAX(id) FROM public.users), 0) + 1, false);
+CREATE SEQUENCE IF NOT EXISTS public.confirmation_codes_id_seq OWNED BY public.confirmation_codes.id;
+ALTER TABLE public.confirmation_codes ALTER COLUMN id SET DEFAULT nextval('public.confirmation_codes_id_seq');
+SELECT setval('public.confirmation_codes_id_seq', COALESCE((SELECT MAX(id) FROM public.confirmation_codes), 0) + 1, false);
+CREATE SEQUENCE IF NOT EXISTS public.input_data_id_seq OWNED BY public.input_data.id;
+ALTER TABLE public.input_data ALTER COLUMN id SET DEFAULT nextval('public.input_data_id_seq');
+SELECT setval('public.input_data_id_seq', COALESCE((SELECT MAX(id) FROM public.input_data), 0) + 1, false);
+SQL

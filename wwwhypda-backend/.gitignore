@@ -196,3 +196,6 @@ cython_debug/
 env.prod
 
 !env.dev
+
+# Real local credentials stay private.
+env.dev

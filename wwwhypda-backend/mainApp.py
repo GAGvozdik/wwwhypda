@@ -149,7 +149,7 @@ app.config['JWT_COOKIE_HTTPONLY'] = True
 app.config['JWT_COOKIE_CSRF_PROTECT'] = True
 app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token_cookie"
 app.config["JWT_ACCESS_COOKIE_PATH"] = "/"
-app.config["JWT_REFRESH_COOKIE_PATH"] = "/users/refresh"
+app.config["JWT_REFRESH_COOKIE_PATH"] = os.getenv("JWT_REFRESH_COOKIE_PATH", "/users/refresh")
 
 # Mail config
 app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
@@ -168,6 +168,9 @@ jwt = JWTManager(app)
 
 @app.after_request
 def rotate_csrf_token(response):
+    # These handlers already issue cookies for the new JWT.
+    if request.endpoint in {"users.login", "users.refresh", "users.logout"}:
+        return response
     if request.method in ["POST", "PUT", "DELETE"] and response.status_code == 200:
         try:
             access_token = request.cookies.get("jwt")

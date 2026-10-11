@@ -111,14 +111,14 @@ def refresh():
             "csrf_token",
             get_csrf_token(new_access_token),
             httponly=False,
-            secure=True,
+            secure=current_app.config["JWT_COOKIE_SECURE"],
             samesite="Strict"
         )
         
         return response
 
     except Exception as e:
-        auth_bp.logger.error(f"Error refreshing access token: {e}")
+        current_app.logger.error(f"Error refreshing access token: {e}")
         return jsonify(message="Failed to refresh access token"), 500
 
 @auth_bp.route('/super_check', methods=['GET'])

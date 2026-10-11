@@ -10,16 +10,17 @@ interface AuthState {
 const useAuthCheck = (): AuthState => {
     const [auth, setAuth] = useState<AuthState>({ isAuth: null, isSuperuser: null });
     const { executeRecaptcha } = useGoogleReCaptcha();
+    const isTestMode = import.meta.env.VITE_CYPRESS_TEST === 'true';
 
     useEffect(() => {
         const checkAuth = async () => {
-            if (!executeRecaptcha) {
+            if (!isTestMode && !executeRecaptcha) {
                 console.error("ReCAPTCHA not available yet");
                 return;
             }
 
             try {
-                const token = await executeRecaptcha('check_auth');
+                const token = isTestMode ? 'test-token' : await executeRecaptcha!('check_auth');
                 const response = await api.get('/users/check', {
                     withCredentials: true,
                     headers: {
@@ -37,7 +38,7 @@ const useAuthCheck = (): AuthState => {
         };
 
         checkAuth();
-    }, [executeRecaptcha]);
+    }, [executeRecaptcha, isTestMode]);
 
     return auth;
 };
