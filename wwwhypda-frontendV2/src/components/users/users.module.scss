@@ -170,3 +170,62 @@ input::placeholder {
     align-items: center;
     height: 100%;
 }
+.registrationPage {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2vh 0;
+    box-sizing: border-box;
+
+    > .authForm { margin-block: auto; }
+}
+
+.registrationNotice {
+    width: 80%;
+    margin: 1vh auto;
+    color: var(--tree-text);
+    font-family: Afacad_Flux, sans-serif;
+    font-size: var(--under-menu-font-size);
+    line-height: 1.35;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.3rem;
+
+    > :first-child { flex-shrink: 0; }
+    > span { min-width: 0; padding-top: 9px; }
+}
+
+.registrationEmailNotice {
+    margin: 0.8vh 0 1vh;
+}
+
+.accountPrivacy {
+    margin-top: 0;
+    max-width: 36rem;
+    font-family: Afacad_Flux, sans-serif;
+    font-size: var(--under-menu-font-size);
+    line-height: 1.4;
+
+    p { margin: 0.6vh 0; }
+    > a { display: block; width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
+}
+
+.checkboxRowError {
+    color: var(--error-text);
+    .policyLink { color: inherit; }
+}
+
+.accountDetails {
+    margin: 0.5vh 5vh;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1.5vh 3rem;
+
+    > div { min-width: 14rem; }
+    .accountPrivacy p:first-child { margin-top: 0; }
+}

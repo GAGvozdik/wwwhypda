@@ -100,7 +100,7 @@ const Account: React.FC = () => {
                 <UserSuggestions />
 
 
-                <div style={{ margin: '5vh' }}>
+                <div className={styles.accountDetails}>
                     {isLoading && <LoadIcon size={34}/>}
                     {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
                     {userData && (
@@ -109,12 +109,13 @@ const Account: React.FC = () => {
                             <div>Email: {userData.email}</div>
                         </div>
                     )}
+                    <section className={styles.accountPrivacy} aria-label="Personal data requests">
+                        <p>Access, correction or deletion of personal data:</p>
+                        <a className={styles.policyLink} href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">georgii.gvozdik@studenti.unimi.it</a>
+                        <a className={styles.policyLink} href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>
+                        <p>Logging out does not delete your account.</p>
+                    </section>
                 </div>
-                <p style={{ margin: '2rem', color: 'var(--tree-text)' }}>
-                    For a copy, correction or deletion of your personal data and account, email{' '}
-                    <a href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">georgii.gvozdik@studenti.unimi.it</a>.
-                    Additional contact: <a href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>. Logging out does not delete your account.
-                </p>
                 <button onClick={handleLogout} className={styles.submitButton} style={{width: '20vh', justifySelf: 'center'}}>
                     Log Out
                 </button>

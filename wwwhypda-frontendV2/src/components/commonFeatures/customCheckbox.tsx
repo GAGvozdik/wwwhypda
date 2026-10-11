@@ -6,12 +6,15 @@ interface CustomCheckboxProps {
     isChecked: boolean;
     onChange: Dispatch<SetStateAction<boolean>>;
     color?: string;
+    required?: boolean;
+    labelledBy?: string;
 }
 
-const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, color }) => {
+const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, color, required, labelledBy }) => {
     return (
         <Checkbox
             checked={isChecked}
+            slotProps={{ input: { 'aria-labelledby': labelledBy, 'aria-required': required } }}
             onChange={(event) => onChange(event.target.checked)}
             sx={{
                 color: color ? color : 'var(--checkbox-color)',
