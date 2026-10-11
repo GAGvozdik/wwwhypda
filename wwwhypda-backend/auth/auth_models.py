@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
-import random
+import secrets
+from flask import current_app
 
 # Initialize SQLAlchemy instance (assuming `db` is imported from `auth.mail`)
 from common_defenitions import db
@@ -54,7 +55,6 @@ class User(db.Model):
         Deactivates a user account.
         Returns True if successful, otherwise False.
         """
-        print('fdsf')
         user = cls.query.filter_by(id=user_id).first()
         if user:
             user.active = False
@@ -234,7 +234,7 @@ class ConfirmationCode(db.Model):
         Generates a 6-digit confirmation code and stores it in the database.
         Returns the created confirmation code object.
         """
-        code = str(random.randint(100000, 999999))
+        code = str((secrets.randbelow(900000) + 100000))
         confirmation_code = cls(email=email, code=code, type=type)
         db.session.add(confirmation_code)
         db.session.commit()
@@ -254,7 +254,7 @@ class ConfirmationCode(db.Model):
         if confirmation_code.created_at.tzinfo is None:
             confirmation_code.created_at = confirmation_code.created_at.replace(tzinfo=timezone.utc)
         
-        if datetime.now(timezone.utc) - confirmation_code.created_at > timedelta(minutes=10):
+        if datetime.now(timezone.utc) - confirmation_code.created_at > timedelta(seconds=current_app.config["PASSWORD_RESET_CODE_TTL_SECONDS" if type == "password_reset" else "CONFIRMATION_CODE_TTL_SECONDS"]):
             return False
         
         return True

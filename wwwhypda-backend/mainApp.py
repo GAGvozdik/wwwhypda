@@ -1,230 +1,154 @@
+import logging
+import json
 import os
+from pathlib import Path
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
-from flask_swagger_ui import get_swaggerui_blueprint
-from dotenv import load_dotenv
 from flask_talisman import Talisman
-import logging
-from flask import request
-from flask_jwt_extended import (
-    JWTManager, create_access_token, create_refresh_token,
-    set_access_cookies, set_refresh_cookies, get_csrf_token,
-    jwt_required, get_jwt_identity, get_jwt
-)
-from flask_jwt_extended import get_jwt, get_jwt_identity, create_access_token, set_access_cookies, get_csrf_token
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
-from datetime import timedelta
-import secrets
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-from inputData.inputData import input_bp
+from dotenv import load_dotenv
+from sqlalchemy.engine import URL
+
+basedir = Path(__file__).resolve().parent
+app = Flask(__name__, instance_relative_config=True)
+profile = os.getenv("APP_ENV", "development")
+if profile not in {"development", "production"}:
+    raise ValueError("APP_ENV must be development or production")
+# Docker injects the selected file; native startup reads the same file here.
+load_dotenv(basedir / ("env.prod" if profile == "production" else "env.dev"), override=False)
+app.config["APP_ENV"] = profile
+
+# Values belong to env.dev / env.prod. This code only converts their types.
+def env_value(name):
+    if name not in os.environ:
+        raise ValueError(f"Missing configuration variable: {name}")
+    return os.environ[name]
+
+
+def env_bool(name):
+    value = env_value(name).strip().lower()
+    if value not in {"true", "false", "1", "0"}:
+        raise ValueError(f"{name} must be True or False")
+    return value in {"true", "1"}
+
+
+string_settings = (
+    "SECRET_KEY", "JWT_SECRET_KEY", "JWT_ACCESS_COOKIE_NAME", "JWT_REFRESH_COOKIE_NAME",
+    "JWT_ACCESS_COOKIE_PATH", "JWT_REFRESH_COOKIE_PATH", "JWT_ACCESS_CSRF_COOKIE_NAME",
+    "JWT_REFRESH_CSRF_COOKIE_NAME", "JWT_COOKIE_SAMESITE", "SESSION_COOKIE_SAMESITE",
+    "FRAME_OPTIONS", "REFERRER_POLICY", "MAIL_SERVER", "MAIL_USERNAME", "MAIL_PASSWORD",
+    "MAIL_DEFAULT_SENDER", "MAIL_DELIVERY_MODE", "RECAPTCHA_SECRET_KEY", "RECAPTCHA_VERIFY_URL",
+    "RATELIMIT_DEFAULT", "RATELIMIT_STORAGE_URI", "AUTH_LOGIN_RATE_LIMIT",
+    "AUTH_REGISTRATION_RATE_LIMIT", "AUTH_CONFIRMATION_RATE_LIMIT", "AUTH_PASSWORD_RESET_RATE_LIMIT",
+    "AUTH_RESEND_RATE_LIMIT", "LOG_LEVEL", "SWAGGER_URL", "API_URL", "APP_HOST",
+)
+boolean_settings = (
+    "TESTING", "DEBUG", "FLASK_DEBUG", "ENABLE_TEST_ENDPOINTS", "JWT_COOKIE_SECURE",
+    "JWT_COOKIE_CSRF_PROTECT", "SESSION_COOKIE_SECURE", "FORCE_HTTPS", "HSTS_ENABLED",
+    "HSTS_INCLUDE_SUBDOMAINS", "CORS_SUPPORTS_CREDENTIALS", "MAIL_USE_TLS", "MAIL_USE_SSL",
+    "MAIL_SUPPRESS_SEND", "RECAPTCHA_ENABLED", "RATELIMIT_ENABLED", "EXPOSE_ERROR_DETAILS",
+    "SWAGGER_ENABLED", "SQLALCHEMY_TRACK_MODIFICATIONS",
+)
+integer_settings = (
+    "ACCESS_EXPIRES_SECONDS", "REFRESH_EXPIRES_SECONDS", "HSTS_MAX_AGE", "PROXY_X_FOR",
+    "PROXY_X_PROTO", "PROXY_X_HOST", "MAIL_PORT", "CONFIRMATION_CODE_TTL_SECONDS",
+    "PASSWORD_RESET_CODE_TTL_SECONDS", "RECAPTCHA_RETRIES", "APP_PORT",
+)
+for name in string_settings:
+    app.config[name] = env_value(name)
+for name in boolean_settings:
+    app.config[name] = env_bool(name)
+for name in integer_settings:
+    app.config[name] = int(env_value(name))
+for name in ("RECAPTCHA_MIN_SCORE", "RECAPTCHA_TIMEOUT_SECONDS", "RECAPTCHA_RETRY_DELAY_SECONDS"):
+    app.config[name] = float(env_value(name))
+for name, expected_type in (("CSP_POLICY", dict), ("CORS_ORIGINS", list),
+                            ("CORS_ALLOW_HEADERS", list), ("JWT_TOKEN_LOCATION", list)):
+    app.config[name] = json.loads(env_value(name))
+    if not isinstance(app.config[name], expected_type):
+        raise ValueError(f"Invalid JSON configuration type: {name}")
+if profile == "production" and any(app.config[name] for name in ("TESTING", "DEBUG", "FLASK_DEBUG", "ENABLE_TEST_ENDPOINTS")):
+    raise ValueError("Development/test modes cannot be enabled in production")
+if app.config["MAIL_USE_TLS"] and app.config["MAIL_USE_SSL"]:
+    raise ValueError("MAIL_USE_TLS and MAIL_USE_SSL cannot both be enabled")
+if app.config["MAIL_DELIVERY_MODE"] not in {"smtp", "log"}:
+    raise ValueError("MAIL_DELIVERY_MODE must be smtp or log")
+if not 0 <= app.config["RECAPTCHA_MIN_SCORE"] <= 1:
+    raise ValueError("RECAPTCHA_MIN_SCORE must be between 0 and 1")
+if app.config["RECAPTCHA_RETRIES"] < 1 or app.config["RECAPTCHA_TIMEOUT_SECONDS"] <= 0:
+    raise ValueError("Invalid CAPTCHA retry or timeout configuration")
+if not app.config["SECRET_KEY"] or not app.config["JWT_SECRET_KEY"]:
+    raise ValueError("SECRET_KEY and JWT_SECRET_KEY must not be empty")
+# Empty SMTP credentials allow local email logging without an SMTP account.
+app.config["MAIL_USERNAME"] = app.config["MAIL_USERNAME"] or None
+app.config["MAIL_PASSWORD"] = app.config["MAIL_PASSWORD"] or None
+if env_value("DB_ENGINE") == "postgres":
+    def database_url(name):
+        return URL.create("postgresql+psycopg2", username=env_value("DB_USER"),
+            password=env_value("DB_PASSWORD"), host=env_value("DB_HOST"),
+            port=int(env_value("DB_PORT")), database=name).render_as_string(hide_password=False)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url(env_value("MAIN_DB_NAME"))
+    app.config["SQLALCHEMY_BINDS"] = {"users_db": database_url(env_value("USERS_DB_NAME"))}
+elif env_value("DB_ENGINE") == "sqlite":
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(basedir / "instance" / env_value("MAIN_DATABASE_FILENAME"))
+    app.config["SQLALCHEMY_BINDS"] = {"users_db": "sqlite:///" + str(basedir / "instance" / env_value("USERS_DATABASE_FILENAME"))}
+else:
+    raise ValueError("DB_ENGINE must be postgres or sqlite")
+logging.basicConfig(level=app.config["LOG_LEVEL"])
+app.wsgi_app = ProxyFix(app.wsgi_app,
+    x_for=app.config["PROXY_X_FOR"], x_proto=app.config["PROXY_X_PROTO"],
+    x_host=app.config["PROXY_X_HOST"], x_port=0, x_prefix=0)
+
+# Load extensions and blueprints after the selected environment configuration.
+from common_defenitions import mail, db, limiter
 from auth.authentication import auth_bp
 from auth.admin.admin import admin_bp
 from rocks.rocks_bp import rocks_bp
-from inputData.inputDataModels import InputData
+from inputData.inputData import input_bp
 
-# from rocks.rocks_models import db
-# from auth.auth_models import db  # потенциально дублирование, оставь один из них
-from common_defenitions import mail, db, limiter
-from sqlalchemy import text, inspect
-from flask import current_app
-
-def add_column_if_not_exists(column_name='editing_by'):
-    
-    try:
-        inspector = inspect(db.engine)
-        columns = [c['name'] for c in inspector.get_columns('input_data')]
-
-        if column_name not in columns:
-            db.session.execute(
-                text(f"ALTER TABLE input_data ADD COLUMN {column_name} VARCHAR(50)")
-            )
-            db.session.commit()
-            current_app.logger.info(f"✅ Column {column_name} added to input_data.")
-        else:
-            current_app.logger.info(f"ℹ️ Column {column_name} already exists.")
-    except Exception as e:
-        db.session.rollback()
-        current_app.logger.error(f"❌ Failed to add {column_name} column: {e}")
-
-
-
-# TODO: Add reCAPTCHA
-# TODO: Add request limiting (maybe reCAPTCHA will help)
-# TODO: Check expiration of reset password code
-# TODO: Check csrf token verification
-
-# Load environment variables for development if 'env.dev' exists.
-# In production (Docker), environment variables are set by docker-compose.
-basedir = os.path.abspath(os.path.dirname(__file__))
-dev_config_path = os.path.join(basedir, 'env.dev')
-if os.path.exists(dev_config_path):
-    load_dotenv(dotenv_path=dev_config_path)
-
-app = Flask(__name__, instance_relative_config=True)
-
-# === Rate Limiting ===
-limiter.init_app(app)
-
-# === Security Configuration ===
-csp = {
-    'default-src': "'self'",
-    'script-src': [
-        "'self'",
-        "https://www.google.com/recaptcha/",
-        "https://www.gstatic.com/recaptcha/"
-    ],
-    'frame-src': [
-        "'self'",
-        "https://www.google.com/recaptcha/",
-        "https://www.gstatic.com/recaptcha/"
-    ],
-    'style-src': ["'self'", "'unsafe-inline'"],
-    'img-src': ["'self'", 'data:'],
-    'connect-src': ["'self'", "https://www.google.com", "http://localhost:3000", "http://localhost:5173"],
-    'font-src': ["'self'"],
-    'object-src': ["'none'"],
-    'worker-src': ["'self'"],
-    'form-action': ["'self'"]
-}
-force_https = os.getenv('FORCE_HTTPS', 'False').lower() == 'true'
-Talisman(app, content_security_policy=csp, force_https=force_https)
-
-# CORS configuration
-CORS(
-    app, 
-    supports_credentials=True, 
-    origins=["http://localhost:8080", "http://localhost:3000", "http://localhost:5173"], 
-    allow_headers=["Content-Type", "Authorization", "X-CSRF-TOKEN", "Cookie", "X-Recaptcha-Token"]
-)
-
-# talisman = Talisman(app)
-logging.basicConfig(level=logging.INFO)
-
-# === Configs ===
-DB_ENGINE = os.getenv('DB_ENGINE', 'sqlite')
-
-if DB_ENGINE == 'postgres':
-    DB_USER = os.getenv('DB_USER', 'postgres')
-    DB_PASSWORD = os.getenv('DB_PASSWORD', 'postgres')
-    DB_HOST = os.getenv('DB_HOST', 'db')
-    DB_PORT = os.getenv('DB_PORT', '5432')
-    MAIN_DB_NAME = os.getenv('MAIN_DB_NAME', 'wwhypda')
-    USERS_DB_NAME = os.getenv('USERS_DB_NAME', 'users_db')
-
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{MAIN_DB_NAME}'
-    )
-    app.config['SQLALCHEMY_BINDS'] = {
-        'users_db': (
-            f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{USERS_DB_NAME}'
-        )
-    }
-
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = (
-        f"sqlite:///{os.path.join(basedir, 'instance', 'wwhypda.db')}"
-    )
-    app.config['SQLALCHEMY_BINDS'] = {
-        'users_db': (
-            f"sqlite:///{os.path.join(basedir, 'instance', 'users_data.db')}"
-        )
-    }
-
-
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-
-# JWT configuration with HttpOnly cookie storage
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config['ACCESS_EXPIRES_SECONDS'] = int(os.getenv('ACCESS_EXPIRES_SECONDS', 21600))
-app.config['REFRESH_EXPIRES_SECONDS'] = int(os.getenv('REFRESH_EXPIRES_SECONDS', 86400))
-
-app.config['JWT_TOKEN_LOCATION'] = ['cookies']
-app.config['JWT_ACCESS_COOKIE_NAME'] =  'jwt'
-app.config['JWT_COOKIE_SECURE'] = os.getenv('JWT_COOKIE_SECURE', 'False').lower() == 'true'
-app.config['JWT_COOKIE_SAMESITE'] = 'Lax'
-app.config['JWT_COOKIE_HTTPONLY'] = True
-app.config['JWT_COOKIE_CSRF_PROTECT'] = True
-app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token_cookie"
-app.config["JWT_ACCESS_COOKIE_PATH"] = "/"
-app.config["JWT_REFRESH_COOKIE_PATH"] = os.getenv("JWT_REFRESH_COOKIE_PATH", "/users/refresh")
-
-# Mail config
-app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
-app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
-
-app.config['TESTING'] = os.getenv('TESTING', 'False').lower() in ('true', '1', 't')
-
-# === Initialize extensions ===
 mail.init_app(app)
 db.init_app(app)
+limiter.init_app(app)
 jwt = JWTManager(app)
+Talisman(app, content_security_policy=app.config["CSP_POLICY"],
+    force_https=app.config["FORCE_HTTPS"],
+    strict_transport_security=app.config["HSTS_ENABLED"],
+    strict_transport_security_max_age=app.config["HSTS_MAX_AGE"],
+    strict_transport_security_include_subdomains=app.config["HSTS_INCLUDE_SUBDOMAINS"],
+    session_cookie_secure=app.config["SESSION_COOKIE_SECURE"],
+    session_cookie_samesite=app.config["SESSION_COOKIE_SAMESITE"],
+    frame_options=app.config["FRAME_OPTIONS"], referrer_policy=app.config["REFERRER_POLICY"])
+CORS(app, origins=app.config["CORS_ORIGINS"],
+    supports_credentials=app.config["CORS_SUPPORTS_CREDENTIALS"],
+    allow_headers=app.config["CORS_ALLOW_HEADERS"])
 
-@app.after_request
-def rotate_csrf_token(response):
-    # These handlers already issue cookies for the new JWT.
-    if request.endpoint in {"users.login", "users.refresh", "users.logout"}:
-        return response
-    if request.method in ["POST", "PUT", "DELETE"] and response.status_code == 200:
-        try:
-            access_token = request.cookies.get("jwt")
-            if access_token:
-                csrf_token = get_csrf_token(access_token)
-                response.set_cookie(
-                    "csrf_token",
-                    csrf_token,
-                    httponly=False,
-                    secure=True,  # если у тебя HTTPS
-                    samesite="Strict"
-                )
-        except Exception as e:
-            app.logger.error(f"Error rotating CSRF token: {e}")
-    return response
-
-# === Register Blueprints ===
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(rocks_bp)
 app.register_blueprint(input_bp)
-
-# Условно регистрируем Blueprint с тестовыми эндпоинтами
-# Он будет доступен только если приложение запущено в режиме тестирования
-if app.config.get("TESTING"):
+if app.config["ENABLE_TEST_ENDPOINTS"] and app.config["TESTING"]:
     from auth.testing_endpoints import testing_bp
     app.register_blueprint(testing_bp)
+if app.config["SWAGGER_ENABLED"]:
+    from flask_swagger_ui import get_swaggerui_blueprint
+    app.register_blueprint(get_swaggerui_blueprint(
+        app.config["SWAGGER_URL"], app.config["API_URL"], config={"app_name": "Flask API"}),
+        url_prefix=app.config["SWAGGER_URL"])
 
-swaggerui_blueprint = get_swaggerui_blueprint(
-    os.getenv('SWAGGER_URL'),
-    os.getenv('API_URL'),
-    config={'app_name': "Flask API with Swagger UI"}
-)
-app.register_blueprint(swaggerui_blueprint, url_prefix=os.getenv('SWAGGER_URL'))
-
-# === Error Handlers ===
 @app.errorhandler(429)
-def ratelimit_handler(e):
-    return jsonify(message="Too many requests", error=str(e.description)), 429
+def ratelimit_handler(error):
+    return jsonify(message="Too many requests"), 429
 
 @app.errorhandler(403)
-def forbidden(e):
-    return jsonify(message="Forbidden", error=str(e), data=None), 403
+def forbidden(error):
+    return jsonify(message="Forbidden", data=None), 403
 
 @app.errorhandler(404)
-def not_found(e):
-    return jsonify(message="Endpoint Not Found", error=str(e), data=None), 404
+def not_found(error):
+    return jsonify(message="Endpoint Not Found", data=None), 404
 
-# === Main Entry ===
 if __name__ == "__main__":
-    # Tables are created by migration script to preserve schema exactly
-    # with app.app_context():
-    #     db.create_all()
-    #     db.create_all(bind_key='users_db')
-    #     add_column_if_not_exists()
-    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    app.run(host="0.0.0.0", port=5000, debug=debug_mode)
+    app.run(host=app.config["APP_HOST"], port=app.config["APP_PORT"], debug=app.config["FLASK_DEBUG"])

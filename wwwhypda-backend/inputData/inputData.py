@@ -1,3 +1,4 @@
+from common_defenitions import error_message
 from flask import Blueprint, request, jsonify, current_app
 import jwt
 from inputData.inputDataModels import InputData, db
@@ -14,13 +15,13 @@ input_bp = Blueprint("input", __name__, url_prefix="/input")
 @jwt_required()
 def get_input_suggestions():
     current_user = get_jwt_identity()
-    print(f"User calling get_input_suggestions: {current_user}")
+    current_app.logger.debug("User calling get_input_suggestions: %s", current_user)
     try:
         data = InputData.get_input_suggestions()
         return jsonify({"data": data}), 200
     except Exception as e:
         current_app.logger.error(f"Error in get_input_suggestions: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": error_message(e)}), 500
 
 @input_bp.route("/get_input_by_id/<int:id>", methods=["GET"])
 @jwt_required()
@@ -32,7 +33,7 @@ def get_input_by_id(id):
         return jsonify(input_data.to_dict()), 200
     except Exception as e:
         current_app.logger.error(f"Error in get_input_by_id: {e}")
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": error_message(e)}), 500
 
 
 @input_bp.route("/in_editing/<int:id>", methods=["POST"])

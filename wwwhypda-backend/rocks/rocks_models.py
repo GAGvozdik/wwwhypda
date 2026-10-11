@@ -1,3 +1,5 @@
+from flask import current_app
+from common_defenitions import error_message
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from flask_login import UserMixin
@@ -40,7 +42,7 @@ class Country(db.Model):
         except Exception as e:
             return jsonify({
                 'error': 'Error in Country.get_all_countries',
-                'details': str(e)
+                'details': error_message(e)
             }), 500
 
 class Review(db.Model):
@@ -59,7 +61,7 @@ class Review(db.Model):
         except Exception as e:
             return jsonify({
                 'error': 'Error in Review.get_all_reviews',
-                'details': str(e)
+                'details': error_message(e)
             }), 500
 
 class Fracturation(db.Model):
@@ -73,7 +75,7 @@ class Fracturation(db.Model):
             fracturations = Fracturation.query.all()
             return jsonify([{"id_fracturation": f.id_fracturation, "fracturation_degree": f.fracturation_degree} for f in fracturations]), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": error_message(e)}), 500
 
 class Scale(db.Model):
     __tablename__ = 'Scale'
@@ -87,7 +89,7 @@ class Scale(db.Model):
             scales = Scale.query.all()
             return jsonify([{"id_Scale": s.id_Scale, "scale_value": s.scale_value, "scale_descr": s.scale_descr} for s in scales]), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": error_message(e)}), 500
 
 class Quality(db.Model):
     __tablename__ = 'Quality'
@@ -103,7 +105,7 @@ class Quality(db.Model):
                 "quality_level": q.quality_level
             } for q in qualities]), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": error_message(e)}), 500
 
 class Parameter(db.Model):
     __tablename__ = 'Parameter'
@@ -123,7 +125,7 @@ class Parameter(db.Model):
             results = db.session.query(Parameter).order_by(Parameter.id_Parameter).all()
             return [parameter.to_dict() for parameter in results]
         except Exception as e:
-            print(f"getParameters error: {e}")
+            current_app.logger.error(f"getParameters error: {e}")
             return []
 
     def to_dict(self):
@@ -158,7 +160,7 @@ class Source(db.Model):
             results = db.session.query(Source).order_by(Source.id_Source.desc()).all()
             return [source.to_dict() for source in results]
         except Exception as e:
-            print(f"getDataAnonce error: {e}")
+            current_app.logger.error(f"getDataAnonce error: {e}")
             return []
 
     def to_dict(self):
@@ -205,7 +207,7 @@ class Environment(db.Model):
         except Exception as e:
             return jsonify({
                 'error': 'Error in Environment.get_all_environments',
-                'details': str(e)
+                'details': error_message(e)
             }), 500
 
 class ExperimentType(db.Model):
@@ -226,7 +228,7 @@ class ExperimentType(db.Model):
                 "exp_status": e.exp_status
             } for e in experiment_types]), 200
         except Exception as e:
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": error_message(e)}), 500
 
 class RockType(db.Model):
     __tablename__ = 'Rock_type'
@@ -248,7 +250,7 @@ class RockType(db.Model):
             results = db.session.query(RockType).order_by(RockType.rt_id.desc()).all()
             return [rocktype.to_dict() for rocktype in results]
         except Exception as e:
-            print(f"getRockTypes error: {e}")
+            current_app.logger.error(f"getRockTypes error: {e}")
             return []
 
     def to_dict(self):
@@ -290,7 +292,7 @@ class InterpretationMethod(db.Model):
                 "int_meth_status": m.int_meth_status
             } for m in methods]), 200
         except Exception as e:
-            return jsonify({"error get_all_interpretation_methods": str(e)}), 500
+            return jsonify({"error get_all_interpretation_methods": error_message(e)}), 500
 
 class MeasureGroup(db.Model):
     __tablename__ = 'measure_group'
@@ -324,7 +326,7 @@ class Sample(db.Model):
             samples = session.query(Sample).filter(Sample.key_rt == rt_id).all()
             return [sample.to_dict() for sample in samples]
         except Exception as e:
-            print(f"getSamplesByRockType error: {e}")
+            current_app.logger.error(f"getSamplesByRockType error: {e}")
             return []
 
     @classmethod
@@ -333,7 +335,7 @@ class Sample(db.Model):
             results = db.session.query(Sample).all()
             return [sample.to_dict() for sample in results]
         except Exception as e:
-            print(f"get_all_samples error: {e}")
+            current_app.logger.error(f"get_all_samples error: {e}")
             return []
 
     def to_dict(self):
@@ -372,7 +374,7 @@ class Measure(db.Model):
             ).all()
             return [measure.to_dict() for measure in measures]
         except Exception as e:
-            print(f"getMeasuresBySampleIdAndParam error: {e}")
+            current_app.logger.error(f"getMeasuresBySampleIdAndParam error: {e}")
             return []
 
     def to_dict(self):

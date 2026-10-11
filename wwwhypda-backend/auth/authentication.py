@@ -5,7 +5,7 @@ import uuid
 from auth.auth_models import db, User, ConfirmationCode
 from auth.validate import validate_email_and_password, validate_user, validate_password
 from flask_mail import Message
-from common_defenitions import mail, verify_recaptcha, limiter
+from common_defenitions import mail, verify_recaptcha, limiter, send_auth_email, error_message
 from datetime import datetime, timedelta, timezone
 from flask import make_response
 from flask_jwt_extended import unset_jwt_cookies
@@ -24,7 +24,7 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @auth_bp.route("/login", methods=["POST"])
-@limiter.limit("10 per minute")
+@limiter.limit(lambda: current_app.config["AUTH_LOGIN_RATE_LIMIT"])
 def login():
     try:
         data = request.json
@@ -41,8 +41,8 @@ def login():
 
         identity = str(user["id"])
 
-        access_expires_seconds = session.get('ACCESS_EXPIRES_SECONDS', current_app.config.get('ACCESS_EXPIRES_SECONDS', 21600))
-        refresh_expires_seconds = current_app.config.get('REFRESH_EXPIRES_SECONDS', 86400)
+        access_expires_seconds = (session.get('ACCESS_EXPIRES_SECONDS', current_app.config['ACCESS_EXPIRES_SECONDS']) if current_app.config['TESTING'] else current_app.config['ACCESS_EXPIRES_SECONDS'])
+        refresh_expires_seconds = current_app.config['REFRESH_EXPIRES_SECONDS']
 
         access_expires = timedelta(seconds=access_expires_seconds)
         refresh_expires = timedelta(seconds=refresh_expires_seconds)
@@ -58,13 +58,12 @@ def login():
         set_access_cookies(response, access_token)
         set_refresh_cookies(response, refresh_token)
         
-        response.set_cookie("csrf_token", get_csrf_token(access_token), httponly=False)
 
         return response
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify(message="Something went wrong", error=str(e)), 500
+        return jsonify(message="Something went wrong", error=error_message(e)), 500
 
 @auth_bp.route('/check', methods=['GET'])
 @jwt_required()
@@ -97,7 +96,7 @@ def refresh():
 
         is_superuser = user.is_superuser
 
-        access_expires_seconds = current_app.config.get('ACCESS_EXPIRES_SECONDS', 21600)
+        access_expires_seconds = current_app.config['ACCESS_EXPIRES_SECONDS']
         new_access_token = create_access_token(
             identity=identity,
             additional_claims={"is_superuser": is_superuser},
@@ -107,13 +106,6 @@ def refresh():
         response = jsonify(message="Access token refreshed")
         set_access_cookies(response, new_access_token)
         
-        response.set_cookie(
-            "csrf_token",
-            get_csrf_token(new_access_token),
-            httponly=False,
-            secure=current_app.config["JWT_COOKIE_SECURE"],
-            samesite="Strict"
-        )
         
         return response
 
@@ -156,8 +148,7 @@ def options_confirm_registration():
     return jsonify({"message": "OK"}), 200
 
 @auth_bp.route("/confirm-registration", methods=["POST"])
-@limiter.limit("2 per minute")
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config["AUTH_CONFIRMATION_RATE_LIMIT"])
 def confirm_registration():
     """Confirm user registration by verifying the activation code."""
     try:
@@ -181,13 +172,12 @@ def confirm_registration():
         
         return jsonify(message="User not found or already activated", error="Not Found"), 404
     except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e)), 500
+        return jsonify(message="Something went wrong", error=error_message(e)), 500
     
 
 # в политику добавить про то что я использую почту gmail и капчу
 @auth_bp.route("/", methods=["POST"])
-@limiter.limit("2 per minute")
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config["AUTH_REGISTRATION_RATE_LIMIT"])
 def add_user():
     """Register a new user and send an activation email (enumeration-safe)."""
     try:
@@ -218,20 +208,10 @@ def add_user():
 
         if not existing_user:
             try:
-                with current_app.app_context():
-                    msg = Message(
-                        "Activate your account",
-                        sender=current_app.config["MAIL_USERNAME"],
-                        recipients=[email],
-                    )
-                    msg.body = f"Your activation code: {confirmation_code.code}"
-
-                    if current_app.config["DEBUG"]:
-                        print(msg.body)
-                    else:
-                        mail.send(msg)
+                send_auth_email("Activate your account", email,
+                    f"Your activation code: {confirmation_code.code}")
             except Exception:
-                pass
+                current_app.logger.exception("Activation email delivery failed")
             User.create(**user_data)
         else:
             if current_app.config["DEBUG"]:
@@ -245,13 +225,12 @@ def add_user():
     except Exception as e:
         return jsonify(
             message="Something went wrong",
-            error=str(e),
+            error=error_message(e),
             data=None
         ), 500
 
 @auth_bp.route("/request-password-reset", methods=["POST"])
-@limiter.limit("10 per minute")
-@limiter.limit("20 per hour")
+@limiter.limit(lambda: current_app.config["AUTH_PASSWORD_RESET_RATE_LIMIT"])
 def request_password_reset():
     """Send a password reset code to the user's email."""
     try:
@@ -271,21 +250,18 @@ def request_password_reset():
         confirmation_code = ConfirmationCode.create_code(email, "password_reset")
         
         try:
-            with current_app.app_context():
-                msg = Message("Password Reset Code", sender=current_app.config["MAIL_USERNAME"], recipients=[email])
-                msg.body = f"Your password reset code: {confirmation_code.code}"
-                if current_app.config["DEBUG"] == True:
-                    print(msg.body)
-                mail.send(msg)
+            send_auth_email("Password Reset Code", email,
+                f"Your password reset code: {confirmation_code.code}")
 
         except Exception as e:
-            return jsonify(message="Mail server is broken", error=str(e)), 202
+            return jsonify(message="Mail server is broken", error=error_message(e)), 202
 
         return jsonify(message="Password reset code sent"), 200
     except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e)), 500
+        return jsonify(message="Something went wrong", error=error_message(e)), 500
     
 @auth_bp.route("/confirm-password-reset", methods=["POST"])
+@limiter.limit(lambda: current_app.config["AUTH_PASSWORD_RESET_RATE_LIMIT"])
 def confirm_password_reset():
     """Verify the reset code and update the user's password."""
     try:
@@ -314,7 +290,7 @@ def confirm_password_reset():
         
         return jsonify(message="User not found or inactive", error="Not Found"), 404
     except Exception as e:
-        return jsonify(message="Something went wrong", error=str(e)), 500
+        return jsonify(message="Something went wrong", error=error_message(e)), 500
 
 @auth_bp.route("/", methods=["PUT"])
 @jwt_required()
@@ -328,9 +304,10 @@ def update_user():
             return jsonify(message="Successfully updated account", data=updated_user), 200
         return jsonify(message="Invalid data, you can only update your account name!", error="Bad Request"), 400
     except Exception as e:
-        return jsonify(message="Failed to update account", error=str(e)), 400
+        return jsonify(message="Failed to update account", error=error_message(e)), 400
     
 @auth_bp.route("/resend-confirmation", methods=["POST"])
+@limiter.limit(lambda: current_app.config["AUTH_RESEND_RATE_LIMIT"])
 def resend_confirmation():
     try:
         data = request.json
@@ -353,17 +330,8 @@ def resend_confirmation():
             confirmation_code = ConfirmationCode.create_code(email, "registration")
 
             try:
-                msg = Message(
-                    "Your new activation code",
-                    sender=current_app.config["MAIL_USERNAME"],
-                    recipients=[email]
-                )
-                msg.body = f"Your new activation code: {confirmation_code.code}"
-
-                if current_app.config["DEBUG"]:
-                    print(msg.body)
-
-                mail.send(msg)
+                send_auth_email("Your new activation code", email,
+                    f"Your new activation code: {confirmation_code.code}")
             except Exception:
                 pass  # ❗ не палим ошибку наружу
 

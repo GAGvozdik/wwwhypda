@@ -1,64 +1,54 @@
-"""Module for initializing global Flask extensions.
+"""Flask extensions and operations controlled by application settings."""
+import time
 
-This module defines global instances of Flask extensions (Flask-Mail and SQLAlchemy)
-to be initialized separately from the main application. 
-
-By defining these instances here and initializing them in the main application, 
-we avoid circular imports when splitting the application into multiple modules.
-"""
-
-from flask_mail import Mail
+import requests
+from flask import current_app, jsonify
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-import os
-import requests
-import time
-from flask import current_app, jsonify
 
-# Create instances of Flask extensions without binding them to the app.
-# This allows importing these objects across different modules without 
-# causing circular dependency issues.
-
-mail = Mail()  # Mail instance for handling email-related functionality.
-db = SQLAlchemy()  # SQLAlchemy instance for database interactions.
-limiter = Limiter(key_func=get_remote_address, default_limits=["40000 per day", "6800 per hour"], storage_uri="memory://")
+mail = Mail()
+db = SQLAlchemy()
+limiter = Limiter(key_func=get_remote_address)
 
 
-def verify_recaptcha(recaptcha_token, retries=3, delay=1):
-    if current_app.config.get('TESTING') and recaptcha_token == 'test-token':
+def error_message(error):
+    current_app.logger.error("Request failed: %s", error)
+    return str(error) if current_app.config["EXPOSE_ERROR_DETAILS"] else "Request could not be completed"
+
+
+def send_auth_email(subject, recipient, body):
+    if current_app.config["MAIL_DELIVERY_MODE"] == "log":
+        current_app.logger.info("Local email %s: %s", subject, body)
+        return
+    mail.send(Message(subject, sender=current_app.config["MAIL_DEFAULT_SENDER"], recipients=[recipient], body=body))
+
+
+def verify_recaptcha(recaptcha_token):
+    config = current_app.config
+    if config["TESTING"] and recaptcha_token == "test-token":
         return True, None
-
-    if not recaptcha_token:
-        return False, (jsonify(message="Verification failed"), 400)
-
-    secret_key = os.getenv('RECAPTCHA_SECRET_KEY')
-    if not secret_key:
-        logger.error("RECAPTCHA_SECRET_KEY is missing")
-        return False, (jsonify(message="Verification failed"), 400)
-
-    verification_url = "https://www.google.com/recaptcha/api/siteverify"
-    payload = {
-        'secret': secret_key,
-        'response': recaptcha_token
-    }
-
-    for attempt in range(retries):
+    if not config["RECAPTCHA_ENABLED"]:
+        return True, None
+    failure = lambda: (False, (jsonify(message="Verification failed"), 400))
+    if not recaptcha_token or not config["RECAPTCHA_SECRET_KEY"]:
+        if not config["RECAPTCHA_SECRET_KEY"]:
+            current_app.logger.error("RECAPTCHA_SECRET_KEY is missing")
+        return failure()
+    for attempt in range(config["RECAPTCHA_RETRIES"]):
         try:
-            response = requests.post(verification_url, data=payload, timeout=5)
+            response = requests.post(config["RECAPTCHA_VERIFY_URL"],
+                data={"secret": config["RECAPTCHA_SECRET_KEY"], "response": recaptcha_token},
+                timeout=config["RECAPTCHA_TIMEOUT_SECONDS"])
             response.raise_for_status()
             result = response.json()
-
-            if result.get('success') and result.get('score', 0.0) >= 0.5:
+            if result.get("success") and result.get("score", 0) >= config["RECAPTCHA_MIN_SCORE"]:
                 return True, None
-            else:
-                logger.warning(f"Recaptcha failed: {result}")
-                return False, (jsonify(message="Verification failed"), 400)
-
-        except requests.exceptions.RequestException as e:
-            logger.exception("Recaptcha request failed")
-
-            if attempt < retries - 1:
-                time.sleep(delay)
-            else:
-                return False, (jsonify(message="Verification failed"), 400)
+            current_app.logger.warning("CAPTCHA verification rejected")
+            return failure()
+        except (requests.exceptions.RequestException, ValueError):
+            current_app.logger.warning("CAPTCHA verification request failed")
+            if attempt + 1 < config["RECAPTCHA_RETRIES"]:
+                time.sleep(config["RECAPTCHA_RETRY_DELAY_SECONDS"])
+    return failure()

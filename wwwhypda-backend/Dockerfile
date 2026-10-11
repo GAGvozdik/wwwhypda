@@ -1,5 +1,7 @@
 FROM python:3.11.9-slim
 
+ENV APP_ENV=production
+
 # создаём пользователя
 RUN addgroup --system app && adduser --system --ingroup app app
 
