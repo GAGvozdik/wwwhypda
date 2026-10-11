@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
 
@@ -34,7 +34,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
         openModal({
             title: "Submit dataset?",
-            description: "",
+            description: "Submitted datasets are reviewed for public publication. Publish only data you are entitled to share. Do not include private contact details, credentials, or sensitive personal information. Published information may be copied by others.",
             buttons: [
                 {
                     label: "Submit",
@@ -95,6 +95,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 INPUT PAGE
             </div>
 
+            <p>Datasets submitted here are intended for review and public sharing. Do not upload private or sensitive personal information. See the <Link to="/user-agreement" target="_blank" rel="noopener noreferrer">User Agreement</Link> and <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.</p>
             <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={true}/>
         </div>
     );

@@ -1,3 +1,4 @@
+import LegalLinks from '../../pages/legalLinks';
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -8,7 +9,6 @@ import api from '../../api';
 import messages from '../../../common/error_messages.json';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
-import CustomCheckbox from '../../commonFeatures/customCheckbox';
 import { validateRegistration } from './validation';
 
 const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
@@ -24,6 +24,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
     const [isChecked, setIsChecked] = useState(false);
+    const [isAdult, setIsAdult] = useState(false);
 
 
     const handleRegister = useCallback(async (e: React.FormEvent) => {
@@ -46,8 +47,13 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setError(validatRes);
             return;
         }
+        if (!isAdult) {
+            setError("Registration is available only to people aged 18 or over.");
+            setIsError(true);
+            return;
+        }
         if (!isChecked) {
-            setError("Please agree to the Privacy Policy and the User Agreement.");
+            setError("Please accept the User Agreement and acknowledge the Privacy and Cookie Policies.");
             setIsError(true);
             return;
         }
@@ -60,6 +66,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 password: password,
                 email: email,
                 recaptcha_token: token,
+                adult_confirmed: isAdult,
+                terms_accepted: isChecked,
             });
 
             if (response.status === 200 || response.status === 201) {
@@ -83,7 +91,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [executeRecaptcha, username, password, confirmPassword, email, isChecked]);
+    }, [executeRecaptcha, username, password, confirmPassword, email, isChecked, isAdult]);
 
     const confirmRegistration = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -230,28 +238,20 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             fontFamily: 'Afacad_Flux !important',
                             fontSize: 'var(--under-menu-font-size)',
                         }}>
-                            <CustomCheckbox
-                                isChecked={isChecked}
-                                color={isError && !isChecked ? 'rgba(var(--error-text), 1)' : undefined}
-                                onChange={setIsChecked}
-                            />
+                            <input type="checkbox" checked={isChecked} onChange={(e) => setIsChecked(e.target.checked)} required aria-labelledby="registration-legal-label" />
                             <div style={{ marginLeft: '0.5rem' }}>
-                                <span>I agree with the </span>
-                                <div>
-                                    <Link to="/privacy-policy" className={styles.policyLink}>
-                                        Privacy Policy
-                                    </Link>
-                                </div>
-                                <div>
-                                    <span>and </span>
-                                    <Link to="/user-agreement" className={styles.policyLink}>
-                                        User Agreement
-                                    </Link>
-                                </div>
+                                <span id="registration-legal-label">I accept the User Agreement and acknowledge that I have read the Privacy Policy and Cookie Policy.</span>
+                                <LegalLinks className={styles.policyLink} />
+                                <p>We use your email for account confirmation, password reset and necessary service messages. Registering does not subscribe you to a newsletter.</p>
+
                             </div>
                         </div>
 
 
+                        <label style={{ display: 'block', width: '80%', margin: '0.6rem auto', color: 'var(--tree-text)' }}>
+                            <input type="checkbox" checked={isAdult} onChange={(e) => setIsAdult(e.target.checked)} required />{' '}
+                            I confirm that I am at least 18 years old.
+                        </label>
                         <UserButton text="Register" isLoading={isLoading} />
 
                         <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>

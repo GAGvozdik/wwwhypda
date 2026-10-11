@@ -1,0 +1,20 @@
+import { Link } from 'react-router-dom';
+import styles from './policy.module.scss';
+
+export default function CookiePolicy() {
+    return <article className={styles.container}>
+        <h1 className={styles.title}>Cookie and browser storage policy</h1>
+        <p className={styles.text}>Updated: 11 October 2026. Read this page together with our <Link to="/privacy-policy">Privacy Policy</Link>.</p>
+        <h2 className={styles.sectionTitle}>Authentication and security</h2>
+        <p className={styles.text}>When you sign in, first-party authentication cookies keep you signed in and allow your session to be renewed. Separate anti-CSRF cookies protect requests that change account data. Authentication cookies are removed by the logout endpoint. Token validity and cookie persistence are different: a token can expire while a browser session cookie remains. These cookies serve the account service you request, rather than advertising.</p>
+        <h2 className={styles.sectionTitle}>Preferences and dataset drafts</h2>
+        <p className={styles.text}>Browser local storage remembers your theme, dataset form drafts, the current form step and editing context. Drafts can contain the information you type into the dataset form. Unlike session cookies, local storage has no automatic expiry. The application clears relevant drafts after successful submission and when resetting forms; you can also clear this site's storage in your browser. Avoid leaving drafts on a shared device.</p>
+        <h2 className={styles.sectionTitle}>Google reCAPTCHA</h2>
+        <p className={styles.text}>This site uses Google reCAPTCHA to protect account actions and selected data requests against automated abuse. reCAPTCHA processes technical and interaction signals, which may include IP address, browser and device information, and sets the _GRECAPTCHA security cookie for risk analysis. Google controls this cookie's lifetime. A failed automated check can prevent a request from completing; contact the site if you believe a legitimate request is blocked.</p>
+        <p className={styles.text}>Google's current terms describe Google as a processor of reCAPTCHA customer data for security, fraud and abuse prevention. See the <a href="https://docs.cloud.google.com/recaptcha/docs/faq#data_processing" target="_blank" rel="noopener noreferrer">reCAPTCHA data processing information</a> and <a href="https://cloud.google.com/terms/data-processing-addendum" target="_blank" rel="noopener noreferrer">Cloud Data Processing Addendum</a>. Our legal document pages do not load the reCAPTCHA integration.</p>
+        <h2 className={styles.sectionTitle}>Your controls</h2>
+        <p className={styles.text}>You can delete or block cookies and local storage using your browser's site settings. Blocking essential storage can prevent sign-in or draft recovery; blocking reCAPTCHA can prevent protected requests. No advertising or analytics integration is implemented in the application code reviewed for this policy. A future optional tracking feature must not be enabled before any legally required consent and must offer a way to withdraw that consent.</p>
+        <p className={styles.text}>Under Italian rules, strictly necessary technical storage does not require a consent banner, but it does require information. This exemption does not automatically apply to every third-party script: the controller must assess the deployed reCAPTCHA configuration and any additional tracking. See the <a href="https://www.garanteprivacy.it/faq/Cookie" target="_blank" rel="noopener noreferrer">Garante's cookie guidance</a>.</p>
+        <p className={styles.text}>For privacy requests and information about recipients and international transfers, use the contacts in our <Link to="/privacy-policy">Privacy Policy</Link>.</p>
+    </article>;
+}

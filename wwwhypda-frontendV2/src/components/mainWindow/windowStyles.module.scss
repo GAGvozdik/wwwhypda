@@ -163,26 +163,29 @@
     grid-row: 2;
 }
 
-/* текст про reCAPTCHA (верх, 2 колонки) */
-.underMenu > div:nth-child(3) {
+.underMenu > .legalDocuments {
     grid-column: 2 / span 2;
-    grid-row: 1;
-
+    grid-row: 1 / span 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+    white-space: normal;
     text-align: right;
-    white-space: nowrap;
 }
 
-/* Privacy (правый нижний) */
-.underMenu > a:nth-child(4) {
-    grid-column: 3;
-    grid-row: 2;
-    justify-self: end;
+@media (max-width: 600px) {
+    .underMenu { display: flex; flex-direction: column; align-items: flex-start; }
+    .underMenu > .legalDocuments { align-items: flex-start; text-align: left; }
 }
 
-/* Terms (средний нижний) */
-.underMenu > a:nth-child(5) {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
+.legalPage {
+    height: 100dvh;
+    overflow: auto;
+    background: var(--body-color);
+    color: var(--tree-text);
+    font-family: Afacad_Flux;
+    > header, > footer { padding: 1rem; }
+    .bodyMenuItem { overflow: visible; padding: 0; }
+    a { color: inherit; text-decoration: underline; }
 }
-

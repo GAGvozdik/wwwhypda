@@ -189,6 +189,11 @@ def add_user():
                 data=None
             ), 400
 
+        if user_data.pop('adult_confirmed', None) is not True:
+            return jsonify(message="Registration is available only to people aged 18 or over."), 400
+        if user_data.pop('terms_accepted', None) is not True:
+            return jsonify(message="Please accept the User Agreement and acknowledge the Privacy and Cookie Policies."), 400
+
         is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'))
         if not is_valid:
             return error_response

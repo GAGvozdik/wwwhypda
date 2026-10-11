@@ -1,116 +1,45 @@
-import React from "react";
-import styles from "./policy.module.scss";
+import styles from './policy.module.scss';
+import { Link } from 'react-router-dom';
 
-const PrivacyPolicy: React.FC = () => {
-  return (
-    <div className={styles.container}>
-      <h1 className={styles.title}>Privacy Policy</h1>
-
-      <p className={styles.text}>
-        This Privacy Policy describes how personal data is collected, used, and processed
-        when using this application, in accordance with Regulation (EU) 2016/679
-        (General Data Protection Regulation, "GDPR") and applicable Italian data protection laws.
-      </p>
-
-      <h2 className={styles.sectionTitle}>1. Data Controller</h2>
-      <p className={styles.text}>
-        The data controllers are:
-        <br />
-        alessandro.comunian@unimi.it
-        <br />
-        gvozdikgeorge@gmail.com
-        <br />
-        (hereinafter referred to as "Controller", "we", "us").
-      </p>
-
-      <h2 className={styles.sectionTitle}>2. Categories of Personal Data</h2>
-      <p className={styles.text}>
-        We may process the following categories of personal data:
-      </p>
-      <ul className={styles.list}>
-        <li className={styles.listItem}>Identification data (e.g. name, email address)</li>
-        <li className={styles.listItem}>Technical data (e.g. IP address, browser, device information)</li>
-        <li className={styles.listItem}>Usage data (e.g. interactions with the application)</li>
-      </ul>
-
-      <h2 className={styles.sectionTitle}>3. Purposes of Processing</h2>
-      <p className={styles.text}>
-        Personal data is processed for the following purposes:
-      </p>
-      <ul className={styles.list}>
-        <li className={styles.listItem}>Provision and operation of the service</li>
-        <li className={styles.listItem}>User account management and authentication</li>
-        <li className={styles.listItem}>Communication with users</li>
-        <li className={styles.listItem}>Improvement and security of the service</li>
-        <li className={styles.listItem}>Compliance with legal obligations</li>
-      </ul>
-
-      <h2 className={styles.sectionTitle}>4. Legal Basis for Processing</h2>
-      <p className={styles.text}>
-        Processing of personal data is based on one or more of the following legal grounds:
-      </p>
-      <ul className={styles.list}>
-        <li className={styles.listItem}>Article 6(1)(a) GDPR – consent</li>
-        <li className={styles.listItem}>Article 6(1)(b) GDPR – performance of a contract</li>
-        <li className={styles.listItem}>Article 6(1)(c) GDPR – compliance with legal obligations</li>
-        <li className={styles.listItem}>Article 6(1)(f) GDPR – legitimate interests</li>
-      </ul>
-
-      <h2 className={styles.sectionTitle}>5. Data Retention</h2>
-      <p className={styles.text}>
-        Personal data is retained only for as long as necessary to achieve the purposes
-        for which it was collected, or as required by applicable law.
-      </p>
-
-      <h2 className={styles.sectionTitle}>6. Data Recipients</h2>
-      <p className={styles.text}>
-        Personal data may be shared with third-party service providers acting as data processors,
-        strictly for purposes related to the provision of the service (e.g. hosting, infrastructure).
-        Data will not be sold or disclosed for unrelated purposes.
-      </p>
-
-      <h2 className={styles.sectionTitle}>7. International Data Transfers</h2>
-      <p className={styles.text}>
-        Where personal data is transferred outside the European Economic Area (EEA),
-        such transfers will be carried out in compliance with GDPR requirements,
-        including appropriate safeguards where necessary.
-      </p>
-
-      <h2 className={styles.sectionTitle}>8. Data Subject Rights</h2>
-      <p className={styles.text}>
-        Under the GDPR, users have the right to:
-      </p>
-      <ul className={styles.list}>
-        <li className={styles.listItem}>Access their personal data</li>
-        <li className={styles.listItem}>Request rectification or erasure</li>
-        <li className={styles.listItem}>Restrict or object to processing</li>
-        <li className={styles.listItem}>Data portability</li>
-        <li className={styles.listItem}>Withdraw consent at any time</li>
-        <li className={styles.listItem}>Lodge a complaint with a supervisory authority</li>
-      </ul>
-
-      <h2 className={styles.sectionTitle}>9. Data Security</h2>
-      <p className={styles.text}>
-        Appropriate technical and organizational measures are implemented to ensure
-        a level of security appropriate to the risk.
-      </p>
-
-      <h2 className={styles.sectionTitle}>10. Changes to this Policy</h2>
-      <p className={styles.text}>
-        This Privacy Policy may be updated from time to time. The updated version
-        will be made available within the application.
-      </p>
-
-      <h2 className={styles.sectionTitle}>11. Contact</h2>
-      <p className={styles.text}>
-        For any requests regarding personal data, please contact:
-        <br />
-        alessandro.comunian@unimi.it
-        <br />
-        gvozdikgeorge@gmail.com
-      </p>
-    </div>
-  );
-};
-
-export default PrivacyPolicy;
+export default function PrivacyPolicy() {
+  return <article className={styles.container}>
+    <h1 className={styles.title}>Privacy Policy</h1>
+    <p className={styles.text}>Updated: 11 October 2026. This notice explains the processing of personal data on wwwhypda, a noncommercial scientific data sharing service. Regulation (EU) 2016/679 (GDPR) and applicable Italian data protection law apply to this processing.</p>
+    <h2 className={styles.sectionTitle}>1. Who is responsible</h2>
+    <p className={styles.text}>The data controller is Georgii Gvozdik, Milan, Italy. For questions about privacy, account deletion, uploaded personal information or any of the rights below, email <a href="mailto:georgii.gvozdik@studenti.unimi.it">georgii.gvozdik@studenti.unimi.it</a>. Additional privacy contact: Alessandro Comunian, <a href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>. This additional contact does not change the identified controller. The university email addresses do not make the university the controller of this service.</p>
+    <h2 className={styles.sectionTitle}>2. What we collect</h2>
+    <ul className={styles.list}>
+      <li className={styles.listItem}>Account information: email, username, a password hash, activation status, account identifier and permissions. Passwords are submitted for authentication but stored as hashes, rather than readable passwords.</li>
+      <li className={styles.listItem}>Registration and password reset codes, their associated email, purpose and creation time.</li>
+      <li className={styles.listItem}>Dataset submissions: measurements, samples, site and source information, submission time, submitter identifier and name, review status and comments. Free-text fields and citations may contain personal information you provide.</li>
+      <li className={styles.listItem}>Technical information: requests, IP addresses and browser information in service logs, and technical and interaction signals processed by Google reCAPTCHA to detect abuse.</li>
+      <li className={styles.listItem}>Browser preferences and form drafts described in our <Link to="/cookie-policy">Cookie Policy</Link>.</li>
+    </ul>
+    <h2 className={styles.sectionTitle}>3. Why we use it and the legal basis</h2>
+    <ul className={styles.list}>
+      <li className={styles.listItem}>Creating and operating your account, authenticating requests, handling submissions and sending requested confirmation and password reset messages and necessary notices about account security or material changes affecting the service: performance of the service agreement, Article 6(1)(b) GDPR.</li>
+      <li className={styles.listItem}>Preventing spam, automated abuse and account misuse, reviewing submissions and investigating faults: legitimate interests in providing a safe, reliable service, Article 6(1)(f). You may object on grounds relating to your situation.</li>
+      <li className={styles.listItem}>Responding to privacy requests and complying with applicable legal duties: Article 6(1)(c), where such a duty applies.</li>
+    </ul>
+    <p className={styles.text}>The registration checkbox acknowledges this notice and accepts the User Agreement. It is not blanket consent to unrelated processing. Registering does not subscribe you to a newsletter. Optional update or promotional mailings require a separate, voluntary choice and an easy way to unsubscribe before they are introduced.</p>
+    <p className={styles.text}>Email, username and password are required for an account. Without them we cannot register or authenticate you. You may read public information without an account, although selected public data requests also use abuse protection. You do not have to submit a dataset. Registration is restricted to adults aged 18 or over. We collect a confirmation of adulthood, rather than your date of birth or identity document. If an account belonging to a minor is identified, contact the controller so that it can be reviewed.</p>
+    <h2 className={styles.sectionTitle}>4. What can become public</h2>
+    <p className={styles.text}>Scientific submissions are intended for review and public sharing. Published dataset content, including citations, author names or personal information entered into its fields, may be visible to visitors and copied or indexed by others. Account email and password hashes are not intended for public display. Site administrators can access account information and submissions to operate and moderate the service.</p>
+    <p className={styles.text}>Do not upload passwords, private email addresses, confidential material, sensitive personal data or information about another person without a lawful basis and the required transparency. Choose a username suitable for a scientific sharing service. If personal information is published by mistake, contact the controller promptly. Requests concerning public personal data will be assessed under the GDPR; copies made by independent third parties cannot always be recalled.</p>
+    <h2 className={styles.sectionTitle}>5. Providers and transfers</h2>
+    <p className={styles.text}>OVHcloud provides hosting and infrastructure and processes information needed to store and operate the service. The application server is hosted in Strasbourg, France, within the European Union. Google services are used for reCAPTCHA abuse protection and Gmail delivery of account messages. The email delivery service receives recipients' email addresses and message contents. An email you send us is also processed by our email provider. For information about OVHcloud's data protection arrangements, see its <a href="https://www.ovhcloud.com/en/personal-data-protection/" target="_blank" rel="noopener noreferrer">personal data protection information</a>.</p>
+    <p className={styles.text}>Google services may involve processing outside the European Economic Area. Their actual role and safeguards depend on the applicable service terms and the controller's arrangements. For reCAPTCHA, Google's current terms provide for processing of customer data as a processor; see the <a href="https://docs.cloud.google.com/recaptcha/docs/faq#data_processing" target="_blank" rel="noopener noreferrer">data processing information</a> and <a href="https://cloud.google.com/terms/data-processing-addendum" target="_blank" rel="noopener noreferrer">Cloud Data Processing Addendum</a>. Contact the controller for information about applicable transfer safeguards and how to obtain a copy. Public publication is different from private sharing with a service provider: the published material can be accessed worldwide.</p>
+    <h2 className={styles.sectionTitle}>6. Retention and deletion</h2>
+    <p className={styles.text}>Account records are retained while the account is maintained. You can request erasure by email; deactivating an account or logging out does not erase its database record. Submission records remain while they are being reviewed or used to provide published scientific data. Removal of identifying information and retention of nonpersonal scientific material are assessed separately.</p>
+    <p className={styles.text}>Confirmation and reset codes have a limited validity period. Expiry prevents use of a code but is not, by itself, deletion of its database record; a successfully used code is deleted. Browser draft storage has no automatic expiry and can be cleared as described in the Cookie Policy.</p>
+    <p className={styles.text}>Only information necessary for a specific legal obligation or a substantiated dispute may be kept after an erasure request, to the extent allowed by law. Residual copies of erased account data may remain in restricted backups for up to one month after erasure, solely for recovery, and must not be returned to normal use without reapplying the erasure. This recovery period does not extend the time allowed to handle your request. Security logs and unused codes must be deleted when no longer needed for their respective purposes. The controller can explain applicable retention criteria; no automatic account erasure is currently provided.</p>
+    <h2 className={styles.sectionTitle}>7. Your rights</h2>
+    <p className={styles.text}>Subject to the GDPR's conditions, you can request access and a copy, correction, erasure, restriction, and portability of data processed by automated means on the basis of consent or contract. You may object to processing based on legitimate interests. Where processing relies on consent, you can withdraw it without affecting earlier lawful processing. We may ask for proportionate information to verify your identity; do not send identity documents unless needed and requested.</p>
+    <p className={styles.text}>Send requests to <a href="mailto:georgii.gvozdik@studenti.unimi.it">georgii.gvozdik@studenti.unimi.it</a>. Requests are normally answered within one month; an extension of up to two further months is possible for complex or numerous requests, with notice and reasons within the first month. Requests are normally free of charge, subject to the GDPR's exceptions.</p>
+    <p className={styles.text}>You may complain to the <a href="https://www.garanteprivacy.it/home/diritti/come-agire-per-tutelare-i-tuoi-dati-personali" target="_blank" rel="noopener noreferrer">Italian Garante per la protezione dei dati personali</a> or another competent supervisory authority, including in your place of habitual residence or work. You do not have to contact us first.</p>
+    <h2 className={styles.sectionTitle}>8. Automated checks and security</h2>
+    <p className={styles.text}>reCAPTCHA produces an automated risk assessment which can reject a request. This is used for abuse prevention, rather than a decision about eligibility, credit or employment. Contact the controller if you believe you were wrongly blocked. Password hashing and restricted account access help protect information, but no online service can guarantee complete security.</p>
+    <h2 className={styles.sectionTitle}>9. Changes</h2>
+    <p className={styles.text}>Material changes will be explained in an updated notice before the new processing begins; where a new use requires consent, consent will be requested separately. See also our <Link to="/cookie-policy">Cookie Policy</Link> and <Link to="/user-agreement">User Agreement</Link>.</p>
+  </article>;
+}

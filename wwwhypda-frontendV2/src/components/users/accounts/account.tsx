@@ -110,6 +110,11 @@ const Account: React.FC = () => {
                         </div>
                     )}
                 </div>
+                <p style={{ margin: '2rem', color: 'var(--tree-text)' }}>
+                    For a copy, correction or deletion of your personal data and account, email{' '}
+                    <a href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">georgii.gvozdik@studenti.unimi.it</a>.
+                    Additional contact: <a href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>. Logging out does not delete your account.
+                </p>
                 <button onClick={handleLogout} className={styles.submitButton} style={{width: '20vh', justifySelf: 'center'}}>
                     Log Out
                 </button>

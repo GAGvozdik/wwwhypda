@@ -1,3 +1,5 @@
+import { Link, useLocation } from 'react-router-dom';
+import LegalLinks from '../pages/legalLinks';
 
 import { useSelector } from 'react-redux';
 // import { useDispatch } from 'react-redux';
@@ -16,6 +18,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 
 export default function MainWindow() {
+    const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(useLocation().pathname);
     // useTokenRefresh(); 
 
     let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
@@ -29,7 +32,15 @@ export default function MainWindow() {
     const heightLessThan559 = useMediaQuery({ maxHeight: screenHeight });
     const unsupportedResolution = widthLessThan600 || heightLessThan559;
     
-    if (unsupportedResolution) {
+    if (isLegalPage) {
+        return <div className={`${windowStyles.legalPage} ${isDarkTheme ? styles.dark : ''}`}>
+            <header><Link to="/">Back to the website</Link></header>
+            <MainBody />
+            <footer><LegalLinks /></footer>
+        </div>;
+    }
+
+    if (unsupportedResolution && !isLegalPage) {
         return (
             <div className={`${windowStyles.menuLabel} ${windowStyles.lowScreen} ${isDarkTheme ? styles.dark : ''}`} style={{color: 'var(--tree-text)', backgroundColor: 'var(--drawer-color)', height: '100vh'}}>
                 The window size should be larger than {screenWidth}x{screenHeight}
@@ -47,7 +58,7 @@ export default function MainWindow() {
     
             <MainMenu />
             <MainBody />
-            <MainTree />
+            {!isLegalPage && <MainTree />}
 
             <div className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
                 <div style={{fontWeight: '300'}}>This website was created by Gvozdik G. and A. Comunian.</div>
@@ -63,16 +74,10 @@ export default function MainWindow() {
                     https://github.com/GAGvozdik/wwwhypda
                 </a>
 
-                <div style={{fontWeight: '300'}}>
-                    This site is protected by reCAPTCHA and the Google:
+                <div className={windowStyles.legalDocuments}>
+                    <span>This site uses reCAPTCHA for abuse prevention.</span>
+                    <LegalLinks className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`} />
                 </div>
-
-                <a href="https://policies.google.com/terms" className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}>
-                     Terms of Service
-                </a>
-                <a href="https://policies.google.com/privacy" className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}>
-                    Privacy Policy,
-                </a>
 
             </div>
             

@@ -19,15 +19,13 @@ const UserAgreement: React.FC = () => {
 
       <h2 className={styles.sectionTitle}>2. User Accounts</h2>
       <p className={styles.text}>
-        Users are responsible for maintaining the confidentiality of their credentials
+        Registration is available only to people aged 18 or over. Users are responsible for maintaining the confidentiality of their credentials
         and for all activities performed under their account.
       </p>
 
       <h2 className={styles.sectionTitle}>3. User Data</h2>
       <p className={styles.text}>
-        Users retain ownership of their data. By using the service, users grant the right
-        to process such data strictly for the purpose of providing and improving the service,
-        in accordance with the Privacy Policy.
+        Users retain their rights in submitted material. By submitting a dataset for publication, you permit the service to store, review and display that material for scientific sharing. This permission does not transfer ownership or grant a blanket right to use personal data for unrelated purposes. Submit only material you are entitled to share; respect copyright, attribution and the rights of other people. Do not upload confidential information, credentials or sensitive personal data. Reviewed datasets can become public, be indexed and be copied by others. Contact the operator about unlawful content or personal information requiring correction or removal.
       </p>
 
       <h2 className={styles.sectionTitle}>4. Prohibited Conduct</h2>
@@ -40,7 +38,7 @@ const UserAgreement: React.FC = () => {
       <h2 className={styles.sectionTitle}>5. Service Availability</h2>
       <p className={styles.text}>
         The service is provided on an "as is" and "as available" basis without warranties
-        of any kind, to the extent permitted by law.
+        of any kind, to the extent permitted by law. This does not exclude mandatory statutory rights or liability that cannot lawfully be excluded.
       </p>
 
       <h2 className={styles.sectionTitle}>6. Limitation of Liability</h2>
@@ -57,21 +55,22 @@ const UserAgreement: React.FC = () => {
       <h2 className={styles.sectionTitle}>8. Governing Law and Jurisdiction</h2>
       <p className={styles.text}>
         This Agreement shall be governed by and construed in accordance with the laws of Italy.
-        Any disputes arising out of or in connection with this Agreement shall be subject
-        to the jurisdiction of the competent courts of Italy.
+        Mandatory protections and any rights to bring proceedings before other competent courts remain unaffected.
       </p>
 
       <h2 className={styles.sectionTitle}>9. Amendments</h2>
       <p className={styles.text}>
         This Agreement may be updated from time to time. Continued use of the service
-        constitutes acceptance of the updated terms.
+        does not constitute consent to new processing of personal data. Material changes will be notified; any legally required acceptance or consent will be requested separately.
       </p>
 
       <h2 className={styles.sectionTitle}>10. Contact</h2>
       <p className={styles.text}>
-        alessandro.comunian@unimi.it
+        Georgii Gvozdik, Milan, Italy.
         <br />
-        gvozdikgeorge@gmail.com
+        <a href="mailto:georgii.gvozdik@studenti.unimi.it">georgii.gvozdik@studenti.unimi.it</a>
+        <br />
+        Additional contact: <a href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>
       </p>
     </div>
   );
