@@ -1,0 +1,85 @@
+name: wwwhypda-dev
+
+networks:
+  dev:
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:?Use --env-file .env.development}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Use --env-file .env.development}
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+      - ./init-db.dev.sh:/docker-entrypoint-initdb.d/init-db.dev.sh:ro
+      - ./db_dumps:/dev-data:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - dev
+
+  dbgate:
+    image: dbgate/dbgate
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8081:3000"
+    environment:
+      ADMIN_PASSWORD: ${DB_PASSWORD:?Use --env-file .env.development}
+    networks:
+      - dev
+
+  frontend:
+    build:
+      context: ./wwwhypda-frontendV2
+      dockerfile: Dockerfile
+    env_file:
+      - path: ./wwwhypda-frontendV2/.env.development
+    volumes:
+      - frontend_dev_dist:/frontend-dist
+    command: sh -c "npm run build -- --mode development && cp -r /app/dist/. /frontend-dist"
+    working_dir: /app
+    restart: "no"
+    networks:
+      - dev
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./wwwhypda-backend/Dockerfile
+    env_file:
+      - path: ./wwwhypda-backend/env.dev
+    environment:
+      APP_ENV: development
+      DB_USER: ${DB_USER:?Use --env-file .env.development}
+      DB_PASSWORD: ${DB_PASSWORD:?Use --env-file .env.development}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dev
+
+  nginx:
+    image: nginx:stable-alpine
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
+      - frontend_dev_dist:/usr/share/nginx/html:ro
+    depends_on:
+      backend:
+        condition: service_started
+      frontend:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      - dev
+
+volumes:
+  frontend_dev_dist:
+  postgres_dev_data:

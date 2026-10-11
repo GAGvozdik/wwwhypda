@@ -25,3 +25,7 @@ wwwhypda-backend/.env.prod
 /wwwhypda-backend/env.prod
 /wwwhypda-frontendV2/.env.production
 /wwwhypda-frontendV2/Dockerfile.prod
+
+# Private local SQLite database copies.
+/wwwhypda-backend/instance/*.db
+/wwwhypda-backend/wwhypda.db
