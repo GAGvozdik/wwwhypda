@@ -1,12 +1,11 @@
+import useRemColumns from '../commonFeatures/useRemColumns';
+import messages from '../../common/error_messages.json';
 import { AgGridReact } from "ag-grid-react";
 import type { ColDef } from "ag-grid-community";
 import * as XLSX from "xlsx";
 import React, { useMemo } from "react";
 import styles from "./searchStyles.module.scss";
-import {
-    colorSchemeDark,
-    themeQuartz,
-} from "ag-grid-community";
+import { useStepsTheme } from '../inputData/steps';
 
 interface DataTableProps {
     rows: any[];
@@ -17,22 +16,18 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
     const containerStyle = useMemo(
         () => ({
             width: "100%",
-            height: "90%",
-            fontFamily: "Afacad_Flux !important",
+            minHeight: 0,
+            fontFamily: "Afacad_Flux",
             "--ag-background-color": "var(--table-color)",
             color: 'var(--tree-text)',
-            // color: '--tree-text',
+            // color: 'var(--tree-text)',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
         }),
         []
     );
 
-    const themeDarkBlue = themeQuartz.withPart(colorSchemeDark).withParams({
-        fontFamily: "Afacad_Flux !important",
-        foregroundColor: "var(--tree-text)",
-        headerTextColor: "var(--tree-text)",
-    });
+    const themeDarkBlue = useStepsTheme();
 
     const defaultColDef = useMemo<ColDef>(
         () => ({
@@ -43,11 +38,11 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
         }),
         []
     );
-    
+
     // Функция экспорта данных в XLSX
     const exportToExcel = () => {
         if (!rows || rows.length === 0) {
-            alert("No data for export");
+            alert(messages.export_empty);
             return;
         }
 
@@ -57,17 +52,17 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
         XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
         XLSX.writeFile(workbook, "table_data.xlsx");
     };
-    const reversedColumns = [...columns].reverse();
+    const reversedColumns = useRemColumns(useMemo(() => [...columns].reverse(), [columns]));
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100%", color: '--tree-text' }}>
+        <div className={styles.resultsContent}>
             {/* Таблица */}
-            <div style={containerStyle}>
+            <div style={containerStyle} className={styles.resultsGrid}>
                 <AgGridReact
                     theme={themeDarkBlue}
                     rowData={rows}
                     columnDefs={reversedColumns}
                     // columnDefs={columns}
-                    defaultColDef={defaultColDef}
+                    defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
                     pagination={true}
                     paginationPageSize={10}
                     paginationPageSizeSelector={[10, 20, 50, 100]}
@@ -75,20 +70,14 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
             </div>
 
             {/* Кнопка (размещаем внизу и по центру) */}
-            <div
-                style={{
-                    flexGrow: 1, // Растягиваем блок, чтобы он занял оставшееся место
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    // backgroundColor: "#1a1a1a",
-                }}
-            >
+            <div className={styles.exportActions}>
+                {/* Равномерные отступы блока вместо растягивания на оставшееся место. */}
+                {/* // backgroundColor: "#1a1a1a", */}
                 <button
                     className={styles.submitButton}
                     onClick={exportToExcel}
                     style={{
-                        padding: "10px 20px", // Увеличиваем размер кнопки
+                        padding: "0.625rem 1.25rem", // Увеличиваем размер кнопки
                         // fontSize: "20px", // Увеличиваем размер шрифта
                         // borderRadius: "8px", // Закругляем края
                         // backgroundColor: "green",
@@ -98,7 +87,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
                         transition: "0.3s",
                     }}
                 >
-                    Download data
+                    {messages.ui_download_data}
                 </button>
             </div>
         </div>

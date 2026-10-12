@@ -7,12 +7,13 @@ import time
 from flask_cors import CORS
 from common_defenitions import verify_recaptcha
 from auth.auth_models import User
+from auth.validate import admin_required
 
 input_bp = Blueprint("input", __name__, url_prefix="/input")
 
 
 @input_bp.route("/get_input_suggestions", methods=["GET"])
-@jwt_required()
+@admin_required()
 def get_input_suggestions():
     current_user = get_jwt_identity()
     current_app.logger.debug("User calling get_input_suggestions: %s", current_user)
@@ -30,6 +31,9 @@ def get_input_by_id(id):
         input_data = InputData.query.filter_by(id=id).first()
         if not input_data:
             return jsonify({"error": "Not found"}), 404
+        user = User.get_by_id(get_jwt_identity())
+        if input_data.user_id != int(get_jwt_identity()) and not user["is_superuser"]:
+            return jsonify(message="Forbidden"), 403
         return jsonify(input_data.to_dict()), 200
     except Exception as e:
         current_app.logger.error(f"Error in get_input_by_id: {e}")

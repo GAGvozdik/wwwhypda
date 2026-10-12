@@ -7,9 +7,9 @@ interface SingleSkeletonProps {
     loading?: boolean;
     error?: string | null;
     children: React.ReactNode;
-    height?: string; 
-    width?: string; 
-    margin?: string; 
+    height?: string;
+    width?: string;
+    margin?: string;
     backgroundColor?: string;
     isLoadIcon?: boolean;
 }
@@ -72,14 +72,14 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
                     }}
 
                 >  */}
-                    <div style={{ 
-                        fontFamily: 'Afacad_Flux', 
-                        fontSize: '2vh', 
-                        margin: '1vh', 
-                        color: 'var(--error-text)', 
-                        wordWrap: 'break-word', 
-                        overflowWrap: 'break-word', 
-                        whiteSpace: 'normal', 
+                    <div style={{
+                        fontFamily: 'Afacad_Flux',
+                        fontSize: 'var(--main-font-size)',
+                        margin: '0.5rem',
+                        color: 'var(--error-text)',
+                        wordWrap: 'break-word',
+                        overflowWrap: 'break-word',
+                        whiteSpace: 'normal',
                         overflow: 'hidden'
                     }}>
                         {error}

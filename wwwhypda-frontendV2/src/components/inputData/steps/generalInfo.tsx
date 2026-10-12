@@ -1,4 +1,9 @@
-// import styles from '../menu.module.scss'; 
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import styles from '../stepper.module.scss';
+import StepActions from '../stepActions';
+import type { InputStepProps } from '../../../common/types';
+import messages from '../../../common/error_messages.json';
+// import styles from '../menu.module.scss';
 import { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
 // import axios from 'axios';
@@ -7,9 +12,9 @@ import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 
-import { 
-    ClientSideRowModelModule, 
-    ModuleRegistry, 
+import {
+    ClientSideRowModelModule,
+    ModuleRegistry,
     TextEditorModule
 } from "ag-grid-community";
 import type { ColDef } from "ag-grid-community";
@@ -37,20 +42,18 @@ interface Environment {
     env_wiki_link: string | null;
 }
 
-type GeneralInfoProps = {
-    isEditable: boolean;
-};
+type GeneralInfoProps = InputStepProps;
 
-function GeneralInfo({isEditable=true}: GeneralInfoProps) {
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "55vh", 
-        "--ag-background-color": "var(--table-color)", 
-        marginTop: '0vh', 
-        marginBottom: '1vh',
+function GeneralInfo({isEditable=true, clearAction}: GeneralInfoProps) {
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -60,7 +63,7 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
 
     // При загрузке компонента
     useEffect(() => {
-        
+
         const savedData = localStorage.getItem('generalInfoData');
         if (savedData && JSON.parse(savedData).length > 0) {
             setTableData(JSON.parse(savedData));
@@ -130,10 +133,10 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
-        { headerName: "Field", field: "field", editable: false, flex: 1 },
-        { 
-            field: "value", 
-            editable: isEditable, 
+        { headerName: messages.ui_field, field: "field", editable: false, flex: 1 },
+        {
+            field: "value",
+            editable: isEditable,
             singleClickEdit: true,
             flex: 1,
             cellEditor: "agSelectCellEditor",
@@ -143,7 +146,7 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
                 return { values: [] };
             }
         },
-        { headerName: "Description", field: "description", editable: false, flex: 2 }
+        { headerName: messages.ui_description, field: "description", editable: false, flex: 2 }
     ], [environments, reviewLevel]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
@@ -151,26 +154,30 @@ function GeneralInfo({isEditable=true}: GeneralInfoProps) {
         flex: 1,
     }), []);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
     return (
-        <div style={containerStyle}>
-            <SingleSkeleton loading={loading} error={error} height={'50vh'}>
-                <div style={{height: '56vh'}}>
-                    <AgGridReact
-                        theme={themeDarkBlue}
-                        rowData={tableData}
-                        columnDefs={columnDefs}
-                        defaultColDef={defaultColDef}
-                        onCellValueChanged={handleCellValueChanged}
-                        suppressColumnVirtualisation={true}
-                        suppressRowHoverHighlight={true}
-                        suppressNoRowsOverlay={true}
-                        suppressMenuHide={true}
-                        headerHeight={0}
-                    />
-                </div>                
-            </SingleSkeleton>
+        <div style={containerStyle} className={styles.measurementGrid}>
+            <StepActions clearAction={clearAction} />
+            <div className={styles.tableArea}>
+                <SingleSkeleton loading={loading} error={error}>
+                    <div className={styles.tableFill}>
+                        <AgGridReact
+                            theme={themeDarkBlue}
+                            rowData={tableData}
+                            columnDefs={scaledColumns}
+                            defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
+                            onCellValueChanged={handleCellValueChanged}
+                            suppressColumnVirtualisation={true}
+                            suppressRowHoverHighlight={true}
+                            suppressNoRowsOverlay={true}
+                            suppressMenuHide={true}
+                            headerHeight={0}
+                        />
+                    </div>
+                </SingleSkeleton>
+            </div>
         </div>
     );
 };

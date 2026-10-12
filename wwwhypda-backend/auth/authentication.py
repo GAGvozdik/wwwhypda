@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app, session
+from flask import Blueprint, request, jsonify, current_app, session, g
 import jwt
 import time
 import uuid
@@ -50,9 +50,9 @@ def login():
         access_token = create_access_token(
             identity=identity,
             expires_delta=access_expires,
-            additional_claims={"is_superuser": user["is_superuser"]}
+            additional_claims={"is_superuser": user["is_superuser"], "account_version": user["account_version"]}
         )
-        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires)
+        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires, additional_claims={"account_version": user["account_version"]})
 
         response = jsonify(message="Successfully logged in")
         set_access_cookies(response, access_token)
@@ -62,7 +62,8 @@ def login():
         return response
 
     except Exception as e:
-        traceback.print_exc()
+        db.session.rollback()
+        current_app.logger.error("Login request failed")
         return jsonify(message="Something went wrong", error=error_message(e)), 500
 
 @auth_bp.route('/check', methods=['GET'])
@@ -79,7 +80,7 @@ def check_auth():
     return jsonify(
         logged_in=True,
         user_id=identity,
-        is_superuser=claims.get("is_superuser", False)
+        is_superuser=g.auth_user.is_superuser
     ), 200
 
 @auth_bp.route("/refresh", methods=["POST"])
@@ -90,16 +91,16 @@ def refresh():
         if not identity:
             raise ValueError("Missing JWT identity")
 
-        user = User.query.get(identity)
-        if not user:
-            raise ValueError("User not found")
+        user = g.auth_user
+        if not user or not user.active:
+            return jsonify(message="Session is no longer valid"), 401
 
         is_superuser = user.is_superuser
 
         access_expires_seconds = current_app.config['ACCESS_EXPIRES_SECONDS']
         new_access_token = create_access_token(
             identity=identity,
-            additional_claims={"is_superuser": is_superuser},
+            additional_claims={"is_superuser": is_superuser, "account_version": user.session_version()},
             expires_delta=timedelta(seconds=access_expires_seconds)
         )
 
@@ -110,6 +111,7 @@ def refresh():
         return response
 
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(f"Error refreshing access token: {e}")
         return jsonify(message="Failed to refresh access token"), 500
 
@@ -166,12 +168,16 @@ def confirm_registration():
         if not ConfirmationCode.verify_code(email, code, "registration"):
             return jsonify(message="Invalid or expired confirmation code", error="Unauthorized"), 401
 
-        if User.activate_user(email):
-            ConfirmationCode.delete_code(email, code, "registration")
+        user = User.query.filter_by(email=email, active=False).first()
+        if user:
+            user.active = True
+            ConfirmationCode.query.filter_by(email=email, code=code, type="registration").delete()
+            db.session.commit()
             return jsonify(message="Account successfully activated"), 200
         
         return jsonify(message="User not found or already activated", error="Not Found"), 404
     except Exception as e:
+        db.session.rollback()
         return jsonify(message="Something went wrong", error=error_message(e)), 500
     
 
@@ -206,18 +212,25 @@ def add_user():
 
         email = user_data["email"]
 
-        existing_user = User.query.filter_by(email=email).first()
+        existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
 
         # 👉 ВСЕГДА создаём/обновляем код
-        confirmation_code = ConfirmationCode.create_code(email, "registration")
+        new_account = existing_user is None
+        if new_account:
+            existing_user = User(name=user_data["name"], email=email, active=False)
+            existing_user.set_password(user_data["password"])
+            db.session.add(existing_user)
+            db.session.flush()
+        confirmation_code = ConfirmationCode.create_code(email, "registration", commit=False)
+        db.session.commit()
 
-        if not existing_user:
+        if new_account:
             try:
                 send_auth_email("Activate your account", email,
                     f"Your activation code: {confirmation_code.code}")
             except Exception:
-                current_app.logger.exception("Activation email delivery failed")
-            User.create(**user_data)
+                current_app.logger.error("Activation email delivery failed")
+            # Аккаунт и код уже сохранены одной транзакцией выше.
         else:
             if current_app.config["DEBUG"]:
                 print('user already exists')
@@ -228,6 +241,7 @@ def add_user():
         ), 200
 
     except Exception as e:
+        db.session.rollback()
         return jsonify(
             message="Something went wrong",
             error=error_message(e),
@@ -253,16 +267,20 @@ def request_password_reset():
             return jsonify(message="User not found or inactive", error="Not Found"), 404
 
         confirmation_code = ConfirmationCode.create_code(email, "password_reset")
+        if confirmation_code is None:
+            return jsonify(message="User not found or inactive"), 404
         
         try:
             send_auth_email("Password Reset Code", email,
                 f"Your password reset code: {confirmation_code.code}")
 
         except Exception as e:
+            db.session.rollback()
             return jsonify(message="Mail server is broken", error=error_message(e)), 202
 
         return jsonify(message="Password reset code sent"), 200
     except Exception as e:
+        db.session.rollback()
         return jsonify(message="Something went wrong", error=error_message(e)), 500
     
 @auth_bp.route("/confirm-password-reset", methods=["POST"])
@@ -289,12 +307,16 @@ def confirm_password_reset():
         if not ConfirmationCode.verify_code(email, code, "password_reset"):
             return jsonify(message="Invalid or expired reset code", error="Unauthorized"), 401
 
-        if User.change_password(email, new_password):
-            ConfirmationCode.delete_code(email, code, "password_reset")
+        user = User.query.filter_by(email=email, active=True).first()
+        if user:
+            user.set_password(new_password)
+            ConfirmationCode.query.filter_by(email=email, code=code, type="password_reset").delete()
+            db.session.commit()
             return jsonify(message="Password successfully updated"), 200
         
         return jsonify(message="User not found or inactive", error="Not Found"), 404
     except Exception as e:
+        db.session.rollback()
         return jsonify(message="Something went wrong", error=error_message(e)), 500
 
 @auth_bp.route("/", methods=["PUT"])
@@ -309,6 +331,7 @@ def update_user():
             return jsonify(message="Successfully updated account", data=updated_user), 200
         return jsonify(message="Invalid data, you can only update your account name!", error="Bad Request"), 400
     except Exception as e:
+        db.session.rollback()
         return jsonify(message="Failed to update account", error=error_message(e)), 400
     
 @auth_bp.route("/resend-confirmation", methods=["POST"])
@@ -328,7 +351,7 @@ def resend_confirmation():
 
         email = data["email"]
 
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
 
         # ⚠️ Никаких ранних return'ов
         if user and not user.active:
@@ -347,3 +370,40 @@ def resend_confirmation():
 
     except Exception:
         return jsonify(message="Something went wrong"), 500
+
+@auth_bp.route("/me", methods=["DELETE"])
+@jwt_required()
+@limiter.limit(lambda: current_app.config["AUTH_PASSWORD_RESET_RATE_LIMIT"])
+def delete_own_account():
+    """Удаляет только владельца JWT и его данные одной транзакцией users_db."""
+    from inputData.inputDataModels import InputData
+    from auth.validate import messages
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or set(data) - {"password", "recaptcha_token"}:
+        return jsonify(message=messages["account_delete_invalid_request"]), 400
+    password = data.get("password")
+    if not isinstance(password, str) or not password or len(password) > 200:
+        return jsonify(message=messages["password_required"]), 400
+    valid, failure = verify_recaptcha(data.get("recaptcha_token"))
+    if not valid:
+        return failure
+    user = g.auth_user
+    if not user.check_password(password):
+        return jsonify(message=messages["account_delete_password_invalid"]), 403
+    try:
+        InputData.query.filter_by(user_id=user.id).delete(synchronize_session=False)
+        # editing_by хранит копию имени администратора, а не FK.
+        # При одинаковых именах нельзя приписывать чужую метку удаляемому пользователю.
+        if User.query.filter_by(name=user.name).count() == 1:
+            InputData.query.filter_by(editing_by=user.name).update(
+                {InputData.editing_by: None}, synchronize_session=False)
+        ConfirmationCode.query.filter_by(email=user.email).delete(synchronize_session=False)
+        db.session.delete(user)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        current_app.logger.error("Account deletion transaction failed")
+        return jsonify(message=messages["account_delete_failed"]), 500
+    response = jsonify(message=messages["account_deleted"])
+    unset_jwt_cookies(response)
+    return response, 200

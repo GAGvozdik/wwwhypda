@@ -50,21 +50,21 @@ const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
 
     return (
         <>
-        {path ? 
+        {path ?
             <Link to={path} style={{borderRadius: '15px',fontFamily: 'Afacad_Flux !important', textDecoration: 'none', fontSize: 'var(--tree-font-size)'}}>
-                <TreeItem  
+                <TreeItem
                     onClick={toggleTheme}
                     itemId={name}
                     label={name}
-                    sx={{ 
+                    sx={{
                         '.MuiTreeItem-label': {borderRadius: '15px',fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
                         // '& .MuiTreeItem-content.Mui-selected ': { borderRadius: '0px', backgroundColor: 'red' },
-                        '& .MuiTreeItem-content:hover': {borderRadius: '15px', backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' }, 
-                        // '& .MuiTreeItem-conten': { paddingLeft: '100px' }, 
-                        // '& .MuiTreeItem- group': { padding: '6vh' }, 
+                        '& .MuiTreeItem-content:hover': {borderRadius: '15px', backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
+                        // '& .MuiTreeItem-conten': { paddingLeft: '100px' },
+                        // '& .MuiTreeItem- group': { padding: '6vh' },
                         color: 'var(--tree-text)',
-                        '--TreeView-itemChildrenIndentation': '3vh',
-                        '& .MuiTreeItem-content': {paddingLeft: '1.5vh', borderRadius: '15px',},
+                        '--TreeView-itemChildrenIndentation': '1.5rem',
+                        '& .MuiTreeItem-content': {paddingLeft: '0.75rem', borderRadius: '15px',},
                         '& .MuiTreeItem-iconContainer': {width: '0px',borderRadius: '15px',},
                     }}
                 >
@@ -72,20 +72,20 @@ const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
                 </TreeItem>
             </Link>
             :
-            <TreeItem 
+            <TreeItem
                 onClick={toggleTheme}
                 itemId={name}
                 label={name}
-                sx={{ 
+                sx={{
                     '.MuiTreeItem-label': {fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
                     // '& .MuiTreeItem-content.Mui-selected ': { borderRadius: '0px', backgroundColor: 'red' },
-                    '& .MuiTreeItem-content:hover': { backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' }, 
-                    // '& .MuiTreeItem-conten': { paddingLeft: '100px' }, 
-                    // '& .MuiTreeItem-group': { padding: '6vh' }, 
+                    '& .MuiTreeItem-content:hover': { backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
+                    // '& .MuiTreeItem-conten': { paddingLeft: '100px' },
+                    // '& .MuiTreeItem-group': { padding: '6vh' },
 
                     color: 'var(--tree-text)',
-                    '--TreeView-itemChildrenIndentation': '2.5vh',
-                    '& .MuiTreeItem-content': {paddingLeft: '1.5vh', backgroundColor: ''},
+                    '--TreeView-itemChildrenIndentation': '1.25rem',
+                    '& .MuiTreeItem-content': {paddingLeft: '0.75rem', backgroundColor: ''},
                     '& .MuiTreeItem-iconContainer': {display: children ? '' : ''},
                     borderRadius: '15px',
                 }}

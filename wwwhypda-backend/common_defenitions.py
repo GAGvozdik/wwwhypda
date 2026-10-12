@@ -14,8 +14,8 @@ limiter = Limiter(key_func=get_remote_address)
 
 
 def error_message(error):
-    current_app.logger.error("Request failed: %s", error)
-    return str(error) if current_app.config["EXPOSE_ERROR_DETAILS"] else "Request could not be completed"
+    current_app.logger.error("Request failed (%s)", type(error).__name__)
+    return "Request could not be completed"
 
 
 def send_auth_email(subject, recipient, body):

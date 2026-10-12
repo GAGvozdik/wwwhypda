@@ -6,11 +6,13 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    box-sizing: border-box;  
+    box-sizing: border-box;
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size);
     transition: 0.5s;
-    height: 5vh;
+    min-height: 2.5rem;
+    height: auto;
+    padding: 0.5rem 1rem;
 }
 
 
@@ -18,7 +20,7 @@
     transition: 0.5s;
     color: var(--submit-button-text-hover);
     background-color: var(--submit-button-hover);
-    
+
 }
 .submitButton:active  {
     transition: 0.5s;
@@ -34,20 +36,71 @@
 }
 
 
-.searchTableRow{
-    display: block;
+.searchParameter{
+    display: flex;
     border-radius: 8px;
     cursor: pointer;
     transition: 0.5s;
 }
-.searchTableRow:hover{
-    background: var(--scrollbar-hover-color); 
+.searchParameter:hover{
+    background: var(--scrollbar-hover-color);
     transition: 0.5s;
 }
 
 
 .wrap-td {
-  max-width: 200px;
+  max-width: 12.5rem;
   word-break: break-word;
   white-space: normal;
 }
+.searchLayout {
+    display: grid;
+    grid-template-columns: minmax(0, 36rem);
+    grid-template-areas: "parameters" "results";
+    gap: 1rem;
+    min-width: 0;
+    inline-size: min(100%, 36rem);
+    margin-inline: auto;
+}
+.resultsPanel, .parametersPanel { min-width: 0; min-height: 0; box-sizing: border-box; }
+.resultsPanel { grid-area: results; display: flex; flex-direction: column; height: 32rem; }
+.parametersPanel { grid-area: parameters; max-height: 24rem; overflow: auto; }
+.resultsContent { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; color: var(--tree-text); }
+.resultsGrid { flex: 1; min-height: 0; min-width: 0; }
+@container workspace (min-width: 49rem) {
+    .searchLayout {
+        inline-size: min(100%, 73rem);
+        grid-template-columns: repeat(2, minmax(24rem, 1fr));
+        grid-template-areas: "parameters results";
+        height: var(--search-panel-height);
+    }
+    .resultsPanel { height: 100%; }
+    .parametersPanel { height: 100%; max-height: none; }
+}
+.searchLayout :global(.MuiRadio-root .MuiSvgIcon-root) { font-size: var(--menu-font-size); }
+
+
+.findButton {
+    inline-size: max-content;
+    min-inline-size: min(10rem, 100%);
+    max-inline-size: 100%;
+    flex-shrink: 0;
+    margin-block-end: 1rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.exportActions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding-block: 1rem;
+    flex-shrink: 0;
+    gap: 0.5rem;
+}
+
+
+.parameterChoices { width: 100%; min-width: 0; padding: 0.5rem; box-sizing: border-box; }
+.searchParameter { width: 100%; margin: 0 !important; font-family: Afacad_Flux; font-size: var(--main-font-size); color: var(--tree-text); }
+.parameterText { display: grid; grid-template-columns: minmax(3rem, 5rem) minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; min-width: 0; flex: 1; overflow-wrap: anywhere; }
+@container workspace (max-width: 30rem) { .parameterText { grid-template-columns: minmax(0, 1fr) auto; } .parameterText > :nth-child(2) { grid-row: 2; grid-column: 1 / -1; } }

@@ -1,24 +1,23 @@
 
 // drawer
 .openHidingDrawer {
-    grid-row-start: 2; 
-    grid-row-end: 2; 
-    grid-column-start: 1; 
-    grid-column-end: 1; 
-    margin: 2vh;
+    grid-area: tree;
+    margin: 1rem;
     box-sizing: border-box;
-    overflow:auto;
-    white-space: nowrap;
+    min-width: 0;
+    align-self: start;
+    min-height: 0;
+    height: var(--tree-available-height);
+    contain: size;
+    white-space: normal;
 }
 
 .hidingDrawer {
-    grid-row-start: 2; 
-    grid-row-end: 2; 
-    grid-column-start: 1; 
-    grid-column-end: 1; 
-    margin: 2vh;
+    display: none;
+    grid-area: tree;
+    margin: 1rem;
     box-sizing: border-box;
-    white-space: nowrap;
+    white-space: normal;
 }
 
 .treeBody {
@@ -32,3 +31,28 @@
 }
 
 
+
+.treeBody {
+    height: 100%;
+    min-height: 0;
+    max-height: var(--tree-available-height);
+    background-color: var(--drawer-color);
+    overflow: auto;
+    scrollbar-gutter: stable;
+}
+.treeBody :global(.MuiTreeItem-label) { overflow-wrap: anywhere; }
+.treeBody :global(.MuiTreeItem-iconContainer .MuiSvgIcon-root) { font-size: var(--tree-font-size); }
+
+
+.treeBody :global(.MuiSimpleTreeView-root) { margin: 0; padding: 0; min-height: 0; }
+.treeBody :global(.MuiTreeItem-root) { height: auto; min-height: 0; }
+.treeBody :global(.MuiTreeItem-content) { padding-block: 0.125rem; min-height: 1.75rem; }
+.treeBody :global(.MuiTreeItem-groupTransition) { margin-block: 0; padding-block: 0; }
+@media (max-width: 48rem) {
+    .openHidingDrawer { height: min(12rem, var(--tree-available-height)); }
+}
+
+
+.searchDrawer { height: 12rem; }
+.searchDrawer .treeBody { max-height: 100%; }
+@container shell (min-width: 71rem) { .searchDrawer { height: var(--search-panel-height); } }

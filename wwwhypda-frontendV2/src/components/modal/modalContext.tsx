@@ -11,6 +11,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import styles from './modalStyles.module.scss';
+import messages from '../../common/error_messages.json';
 
 interface ModalButton {
     label: string;
@@ -57,13 +58,13 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
     const openModal = ({ title, description, buttons }: OpenModalOptions) => {
         setModalContent(
             <>
-                <div className={styles.modalTitle}>{title}</div>
-                {description && <div className={styles.modalDescription}>{description}</div>}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1vh', marginTop: '2vh' }}>
+                <div id="modal-modal-title" className={styles.modalTitle}>{title}</div>
+                {description && <div id="modal-modal-description" className={styles.modalDescription}>{description}</div>}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem' }}>
                     {buttons.map((btn, idx) => (
                         <Button
                             key={idx}
-                            style={{ minWidth: 200 }}
+                            style={{ minWidth: '12.5rem', maxWidth: '100%' }}
                             className={styles.submitButton}
                             onClick={() => {
                                 btn.onClick();
@@ -94,7 +95,7 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
                     onClick: onAction,
                 },
                 {
-                    label: 'Close',
+                    label: messages.close,
                     onClick: () => {},
                 },
             ],
@@ -112,7 +113,7 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
             <Modal
                 open={isOpen}
                 onClose={closeModal}
-                container={modalRootRef.current || undefined}
+                container={() => modalRootRef.current}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -122,12 +123,15 @@ export const ModalProvider = ({ children, modalRootRef }: ModalProviderProps) =>
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: 400,
+                        width: 'min(25rem, calc(100% - 2rem))',
+                        boxSizing: 'border-box',
+                        maxHeight: 'calc(100dvh - 2rem)',
+                        overflowY: 'auto',
                         backgroundColor: 'var(--body-color)',
                         border: '4px solid var(--border)',
                         borderRadius: '25px',
-                        boxShadow: 24,
-                        p: 4,
+                        boxShadow: '0 0.5rem 1.5rem var(--under-body-color)',
+                        padding: '2rem',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'center',

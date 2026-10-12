@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import axios from 'axios';
+import messages from '../../../common/error_messages.json';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
@@ -13,7 +15,8 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false); 
+    const pendingRequest = useRef(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState<boolean>(false);
 
     const navigate = useNavigate();
@@ -29,11 +32,15 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
     const handleLogin = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        if (pendingRequest.current) return;
+        pendingRequest.current = true;
         setIsLoading(true);
 
         if (!executeRecaptcha) {
-            setError('Recaptcha not available');
+            setError(messages.captcha_unavailable);
+            pendingRequest.current = false;
             setIsLoading(false);
+            setIsError(true);
             return;
         }
 
@@ -60,33 +67,30 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
             navigate(is_superuser ? '/superaccount' : '/account');
 
-            setError('Login successful!');
+            setError(messages.login_success);
             setIsError(false);
-        } catch (error: any) {
+        } catch (error: unknown) {
             setIsLoading(false);
-            setError(error.response?.data?.message || 'Login failed. Please check your credentials.');
+            setError((axios.isAxiosError<{ message?: string }>(error) ? error.response?.data?.message : undefined) || messages.login_failed);
             setIsError(true);
+        } finally {
+            pendingRequest.current = false;
+            setIsLoading(false);
         }
     }, [executeRecaptcha, username, password, navigate]);
 
 
     return (
-        <div 
-            style={{    
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: '100%',
-            }}
-        >
+        <div className={styles.authPage}>
             <div className={styles.authForm}>
-                <div className={styles.formTitle}>Authorization</div>
+                <div className={styles.formTitle}>{messages.auth_title}</div>
 
                 <form onSubmit={handleLogin}>
                     <div className={styles.autocompleteContainer}>
                         <input
                             type="email"
-                            placeholder="Email"
+                            placeholder={messages.email_label}
+                            aria-label={messages.email_label}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className={styles.inputField}
@@ -99,31 +103,33 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
                     <input
                         type="password"
-                        placeholder="Password"
+                        placeholder={messages.password_label}
+                            aria-label={messages.password_label}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className={styles.inputField}
+                        autoComplete="current-password"
                         required
                     />
 
                     <ErrorMessage error={error} isError={isError} />
 
-                    <UserButton text='Login' isLoading={isLoading} />
+                    <UserButton text={messages.login_button} isLoading={isLoading} />
                 </form>
 
-                <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                    <div style={{ fontSize: '2.5vh' }}>Do you have an account?</div>
+                <div style={{ margin: '0.5rem 0rem 0rem 0rem', fontSize: 'var(--main-font-size)', color: 'var(--tree-text)', textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--menu-font-size)' }}>{messages.have_account_prompt}</div>
                     <div>
                         <Link to="/register" className={styles.link}>
-                            Register here
+                            {messages.register_here}
                         </Link>
                     </div>
                 </div>
-                <div style={{ margin: '1vh 0vh 0vh 0vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                    <div style={{ fontSize: '2.5vh' }}>Do you want to reset your password?</div>
+                <div style={{ margin: '0.5rem 0rem 0rem 0rem', fontSize: 'var(--main-font-size)', color: 'var(--tree-text)', textAlign: 'center' }}>
+                    <div style={{ fontSize: 'var(--menu-font-size)' }}>{messages.reset_password_prompt}</div>
                     <div>
                         <Link to="/forgot-password" className={styles.link}>
-                            Reset password
+                            {messages.reset_password_link}
                         </Link>
                     </div>
                 </div>

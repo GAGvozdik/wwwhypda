@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
 
@@ -5,9 +6,9 @@ import { useSelector } from 'react-redux';
 // import { useDispatch } from 'react-redux';
 import type { State } from '../../common/types';
 // import type { UpdateThemeAction, UpdateOpenCloseAction } from '../../common/types';
-import { useMediaQuery } from 'react-responsive';
-import windowStyles from "./windowStyles.module.scss"; 
-import styles from "../menu.module.scss"; 
+import messages from '../../common/error_messages.json';
+import windowStyles from "./windowStyles.module.scss";
+import styles from "../menu.module.scss";
 import MainTree from '../tree/mainTree';
 import MainMenu from '../menu/mainMenu';
 import MainBody from './mainBody';
@@ -18,55 +19,74 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 
 export default function MainWindow() {
-    const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(useLocation().pathname);
-    // useTokenRefresh(); 
+    const pathname = useLocation().pathname;
+    const isSearchPage = pathname === '/search';
+    const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(pathname);
+    // useTokenRefresh();
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
-    let isOpenNow = useSelector((state: State) => state.open);  
+    const isOpenNow = useSelector((state: State) => state.open);
+    const shellRef = useRef<HTMLDivElement>(null);
 
-    const screenWidth = 600;
-    const screenHeight = 559;
+    useLayoutEffect(() => {
+        const scroller = document.scrollingElement ?? document.documentElement;
+        const targets = new Set([document.documentElement, scroller]);
+        const previous = [...targets].map(element => [element, element.classList.contains(styles.dark)] as const);
+        targets.forEach(element => element.classList.toggle(styles.dark, isDarkTheme));
+        return () => previous.forEach(([element, wasDark]) => element.classList.toggle(styles.dark, wasDark));
+    }, [isDarkTheme]);
 
-    const widthLessThan600 = useMediaQuery({ maxWidth: screenWidth });
-    const heightLessThan559 = useMediaQuery({ maxHeight: screenHeight });
-    const unsupportedResolution = widthLessThan600 || heightLessThan559;
-    
+    useLayoutEffect(() => {
+        const shell = shellRef.current;
+        if (!shell || isLegalPage) return;
+        const header = shell.firstElementChild;
+        const footer = shell.querySelector('footer');
+        if (!header || !footer) return;
+        const measure = () => {
+            shell.style.setProperty('--shell-header-height', `${header.getBoundingClientRect().height}px`);
+            shell.style.setProperty('--shell-footer-height', `${footer.getBoundingClientRect().height}px`);
+        };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(header);
+        observer.observe(footer);
+        window.addEventListener('resize', measure);
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', measure);
+        };
+    }, [isLegalPage]);
+
+
     if (isLegalPage) {
         return <div className={`${windowStyles.legalPage} ${isDarkTheme ? styles.dark : ''}`}>
-            <header><Link to="/">Back to the website</Link></header>
+            <header><Link to="/">{messages.back_to_website}</Link></header>
             <MainBody />
             <footer><LegalLinks /></footer>
         </div>;
     }
 
-    if (unsupportedResolution && !isLegalPage) {
-        return (
-            <div className={`${windowStyles.menuLabel} ${windowStyles.lowScreen} ${isDarkTheme ? styles.dark : ''}`} style={{color: 'var(--tree-text)', backgroundColor: 'var(--drawer-color)', height: '100vh'}}>
-                The window size should be larger than {screenWidth}x{screenHeight}
-            </div>
-        )
-    }
 
     return (
-        <div className={
-            isOpenNow ? 
-                (`${windowStyles.container} ${isDarkTheme ? styles.dark : ''}`) 
-                    : 
-                (`${windowStyles.openContainer} ${isDarkTheme ? styles.dark : ''}`)   
+        <div ref={shellRef} className={
+            isOpenNow ?
+                (`${windowStyles.container} ${isSearchPage ? windowStyles.searchShell : ''} ${isDarkTheme ? styles.dark : ''}`)
+                    :
+                (`${windowStyles.openContainer} ${isSearchPage ? windowStyles.searchShell : ''} ${isDarkTheme ? styles.dark : ''}`)
         }>
-    
+
             <MainMenu />
             <MainBody />
             {!isLegalPage && <MainTree />}
 
-            <div className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
-                <div style={{fontWeight: '300'}}>This website was created by Gvozdik G. and A. Comunian.</div>
-                
-                
-                <a 
-                    href="https://github.com/GAGvozdik/wwwhypda" 
-                    target="_blank" 
+            <footer className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
+                <div style={{fontWeight: '300'}}>{messages.website_credits}</div>
+
+
+                <a
+                    href="https://github.com/GAGvozdik/wwwhypda"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`}
                 >
@@ -75,12 +95,12 @@ export default function MainWindow() {
                 </a>
 
                 <div className={windowStyles.legalDocuments}>
-                    <span>This site uses reCAPTCHA for abuse prevention.</span>
+                    <span>{messages.recaptcha_notice}</span>
                     <LegalLinks className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`} />
                 </div>
 
-            </div>
-            
+            </footer>
+
         </div>
     );
 }

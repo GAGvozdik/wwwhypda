@@ -1,5 +1,6 @@
+import axios from 'axios';
 import CustomCheckbox from '../../commonFeatures/customCheckbox';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
@@ -18,6 +19,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [email, setEmail] = useState('');
     const [confirmationCode, setConfirmationCode] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const pendingRequest = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
     const [isResending, setIsResending] = useState(false);
     const [step, setStep] = useState(1);
@@ -29,15 +31,16 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const termsMissing = hasSubmitted && !isChecked;
     const ageMissing = hasSubmitted && !isAdult;
     const checkboxError = termsMissing && ageMissing
-        ? "Please accept the terms and confirm that you are at least 18 years old."
+        ? messages.terms_and_age_required
         : termsMissing
-            ? "Please accept the User Agreement and acknowledge the Privacy and Cookie Policies."
-            : ageMissing ? "Please confirm that you are at least 18 years old." : null;
+            ? messages.terms_required
+            : ageMissing ? messages.age_required : null;
 
 
 
     const handleRegister = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        if (pendingRequest.current) return;
         setHasSubmitted(true);
         if (!isChecked || !isAdult) {
             setIsError(true);
@@ -51,6 +54,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         }
 
         if (!executeRecaptcha) {
+            setError(messages.captcha_unavailable);
+            setIsError(true);
             return;
         }
 
@@ -61,6 +66,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setError(validatRes);
             return;
         }
+        pendingRequest.current = true;
         setIsLoading(true);
         try {
             const token = await executeRecaptcha('register');
@@ -78,8 +84,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 setIsError(false);
                 setStep(2);
             }
-        } catch (err: any) {
-            if (err.response?.data) {
+        } catch (err: unknown) {
+            if (axios.isAxiosError<{ message?: string }>(err) && err.response?.data) {
                 if (err.response.data.message) {
                     setError(err.response.data.message);
                 } else {
@@ -92,13 +98,17 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             }
             setIsError(true);
         } finally {
+            pendingRequest.current = false;
             setIsLoading(false);
         }
     }, [executeRecaptcha, username, password, confirmPassword, email, isChecked, isAdult]);
 
     const confirmRegistration = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
+        if (pendingRequest.current) return;
         if (!executeRecaptcha) {
+            setError(messages.captcha_unavailable);
+            setIsError(true);
             return;
         }
 
@@ -110,6 +120,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             return;
         }
         setIsError(false);
+        pendingRequest.current = true;
         setIsLoading(true);
 
         try {
@@ -127,36 +138,40 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 setError(response.data.message || messages.invalid_confirmation_code);
                 setIsError(true);
             }
-        } catch (err: any) {
-            setError(err.response?.data?.message || messages.confirmation_failed);
+        } catch (err: unknown) {
+            setError((axios.isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined) || messages.confirmation_failed);
             setIsError(true);
         } finally {
+            pendingRequest.current = false;
             setIsLoading(false);
         }
-    }, [executeRecaptcha, email, confirmationCode, navigate]);
+    }, [executeRecaptcha, email, confirmationCode, navigate, username, password]);
 
     const [resendTimer, setResendTimer] = useState(0);
 
     const handleResendCode = useCallback(async () => {
         if (resendTimer > 0 || !executeRecaptcha) return;
 
+        if (pendingRequest.current) return;
+        pendingRequest.current = true;
         setIsResending(true);
         try {
             const token = await executeRecaptcha('resend_code');
             const response = await api.post("/users/resend-confirmation", { email, recaptcha_token: token });
 
             if (response.status === 200) {
-                setError(response.data.message || "A new confirmation code has been sent to your email.");
+                setError(response.data.message || messages.confirmation_code_resent);
                 setIsError(false);
                 setResendTimer(30);
             } else {
-                setError(response.data.message || "Failed to resend the confirmation code.");
+                setError(response.data.message || messages.resend_failed);
                 setIsError(true);
             }
-        } catch (err: any) {
-            setError(err.response?.data?.message || "Error while resending the confirmation code.");
+        } catch (err: unknown) {
+            setError((axios.isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined) || messages.resend_error);
             setIsError(true);
         } finally {
+            pendingRequest.current = false;
             setIsResending(false);
         }
     }, [executeRecaptcha, email, resendTimer]);
@@ -176,12 +191,13 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     return (
         <div className={styles.registrationPage}>
             <div className={styles.authForm}>
-                <div className={styles.formTitle}>Registration</div>
+                <div className={styles.formTitle}>{messages.registration_title}</div>
                 {step === 1 && (
                     <form onSubmit={handleRegister} onInvalid={() => setHasSubmitted(true)}>
                         <input
                             type="email"
-                            placeholder="Email"
+                            placeholder={messages.email_label}
+                            aria-label={messages.email_label}
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className={styles.inputField}
@@ -192,7 +208,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
                         <input
                             type="text"
-                            placeholder="Username"
+                            placeholder={messages.username_label}
+                            aria-label={messages.username_label}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             className={styles.inputField}
@@ -200,7 +217,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
                         <input
                             type="password"
-                            placeholder="Password"
+                            placeholder={messages.password_label}
+                            aria-label={messages.password_label}
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className={styles.inputField}
@@ -210,7 +228,8 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
                         <input
                             type="password"
-                            placeholder="Confirm Password"
+                            placeholder={messages.confirm_password_label}
+                            aria-label={messages.confirm_password_label}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className={styles.inputField}
@@ -231,7 +250,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                                     color={termsMissing ? 'var(--error-text)' : undefined}
                                 />
                                 <span id="registration-legal-label">
-                                    I accept the <Link to="/user-agreement" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>User Agreement</Link> and have read the <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>Privacy Policy</Link> and <Link to="/cookie-policy" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>Cookie Policy</Link>.
+                                    {messages.accept_terms_prefix} <Link to="/user-agreement" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>{messages.user_agreement}</Link> {messages.read_policy_prefix} <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>{messages.privacy_policy}</Link> {messages.and} <Link to="/cookie-policy" target="_blank" rel="noopener noreferrer" className={styles.policyLink}>{messages.cookie_policy}</Link>.
                                 </span>
                             </div>
                             <div className={`${styles.checkboxRow} ${ageMissing ? styles.checkboxRowError : ''}`}>
@@ -242,17 +261,17 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                                     labelledBy="registration-age-label"
                                     color={ageMissing ? 'var(--error-text)' : undefined}
                                 />
-                                <span id="registration-age-label">I confirm that I am at least 18 years old.</span>
+                                <span id="registration-age-label">{messages.age_confirmation}</span>
                             </div>
-                            <p className={styles.registrationEmailNotice}>Account and security emails only; registration does not subscribe you to a newsletter.</p>
+                            <p className={styles.registrationEmailNotice}>{messages.registration_email_notice}</p>
                         </div>
-                        <UserButton text="Register" isLoading={isLoading} />
+                        <UserButton text={messages.register_button} isLoading={isLoading} />
 
-                        <div style={{ marginTop: '1vh', fontSize: '2vh', color: 'var(--tree-text)', textAlign: 'center' }}>
-                            <div style={{ fontSize: '2.5vh' }}>Already have an account?</div>
+                        <div style={{ marginTop: '0.5rem', fontSize: 'var(--main-font-size)', color: 'var(--tree-text)', textAlign: 'center' }}>
+                            <div style={{ fontSize: 'var(--menu-font-size)' }}>{messages.already_have_account}</div>
                             <div>
                                 <Link to="/login" className={styles.link}>
-                                    Login here
+                                    {messages.login_here}
                                 </Link>
                             </div>
                         </div>
@@ -262,27 +281,28 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     <form onSubmit={confirmRegistration}>
                         <input
                             type="text"
-                            placeholder="Confirmation Code"
+                            placeholder={messages.confirmation_code_label}
+                            aria-label={messages.confirmation_code_label}
                             value={confirmationCode}
                             onChange={(e) => setConfirmationCode(e.target.value)}
                             className={styles.inputField}
                             required
                         />
 
-                        <ErrorMessage 
-                            error={resendTimer > 0 ? `Resend code in ${resendTimer}s` : error}
-                            isError={isError} 
+                        <ErrorMessage
+                            error={isError ? error : resendTimer > 0 ? messages.resend_countdown.replace('{seconds}', String(resendTimer)) : error}
+                            isError={isError}
                         />
 
                         <UserButton
-                            text="Resend Code"
-                            isLoading={isResending || resendTimer > 0}
+                            text={messages.resend_code_button}
+                            isLoading={isResending}
                             onclick={handleResendCode}
-                            disabled={resendTimer > 0}
+                            disabled={resendTimer > 0 || isLoading}
                         />
-                        <div style={{height: '1vh'}}></div>
+                        <div style={{height: '0.5rem'}}></div>
 
-                        <UserButton text="Confirm" isLoading={isLoading} />
+                        <UserButton text={messages.confirm_button} isLoading={isLoading} />
                     </form>
                 )}
             </div>

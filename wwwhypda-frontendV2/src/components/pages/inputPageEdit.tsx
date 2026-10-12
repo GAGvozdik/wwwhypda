@@ -1,3 +1,5 @@
+import messages from '../../common/error_messages.json';
+import windowStyles from '../mainWindow/windowStyles.module.scss';
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
@@ -67,19 +69,19 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     };
 
     return (
-        <div className={styles.treeText}>
+        <div className={`${styles.treeText} ${windowStyles.contentGroup}`}>
 
-            <div style={{ 
+            <div style={{
 
-                    justifyContent: 'center', 
+                    justifyContent: 'center',
                     justifyItems: 'center',
-                    fontFamily: 'Afacad_Flux !important',
-                    fontSize: '5vh',
-                    padding: '1vh',
+                    fontFamily: 'Afacad_Flux',
+                    fontSize: 'calc(var(--main-font-size) * 2.5)',
+                    padding: '0.5rem',
                     textAlign: 'center'
                 }}
             >
-                InputPageEdit
+                {messages.input_edit_title}
             </div>
 
             <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={true}/>

@@ -117,6 +117,8 @@ mail.init_app(app)
 db.init_app(app)
 limiter.init_app(app)
 jwt = JWTManager(app)
+from auth.session_security import configure_session_security
+configure_session_security(jwt)
 Talisman(app, content_security_policy=app.config["CSP_POLICY"],
     force_https=app.config["FORCE_HTTPS"],
     strict_transport_security=app.config["HSTS_ENABLED"],

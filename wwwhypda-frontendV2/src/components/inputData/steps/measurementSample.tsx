@@ -1,4 +1,8 @@
-// import styles from '../../menu.module.scss'; 
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import StepActions from '../stepActions';
+import type { InputStepProps } from '../../../common/types';
+import messages from '../../../common/error_messages.json';
+// import styles from '../../menu.module.scss';
 import styles from '../stepper.module.scss';
 import React, { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
@@ -16,13 +20,13 @@ import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import Button from '@mui/material/Button';
 
-import { 
-    ClientSideRowModelModule, 
-    ModuleRegistry, 
+import {
+    ClientSideRowModelModule,
+    ModuleRegistry,
     TextEditorModule,
     SelectEditorModule,
 } from "ag-grid-community";
-import type { ColDef, CellSelectionOptions } from "ag-grid-community";
+import type { ColDef } from "ag-grid-community";
 
 
 // import {
@@ -70,24 +74,22 @@ interface RockTypeData {
     UID: string | null;
     PARENTUID: string | null;
     rt_status: number;
-    status_name: string | null; 
+    status_name: string | null;
 }
 
-type MeasurementSampleTableProps = {
-    isEditable: boolean;
-};
+type MeasurementSampleTableProps = InputStepProps;
 
 
-const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha}) => {
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "50.5vh", 
-        "--ag-background-color": "var(--table-color)", 
-        marginTop: '0vh', 
-        marginBottom: '5.5vh',
+const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha, clearAction}) => {
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
 
     const [error, setError] = useState<string | null>(null);
@@ -104,7 +106,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
     useEffect(() => {
         const fetchData = async () => {
 
-            
+
             const csrfToken = getCsrfTokenFromCookie();
 
             if (!csrfToken) {
@@ -197,14 +199,14 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
 
         // const newMeasurementRow: MeasurementRow = {
         //     id: measurementsTableData.length + 1,
-        //     sampleRef: "", 
-        //     parameter: "", 
-        //     value: "", 
-        //     error: "", 
-        //     units: "", 
-        //     quality: "", 
-        //     experimentType: "", 
-        //     interpretation: "", 
+        //     sampleRef: "",
+        //     parameter: "",
+        //     value: "",
+        //     error: "",
+        //     units: "",
+        //     quality: "",
+        //     experimentType: "",
+        //     interpretation: "",
         //     comment: ""
         // };
         // dispatch(UpdateMeasurementsData([...measurementsTableData, newMeasurementRow]));
@@ -216,74 +218,74 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
     };
 
     const columnDefs = useMemo<ColDef[]>(() => [
-        { 
-            headerName: "id", 
-            field: "id", 
-            editable: false, 
-            flex: 0.5, 
-            singleClickEdit: false 
+        {
+            headerName: messages.ui_id,
+            field: "id",
+            editable: false,
+            flex: 0.5,
+            singleClickEdit: false
         },
-        { 
-            headerName: "smpl_name", 
-            field: "smpl_name", 
-            editable: isEditable, 
-            flex: 1, 
-            singleClickEdit: false 
+        {
+            headerName: messages.ui_smpl_name,
+            field: "smpl_name",
+            editable: isEditable,
+            flex: 1,
+            singleClickEdit: false
         },
-        { 
-            headerName: "rock_type", 
-            field: "rock_type", 
-            editable: isEditable, 
-            flex: 1, 
-            cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: rocksNames }, 
+        {
+            headerName: messages.ui_rock_type,
+            field: "rock_type",
+            editable: isEditable,
+            flex: 1,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: { values: rocksNames },
             valueParser: (params) => {
                 if (rocksNames.includes(params.newValue)) {
-                    return params.newValue; 
+                    return params.newValue;
                 } else {
-                    return params.oldValue; 
+                    return params.oldValue;
                 }
             },
-            singleClickEdit: false 
+            singleClickEdit: false
         },
-        { 
-            headerName: "scale", 
-            field: "scale", 
-            editable: isEditable, 
-            flex: 1, 
-            cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: scales }, 
+        {
+            headerName: messages.ui_scale,
+            field: "scale",
+            editable: isEditable,
+            flex: 1,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: { values: scales },
             valueParser: (params) => {
                 if (scales.includes(params.newValue)) {
-                    return params.newValue; 
+                    return params.newValue;
                 } else {
-                    return params.oldValue; 
+                    return params.oldValue;
                 }
             },
-            singleClickEdit: false 
+            singleClickEdit: false
         },
-        { 
-            headerName: "fracturation_degree", 
-            field: "fracturation_degree", 
-            editable: isEditable, 
-            flex: 1, 
-            cellEditor: "agSelectCellEditor", 
-            cellEditorParams: { values: fracturations }, 
+        {
+            headerName: messages.ui_fracturation_degree,
+            field: "fracturation_degree",
+            editable: isEditable,
+            flex: 1,
+            cellEditor: "agSelectCellEditor",
+            cellEditorParams: { values: fracturations },
             valueParser: (params) => {
                 if (fracturations.includes(params.newValue)) {
-                    return params.newValue; 
+                    return params.newValue;
                 } else {
-                    return params.oldValue; 
+                    return params.oldValue;
                 }
             },
-            singleClickEdit: false 
+            singleClickEdit: false
         },
-        { 
-            headerName: "Sample_comment", 
-            field: "Sample_comment", 
-            editable: isEditable, 
-            flex: 1, 
-            singleClickEdit: false 
+        {
+            headerName: messages.ui_sample_comment,
+            field: "Sample_comment",
+            editable: isEditable,
+            flex: 1,
+            singleClickEdit: false
         }
     ], [scales, fracturations, rocksNames]);
 
@@ -296,81 +298,61 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
         };
     }, []);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
-    
-    const cellSelection = useMemo<boolean | CellSelectionOptions>(() => {
-        return {
-            handle: {
-                mode: "fill",
-            },
-        };
-    }, []);
+
 
     return (
-        <div style={containerStyle}>
-            
-            
+        <div style={containerStyle} className={styles.measurementGrid}>
 
-            <div style={{display: 'flex'}}>
-                <SingleSkeleton 
+
+
+            <StepActions clearAction={clearAction}>
+                <SingleSkeleton
                     loading={loading}
-                    error={error}
-                    margin={'1vh 1vh 1vh 0vh'}
-                    width={'15vh'}
-                    height={'3.5vh'}
+                    margin={'0'}
+                    width={'7.5rem'}
+                    height={'2.5rem'}
                 >
                     <Button
                         onClick={addRow}
-                        className={styles.submitButton}
-                        disabled={!isEditable}
-                        style={{
-                            margin: '1vh 1vh 1vh 0vh', 
-                            width: '17vh !important', 
-                            height: '3.5vh', 
-                            fontSize: '1.5vh', 
-                            padding: '0vh'
-                        }}
+                        className={`${styles.submitButton} ${styles.rowActionButton}`}
+                        disabled={!isEditable || loading || Boolean(error)}
                     >
-                        Add Row
+                        {messages.ui_add_row}
                     </Button>
                 </SingleSkeleton>
 
-                <SingleSkeleton 
+                <SingleSkeleton
                     loading={loading}
-                    error={error}
-                    margin={'1vh 1vh 1vh 0vh'}
-                    width={'15vh'}
-                    height={'3.5vh'}
+                    margin={'0'}
+                    width={'7.5rem'}
+                    height={'2.5rem'}
                 >
                     <Button
-                        disabled={!isEditable}
+                        disabled={!isEditable || loading || Boolean(error)}
                         onClick={deleteRow}
-                        className={styles.submitButton}
-                        style={{
-                            margin: '1vh 1vh 1vh 0vh', 
-                            width: '10vh', 
-                            height: '3.5vh', 
-                            fontSize: '0.5vh', 
-                            padding: '0vh'
-                        }}
+                        className={`${styles.submitButton} ${styles.rowActionButton}`}
                     >
-                        Delete Row
+                        {messages.ui_delete_row}
                     </Button>
                 </SingleSkeleton>
-            </div>
+            </StepActions>
 
-            <SingleSkeleton loading={loading} error={error}>
-                <AgGridReact
-                    theme={themeDarkBlue}
-                    rowData={tableData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    tooltipShowDelay={0}
-                    headerHeight={40}
-                    cellSelection={cellSelection}
-                    onCellValueChanged={handleCellValueChanged}
-                />
-            </SingleSkeleton>
+            <div className={styles.tableArea}>
+                <SingleSkeleton loading={loading} error={error}>
+                    <AgGridReact
+                        theme={themeDarkBlue}
+                        rowData={tableData}
+                        columnDefs={scaledColumns}
+                        defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
+                        tooltipShowDelay={0}
+
+
+                        onCellValueChanged={handleCellValueChanged}
+                    />
+                </SingleSkeleton>
+            </div>
 
         </div>
     );

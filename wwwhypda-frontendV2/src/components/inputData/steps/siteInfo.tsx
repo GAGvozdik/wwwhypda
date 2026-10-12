@@ -1,3 +1,7 @@
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import styles from '../stepper.module.scss';
+import StepActions from '../stepActions';
+import type { InputStepProps } from '../../../common/types';
 // import styles from '../menu.module.scss';
 import { useMemo, useState, useEffect } from "react";
 import { AgGridReact } from "ag-grid-react";
@@ -45,19 +49,17 @@ const defaultRowData: SiteRow[] = [
 ];
 
 
-type SiteInfoProps = {
-    isEditable: boolean;
-};
+type SiteInfoProps = InputStepProps;
 
-function SiteInfo({isEditable=true}: SiteInfoProps) {
+function SiteInfo({isEditable=true, clearAction}: SiteInfoProps) {
 
     const containerStyle = useMemo(() => ({
         width: "100%",
-        height: "56vh",
+        maxWidth: "72rem",
         "--ag-background-color": "var(--table-color)",
-        marginTop: '0vh',
-        marginBottom: '-1vh',
-        // fontSize: '26px',  
+        marginTop: '0rem',
+        marginBottom: '0rem',
+        // fontSize: '26px',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
     }), []);
@@ -147,14 +149,14 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
             editable: isEditable,
             singleClickEdit: true,
             flex: 1,
-            
+
             cellEditorSelector: (params) => {
                 return params.data.field === "country_name"
                     ? { component: "agSelectCellEditor", params: { values: countryNames } }
                     : { component: "agTextCellEditor" };
             }
         },
-        { field: "description", editable: false, flex: 2, cellStyle: { fontSize: '4vh' }, }
+        { field: "description", editable: false, flex: 2, cellStyle: { fontSize: 'var(--main-font-size)' }, }
     ], [countryNames]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
@@ -166,6 +168,7 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
         headerClass: 'custom-header',  // Класс для заголовков
     }), []);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
     const handleCellValueChanged = (params: any) => {
@@ -177,23 +180,26 @@ function SiteInfo({isEditable=true}: SiteInfoProps) {
 
     const gridOptions = useMemo(() => ({
         defaultColDef: {
-            cellStyle: { fontSize: '56px' },  // Устанавливаем размер шрифта для всех ячеек
+            cellStyle: { fontSize: 'var(--main-font-size)' },  // Устанавливаем размер шрифта для всех ячеек
             headerClass: 'custom-header',     // Класс для заголовков
         }
     }), []);
     return (
-        <div style={containerStyle}>
-            <SingleSkeleton loading={loading} error={error}>
-                <AgGridReact
-                    gridOptions={gridOptions} 
-                    theme={themeDarkBlue}
-                    rowData={tableData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
-                    headerHeight={0}
-                    onCellValueChanged={handleCellValueChanged}
-                />
-            </SingleSkeleton>
+        <div style={containerStyle} className={styles.measurementGrid}>
+            <StepActions clearAction={clearAction} />
+            <div className={styles.tableArea}>
+                <SingleSkeleton loading={loading} error={error}>
+                    <AgGridReact
+                        gridOptions={gridOptions}
+                        theme={themeDarkBlue}
+                        rowData={tableData}
+                        columnDefs={scaledColumns}
+                        defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
+                        headerHeight={0}
+                        onCellValueChanged={handleCellValueChanged}
+                    />
+                </SingleSkeleton>
+            </div>
         </div>
     );
 };

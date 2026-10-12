@@ -17,9 +17,11 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, co
             slotProps={{ input: { 'aria-labelledby': labelledBy, 'aria-required': required } }}
             onChange={(event) => onChange(event.target.checked)}
             sx={{
-                color: color ? color : 'var(--checkbox-color)',
-                '&.Mui-checked': { color: color ? color : 'var(--checkbox-checked)' },
+                color: color ? color : 'var(--radio-color)',
+                '&.Mui-checked': { color: color ? color : 'var(--radio-color)' },
                 fontFamily: 'Afacad_Flux',
+                padding: '0.5rem',
+                '& .MuiSvgIcon-root': { fontSize: 'var(--menu-font-size)' },
                 zIndex: '99',
             }}
         />
@@ -34,10 +36,10 @@ export default CustomCheckbox;
         // <FormControl size="small" className={styles.filterControlCheckbox}>
         //     <FormControlLabel
         //         control={
-        //           <Checkbox 
+        //           <Checkbox
         //             size="small"
-        //             checked={freeOnly} 
-        //             onChange={(e) => setFreeOnly(e.target.checked)} 
+        //             checked={freeOnly}
+        //             onChange={(e) => setFreeOnly(e.target.checked)}
         //             sx={{ p: 0.5 }}
         //           />
         //         }

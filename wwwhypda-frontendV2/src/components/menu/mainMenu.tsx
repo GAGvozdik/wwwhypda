@@ -1,11 +1,12 @@
 // import * as React from 'react';
 
+import messages from '../../common/error_messages.json';
 import MenuButtuon from './menuButton';
 // import {useEffect, useState, useRef} from 'react';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import IconButton from '@mui/material/IconButton';
-import styles from "./menuStyles.module.scss" 
+import styles from "./menuStyles.module.scss"
 
 import { useSelector, useDispatch } from 'react-redux';
 import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
@@ -21,74 +22,77 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 export default function MainMenu() {
 
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
     const dispatch = useDispatch();
 
     const toggleTheme = () => {
-        dispatch<UpdateThemeAction>(UpdateTheme(!isDarkTheme)); 
+        dispatch<UpdateThemeAction>(UpdateTheme(!isDarkTheme));
         localStorage.setItem("isDarkTheme", String(!isDarkTheme));
     };
 
-    let isOpenNow = useSelector((state: State) => state.open);  
+    const isOpenNow = useSelector((state: State) => state.open);
 
     const toggleOpen = () => {
-        dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow)); 
+        dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow));
     };
 
-    const isSuperuser = localStorage.getItem('isSuperuser');
-    console.log('isSuperuser in main menu', isSuperuser);
+    const isSuperuser = localStorage.getItem('isSuperuser') === 'true';
+
 
     return (
 
         <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`}>
-            
-            <MenuButtuon 
-                className={`${styles.drawerItem} ${styles.menuButton}`} 
+
+            <MenuButtuon
+                className={`${styles.drawerItem} ${styles.menuButton}`}
                 onClick={toggleOpen}
+                aria-label={isOpenNow ? messages.open_tree : messages.close_tree}
+                aria-expanded={!isOpenNow}
+                aria-controls="rock-type-tree"
             >
-                <IconButton className={`${styles.drawerButton}`} style={{}}>
-                    {isOpenNow ? 
+                <span className={styles.drawerButton}>
+                    {isOpenNow ?
                         <MenuIcon className={styles.drawerIcon} data-testid="MenuIcon"/>
-                            : 
+                            :
                         <ClearIcon className={styles.drawerIcon} data-testid="ClearIcon" />
-                    }  
-                </IconButton>
+                    }
+                </span>
             </MenuButtuon>
 
-            <MenuButtuon 
-                className={`${styles.homePageItem} ${styles.menuButton}`} 
+            <MenuButtuon
+                className={`${styles.homePageItem} ${styles.menuButton}`}
                 path={'/'}
             >
-                Home
+                {messages.menu_home}
             </MenuButtuon>
 
-            <MenuButtuon 
-                className={`${styles.searchItem} ${styles.menuButton}`} 
+            <MenuButtuon
+                className={`${styles.searchItem} ${styles.menuButton}`}
                 path={'search'}
             >
-                Search
+                {messages.menu_search}
             </MenuButtuon>
-            
-            {/* <MenuButtuon 
-                className={`${styles.contributeItem} ${styles.menuButton}`} 
+
+            {/* <MenuButtuon
+                className={`${styles.contributeItem} ${styles.menuButton}`}
                 path={'contribute'}
             >
                 Contribute
             </MenuButtuon>
-            
-            <MenuButtuon 
-                className={`${styles.documentsItem} ${styles.menuButton}`} 
+
+            <MenuButtuon
+                className={`${styles.documentsItem} ${styles.menuButton}`}
                 path={'documents'}
             >
                 Documents
             </MenuButtuon> */}
 
-            <MenuButtuon 
-                className={` ${styles.menuButton}`} 
+            <MenuButtuon
+                className={` ${styles.menuButton}`}
                 // path={token ? '/input' : '/login'}
                 path={'/input'}
             >
-                Add data
+                {messages.menu_add_data}
             </MenuButtuon>
 
 
@@ -99,15 +103,15 @@ export default function MainMenu() {
             </div> */}
 
             <div className={`${styles.themeItem} ${styles.menuLabel}`}>
-                <IconButton onClick={toggleTheme}>
-                    {isDarkTheme ? 
-                        (<Brightness4Icon className={styles.themeIcon}/>) 
-                            : 
+                <IconButton onClick={toggleTheme} aria-label={isDarkTheme ? messages.light_theme : messages.dark_theme}>
+                    {isDarkTheme ?
+                        (<Brightness4Icon className={styles.themeIcon}/>)
+                            :
                         (<Brightness7Icon className={styles.themeIcon}/>)
-                    }  
+                    }
                 </IconButton>
-            </div> 
-            
+            </div>
+
             {/* <div className={`${styles.languageItem} ${styles.menuLabel}`}>
                 <IconButton>
                     <LanguageIcon className={styles.themeIcon}/>
@@ -115,14 +119,12 @@ export default function MainMenu() {
             </div> */}
 
             <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <Link to={
-                    // isSuperuser === null ? '/login' : 
+                <IconButton component={Link} aria-label={messages.menu_account} to={
+                    // isSuperuser === null ? '/login' :
                     isSuperuser ? '/superaccount' : '/account'
                 }>
-                    <IconButton>
                         <AccountCircleIcon className={styles.themeIcon} />
-                    </IconButton>
-                </Link>
+                </IconButton>
             </div>
 
         </div>

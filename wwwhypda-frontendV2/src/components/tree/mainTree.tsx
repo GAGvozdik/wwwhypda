@@ -1,10 +1,12 @@
+import { useLocation } from 'react-router-dom';
+import messages from '../../common/error_messages.json';
 import * as React from 'react';
 // import Box from '@mui/material/Box';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 // import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import styles from './treeStyles.module.scss';
 // import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';                 
+import { useSelector } from 'react-redux';
 import type { State } from '../../common/types';
 // import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
 import {useEffect, useState} from 'react';
@@ -30,28 +32,28 @@ interface RockTypeData {
     UID: string | null;
     PARENTUID: string | null;
     rt_status: number;
-    status_name: string | null; 
+    status_name: string | null;
 }
 
 
 const buildTree = (data: RockTypeData[]): React.ReactNode[] => {
-    
+
     if (!Array.isArray(data)) {
-        return []; 
+        return [];
     }
 
     const nodeMap: { [key: number]: RockTypeData } = {};
     data.forEach(node => nodeMap[node.rt_id] = node);
 
-    
+
     const rootNodes = data.filter(node => node.rt_id_parent === -1);
 
-    
+
     const createTreeItem = (nodeId: number): React.ReactNode => {
         const node = nodeMap[nodeId];
         if (!node) {
             return(<></>)
-        }; 
+        };
 
         const children = data.filter(child => child.rt_id_parent === node.rt_id);
         const childItems = children.map(child => createTreeItem(child.rt_id));
@@ -68,7 +70,7 @@ const buildTree = (data: RockTypeData[]): React.ReactNode[] => {
         );
     };
 
-    
+
     return rootNodes.map(rootNode => createTreeItem(rootNode.rt_id));
 };
 
@@ -80,6 +82,7 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
 
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
     const isOpenNow = useSelector((state: State) => state.open);
+    const isSearchPage = useLocation().pathname === '/search';
 
     useEffect(() => {
         const fetchRockTypes = async () => {
@@ -89,12 +92,12 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
                     const response = await api.get<RockTypeData[]>('/rocks/rock_type', { headers: { 'X-Recaptcha-Token': token } });
 
                     if (!response.data || response.data.length === 0) {
-                        setError("No data received from the server.");
+                        setError(messages.tree_empty);
                     } else {
                         setTreeData(response.data);
                     }
-                } catch (error: any) {
-                    setError(getErrorMessage(error));
+                } catch {
+                    setError(messages.tree_failed);
                 }
             }
         };
@@ -108,35 +111,20 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
         }
     }, [treeData, error]);
 
-    const getErrorMessage = (error: any): string => {
-        if (error.response) {
-            return `HTTP error! status: ${error.response.status}, data: ${error.response.data}`;
-        } else if (error.request) {
-            return 'Error: No response received from the server.';
-        } else {
-            return `Error: ${error.message}`;
-        }
-    };
 
     const tree = buildTree(treeData);
 
     return (
-        <div className={
-            isOpenNow 
+        <div id="rock-type-tree" className={
+            isOpenNow
                 ? `${styles.hidingDrawer} ${isDarkTheme ? styles.dark : ''}`
-                : `${styles.openHidingDrawer} ${isDarkTheme ? styles.dark : ''}`
+                : `${styles.openHidingDrawer} ${isSearchPage ? styles.searchDrawer : ''} ${isDarkTheme ? styles.dark : ''}`
         }>
-            <div 
+            <div
             className={styles.treeBody}
             style={{
                 backgroundColor: 'var(--drawer-color)',
-                height: '100%',
-                overflowY: 'auto',
-                overflowX: 'hidden',
             }}>
-                {isOpenNow ? (
-                    <></>
-                ) : (
                     <SingleSkeleton loading={loading} error={error}>
                         <SimpleTreeView
                             sx={{
@@ -148,7 +136,6 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
                             {tree}
                         </SimpleTreeView>
                     </SingleSkeleton>
-                )}
             </div>
         </div>
     );

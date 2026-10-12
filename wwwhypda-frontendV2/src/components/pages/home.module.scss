@@ -1,6 +1,6 @@
 .hero {
   width: 100%;
-  padding: 4vh 2vw;
+  padding: 2rem 2rem;
   display: flex;
   justify-content: center;
   box-sizing: border-box;
@@ -11,7 +11,7 @@
 .heroInner {
   width: min(1100px, 100%);
   display: grid;
-  gap: 2vh;
+  gap: 1rem;
 }
 
 .heroBadge {
@@ -49,19 +49,21 @@
 
 .heroActions {
   display: flex;
-  gap: 1vw;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 .primaryButton {
   font-family: "Afacad_Flux", sans-serif !important;
   font-size: calc(var(--button-font-size) * 1.6);
   width: 13rem;
-  height: 3rem;
+  min-height: 3rem;
+  height: auto;
+  max-width: 100%;
   background-color: var(--start-button) !important;
   color: var(--start-button-text) !important;
 
   border-radius: 4px;
-  padding: 0.6vh 1.2vw;
+  padding: 0.3rem 1.2rem;
 
   transition: 0.3s !important;
 }
@@ -84,13 +86,15 @@
   font-family: "Afacad_Flux", sans-serif !important;
   font-size: calc(var(--button-font-size) * 1.6);
 
-  background-color: transparent !important;
+  background-color: var(--transparent-color) !important;
   color: var(--start-page-text) !important;
   width: 10rem;
-  height: 3rem;
+  min-height: 3rem;
+  height: auto;
+  max-width: 100%;
   border: 1px solid var(--border) !important;
   border-radius: 4px;
-  padding: 0.6vh 1.2vw;
+  padding: 0.3rem 1.2rem;
 
   transition: 0.3s !important;
 }
@@ -106,22 +110,22 @@
   background-color: var(--submit-button-active) !important;
 }
 .heroGrid {
-  margin-top: 2vh;
+  margin-top: 1rem;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1vw;
+  gap: 1rem;
 }
 
 .featureCard {
-  padding: 1.5vh 1vw;
-  border-radius: 1vh;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
 
   background: var(--form-color);
   border: 1px solid var(--border);
 }
 
 .featureTitle {
-  margin: 0 0 0.7vh;
+  margin: 0 0 0.35rem;
 
   font-size: var(--menu-font-size);
   color: var(--start-page-text);
@@ -143,3 +147,6 @@
 }
 
 
+
+.heroInner, .featureCard { min-width: 0; }
+.heroTitle, .featureText { overflow-wrap: anywhere; }

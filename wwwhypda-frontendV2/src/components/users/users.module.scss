@@ -6,10 +6,11 @@
 .authForm {
     background-color: var(--form-color);
 
-    width: 45vh;
+    width: min(22.5rem, 100%);
+    box-sizing: border-box;
     // margin-top: 15vh;
     // margin-bottom: 3vh;
-    padding-bottom: 2vh;
+    padding-bottom: 1rem;
 
     border-radius: 8px;
     border: 3px solid var(--border);
@@ -20,8 +21,9 @@
 .skeletonAuthForm {
     background-color: var(--form-color);
 
-    width: 45vh;
-    padding-bottom: 2vh;
+    width: min(22.5rem, 100%);
+    box-sizing: border-box;
+    padding-bottom: 1rem;
 
     border-radius: 8px;
     font-family: Afacad_Flux !important;
@@ -38,7 +40,7 @@
     font-family: Afacad_Flux !important;
     font-size: var(--under-menu-font-size);
     font-weight: 300;
-    gap: 1vh;
+    gap: 0.5rem;
 }
 
 .policyLink:hover{
@@ -53,7 +55,7 @@
 
 
 .errorMessage {
-    font-size: 2vh;
+    font-size: var(--main-font-size);
     margin: 5% 5% 5% 5%;
     // margin-left: 10vh;
     text-align: center;
@@ -62,21 +64,23 @@
 .formTitle {
     color: var(--tree-text);
     text-align: center;
-    margin: 1vh 1vh 1vh 1vh;
+    margin: 0.5rem 0.5rem 0.5rem 0.5rem;
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
 }
 
 .inputField {
   border: none;
-  color: rgb(51, 51, 51);
-  padding: 3%;
+  color: var(--input-text);
+  padding: 0.65rem;
+  box-sizing: border-box;
+  min-height: 2.5rem;
   border-radius: 4px;
-  width: 74%;
-  margin: 0 10% 1vh 10%;
+  width: 80%;
+  margin: 0 10% 0.5rem 10%;
   background-color: var(--input);
   transition: background-color 0.5s;
-  
+
   font-family: 'Afacad_Flux', system-ui, sans-serif;
   font-size: var(--input-font-size);
 
@@ -85,7 +89,8 @@
   }
 
   &:focus {
-    outline: none;
+    outline: 2px solid var(--border);
+    outline-offset: 2px;
   }
 
   &::placeholder {
@@ -118,7 +123,7 @@ input::placeholder {
     font-family: Afacad_Flux !important;
     transition: 0.5s;
     font-weight: 600;
-    font-size: 2.5vh;
+    font-size: var(--menu-font-size);
 }
 
 .link:hover {
@@ -131,18 +136,19 @@ input::placeholder {
 .submitButton {
     background-color: var(--menu);
     color: var(--submit-button-text);
-    padding: auto;
-    
+    padding: 0.5rem;
+
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    box-sizing: border-box;  
+    box-sizing: border-box;
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size);
     width: 80%;
     margin-left: 10%;
     margin-right: 10%;
-    height: 5vh;
+    min-height: 2.5rem;
+    height: auto;
 
 
     display: flex;
@@ -155,7 +161,7 @@ input::placeholder {
     transition: 0.5s;
     color: var(--submit-button-text-hover);
     background-color: var(--submit-button-hover);
-    
+
 }
 .submitButton:active  {
     transition: 0.5s;
@@ -175,7 +181,7 @@ input::placeholder {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2vh 0;
+    padding: 1rem 0;
     box-sizing: border-box;
 
     > .authForm { margin-block: auto; }
@@ -183,7 +189,7 @@ input::placeholder {
 
 .registrationNotice {
     width: 80%;
-    margin: 1vh auto;
+    margin: 0.5rem auto;
     color: var(--tree-text);
     font-family: Afacad_Flux, sans-serif;
     font-size: var(--under-menu-font-size);
@@ -200,7 +206,7 @@ input::placeholder {
 }
 
 .registrationEmailNotice {
-    margin: 0.8vh 0 1vh;
+    margin: 0.4rem 0 0.5rem;
 }
 
 .accountPrivacy {
@@ -210,7 +216,7 @@ input::placeholder {
     font-size: var(--under-menu-font-size);
     line-height: 1.4;
 
-    p { margin: 0.6vh 0; }
+    p { margin: 0.3rem 0; }
     > a { display: block; width: fit-content; max-width: 100%; overflow-wrap: anywhere; }
 }
 
@@ -220,12 +226,46 @@ input::placeholder {
 }
 
 .accountDetails {
-    margin: 0.5vh 5vh;
+    margin: 0.25rem 2.5rem;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
-    gap: 1.5vh 3rem;
+    gap: 0.75rem 3rem;
 
     > div { min-width: 14rem; }
     .accountPrivacy p:first-child { margin-top: 0; }
 }
+
+.authPage {
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-block: 1rem;
+    box-sizing: border-box;
+}
+.authForm, .skeletonAuthForm { overflow-wrap: anywhere; }
+.authForm form { font-size: var(--main-font-size); }
+.inputField:autofill {
+    box-shadow: 0 0 0 1000px var(--form-color) inset;
+    -webkit-text-fill-color: var(--input-text);
+    font-family: Afacad_Flux;
+    font-size: var(--input-font-size);
+}
+.submitButton:focus-visible { outline: 2px solid var(--border); outline-offset: 2px; }
+.submitButton:disabled { cursor: wait; background: var(--submit-button-unactive); }
+
+
+.submitButton.logoutButton {
+    width: max-content;
+    min-inline-size: min(10rem, 100%);
+    max-inline-size: 100%;
+    padding-inline: 1.25rem;
+    flex-shrink: 0;
+    display: flex;
+    margin: 1rem auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.policyLink:visited, .policyLink:focus-visible { color: var(--tree-text); }
+.policyLink:focus-visible { outline: 2px solid var(--tree-text); outline-offset: 0.125rem; }

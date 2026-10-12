@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 // import type { GridColDef } from '@mui/x-data-grid';
 
 
@@ -48,7 +49,7 @@ export function generateColumns(data: DynamicRowData[]): ColDef[] {
 //   if (typeof value === 'string') return 'string';
 //   if (value === null) return 'string';
 //   if (typeof value === 'boolean') return 'boolean';
-//   return 'string'; 
+//   return 'string';
 // }
 
 export interface State {
@@ -100,25 +101,25 @@ export interface Action {
 export interface UpdateThemeAction extends Action {
     type: 'UPDATE_THEME';
     payload: boolean;
-    [key: string]: any; 
+    [key: string]: any;
 }
 
 export interface UpdateOpenCloseAction extends Action {
     type: 'UPDATE_OPEN';
     payload: boolean;
-    [key: string]: any; 
+    [key: string]: any;
 }
 
 export interface UpdateRTIDAction extends Action {
     type: 'UPDATE_RTID';
     payload: string;
-    [key: string]: any; 
+    [key: string]: any;
 }
 
 export interface UpdateRTNameAction extends Action {
     type: 'UPDATE_RTNAME';
     payload: string;
-    [key: string]: any; 
+    [key: string]: any;
 }
 
 
@@ -153,3 +154,16 @@ export function getCsrfTokenFromCookie() {
 
 
 
+
+export interface AccountProfile {
+    id: number;
+    name: string;
+    email: string;
+    active: boolean;
+    is_superuser: boolean;
+}
+
+export interface InputStepProps {
+    isEditable: boolean;
+    clearAction?: ReactNode;
+}

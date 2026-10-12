@@ -1,3 +1,4 @@
+import messages from '../../common/error_messages.json';
 import React, { useCallback, useEffect, useState } from 'react';
 import styles from "./searchStyles.module.scss";
 import FormControl from '@mui/material/FormControl';
@@ -24,11 +25,11 @@ interface Parameter {
 }
 
 const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
-    let rt_id = useSelector((state: State) => state.currentRTID);  
-    let rt_name = useSelector((state: State) => state.currentRTName);  
+    let rt_id = useSelector((state: State) => state.currentRTID);
+    let rt_name = useSelector((state: State) => state.currentRTName);
 
     const dispatch = useDispatch();
-    
+
     const [parameters, setParameters] = useState<Parameter[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -44,9 +45,9 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             if (executeRecaptcha) {
                 try {
                     const token = await executeRecaptcha('parameters');
-                    const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } }); 
+                    const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } });
                     setParameters(response.data);
-     
+
                 } catch (error: any) {
                     setError(error.message);
                 } finally {
@@ -66,11 +67,11 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             const token = await executeRecaptcha('search');
             const fetchParameters = async () => {
                 try {
-                    const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } }); 
+                    const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } });
                     console.log(`/rocks/samples/${rt_id}/${selectedValue}`)
                     const res = response.data.map((item, index) => ({
                         ...item,
-                        id: index + 1 
+                        id: index + 1
                     }));
 
                     dispatch<UpdateTableDataAction>(UpdateTableData(res));
@@ -87,73 +88,73 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     }, [selectedValue, executeRecaptcha, rt_id]);
 
     return (
-        <div 
-            className={`${styles.treeText}`} 
-            style={{    
-                height: '82vh',
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gridTemplateRows: '1fr',
-                paddingTop: '2vh',
-                gap: '2vh',
+        <div
+            className={`${styles.treeText} ${styles.searchLayout}`}
+            style={{
+
+
+
+                paddingTop: '1rem',
+                gap: '1rem',
             }}
         >
-           
-            <div 
-                className={`${styles.treeText}`} 
-                style={{    
+
+            <div
+                className={`${styles.treeText} ${styles.resultsPanel}`}
+                style={{
                     backgroundColor: 'var(--drawer-color)',
                     borderRadius: '8px',
                     boxSizing: 'border-box',
-                    height: '82vh',
-                    overflowY: 'auto',
+
+
                     // marginBottom: '2vh',
-                    gridRowStart: 1, 
-                    gridRowEnd: 1, 
-                    gridColumnStart: 2, 
-                    gridColumnEnd: 2, 
+
+
+
+
                 }}
             >
-                <SingleSkeleton loading={isSearching} error={error} height='82vh' isLoadIcon={true}>
+                <SingleSkeleton loading={isSearching} error={error} height='100%' isLoadIcon={true}>
                     <SearchResultsTable/>
                 </SingleSkeleton>
             </div>
-            
 
-        
-            <div 
-                className={`${styles.treeText}`} 
-                style={{    
+
+
+            <div
+                className={`${styles.treeText} ${styles.parametersPanel}`}
+                style={{
                     backgroundColor: 'var(--drawer-color)',
                     borderRadius: '4px',
                     boxSizing: 'border-box',
-                    height: '82vh',
-                    overflowY: 'auto',
+
+
                     // marginBottom: '2vh',
-                    gridRowStart: 1, 
-                    gridRowEnd: 1, 
-                    gridColumnStart: 1, 
-                    gridColumnEnd: 2, 
+
+
+
+
                 }}
             >
-                <SingleSkeleton loading={loading} error={error} height='82vh'>
-                    <div 
-                        className={styles.treeText} 
-                        style={{    
-                            marginTop: '2vh',
+                <SingleSkeleton loading={loading} error={error} height='100%'>
+                    <div
+                        className={styles.treeText}
+                        id="search-parameter-title"
+                        style={{
+                            marginTop: '1rem',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
                             fontSize: 'var(--head-font-size)',
-                            textAlign: 'center', 
+                            textAlign: 'center',
                         }}
                     >
-                        Search in {rt_name}
+                        {messages.search_in} {rt_name}
                     </div>
 
                     <FormControl
-                        style={{    
-                            marginTop: '2vh',       
+                        style={{
+                            marginTop: '1rem',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
@@ -161,34 +162,32 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         component="form"
                         onSubmit={handleSubmit}
                     >
-                        
+
                         <RadioGroup
-                            aria-labelledby="demo-radio-buttons-group-label"
-                            defaultValue="female"
+                            className={styles.parameterChoices}
+                            aria-labelledby="search-parameter-title"
                             name="radio-buttons-group"
                             value={selectedValue}
                             onChange={(event) => {setSelectedValue(parseInt(event.target.value as string, 10))}}
                         >
 
-                            <table>
-                                <tbody>
+
                                     {(parameters || []).map((param) => (
                                             <SearchTableRow
                                                 key={param.id_Parameter}
                                                 name={param.html_code}
                                                 desc={param.param_name}
                                                 unit={param.html_units}
-                                                value={param.id_Parameter} 
-                                                onChange={setSelectedValue} 
-                                                selectedValue={selectedValue} 
+                                                value={param.id_Parameter}
+                                                onChange={setSelectedValue}
+                                                selectedValue={selectedValue}
                                             />
                                         ))}
-                                </tbody>
-                            </table>
+
                         </RadioGroup>
 
-                        <button type="submit" className={styles.submitButton} style={{width: '30%', marginBottom: '2vh'}}>
-                            Find data
+                        <button type="submit" className={`${styles.submitButton} ${styles.findButton}`}>
+                            {messages.ui_find_data}
                         </button>
 
                     </FormControl>

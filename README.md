@@ -67,8 +67,9 @@ MAIL_USE_TLS=False
 MAIL_USE_SSL=True
 MAIL_DELIVERY_MODE=smtp
 MAIL_SUPPRESS_SEND=False
-CONFIRMATION_CODE_TTL_SECONDS=600
-PASSWORD_RESET_CODE_TTL_SECONDS=600
+CONFIRMATION_CODE_TTL_SECONDS=120
+PASSWORD_RESET_CODE_TTL_SECONDS=120
+AUTH_CODE_CLEANUP_INTERVAL_SECONDS=60
 RECAPTCHA_ENABLED=True
 RECAPTCHA_VERIFY_URL=https://www.google.com/recaptcha/api/siteverify
 RECAPTCHA_MIN_SCORE=0.5
@@ -132,9 +133,7 @@ Normal local use keeps `RECAPTCHA_ENABLED=True`, `TESTING=False`,
 `/api/rocks/rock_type` and `/api/rocks/parameters` requests do not require login,
 but still require a valid CAPTCHA token, which the frontend obtains.
 
-SMTP settings are independent of CAPTCHA. Configure your own development mail
-account, or explicitly use `MAIL_DELIVERY_MODE=log` to write local confirmation
-messages to the backend log without sending email.
+Настройки SMTP независимы от CAPTCHA. Настройте собственный почтовый аккаунт для разработки. В режиме `MAIL_DELIVERY_MODE=log` отправка пропускается и в журнал записывается только факт пропуска; код, адрес получателя и тело письма не выводятся. Этот режим не доставляет код пользователю.
 
 ### Create your own development credentials
 
@@ -256,3 +255,45 @@ git push origin main
 
 `git add -A` respects `.gitignore`. Ignore rules do not protect files that Git
 already tracks. Review the staged diff and keep real credentials out of Git.
+
+## Удаление аккаунта и срок кодов
+
+В новой версии кнопка `Delete account` доступна в обычном и административном аккаунтах. Подтверждение требует текущего пароля, CSRF и CAPTCHA. Сервер удаляет собственный аккаунт, его заявки всех статусов и коды одной транзакцией в users_db; старые access/refresh JWT больше не дают доступа. Независимые исторические научные таблицы не удаляются по совпадению имени автора. После успеха браузер очищает состояние пользователя и черновики, сохраняя тему; другие вкладки того же сайта получают уведомление. Сервер не может сам очистить браузерное хранилище другого устройства. Письма и резервные копии имеют отдельный жизненный цикл.
+
+Несекретные настройки в существующих backend env-файлах:
+
+```dotenv
+CONFIRMATION_CODE_TTL_SECONDS=120
+PASSWORD_RESET_CODE_TTL_SECONDS=120
+AUTH_CODE_CLEANUP_INTERVAL_SECONDS=60
+```
+
+Код действителен 2 минуты от создания; на границе 120 секунд он уже отклоняется. Использованный код удаляется сразу. Отдельный dev-сервис `auth-code-cleanup` запускает проход немедленно, затем каждую минуту; при штатной работе истёкшая запись удаляется примерно в пределах 3 минут от создания. При сбое БД проход откатывается и повторяется. Истёкший код остаётся недействительным, даже пока очистка недоступна. Удаление кода не удаляет незавершённый аккаунт. Таймер не запускается в Gunicorn workers.
+
+Локальная одноразовая проверка очистки (удаляет только истёкшие коды dev-БД):
+
+```sh
+docker compose --env-file .env.development run --rm --no-deps auth-code-cleanup python -m auth.code_cleanup --once
+```
+
+Тесты с изолированными SQLite БД без env-файлов и SMTP:
+
+```sh
+docker compose --env-file .env.development build backend
+docker run --rm wwwhypda-dev-backend python -m unittest discover -s tests -v
+```
+
+Проверки настоящих блокировок и отдельного worker-процесса требуют отдельной тестовой PostgreSQL БД, переданной через `TEST_AUTH_DATABASE_URI`; их нельзя направлять в рабочую БД. Проверки очистки браузерного состояния и поздних ответов Axios:
+
+```sh
+docker compose --env-file .env.development run --rm --build --no-deps frontend node --experimental-vm-modules --test scripts/test-account-session.mjs
+```
+
+Раздел Privacy Policy сначала был подготовлен как описание будущих изменений, затем согласован с реализованной очисткой и удалением. Перед выпуском остаются проверки резервных копий и браузерных сценариев. Старые JWT без привязки к версии аккаунта после обновления отклоняются: пользователям нужно заново войти. Неоднозначные старые метки редактора при совпадающих именах сохраняются для отдельного рассмотрения, чтобы не удалить чужие сведения.
+
+
+## Масштабирование интерфейса и Community-таблицы
+
+Размеры форм, кнопок, подписей, строк таблиц и промежутков переведены в rem/em и общую шкалу CSS-переменных для штатного browser zoom. Оболочка прокручивается целиком: шапка, содержимое и футер; таблицы сохраняют прокрутку строк и столбцов. Узкая раскладка допускает перенос меню и размещение дерева над содержимым; прежнее предупреждение 600×559 больше не закрывает страницу.
+
+Таблицы используют только ag-grid-community и ag-grid-react одной версии 35.2.0. Платное выделение диапазонов/fill handle отключено; редактирование отдельных ячеек и существующий XLSX-экспорт через xlsx сохранены. Закомментированные Enterprise-импорты сохранены по правилам проекта и не подключаются. Визуальная приёмка Chrome/Firefox, обеих тем и масштаба 80–200% остаётся открытой; сборка её не заменяет.

@@ -1,3 +1,5 @@
+import messages from '../../common/error_messages.json';
+import windowStyles from '../mainWindow/windowStyles.module.scss';
 import React, {useState} from 'react';
 import styles from '../menu.module.scss';
 import CustomStepper from '../inputData/stepper';
@@ -71,19 +73,19 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     };
 
     return (
-        <div className={styles.treeText}>
+        <div className={`${styles.treeText} ${windowStyles.contentGroup}`}>
 
-            <div style={{ 
-                    justifyContent: 'center', 
+            <div style={{
+                    justifyContent: 'center',
                     justifyItems: 'center',
                     fontFamily: 'Afacad_Flux !important',
                     alignItems: 'center',
                     textAlign: 'center',
-                    fontSize: '5vh',
-                    padding: '1vh'
+                    fontSize: 'calc(var(--main-font-size) * 2.5)',
+                    padding: '0.5rem'
                 }}
             >
-                Data reading
+                {messages.input_read_title}
             </div>
 
             <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={false}/>

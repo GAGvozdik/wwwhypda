@@ -12,14 +12,14 @@ const ErrorMessage: React.FC<ErrorMessageProps> = ({ error, isError }) => {
     const errorMessage = typeof error === 'string' ? error : '';
 
     return (
-        <div
+        <div role={isError ? "alert" : "status"}
             style={{
-                color: isError ? 'var(--error-text)' : 'green',  // Используем isError для выбора цвета
-                fontSize: '60%',
+                color: isError ? 'var(--error-text)' : 'var(--success-text)',  // Используем isError для выбора цвета
+                fontSize: 'var(--main-font-size)',
                 width: '80%',
                 marginLeft: '10%',
                 textAlign: 'center',
-                marginBottom: '1vh',
+                marginBottom: '0.5rem',
             }}
         >
             {errorMessage}

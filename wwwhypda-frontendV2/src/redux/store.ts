@@ -38,7 +38,7 @@ const reducer = (state: State = initialState, action: Action): State => {
             return { ...state, token: action.payload };
 
         case 'LOGOUT':
-            return { ...state, token: '' };
+            return { ...state, token: '', currentRTID: '', currentRTName: '', currentTableData: [], sampleMeasurementTableData: [], measurementsTableData: [] };
 
         case 'UPDATE_SAMPLE_MEASUREMENT_DATA':
             return { ...state, sampleMeasurementTableData: action.payload };
@@ -57,7 +57,7 @@ const reducer = (state: State = initialState, action: Action): State => {
     }
 };
 
-const store = createStore<State, Action, {}, {}>(reducer); 
+const store = createStore<State, Action, {}, {}>(reducer);
 
 store.subscribe(() => {
     const state = store.getState();

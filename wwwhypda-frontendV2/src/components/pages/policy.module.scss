@@ -1,6 +1,8 @@
 .container {
   padding: 2rem;
-  max-width: 800px;
+  max-width: 50rem;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
   margin: 0 auto;
 
   font-family: "Afacad_Flux";

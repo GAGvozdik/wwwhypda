@@ -1,10 +1,18 @@
+import axios from 'axios';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { sessionEvent, sessionUnavailable } from './accountSession';
 import { useEffect } from 'react';
 // import axios from 'axios';
 import api from '../api';
 
 const useTokenRefresh = () => {
+    const { executeRecaptcha } = useGoogleReCaptcha();
     useEffect(() => {
+        let disposed = false;
+        let busy = false;
         const refreshAccessToken = async () => {
+            if (disposed || busy || sessionUnavailable()) return;
+            busy = true;
             try {
                 const csrfRefreshToken = document.cookie
                     .split('; ')
@@ -27,40 +35,51 @@ const useTokenRefresh = () => {
                     }
                 );
 
-                console.log(response.data.message || 'Access token refreshed successfully');
+                if (disposed || sessionUnavailable() || response.status !== 200) return;
 
                 // ⏩ После успешного рефреша сразу проверяем пользователя
                 await refreshUserData();
 
-            } catch (error: any) {
-                console.error('Error refreshing access token:', error.response?.data || error.message);
-
-                if (error.response?.status === 401) {
-                    console.error('Unauthorized! Refresh token is missing or expired.');
-                }
+            } catch (error: unknown) {
+                if (!axios.isCancel(error)) console.warn('Session refresh failed');
+            } finally {
+                busy = false;
             }
         };
 
         const refreshUserData = async () => {
+            if (disposed || sessionUnavailable() || !executeRecaptcha) return;
             try {
+                const token = await executeRecaptcha('check_auth_after_refresh');
                 const res = await api.get('/users/check', {
                     withCredentials: true,
+                    headers: { 'X-Recaptcha-Token': token },
                 });
-
-                console.log('User checked:', res.data);
+                if (res.status !== 200) console.warn('Session check failed');
 
             } catch (error) {
-                console.error('Error checking user:', error);
+                if (!axios.isCancel(error)) console.warn('Session check failed');
             }
         };
 
-        const intervalId = setInterval(() => {
-            console.log('token refreshing');
-            refreshAccessToken();
-        }, 1 * 20 * 1000); // каждые 20 секунд
-
-        return () => clearInterval(intervalId);
-    }, []);
+        let intervalId: ReturnType<typeof setInterval> | undefined;
+        const onSessionChange = () => {
+            if (intervalId) clearInterval(intervalId);
+            intervalId = undefined;
+            if (!sessionUnavailable() && !disposed) {
+                intervalId = setInterval(() => {
+                    void refreshAccessToken();
+                }, 1 * 20 * 1000); // каждые 20 секунд
+            }
+        };
+        onSessionChange();
+        window.addEventListener(sessionEvent, onSessionChange);
+        return () => {
+            disposed = true;
+            clearInterval(intervalId);
+            window.removeEventListener(sessionEvent, onSessionChange);
+        };
+    }, [executeRecaptcha]);
 };
 
 export default useTokenRefresh;

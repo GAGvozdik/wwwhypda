@@ -1,12 +1,16 @@
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import styles from '../stepper.module.scss';
+import StepActions from '../stepActions';
+import type { InputStepProps } from '../../../common/types';
 // import styles from '../menu.module.scss';
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { AgGridReact } from "ag-grid-react";
 import { useStepsTheme } from '../steps';
 // import { useSelector } from 'react-redux';
 // import { State } from '../../../common/types';
-import { 
-    ClientSideRowModelModule, 
-    ModuleRegistry, 
+import {
+    ClientSideRowModelModule,
+    ModuleRegistry,
     TextEditorModule
 } from "ag-grid-community";
 import type { ColDef } from "ag-grid-community";
@@ -28,21 +32,19 @@ const getDefaultRowData = () => [
 
 const LOCAL_STORAGE_KEY = "sourceTableData";
 
-type SourceInfoProps = {
-    isEditable: boolean;
-};
+type SourceInfoProps = InputStepProps;
 
-const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
+const SourceInfo = ({isEditable=true, clearAction}: SourceInfoProps) => {
 
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "51vh", 
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
         ["--ag-background-color"]: "var(--table-color)",
-        marginTop: '0vh', 
-        marginBottom: '5vh',
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
     const [tableData, setTableData] = useState(getDefaultRowData());
 
@@ -90,16 +92,18 @@ const SourceInfo = ({isEditable=true}: SourceInfoProps) => {
         headerComponentParams: { suppressHeader: true }
     }), []);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
     return (
-        <div style={containerStyle}>
-            <div style={{height: '56vh'}}>
+        <div style={containerStyle} className={styles.measurementGrid}>
+            <StepActions clearAction={clearAction} />
+            <div className={styles.tableArea}>
                 <AgGridReact
                     theme={themeDarkBlue}
                     rowData={tableData}
-                    columnDefs={columnDefs}
-                    defaultColDef={defaultColDef}
+                    columnDefs={scaledColumns}
+                    defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
                     headerHeight={0}
                     onCellValueChanged={handleCellValueChanged}
                     // suppressColumnVirtualisation={true}

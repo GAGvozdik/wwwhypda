@@ -1,3 +1,4 @@
+import accountStyles from './accountsStyles.module.scss';
 import React, { useState, useEffect } from 'react';
 import styles from './../users.module.scss';
 // import axios from 'axios';
@@ -7,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import LoadIcon from '../../commonFeatures/loadIcon';
 import UserSuggestions from './userSuggestions';
 import api from '../../api';
+import axios from 'axios';
+import DeleteAccount from './deleteAccount';
+import messages from '../../../common/error_messages.json';
+import type { AccountProfile } from '../../../common/types';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 
 const Account: React.FC = () => {
@@ -14,7 +19,7 @@ const Account: React.FC = () => {
     // const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const [userData, setUserData] = useState<any>(null);
+    const [userData, setUserData] = useState<AccountProfile | null>(null);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -26,15 +31,16 @@ const Account: React.FC = () => {
         setIsLoading(true);
         try {
             const response = await api.get('/users/', {
-                withCredentials: true, 
+                withCredentials: true,
             });
 
             setUserData(response.data.data);
-        } catch (error: any) {
-            if (error.response?.status === 401) {
+        } catch (error: unknown) {
+            if (axios.isCancel(error)) return;
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
                 navigate('/login');
             } else {
-                setError(error.response?.data?.error || 'Error fetching user data');
+                setError(messages.account_fetch_failed);
             }
         } finally {
             setIsLoading(false);
@@ -62,22 +68,22 @@ const Account: React.FC = () => {
 
             if (res.status === 200) {
                 localStorage.removeItem('isSuperuser');
-                clearAllCookies(); 
+                clearAllCookies();
                 navigate('/login', { replace: true });
             }
         } catch (err) {
-            console.error("Ошибка при выходе:", err);
+            if (!axios.isCancel(err)) console.warn('Logout failed');
 
         } finally {
             localStorage.removeItem('isSuperuser');
-            clearAllCookies(); 
+            clearAllCookies();
             navigate('/login', { replace: true });
         }
     };
 
     return (
-        <div 
-            style={{    
+        <div className={accountStyles.accountPage}
+            style={{
                 // display: 'flex',
                 // justifyContent: 'center',
                 // alignItems: 'center',
@@ -89,14 +95,15 @@ const Account: React.FC = () => {
                 // className={styles.authForm}
                 style={{
                     color: 'var(--tree-text)',
-                    fontSize: '2vh',
+                    fontSize: 'var(--main-font-size)',
                     fontFamily: 'Afacad_Flux !important',
                 }}
             >
-                <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>
-                    Your Account
+                <div className={styles.formTitle} style={{ fontSize: 'calc(var(--main-font-size) * 2.25)' }}>
+                    {messages.account_title}
                 </div>
 
+                <DeleteAccount />
                 <UserSuggestions />
 
 
@@ -105,19 +112,19 @@ const Account: React.FC = () => {
                     {error && <p style={{ color: 'var(--tree-text)' }}>{error}</p>}
                     {userData && (
                         <div>
-                            <div>Name: {userData.name}</div>
-                            <div>Email: {userData.email}</div>
+                            <div>{messages.account_name}: {userData.name}</div>
+                            <div>{messages.account_email}: {userData.email}</div>
                         </div>
                     )}
-                    <section className={styles.accountPrivacy} aria-label="Personal data requests">
-                        <p>Access, correction or deletion of personal data:</p>
-                        <a className={styles.policyLink} href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">georgii.gvozdik@studenti.unimi.it</a>
-                        <a className={styles.policyLink} href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>
-                        <p>Logging out does not delete your account.</p>
+                    <section className={styles.accountPrivacy} aria-label={messages.personal_data_requests}>
+                        <p>{messages.personal_data_request_description}</p>
+                        <a className={styles.policyLink} href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">{messages.ui_georgii_gvozdik_studenti_unimi_it}</a>
+                        <a className={styles.policyLink} href="mailto:alessandro.comunian@unimi.it">{messages.ui_alessandro_comunian_unimi_it}</a>
+                        <p>{messages.logout_does_not_delete}</p>
                     </section>
                 </div>
-                <button onClick={handleLogout} className={styles.submitButton} style={{width: '20vh', justifySelf: 'center'}}>
-                    Log Out
+                <button onClick={handleLogout} className={`${styles.submitButton} ${styles.logoutButton}`}>
+                    {messages.logout}
                 </button>
             </div>
         </div>

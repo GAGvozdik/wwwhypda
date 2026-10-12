@@ -50,6 +50,7 @@ const UserAgreement: React.FC = () => {
       <h2 className={styles.sectionTitle}>7. Termination</h2>
       <p className={styles.text}>
         Access to the service may be suspended or terminated in case of violation of this Agreement.
+        You can permanently delete your own account and uploaded submission records using Delete account, with your current password and verification. This also deletes its verification codes and revokes existing sessions. Delivered emails, independent published records and backup copies have separate handling described in the Privacy Policy; contact the operator about other personal information.
       </p>
 
       <h2 className={styles.sectionTitle}>8. Governing Law and Jurisdiction</h2>

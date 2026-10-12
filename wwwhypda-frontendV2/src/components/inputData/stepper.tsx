@@ -1,3 +1,4 @@
+import messages from '../../common/error_messages.json';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -26,11 +27,11 @@ import withRecaptcha from '../commonFeatures/withRecaptcha';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 
 const steps = [
-    { label: 'Step 1', title: 'Site Information' },
-    { label: 'Step 2', title: 'General information about measurements' },
-    { label: 'Step 3', title: 'Source Information' },
-    { label: 'Step 4', title: 'Measurement Sample Details' },
-    { label: 'Step 5', title: 'Measurements' },
+    { label: messages.step_1, title: messages.step_site_title },
+    { label: messages.step_2, title: messages.step_general_title },
+    { label: messages.step_3, title: messages.step_source_title },
+    { label: messages.step_4, title: messages.step_sample_title },
+    { label: messages.step_5, title: messages.step_measurements_title },
 ];
 
 function CustomStepIcon(props: StepIconProps) {
@@ -66,13 +67,7 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
     const [generalInfoKey, setGeneralInfoKey] = useState(0);
     const [sourceInfoKey, setSourceInfoKey] = useState(0);
 
-    const stepComponents = [
-        <SiteInfo key={siteInfoKey} isEditable={isEditable}/>,
-        <GeneralInfo key={generalInfoKey} isEditable={isEditable}/>,
-        <SourceInfo key={sourceInfoKey} isEditable={isEditable}/>,
-        <MeasurementSample isEditable={isEditable}/>,
-        <Measurements isEditable={isEditable}/>,
-    ];
+
 
     const dispatch = useDispatch();
 
@@ -102,6 +97,35 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
                 break;
         }
     };
+
+    const clearAction = (
+        <SingleSkeleton
+            loading={isLoading}
+            margin={'0'}
+            width={'7.5rem'}
+            height={'2.5rem'}
+        >
+            <Button
+                onClick={handleClearAll}
+                className={styles.submitButton}
+                disabled={!isEditable || isLoading}
+                style={{
+                    minHeight: '2.5rem',   // минимальная высота в rem
+                    minWidth: '7.5rem'    // ширина в rem
+                }}
+            >
+                {messages.ui_clear_all}
+            </Button>
+        </SingleSkeleton>
+    );
+
+    const stepComponents = [
+        <SiteInfo key={siteInfoKey} isEditable={isEditable} clearAction={clearAction}/>,
+        <GeneralInfo key={generalInfoKey} isEditable={isEditable} clearAction={clearAction}/>,
+        <SourceInfo key={sourceInfoKey} isEditable={isEditable} clearAction={clearAction}/>,
+        <MeasurementSample isEditable={isEditable} clearAction={clearAction}/>,
+        <Measurements isEditable={isEditable} clearAction={clearAction}/>,
+    ];
 
     const [skipped, setSkipped] = useState(new Set<number>());
 
@@ -153,7 +177,7 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
     }, []);
 
     return (
-        <Box sx={{ width: '100%' }} className={styles.treeText}>
+        <Box sx={{ width: '100%', minWidth: 0 }} className={`${styles.treeText} ${styles.stepperPage}`}>
             <Stepper activeStep={activeStep}>
                 {steps.map((step) => (
                     <Step key={step.label}>
@@ -166,22 +190,24 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
 
             {activeStep === steps.length ? (
                 <React.Fragment>
-                    <Typography 
-                        sx={{ 
-                            paddingTop: '4vh', 
-                            fontSize: '4vh', 
-                            display: 'flex', 
-                            justifyContent: 'center', 
-                            fontFamily: 'Afacad_Flux',
-                            color: 'var(--tree-text)'
-                        }}
-                    >
-                        All steps completed - you're finished
-                    </Typography>
+                    <Box className={styles.stepContent}>
+                        <Typography
+                            sx={{
+                                paddingTop: '2rem',
+                                fontSize: 'calc(var(--main-font-size) * 2)',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                fontFamily: 'Afacad_Flux',
+                                color: 'var(--tree-text)'
+                            }}
+                        >
+                            {messages.ui_all_steps_completed}
+                        </Typography>
 
-                    <Box sx={{ height: '54vh' }} /> 
+                        <Box sx={{ minHeight: '4rem' }} />
+                    </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'row', marginTop: '1vh' }}>
+                    <Box className={styles.stepNavigation}>
                         <Button
                             onClick={() => {
                                 const lastStep = steps.length - 1;
@@ -190,9 +216,9 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
                             }}
                             className={styles.submitButton}
                             sx={{ mr: 1 }}
-                            style={{ width: '120px' }}
+                            style={{ minWidth: '7.5rem' }}
                         >
-                            Back
+                            {messages.ui_back}
                         </Button>
 
                         <Box sx={{ flex: '1 1 auto' }} />
@@ -200,10 +226,10 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
                             <Button
                                 onClick={() => handleClick()}
                                 className={styles.submitButton}
-                                style={{ width: '120px' }}
+                                style={{ minWidth: '7.5rem' }}
                                 disabled={isLoading} // Disable when loading
                             >
-                                Submit
+                                {messages.ui_submit}
                             </Button>
 
                     </Box>
@@ -212,66 +238,36 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
             ) : (
 
                 <React.Fragment>
-                    <div style={{ display: 'flex', alignItems: 'center', padding: '1vh 0' }}>
-                        <div style={{ flex: 1 }}></div> {/* Left spacer */}
-                        <div 
-                            style={{
-                                flex: 5,
-                                color: "var(--tree-text)",
-                                textAlign: "center",
-                                fontSize: '3vh'
-                            }}
-                        >
-                            {steps[activeStep].title}
-                        </div>
-
-                        <div 
-                        style={{ 
-                            flex: 1, 
-                            display: 'flex', 
-                            justifyContent: 'flex-end', 
-                            alignItems: 'center'   // центрируем по высоте
-                        }}
-                        >
-                            <SingleSkeleton
-                                loading={isLoading}
-                                margin={'0'}
-                                width={'15vh'}
-                                height={'4vh'}
+                    <Box className={styles.stepContent}>
+                        <div className={styles.stepTitle}>
+                            {/* Панель действий ниже центрируем по высоте, отдельно от заголовка. */}
+                            {/* Left spacer */}
+                            <div
+                                style={{
+                                    color: "var(--tree-text)",
+                                    textAlign: "center",
+                                    fontSize: 'calc(var(--main-font-size) * 1.5)'
+                                }}
                             >
-                                <Button
-                                    onClick={handleClearAll}
-                                    className={styles.submitButton}
-                                    disabled={!isEditable}
-                                    style={{ 
-                                        maxHeight: '4vh',   // высота в vh
-                                        minWidth: '15vh'    // ширина в vh
-                                    }}
-                                >
-                                    Clear all
-                                </Button>
-                            </SingleSkeleton>
+                                {steps[activeStep].title}
+                            </div>
                         </div>
-
-
-                    </div>
-                    <Box sx={{ minHeight: '50vh' }}>
                         {stepComponents[activeStep]}
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2, marginTop: '1vh' }}>
+                    <Box className={styles.stepNavigation}>
                         <Button
                             disabled={activeStep === 0}
                             onClick={handleBack}
                             sx={{ mr: 1 }}
                             className={styles.submitButton}
                         >
-                            Back
+                            {messages.ui_back}
                         </Button>
 
                         <Box sx={{ flex: '1 1 auto' }} />
 
                         <Button onClick={handleNextOrFinish} className={styles.submitButton}>
-                            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+                            {activeStep === steps.length - 1 ? messages.step_finish : messages.step_next}
                         </Button>
                     </Box>
                 </React.Fragment>

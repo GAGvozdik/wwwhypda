@@ -3,7 +3,7 @@ import re
 import json
 import os
 from functools import wraps
-from flask import jsonify
+from flask import jsonify, g
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 
 # Construct the absolute path to the JSON file
@@ -20,7 +20,7 @@ def admin_required():
         def decorator(*args, **kwargs):
             verify_jwt_in_request()
             claims = get_jwt()
-            if claims.get("is_superuser"):
+            if g.auth_user and g.auth_user.is_superuser:
                 print("superuser")
                 return fn(*args, **kwargs)
             else:

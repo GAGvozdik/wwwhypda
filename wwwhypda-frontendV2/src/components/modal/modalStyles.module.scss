@@ -2,17 +2,17 @@
 .submitButton {
     background-color: var(--menu) !important;
     color: var(--submit-button-text) !important;
-    padding: 1vh !important;
-    
+    padding: 0.5rem !important;
+
     border: none !important;
     border-radius: 4px !important;
     cursor: pointer !important;
-    box-sizing: border-box !important;  
+    box-sizing: border-box !important;
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size) !important;
-    width: 10vh !important;
-    // margin-left: 10% !important; 
-    // margin-right: 10% !important; 
+    width: 5rem !important;
+    // margin-left: 10% !important;
+    // margin-right: 10% !important;
     transition: 0.5s !important;
 }
 
@@ -38,9 +38,9 @@
 .modalDescription {
     color: var(--tree-text);
     font-family: Afacad_Flux !important;
-    font-size: 2vh;
+    font-size: var(--main-font-size);
     text-align: center;
-    margin-bottom: 2vh;
+    margin-bottom: 1rem;
 }
 
 // .submitButton {
@@ -55,8 +55,8 @@
 .modalTitle {
     color: var(--tree-text);
     font-family: Afacad_Flux !important;
-    font-size: 4vh;
+    font-size: var(--head-font-size);
     font-weight: 600;
     text-align: center;
-    margin: 2vh 0;
+    margin: 1rem 0;
 }

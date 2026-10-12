@@ -12,5 +12,9 @@
   "registration_failed": "Registration failed. Please try again.",
   "confirmation_failed": "Confirmation failed. Please try again.",
   "invalid_confirmation_code": "Invalid confirmation code.",
-  "account_activated": "Account successfully activated"
+  "account_activated": "Account successfully activated",
+  "account_delete_invalid_request": "Please provide your current password and verification.",
+  "account_delete_password_invalid": "Current password is incorrect.",
+  "account_delete_failed": "Account deletion failed. Please try again.",
+  "account_deleted": "Account and uploaded submissions deleted."
 }

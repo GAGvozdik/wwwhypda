@@ -13,7 +13,7 @@ export const sendAllDataToServer = async (recaptchaToken: string) => {
   const payload = insertData();
 
   try {
-    const response = await api.post("/input/submit", { ...payload, recaptcha_token: recaptchaToken }, {
+    await api.post("/input/submit", { ...payload, recaptcha_token: recaptchaToken }, {
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN": getCsrfTokenFromCookie(),
@@ -21,23 +21,23 @@ export const sendAllDataToServer = async (recaptchaToken: string) => {
       withCredentials: true, // Отправлять HttpOnly cookie (JWT)
     });
 
-    console.log("Данные успешно отправлены:", response.data);
-  } catch (error: any) {
-    console.error("Ошибка при отправке:", error.response?.data || error.message);
+    console.log("Данные успешно отправлены");
+  } catch {
+    console.warn("Ошибка при отправке данных");
   }
 };
 
 export const completeSubmission = async (id: string) => {
   try {
-    const response = await api.post(`/input/complete/${id}`, {}, {
+    await api.post(`/input/complete/${id}`, {}, {
         headers: {
             'X-CSRF-TOKEN': getCsrfTokenFromCookie()
         },
-        withCredentials: true 
+        withCredentials: true
     });
-    console.log("Submission completed:", response.data);
-  } catch (error: any) {
-    console.error("Error completing submission:", error.response?.data || error.message);
+    console.log("Submission completed");
+  } catch {
+    console.warn("Error completing submission");
   }
 };
 
@@ -54,13 +54,33 @@ const insertData = () => {
 export const useStepsTheme = () => {
   const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
-  const theme = themeQuartz.withPart(colorSchemeDark).withParams({
-    fontFamily: "Afacad_Flux !important",
+  const baseTheme = isDarkTheme ? themeQuartz.withPart(colorSchemeDark) : themeQuartz;
+  const theme = baseTheme.withParams({
+    fontFamily: "Afacad_Flux",
+    fontSize: "var(--main-font-size)",
+    cellFontSize: "var(--main-font-size)",
+    headerFontSize: "var(--main-font-size)",
+    backgroundColor: "var(--table-color)",
+    headerBackgroundColor: "var(--form-color)",
+    borderColor: "var(--table-border-color)",
+    accentColor: "var(--tree-text)",
+    selectedRowBackgroundColor: "var(--tree-hover)",
+    rowHoverColor: "var(--tree-hover)",
+    cellEditingBorder: { color: "var(--tree-text)", width: "1px" },
+    inputFocusBorder: { color: "var(--tree-text)", width: "1px" },
+    rowHeight: "2.5rem",
+    headerHeight: "2.5rem",
+    listItemHeight: "2.5rem",
+    iconSize: "1rem",
+    spacing: "0.375rem",
+
     foregroundColor: isDarkTheme ? "var(--tree-text)" : "var(--border)",
     headerTextColor: "var(--tree-text)",
-    rangeSelectionBorderColor: "var(--tree-text)",
-    rangeSelectionBackgroundColor: "var(--scrollbar-track-color)",
-    columnBorder: { color: isDarkTheme ? '#33383d' : "lightgrey", width: '1px' },
+    columnBorder: { color: 'var(--table-grid-line)', width: '1px', style: 'solid' },
+    rowBorder: { color: 'var(--table-grid-line)', width: '1px', style: 'solid' },
+    headerColumnBorder: { color: 'var(--table-grid-line)', width: '1px', style: 'solid' },
+    headerColumnBorderHeight: '100%',
+    headerRowBorder: { color: 'var(--table-grid-line)', width: '1px', style: 'solid' },
   });
 
   return theme;
@@ -72,26 +92,26 @@ export const CustomStepIconRoot = styled('div')<{ ownerState: { active?: boolean
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: '50%',
-    width: '4vh',
-    height: '4vh',
-    fontSize: '2vh',
+    width: '2rem',
+    height: '2rem',
+    fontSize: 'var(--main-font-size)',
     fontFamily: 'Afacad_Flux',
-    color: 'var(--step-color-active)', 
+    color: 'var(--step-color-active)',
     transition: '0.8s',
   })
 );
 
 export const StepNumberCircle = styled('div')<{ ownerState: { active?: boolean } }>(
   ({ ownerState }) => ({
-    width: '4vh',
-    height: '4vh',
+    width: '2rem',
+    height: '2rem',
     borderRadius: '50%',
-    backgroundColor: ownerState.active ? 'var(--step-color-active)' : 'var(--step-color)',  
+    backgroundColor: ownerState.active ? 'var(--step-color-active)' : 'var(--step-color)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: '2vh',
-    color: 'var(--step-text)', 
+    fontSize: 'var(--main-font-size)',
+    color: 'var(--step-text)',
     fontWeight: ownerState.active ? 'bold' : '',
     transition: '0.8s',
   })

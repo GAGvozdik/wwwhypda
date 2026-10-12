@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 
 import { ModuleRegistry } from 'ag-grid-community';
-import { ClientSideRowModelModule, PaginationModule, ValidationModule } from 'ag-grid-community';
+import { AllCommunityModule } from 'ag-grid-community';
 
 import { Provider } from 'react-redux';
 import store from './redux/store';
@@ -15,9 +15,7 @@ import App from './App';
 // ModuleRegistry.registerModules(AllEnterpriseModules);
 
 ModuleRegistry.registerModules([
-    ClientSideRowModelModule,
-    PaginationModule,
-    ValidationModule
+    AllCommunityModule
 ]);
 
 // import reportWebVitals from './reportWebVitals';

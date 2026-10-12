@@ -9,17 +9,18 @@ export interface UserButtonProps {
     disabled?: boolean;
 }
 
-const UserButton: React.FC<UserButtonProps> = ({ text, isLoading, onclick  }) => {
+const UserButton: React.FC<UserButtonProps> = ({ text, isLoading, onclick, disabled }) => {
     return (
         <button
-            type="submit"
+            type={onclick ? "button" : "submit"}
             className={styles.submitButton}
-            disabled={isLoading}
+            disabled={isLoading || disabled}
+            aria-busy={isLoading}
             onClick={onclick ? onclick : undefined}
         >
             {isLoading ? (
                 <CircularProgress
-                    size={30}
+                    size="1.5rem"
                     sx={{
                         color: 'var(--border)',
                         display: 'flex',

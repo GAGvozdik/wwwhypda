@@ -2,6 +2,8 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta, timezone
 import secrets
+import hashlib
+import hmac
 from flask import current_app
 
 # Initialize SQLAlchemy instance (assuming `db` is imported from `auth.mail`)
@@ -37,6 +39,11 @@ class User(db.Model):
     def set_password(self, password):
         """Хэширует пароль и сохраняет его"""
         self.password = generate_password_hash(password)
+
+    def session_version(self):
+        """Привязывает JWT к аккаунту, защищая от повторного использования id после удаления."""
+        return hmac.new(current_app.config["JWT_SECRET_KEY"].encode(),
+            f"{self.id}:{self.email}:{self.password}".encode(), hashlib.sha256).hexdigest()
 
     def check_password(self, password):
         """Проверяет пароль на соответствие хэшу"""
@@ -184,7 +191,7 @@ class User(db.Model):
         user = cls.query.filter_by(email=email, active=True).first()
         if user and check_password_hash(user.password, password):
             return {"id": user.id, "name": user.name, "email": user.email,"is_superuser": user.is_superuser,  # 👈 обязательно добавь это!
-                "active": user.active}
+                "active": user.active, "account_version": user.session_version()}
         return None
 
 
@@ -229,23 +236,30 @@ class ConfirmationCode(db.Model):
     type = db.Column(db.String(50), nullable=False)  # Either "registration" or "password_reset"
     
     @classmethod
-    def create_code(cls, email: str, type: str):
+    def create_code(cls, email: str, type: str, commit=True):
         """
         Generates a 6-digit confirmation code and stores it in the database.
         Returns the created confirmation code object.
         """
+        user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
+        if type == "password_reset" and (not user or not user.active):
+            return None
         code = str((secrets.randbelow(900000) + 100000))
         confirmation_code = cls(email=email, code=code, type=type)
         db.session.add(confirmation_code)
-        db.session.commit()
+        if commit:
+            db.session.commit()
         return confirmation_code
 
     @classmethod
     def verify_code(cls, email: str, code: str, type: str):
         """
-        ????????? ??? ? ??????? ???????????? ????? ???????? (???? ? 2 ??????).
+        Проверяет код в течение настроенного срока действия (цель — 2 минуты).
         Returns True if valid, otherwise False.
         """
+        user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
+        if not user:
+            return False
         confirmation_code = cls.query.filter_by(email=email, code=code, type=type).with_for_update().first()
         if not confirmation_code:
             return False
@@ -262,14 +276,14 @@ class ConfirmationCode(db.Model):
 
     @classmethod
     def ttl_seconds(cls, code_type):
-        """?????????? ???? ???? ????; ??????????? ??? ?? ????????? ???????????."""
+        """Возвращает срок типа кода; неизвестный тип не считается действующим."""
         setting = {"registration": "CONFIRMATION_CODE_TTL_SECONDS",
                    "password_reset": "PASSWORD_RESET_CODE_TTL_SECONDS"}.get(code_type)
         return current_app.config[setting] if setting else None
 
     @classmethod
     def cleanup_expired(cls, now=None):
-        """??????? ????????/???????????? ???? ????? ???????????, ??? ???????? ?????????."""
+        """Удаляет истёкшие/некорректные коды одной транзакцией, без удаления аккаунтов."""
         from sqlalchemy import and_, or_
         now = now or datetime.now(timezone.utc)
         if now.tzinfo is None:

@@ -1,6 +1,10 @@
+import windowStyles from '../mainWindow/windowStyles.module.scss';
+import messages from '../../common/error_messages.json';
 import React, {useState} from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import styles from '../menu.module.scss';
+import userStyles from '../users/users.module.scss';
+import pageStyles from './inputPage.module.scss';
 import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
@@ -81,22 +85,27 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     };
 
     return (
-        <div className={styles.treeText}>
+        <div className={`${styles.treeText} ${windowStyles.contentGroup}`}>
 
-            <div style={{ 
+            <div style={{
                     display: 'flex',
-                    justifyContent: 'center', 
-                    fontFamily: 'Afacad_Flux !important',
-                    fontSize: '5vh',
-                    padding: '1vh',
-                    
+                    justifyContent: 'center',
+                    fontFamily: 'Afacad_Flux',
+                    fontSize: 'calc(var(--main-font-size) * 2.5)',
+                    padding: '0.5rem',
+
                 }}
             >
-                INPUT PAGE
+                {messages.input_page_title}
             </div>
 
-            <p>Datasets submitted here are intended for review and public sharing. Do not upload private or sensitive personal information. See the <Link to="/user-agreement" target="_blank" rel="noopener noreferrer">User Agreement</Link> and <Link to="/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy Policy</Link>.</p>
             <CustomStepper handleClick={handleSomething} isLoading={isLoading} isEditable={true}/>
+            <p className={pageStyles.submissionNotice}>
+                {messages.dataset_submission_notice}{' '}
+                <Link className={userStyles.policyLink} to="/user-agreement" target="_blank" rel="noopener noreferrer">{messages.user_agreement}</Link>
+                {' '}{messages.legal_link_and}{' '}
+                <Link className={userStyles.policyLink} to="/privacy-policy" target="_blank" rel="noopener noreferrer">{messages.privacy_policy}</Link>.
+            </p>
         </div>
     );
 };

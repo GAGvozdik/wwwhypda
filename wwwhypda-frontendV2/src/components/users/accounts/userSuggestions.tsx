@@ -1,3 +1,10 @@
+import type { ColDef } from 'ag-grid-community';
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import { useSelector } from 'react-redux';
+import accountStyles from './accountsStyles.module.scss';
+import type { State, DynamicRowData } from '../../../common/types';
+import menuStyles from '../../menu.module.scss';
+import messages from '../../../common/error_messages.json';
 import React, { useState, useEffect, useMemo } from 'react';
 // import styles from './accountsStyles.module.scss';
 // import styles from '../../inputData/stepper.module.scss';
@@ -25,6 +32,7 @@ import { getCsrfTokenFromCookie } from '../../../common/types';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 
 const UserSuggestions: React.FC = () => {
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
     const [allSuggestions, setAllSuggestions] = useState<any[]>([]);
     const [error, setError] = useState('');
@@ -43,10 +51,10 @@ const UserSuggestions: React.FC = () => {
 
             const csrfToken = getCsrfTokenFromCookie();
             if (!csrfToken) {
-                setError("CSRF token not found in cookie");
+                setError(messages.csrf_missing);
                 return;
             }
-            const response = await api.delete(`/input/delete_submission/${submissionId}`, {
+            await api.delete(`/input/delete_submission/${submissionId}`, {
                 withCredentials: true,
                 headers: {
                     "X-CSRF-TOKEN": csrfToken,
@@ -54,13 +62,13 @@ const UserSuggestions: React.FC = () => {
                 },
             });
 
-            console.log("Delete response:", response.data);
+            console.log("Submission deleted");
             // Удаляем из таблицы
             setAllSuggestions(prev => prev.filter(item => item.id !== submissionId));
 
-        } catch (error: any) {
-            console.error("Error deleting submission:", error.response?.data || error.message);
-            setError('Error deleting submission');
+        } catch {
+            console.error("Error deleting submission:");
+            setError(messages.submission_delete_failed);
         } finally {
             setIsLoading(false);
         }
@@ -74,14 +82,14 @@ const UserSuggestions: React.FC = () => {
         try {
             setIsLoading(true);
             const response = await api.get("/input/my_submissions", {
-            withCredentials: true, 
+            withCredentials: true,
             });
 
             setAllSuggestions(response.data);
 
-        } catch (error: any) {
-            console.error("Error in my_submissions recieving:", error.response?.data || error.message);
-            setError(error.message)
+        } catch {
+            console.error("Error in my_submissions recieving:");
+            setError(messages.suggestions_failed)
             return [];
         }
         finally {
@@ -91,11 +99,11 @@ const UserSuggestions: React.FC = () => {
 
     const handleClick = (data: any) => {
         openModal({
-            title: 'Are you sure you want to start reading your data?',
-            description: 'All current sample data in add data page will be permanently erased!',
+            title: messages.read_data_confirm,
+            description: messages.read_data_description,
             buttons: [
                 {
-                    label: 'Go to reading',
+                    label: messages.read_data_action,
                     onClick: () => {
                         // Очистка старых данных
                         localStorage.removeItem("generalInfoData");
@@ -115,15 +123,15 @@ const UserSuggestions: React.FC = () => {
                             localStorage.setItem("activeStep", "0");
 
                             console.log("Данные успешно записаны в localStorage.");
-                        } catch (e) {
-                            console.error("Ошибка при сохранении в localStorage:", e);
+                        } catch {
+                            console.error("Ошибка при сохранении в localStorage:");
                         }
 
                         navigate('/read');
                     }
                 },
                 {
-                    label: 'Cancel',
+                    label: messages.cancel,
                     onClick: () => {
                         console.log("Редактирование отменено.");
                     }
@@ -136,9 +144,9 @@ const UserSuggestions: React.FC = () => {
     const { openModal} = useModal();
 
 
-    const columnDefs = useMemo(() => [
+    const columnDefs = useMemo<ColDef<DynamicRowData>[]>(() => [
         {
-            headerName: 'Created At',
+            headerName: messages.ui_created_at,
             field: 'created_at',
             sortable: true,
             filter: true,
@@ -148,7 +156,7 @@ const UserSuggestions: React.FC = () => {
             },
         },
         {
-            headerName: 'Status',
+            headerName: messages.ui_status,
             field: 'status',
             flex: 1,
             valueFormatter: (params: any) => {
@@ -157,18 +165,18 @@ const UserSuggestions: React.FC = () => {
         },
 
         {
-            headerName: 'Actions',
+            headerName: messages.column_actions,
             field: 'actions',
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
 
-                    <Tooltip title="Delete your data">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.ui_delete_your_data}>
                         <IconButton onClick={() => delMySubmission(data.id)}>
                             <DeleteIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
 
-                    <Tooltip title="Read your data">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.ui_read_your_data}>
                         <IconButton onClick={() => handleClick(data)}>
                             <AutoStoriesIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
@@ -180,31 +188,34 @@ const UserSuggestions: React.FC = () => {
             minWidth: 200,
             maxWidth: 300
         },
-    ], []);
+    ], [isDarkTheme]);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "50vh", 
-        "--ag-background-color": "var(--table-color)", 
-        marginTop: '0vh', 
-        marginBottom: '0vh',
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
+        height: "25rem",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
     return (
-        <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important'}}>
+        <div className={accountStyles.accountPage} style={{ color: 'var(--tree-text)', fontSize: 'var(--main-font-size)', fontFamily: 'Afacad_Flux !important'}}>
 
-            <div style={{ margin: '5vh' }}>
+            <div style={{ margin: '1rem 0' }}>
 
                 <div style={containerStyle}>
-                    <SingleSkeleton loading={isLoading} error={error} height={'50vh'}>
+                    <SingleSkeleton loading={isLoading} error={error} height={'25rem'}>
                         <AgGridReact
+                            defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true }}
                             theme={themeDarkBlue}
                             rowData={allSuggestions}
-                            columnDefs={columnDefs}
+                            columnDefs={scaledColumns}
                             pagination={true}
                             paginationPageSize={10}
                             paginationPageSizeSelector={[10, 20, 50, 100]}

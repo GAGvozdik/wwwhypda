@@ -1,3 +1,8 @@
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import { useSelector } from 'react-redux';
+import accountStyles from './accountsStyles.module.scss';
+import type { State } from '../../../common/types';
+import menuStyles from '../../menu.module.scss';
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from './../users.module.scss';
 // import axios from 'axios';
@@ -6,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 // import { State } from '../../../common/types';
 // import { useSelector, useDispatch } from 'react-redux';
 import { AgGridReact } from 'ag-grid-react';
+import type { ColDef } from 'ag-grid-community';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { IconButton, Tooltip } from '@mui/material';
 import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
@@ -14,15 +20,20 @@ import LoadIcon from '../../commonFeatures/loadIcon';
 import SingleSkeleton from '../../commonFeatures/singleSkeleton';
 import InputSuggestions from './inputSuggestions';
 import api from '../../api';
+import axios from 'axios';
+import DeleteAccount from './deleteAccount';
+import messages from '../../../common/error_messages.json';
+import type { AccountProfile } from '../../../common/types';
 import { getCsrfTokenFromCookie, clearAllCookies } from '../../../common/types';
 
 
 const SuperuserAccount: React.FC = () => {
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
     const navigate = useNavigate();
 
-    const [userData, setUserData] = useState<any>(null);
-    const [allUsers, setAllUsers] = useState<any[]>([]);
+    const [userData, setUserData] = useState<AccountProfile | null>(null);
+    const [allUsers, setAllUsers] = useState<AccountProfile[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -40,8 +51,9 @@ const SuperuserAccount: React.FC = () => {
                 withCredentials: true,
             });
             setUserData(response.data.data);
-        } catch (error: any) {
-            setError(error.response?.data?.error || 'Error fetching user data');
+        } catch (error: unknown) {
+            if (axios.isCancel(error)) return;
+            setError(messages.account_fetch_failed);
         } finally {
             setIsLoading(false);
         }
@@ -53,8 +65,9 @@ const SuperuserAccount: React.FC = () => {
                 withCredentials: true,
             });
             setAllUsers(response.data.data);
-        } catch (error: any) {
-            setError(error.response?.data?.error || 'Error fetching all users');
+        } catch (error: unknown) {
+            if (axios.isCancel(error)) return;
+            setError(messages.account_users_fetch_failed);
         }
     };
 
@@ -71,14 +84,14 @@ const SuperuserAccount: React.FC = () => {
 
             if (res.status === 200) {
                 localStorage.removeItem('isSuperuser');
-                clearAllCookies(); 
+                clearAllCookies();
                 navigate('/login', { replace: true });
             }
         } catch (err) {
-            console.error("Ошибка при выходе:", err);
+            if (!axios.isCancel(err)) console.warn('Logout failed');
         } finally {
             localStorage.removeItem('isSuperuser');
-            clearAllCookies(); 
+            clearAllCookies();
             navigate('/login', { replace: true });
         }
     };
@@ -87,7 +100,7 @@ const SuperuserAccount: React.FC = () => {
     const performAction = async (url: string, userId: number) => {
         const csrfToken = getCsrfTokenFromCookie();
         if (!csrfToken) {
-            setError("CSRF token not found in cookie");
+            setError(messages.csrf_missing);
             return;
         }
 
@@ -99,49 +112,50 @@ const SuperuserAccount: React.FC = () => {
                 },
             });
             fetchAllUsers();
-        } catch (err: any) {
-            setError(err.response?.data?.error || 'Ошибка при отправке запроса');
-            console.error(err);
+        } catch (err: unknown) {
+            if (axios.isCancel(err)) return;
+            setError(messages.account_action_failed);
+            console.warn('Account action failed');
         }
     };
 
-    const columnDefs = useMemo(() => [
-        { headerName: 'ID', field: 'id', sortable: true, filter: true, flex: 1 },
-        { headerName: 'Name', field: 'name', sortable: true, filter: true, flex: 1 },
-        { headerName: 'Email', field: 'email', sortable: true, filter: true, flex: 2 },
+    const columnDefs = useMemo<ColDef<AccountProfile>[]>(() => [
+        { headerName: messages.column_id, field: 'id', sortable: true, filter: true, flex: 1 },
+        { headerName: messages.account_name, field: 'name', sortable: true, filter: true, flex: 1 },
+        { headerName: messages.account_email, field: 'email', sortable: true, filter: true, flex: 2 },
         {
-            headerName: 'Active',
+            headerName: messages.column_active,
             field: 'active',
-            cellRenderer: ({ value }: any) => value ? 'Yes' : 'No',
+            cellRenderer: ({ value }: { value: boolean }) => value ? messages.yes : messages.no,
             flex: 1
         },
         {
-            headerName: 'Superuser',
+            headerName: messages.column_superuser,
             field: 'is_superuser',
-            cellRenderer: ({ value }: any) => value ? 'Yes' : 'No',
+            cellRenderer: ({ value }: { value: boolean }) => value ? messages.yes : messages.no,
             flex: 1
         },
         {
-            headerName: 'Actions',
-            field: 'actions',
-            cellRenderer: ({ data }: any) => (
+            headerName: messages.column_actions,
+            colId: 'actions',
+            cellRenderer: ({ data }: { data: AccountProfile }) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Deactivate User">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.deactivate_user}>
                         <IconButton onClick={() => performAction('/admin/deactivate', data.id)}>
                             <PersonOff sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Activate User">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.activate_user}>
                         <IconButton onClick={() => performAction('/admin/activate', data.id)}>
                             <CheckCircleIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Promote to Superuser">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.promote_superuser}>
                         <IconButton onClick={() => performAction('/admin', data.id)}>
                             <Security sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Remove Superuser Status">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.remove_superuser}>
                         <IconButton onClick={() => performAction('/admin/remove-super', data.id)}>
                             <DoDisturb sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
@@ -151,32 +165,35 @@ const SuperuserAccount: React.FC = () => {
             minWidth: 200,
             maxWidth: 300
         }
-    ], []);
+    ], [isDarkTheme]);
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "50vh", 
-        "--ag-background-color": "var(--table-color)", 
-        marginTop: '0vh', 
-        marginBottom: '0vh',
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
+        height: "25rem",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
     return (
-        <div style={{ height: '84vh', color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important', overflowY: 'scroll' }}>
-            <div className={styles.formTitle} style={{ fontSize: '4.5vh' }}>Super Account</div>
-            <div style={{ margin: '5vh' }}>
+        <div className={accountStyles.accountPage} style={{ color: 'var(--tree-text)', fontSize: 'var(--main-font-size)', fontFamily: 'Afacad_Flux !important' }}>
+            <div className={styles.formTitle} style={{ fontSize: 'calc(var(--main-font-size) * 2.25)' }}>{messages.superaccount_title}</div>
+            <div style={{ margin: '1rem 0' }}>
 
 
                 <div style={containerStyle}>
-                    <SingleSkeleton loading={isLoading} error={error} height={'50vh'}>
+                    <SingleSkeleton loading={isLoading} error={error} height={'25rem'}>
                         <AgGridReact
+                            defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true }}
                             theme={themeDarkBlue}
                             rowData={allUsers}
-                            columnDefs={columnDefs}
+                            columnDefs={scaledColumns}
                             pagination={true}
                             paginationPageSize={10}
                             paginationPageSizeSelector={[10, 20, 50, 100]}
@@ -190,28 +207,28 @@ const SuperuserAccount: React.FC = () => {
 
 
                 {isLoading ? (
-                    <div style={{height: '8.3vh', display: 'flex', alignItems: 'center', justifyContent:'center'}}>
+                    <div style={{height: '4.15rem', display: 'flex', alignItems: 'center', justifyContent:'center'}}>
                         <LoadIcon size={20} />
                     </div>
                 ) : error ? (
                     <p style={{ color: 'var(--error-text)' }}>{error}</p>
                 ) : userData ? (
-                    <div style={{ marginTop: '3vh', marginBottom: '3vh' }}>
-                        <div>Name: {userData.name}</div>
-                        <div>Email: {userData.email}</div>
+                    <div style={{ marginTop: '1.5rem', marginBottom: '1.5rem' }}>
+                        <div>{messages.account_name}: {userData.name}</div>
+                        <div>{messages.account_email}: {userData.email}</div>
                     </div>
                 ) : null}
 
             </div>
 
+            <DeleteAccount />
             <InputSuggestions />
 
             <button
                 onClick={handleLogout}
-                className={styles.submitButton}
-                style={{width: '30%', margin: '0% 35% 0% 35%'}}
+                className={`${styles.submitButton} ${styles.logoutButton}`}
             >
-                Log Out
+                {messages.logout}
             </button>
 
         </div>

@@ -1,3 +1,10 @@
+import type { ColDef } from 'ag-grid-community';
+import useRemColumns from '../../commonFeatures/useRemColumns';
+import { useSelector } from 'react-redux';
+import accountStyles from './accountsStyles.module.scss';
+import type { State, DynamicRowData } from '../../../common/types';
+import menuStyles from '../../menu.module.scss';
+import messages from '../../../common/error_messages.json';
 import React, { useState, useEffect, useMemo } from 'react';
 import styles from './../users.module.scss';
 // import axios from 'axios';
@@ -19,6 +26,7 @@ import { useModal } from '../../modal/modalContext';
 import api from '../../api';
 
 const InputSuggestions: React.FC = () => {
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
     const [allSuggestions, setAllSuggestions] = useState<any[]>([]);
     const [error, setError] = useState('');
@@ -37,33 +45,33 @@ const InputSuggestions: React.FC = () => {
             });
             setAllSuggestions(response.data.data);
 
-        } catch (error: any) {
-            setError(error.response?.data?.error || 'Error fetching suggestions data');
+        } catch {
+            setError(messages.suggestions_failed);
         } finally {
             setIsLoading(false);
         }
     };
 
-    const columnDefs = useMemo(() => [
+    const columnDefs = useMemo<ColDef<DynamicRowData>[]>(() => [
         {
-            headerName: 'ID',
+            headerName: messages.column_id,
             field: 'id',
             sortable: true,
             filter: true,
             flex: 1,
         },
         {
-            headerName: 'Name',
+            headerName: messages.account_name,
             field: 'username',
             sortable: true,
             filter: true,
             flex: 1,
             valueFormatter: (params: any) => {
-                return params.value || '—'; 
+                return params.value || '—';
             },
         },
         {
-            headerName: 'Created At',
+            headerName: messages.ui_created_at,
             field: 'created_at',
             sortable: true,
             filter: true,
@@ -73,7 +81,7 @@ const InputSuggestions: React.FC = () => {
             },
         },
         {
-            headerName: 'Status',
+            headerName: messages.ui_status,
             field: 'status',
             flex: 1,
             valueFormatter: (params: any) => {
@@ -81,7 +89,7 @@ const InputSuggestions: React.FC = () => {
             },
         },
         {
-            headerName: 'Editing By',
+            headerName: messages.ui_editing_by,
             field: 'editing_by',
             flex: 1,
             valueFormatter: (params: any) => {
@@ -89,16 +97,16 @@ const InputSuggestions: React.FC = () => {
             },
         },
         {
-            headerName: 'Actions',
+            headerName: messages.column_actions,
             field: 'actions',
             cellRenderer: ({ }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Submit request">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.ui_submit_request}>
                         <IconButton onClick={() =>{}}>
                             <CheckCircleOutlineIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title="Deny request">
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.ui_deny_request}>
                         <IconButton onClick={() => {}}>
                             <DoDisturbIcon sx={{ color: 'var(--tree-text)' }} />
                         </IconButton>
@@ -109,22 +117,22 @@ const InputSuggestions: React.FC = () => {
             maxWidth: 300
         },
         {
-            headerName: 'Link to view',
+            headerName: messages.ui_link_to_view,
             field: 'status',
             flex: 1,
             cellRenderer: ({ data }: any) => (
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <Tooltip title="Tap to view">
-                        <div 
-                        className={styles.link} 
-                        onClick={() => handleClick(data.id)} 
-                        role="button" 
-                        tabIndex={0} 
+                    <Tooltip slotProps={{ popper: { className: `${accountStyles.accountTooltip} ${isDarkTheme ? menuStyles.dark : ''}` } }} title={messages.ui_tap_to_view}>
+                        <div
+                        className={styles.link}
+                        onClick={() => handleClick(data.id)}
+                        role="button"
+                        tabIndex={0}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') handleClick(data.id);
                         }}
                         >
-                        Tap to view
+                        {messages.ui_tap_to_view}
                         </div>
 
                     </Tooltip>
@@ -133,25 +141,27 @@ const InputSuggestions: React.FC = () => {
             minWidth: 200,
             maxWidth: 300
         },
-    ], []);
+    ], [isDarkTheme]);
 
 
+    const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
 
-    const containerStyle = useMemo(() => ({ 
-        width: "100%", 
-        height: "50vh", 
-        "--ag-background-color": "var(--table-color)", 
-        marginTop: '0vh', 
-        marginBottom: '0vh',
+    const containerStyle = useMemo(() => ({
+        width: "100%",
+        maxWidth: "72rem",
+        height: "25rem",
+        "--ag-background-color": "var(--table-color)",
+        marginTop: '0rem',
+        marginBottom: '0rem',
         "--ag-font-family": "Afacad_Flux",
         "--ag-font-size": 'var(--tree-font-size)'
-    }), []);    
+    }), []);
 
-    
+
     const { openModal, closeModal } = useModal();
     const navigate = useNavigate();
-    
+
     const handleClick = async (id: number) => {
         try {
             const response = await api.get(`/input/get_input_by_id/${id}`, {
@@ -186,8 +196,8 @@ const InputSuggestions: React.FC = () => {
                     navigate(`/edit`);
                     closeModal();
                     getSuggestionsData();
-                } catch (error) {
-                    console.error("Error in handleGoToEditing:", error);
+                } catch {
+                    console.error("Error in handleGoToEditing:");
                 }
             };
 
@@ -198,10 +208,10 @@ const InputSuggestions: React.FC = () => {
                 });
                 currentUserData = response.data.data;
                 // setUserData(currentUserData);
-            } catch (error: any) {
-                setError(error.response?.data?.error || 'Error fetching user data');
-                console.error("Could not fetch user data, aborting handleClick.", error);
-                return; 
+            } catch {
+                setError(messages.account_fetch_failed);
+                console.error("Could not fetch user data, aborting handleClick.");
+                return;
             }
 
             if (!currentUserData) {
@@ -213,11 +223,11 @@ const InputSuggestions: React.FC = () => {
             if (data.status == 'Completed') {
                 console.log('2 condition is true');
                 openModal({
-                    title: 'Are you sure you want to start reading your data?',
-                    description: 'This data set have been checked by one superuser. You can only read this data. All current sample data in add data page will be permanently erased if you go to read!',
+                    title: messages.read_data_confirm,
+                    description: messages.read_checked_description,
                     buttons: [
                         {
-                            label: 'Go to reading',
+                            label: messages.read_data_action,
                             onClick: () => {
                                 // Очистка старых данных
                                 localStorage.removeItem("generalInfoData");
@@ -237,15 +247,15 @@ const InputSuggestions: React.FC = () => {
                                     localStorage.setItem("activeStep", "0");
 
                                     console.log("Данные успешно записаны в localStorage.");
-                                } catch (e) {
-                                    console.error("Ошибка при сохранении в localStorage:", e);
+                                } catch {
+                                    console.error("Ошибка при сохранении в localStorage:");
                                 }
 
                                 navigate('/read');
                             }
                         },
                         {
-                            label: 'Cancel',
+                            label: messages.cancel,
                             onClick: () => {
                                 console.log("Редактирование отменено.");
                             }
@@ -256,15 +266,15 @@ const InputSuggestions: React.FC = () => {
             } else if ((data.editing_by == null) || (data.editing_by == currentUserData.name)){
                 console.log('1 condition is true');
                 openModal({
-                    title: 'Are you sure you want to start editing?',
-                    description: 'All current sample data will be permanently erased!',
+                    title: messages.edit_data_confirm,
+                    description: messages.edit_data_description,
                     buttons: [
                         {
-                            label: 'Go to editing',
+                            label: messages.edit_data_action,
                             onClick: handleGoToEditing
                         },
                         {
-                            label: 'Cancel',
+                            label: messages.cancel,
                             onClick: () => {
                                 getSuggestionsData();
                                 closeModal();
@@ -272,16 +282,16 @@ const InputSuggestions: React.FC = () => {
                         }
                     ]
                 });
-            
+
 
             } else {
                 console.log('3 condition is true');
                 openModal({
-                    title: `You can\'t edit this data! Please wait ...`,
-                    description: `This data set is editing by ${data.editing_by}`,
+                    title: messages.edit_data_unavailable,
+                    description: messages.edit_data_owner.replace('{name}', data.editing_by || ''),
                     buttons: [
                         {
-                            label: 'Cancel',
+                            label: messages.cancel,
                             onClick: () => {
                                 console.log("Редактирование отменено.");
                             }
@@ -290,8 +300,8 @@ const InputSuggestions: React.FC = () => {
                 });
             }
 
-        } catch (error) {
-            console.error("Ошибка при получении данных:", error);
+        } catch {
+            console.error("Ошибка при получении данных:");
         }
     };
 
@@ -299,16 +309,17 @@ const InputSuggestions: React.FC = () => {
 
 
     return (
-        <div style={{ color: 'var(--tree-text)', fontSize: '2vh', fontFamily: 'Afacad_Flux !important'}}>
+        <div className={accountStyles.accountPage} style={{ color: 'var(--tree-text)', fontSize: 'var(--main-font-size)', fontFamily: 'Afacad_Flux !important'}}>
 
-            <div style={{ margin: '5vh' }}>
+            <div style={{ margin: '1rem 0' }}>
 
                 <div style={containerStyle}>
-                    <SingleSkeleton loading={isLoading} error={error} height={'50vh'}>
+                    <SingleSkeleton loading={isLoading} error={error} height={'25rem'}>
                         <AgGridReact
+                            defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true }}
                             theme={themeDarkBlue}
                             rowData={allSuggestions}
-                            columnDefs={columnDefs}
+                            columnDefs={scaledColumns}
                             pagination={true}
                             paginationPageSize={10}
                             paginationPageSizeSelector={[10, 20, 50, 100]}

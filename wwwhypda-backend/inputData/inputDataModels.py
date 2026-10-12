@@ -52,11 +52,10 @@ class InputData(db.Model):
     @classmethod
     def save_submission(cls, user_id: int, data: dict):
         try:
-            user = User.get_by_id(user_id)
-            if user:
-                name = user["name"]
-            else:
-                name = "Unknown"
+            user = User.query.filter_by(id=user_id, active=True).populate_existing().with_for_update().first()
+            if not user:
+                return None
+            name = user.name
 
             entry = cls(
                 user_id=user_id,

@@ -13,6 +13,7 @@
     --tree-font-size: 1rem;
 
     --color-scheme: light;
+    --transparent-color: transparent;
 
     --menu: #639da8;
     --error-text: #ff6666;
@@ -27,12 +28,16 @@
     --icons: white;
     --icon-hover-color: rgb(197, 242, 255);
     --buttons: #4a96a3;
-    --border: #4a96a3; 
-    --drawer-color: #fff2d9;  
+    --border: #4a96a3;
+    --table-border-color: lightgrey;
+    --table-grid-line: color-mix(in srgb, var(--tree-text) 36%, var(--table-color));
+    --drawer-color: #fff2d9;
     --drawer-border-color: #4a96a3;
     --input: rgb(255, 255, 255);
     --input-hover: rgba(255, 255, 255, 0.543);
     --input-placeholder: grey;
+    --input-text: #333333;
+    --success-text: #2f753c;
     --submit-button-text: rgb(255, 255, 255);
     --submit-button-text-hover: rgb(255, 255, 255);
     --submit-button-hover: #4a96a3ae;
@@ -43,9 +48,9 @@
     --radio-color: #4a96a3;
     --scrollbar-color: #4a96a3ae;
     --scrollbar-hover-color: #4a96a351;
-    --table-color: #fff2d9; 
-    --step-color-active: #358e9d; 
-    --step-color: #4a96a383; 
+    --table-color: #fff2d9;
+    --step-color-active: #358e9d;
+    --step-color: #4a96a383;
     --step-text: #fff2d9;
     --scrollbar-track-color: #fff2d9;
     --logo-color: #68aebc;
@@ -57,7 +62,7 @@
 }
 
 .dark {
-    
+
     --error-text: #913636;
     --menu: #101316;
     --tree-text: #949494;
@@ -72,12 +77,16 @@
     --icons: #949494;
     --icon-hover-color: rgb(201, 201, 201);
     --buttons: #4a96a3;
-    --border: #949494; 
-    --drawer-color: #22282e;  
+    --border: #949494;
+    --table-border-color: #33383d;
+    --table-grid-line: color-mix(in srgb, var(--tree-text) 36%, var(--table-color));
+    --drawer-color: #22282e;
     --drawer-border-color: #4a96a3;
     --input: rgba(255, 255, 255, 0.411);
     --input-hover: rgba(255, 255, 255, 0.623);
     --input-placeholder: #1d1d1d;
+    --input-text: #f7f6fc;
+    --success-text: #91b99a;
     --submit-button-text: #9c9c9c;
     --submit-button-text-hover: #9c9c9c;
     --submit-button-hover: #171c22;
@@ -89,10 +98,10 @@
     --scrollbar-color: #505861;
     --scrollbar-hover-color: #43494f;
     --scrollbar-track-color: #2f3841;
-    --table-color: #22282e; 
+    --table-color: #22282e;
     --color-scheme: dark;
-    --step-color-active: rgb(32, 78, 108); 
-    --step-color: rgb(51, 67, 78); 
+    --step-color-active: rgb(32, 78, 108);
+    --step-color: rgb(51, 67, 78);
     --step-text: #949494;
     --logo-color: #a4a4a4;
     --start-button: #2d6c80;
@@ -135,8 +144,8 @@ body {
 
 .search {
     position: relative;
-    border-radius: 6px; 
-    background-color: var(--search-color); 
+    border-radius: 6px;
+    background-color: var(--search-color);
     margin-left: 5%;
     width: 100%;
     transition: 0.5s;
@@ -153,7 +162,7 @@ body {
     font-size: var(--main-font-size);
 }
 
-    
+
 .treeLink{
     text-decoration: none;
 }
@@ -171,7 +180,7 @@ body {
     border: 3px solid var(--border);
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
-    
+
 }
 
 
@@ -215,17 +224,17 @@ input::placeholder {
     background-color: var(--menu);
     color: var(--submit-button-text);
     padding: 0.5rem;
-    
+
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    box-sizing: border-box;  
+    box-sizing: border-box;
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size);
     width: 85%;
-    margin-left: 10%; 
-    margin-right: 10%; 
-    
+    margin-left: 10%;
+    margin-right: 10%;
+
     transition: 0.5s;
 }
 
@@ -233,7 +242,7 @@ input::placeholder {
     transition: 0.5s;
     color: var(--submit-button-text-hover);
     background-color: var(--submit-button-hover);
-    
+
 }
 .submitButton:active  {
     transition: 0.5s;
@@ -279,21 +288,21 @@ input::placeholder {
 
 /* Track */
 ::-webkit-scrollbar-track {
-    background: var(--scrollbar-track-color); 
+    background: var(--scrollbar-track-color);
     border-radius: 8px;
     transition: 0.5s;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-color); 
+    background: var(--scrollbar-color);
     border-radius: 8px;
     transition: 0.5s;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-hover-color); 
+    background: var(--scrollbar-hover-color);
     border-radius: 8px;
     transition: 0.5s;
 }
@@ -306,4 +315,3 @@ input::placeholder {
 .ag-cell {
     font-size: var(--main-font-size);  // Размер шрифта для ячеек
 }
-

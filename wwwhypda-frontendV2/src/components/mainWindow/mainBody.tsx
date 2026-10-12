@@ -12,7 +12,7 @@ import { useRef} from 'react';
 // import Brightness4Icon from '@mui/icons-material/Brightness4';
 // import Brightness7Icon from '@mui/icons-material/Brightness7';
 // import IconButton from '@mui/material/IconButton';
-import styles from "./windowStyles.module.scss"; 
+import styles from "./windowStyles.module.scss";
 
 import { useSelector} from 'react-redux';
 // import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
@@ -36,7 +36,7 @@ import Documents from '../pages/documents';
 import Account from '../users/accounts/account';
 
 import InputPageRead from '../pages/InputPageRead';
-import InputPage from '../pages/inputPage'; 
+import InputPage from '../pages/inputPage';
 import InputPageEdit from '../pages/inputPageEdit';
 
 import ProtectedRoute from '../users/routes/protectedRoute';
@@ -53,7 +53,7 @@ import { ModalProvider } from '../modal/modalContext';
 
 export default function MainMenu() {
 
-    let isDarkTheme = useSelector((state: State) => state.isDarkTheme);  
+    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
     const modalRootRef = useRef<HTMLDivElement>(null);
 
     return (
@@ -65,10 +65,10 @@ export default function MainMenu() {
                     {/* <Route path="/contribute" element={<Contribute />} /> */}
                     <Route path="/documents" element={<Documents />} />
                     <Route path="/about" element={<About />} />
-                    <Route path="/notfound" element={<NotFound />} /> 
+                    <Route path="/notfound" element={<NotFound />} />
                     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                     <Route path="/cookie-policy" element={<CookiePolicy />} />
-                    <Route path="/user-agreement" element={<UserAgreement />} /> 
+                    <Route path="/user-agreement" element={<UserAgreement />} />
 
                     {/* <Route path="/account" element={
                         <AppProvider>
@@ -76,30 +76,30 @@ export default function MainMenu() {
                         </AppProvider>
                     } />  */}
 
-                    <Route 
-                        path="/account" 
+                    <Route
+                        path="/account"
                         element={
                             <ProtectedRoute>
                                 <SuperProtectedRoute redirectIfSuperuser={true}>
                                     <Account />
                                 </SuperProtectedRoute>
                             </ProtectedRoute>
-                        } 
+                        }
                     />
 
-                    <Route 
-                        path="/superaccount" 
-                        element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>} 
+                    <Route
+                        path="/superaccount"
+                        element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>}
                     />
 
-                    <Route 
-                        path="/read" 
-                        element={<ProtectedRoute><InputPageRead /></ProtectedRoute>} 
+                    <Route
+                        path="/read"
+                        element={<ProtectedRoute><InputPageRead /></ProtectedRoute>}
                     />
 
-                    <Route 
-                        path="/edit" 
-                        element={<SuperProtectedRoute><InputPageEdit /></SuperProtectedRoute>} 
+                    <Route
+                        path="/edit"
+                        element={<SuperProtectedRoute><InputPageEdit /></SuperProtectedRoute>}
                     />
 
                     <Route

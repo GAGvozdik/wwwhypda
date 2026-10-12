@@ -3,17 +3,20 @@
 .submitButton {
     background-color: var(--menu) !important;
     color: var(--submit-button-text) !important;
-    padding: 1vh !important;
-    
+    padding: 0.5rem !important;
+
     border: none !important;
     border-radius: 4px !important;
     cursor: pointer !important;
-    box-sizing: border-box !important;  
+    box-sizing: border-box !important;
     font-family: Afacad_Flux !important;
     font-size: var(--button-font-size) !important;
-    width: 15vh !important;
-    // margin-left: 10% !important; 
-    // margin-right: 10% !important; 
+    min-width: 7.5rem !important;
+    width: auto !important;
+    max-width: 100%;
+    min-height: 2.5rem;
+    // margin-left: 10% !important;
+    // margin-right: 10% !important;
     transition: 0.5s !important;
 }
 
@@ -42,3 +45,44 @@
     font-size: var(--main-font-size) !important;
 }
 
+
+.measurementGrid {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+}
+.stepperPage :global(.MuiStepper-root) { flex-wrap: wrap; gap: 0.5rem; }
+.stepperPage :global(.MuiStep-root) { padding: 0.25rem; }
+.stepperPage :global(.MuiStepLabel-label) { font-family: Afacad_Flux; font-size: var(--main-font-size); }
+.stepperPage :global(.MuiStepIcon-completedIcon) { font-size: var(--menu-font-size); }
+
+.stepTitle { padding-block: 0.5rem; text-align: center; }
+.stepActions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-block: 0.5rem;
+    flex-shrink: 0;
+    min-height: 2.5rem;
+}
+.rowActions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.clearAction { display: flex; align-items: center; margin-inline-start: auto; }
+.rowActionButton { min-height: 2.5rem; flex-shrink: 0; }
+.tableArea { flex: 1; min-height: 0; min-width: 0; }
+.tableFill { height: 100%; min-height: 0; }
+
+.stepActions .submitButton { line-height: 1.5; }
+
+.stepContent { min-width: 0; height: 34rem; display: flex; flex-direction: column; }
+.stepContent > .measurementGrid { flex: 1; min-height: 0; }
+.stepContent > .stepTitle { flex: 0 0 4rem; min-height: 0; box-sizing: border-box; display: grid; place-items: center; overflow: auto; }
+.stepNavigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-block-start: 1rem;
+}
+
+.stepperPage { max-inline-size: 72rem; margin-inline: auto; }
