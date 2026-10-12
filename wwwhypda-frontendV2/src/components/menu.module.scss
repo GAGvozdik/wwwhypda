@@ -89,9 +89,9 @@
     --drawer-border-color: #4a96a3;
     --input: rgba(255, 255, 255, 0.411);
     --field-background: color-mix(in srgb, var(--form-color) 75%, var(--input-text) 25%);
-    --field-border: var(--drawer-border-color);
-    --field-border-hover: var(--start-button-hover);
-    --field-border-active: var(--start-button-active);
+    --field-border: var(--border);
+    --field-border-hover: color-mix(in srgb, var(--border) 80%, var(--input-text) 20%);
+    --field-border-active: color-mix(in srgb, var(--border) 65%, var(--input-text) 35%);
     --input-hover: rgba(255, 255, 255, 0.623);
     --input-placeholder: #1d1d1d;
     --input-text: #f7f6fc;
