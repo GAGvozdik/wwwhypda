@@ -1,3 +1,4 @@
+import MainTree from '../tree/mainTree';
 import messages from '../../common/error_messages.json';
 import React, { useCallback, useEffect, useState } from 'react';
 import styles from "./searchStyles.module.scss";
@@ -94,32 +95,11 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
 
 
-                paddingTop: '1rem',
                 gap: '1rem',
             }}
         >
 
-            <div
-                className={`${styles.treeText} ${styles.resultsPanel}`}
-                style={{
-                    backgroundColor: 'var(--drawer-color)',
-                    borderRadius: '8px',
-                    boxSizing: 'border-box',
-
-
-                    // marginBottom: '2vh',
-
-
-
-
-                }}
-            >
-                <SingleSkeleton loading={isSearching} error={error} height='100%' isLoadIcon={true}>
-                    <SearchResultsTable/>
-                </SingleSkeleton>
-            </div>
-
-
+            <MainTree />
 
             <div
                 className={`${styles.treeText} ${styles.parametersPanel}`}
@@ -191,6 +171,27 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         </button>
 
                     </FormControl>
+                </SingleSkeleton>
+            </div>
+
+
+            <div
+                className={`${styles.treeText} ${styles.resultsPanel}`}
+                style={{
+                    backgroundColor: 'var(--drawer-color)',
+                    borderRadius: '8px',
+                    boxSizing: 'border-box',
+
+
+                    // marginBottom: '2vh',
+
+
+
+
+                }}
+            >
+                <SingleSkeleton loading={isSearching} error={error} height='100%' isLoadIcon={true}>
+                    <SearchResultsTable/>
                 </SingleSkeleton>
             </div>
 

@@ -1,3 +1,4 @@
+@use '../../commonFeatures/inputContour';
 
 .submitButton {
     background-color: var(--menu) !important;
@@ -94,13 +95,14 @@
     color: var(--tree-text);
     font-family: Afacad_Flux, sans-serif;
     font-size: var(--input-font-size);
-    &:focus-visible { outline: 2px solid var(--border); outline-offset: 2px; }
+    &:focus-visible { outline: 2px solid var(--border); outline-offset: 0; }
     &:autofill {
-        box-shadow: 0 0 0 1000px var(--form-color) inset;
+        box-shadow: 0 0 0 1000px var(--field-background) inset;
         -webkit-text-fill-color: var(--tree-text);
         font-family: Afacad_Flux, sans-serif;
         font-size: var(--input-font-size);
     }
+    @include inputContour.contour;
 }
 .deleteError { color: var(--error-text); }
 

@@ -1,3 +1,4 @@
+@use '../commonFeatures/inputContour';
 .treeLink{
     text-decoration: none;
 }
@@ -70,7 +71,7 @@
 }
 
 .inputField {
-  border: none;
+  border: 1px solid var(--border);
   color: var(--input-text);
   padding: 0.65rem;
   box-sizing: border-box;
@@ -90,7 +91,7 @@
 
   &:focus {
     outline: 2px solid var(--border);
-    outline-offset: 2px;
+    outline-offset: 0;
   }
 
   &::placeholder {
@@ -99,6 +100,7 @@
     color: var(--input-placeholder);
     opacity: 1; // чтобы Firefox не делал серее
   }
+  @include inputContour.contour;
 }
 
 
@@ -247,7 +249,7 @@ input::placeholder {
 .authForm, .skeletonAuthForm { overflow-wrap: anywhere; }
 .authForm form { font-size: var(--main-font-size); }
 .inputField:autofill {
-    box-shadow: 0 0 0 1000px var(--form-color) inset;
+    box-shadow: 0 0 0 1000px var(--field-background) inset;
     -webkit-text-fill-color: var(--input-text);
     font-family: Afacad_Flux;
     font-size: var(--input-font-size);

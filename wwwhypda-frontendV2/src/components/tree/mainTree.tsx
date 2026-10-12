@@ -1,4 +1,3 @@
-import { useLocation } from 'react-router-dom';
 import messages from '../../common/error_messages.json';
 import * as React from 'react';
 // import Box from '@mui/material/Box';
@@ -6,8 +5,6 @@ import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 // import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import styles from './treeStyles.module.scss';
 // import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import type { State } from '../../common/types';
 // import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
 import {useEffect, useState} from 'react';
 import CustomTreeItem from './customTreeItem';
@@ -80,10 +77,6 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
-    const isOpenNow = useSelector((state: State) => state.open);
-    const isSearchPage = useLocation().pathname === '/search';
-
     useEffect(() => {
         const fetchRockTypes = async () => {
             if (executeRecaptcha) {
@@ -115,11 +108,7 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
     const tree = buildTree(treeData);
 
     return (
-        <div id="rock-type-tree" className={
-            isOpenNow
-                ? `${styles.hidingDrawer} ${isDarkTheme ? styles.dark : ''}`
-                : `${styles.openHidingDrawer} ${isSearchPage ? styles.searchDrawer : ''} ${isDarkTheme ? styles.dark : ''}`
-        }>
+        <section id="rock-type-tree" className={styles.treePanel} aria-label={messages.ui_rock_type}>
             <div
             className={styles.treeBody}
             style={{
@@ -137,7 +126,7 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
                         </SimpleTreeView>
                     </SingleSkeleton>
             </div>
-        </div>
+        </section>
     );
 };
 

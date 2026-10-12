@@ -54,9 +54,10 @@
   white-space: normal;
 }
 .searchLayout {
+    --search-panel-height: 36rem;
     display: grid;
     grid-template-columns: minmax(0, 36rem);
-    grid-template-areas: "parameters" "results";
+    grid-template-areas: "tree" "parameters" "results";
     gap: 1rem;
     min-width: 0;
     inline-size: min(100%, 36rem);
@@ -67,11 +68,11 @@
 .parametersPanel { grid-area: parameters; max-height: 24rem; overflow: auto; }
 .resultsContent { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; color: var(--tree-text); }
 .resultsGrid { flex: 1; min-height: 0; min-width: 0; }
-@container workspace (min-width: 49rem) {
+@container workspace (min-width: 65rem) {
     .searchLayout {
-        inline-size: min(100%, 73rem);
-        grid-template-columns: repeat(2, minmax(24rem, 1fr));
-        grid-template-areas: "parameters results";
+        inline-size: min(100%, 94rem);
+        grid-template-columns: minmax(15rem, 20rem) minmax(24rem, 1fr) minmax(24rem, 1fr);
+        grid-template-areas: "tree parameters results";
         height: var(--search-panel-height);
     }
     .resultsPanel { height: 100%; }

@@ -1,0 +1,17 @@
+@mixin contour {
+    border: 2px solid var(--field-border);
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: var(--field-background);
+    color: var(--input-text);
+    &:hover { border-color: var(--field-border-hover); background-color: var(--field-background); }
+    &:focus, &:focus-visible { border-color: var(--field-border-active); outline: 1px solid var(--field-border-active); outline-offset: 0; background-color: var(--field-background); }
+    &:active { border-color: var(--field-border-active); background-color: var(--field-background); }
+    &:is(:autofill, :-webkit-autofill) {
+        box-shadow: 0 0 0 1000px var(--field-background) inset;
+        -webkit-text-fill-color: var(--input-text);
+        caret-color: var(--input-text);
+    }
+    &:user-invalid, &[aria-invalid='true'] { border-color: var(--error-text); outline-color: var(--error-text); }
+    &:disabled { border-style: dashed; color: var(--input-placeholder); -webkit-text-fill-color: var(--input-placeholder); cursor: not-allowed; }
+}

@@ -1,3 +1,4 @@
+@use './commonFeatures/inputContour';
 
 :root {
     // var(--main-font-size)
@@ -34,6 +35,10 @@
     --drawer-color: #fff2d9;
     --drawer-border-color: #4a96a3;
     --input: rgb(255, 255, 255);
+    --field-background: var(--input);
+    --field-border: var(--border);
+    --field-border-hover: var(--buttons);
+    --field-border-active: var(--step-color-active);
     --input-hover: rgba(255, 255, 255, 0.543);
     --input-placeholder: grey;
     --input-text: #333333;
@@ -83,6 +88,10 @@
     --drawer-color: #22282e;
     --drawer-border-color: #4a96a3;
     --input: rgba(255, 255, 255, 0.411);
+    --field-background: color-mix(in srgb, var(--form-color) 75%, var(--input-text) 25%);
+    --field-border: var(--drawer-border-color);
+    --field-border-hover: var(--start-button-hover);
+    --field-border-active: var(--start-button-active);
     --input-hover: rgba(255, 255, 255, 0.623);
     --input-placeholder: #1d1d1d;
     --input-text: #f7f6fc;
@@ -213,6 +222,7 @@ body {
     }
     font-family: Afacad_Flux !important;
     font-size: var(--input-font-size);
+    @include inputContour.contour;
 }
 
 input::placeholder {

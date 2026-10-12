@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
 
@@ -9,7 +9,6 @@ import type { State } from '../../common/types';
 import messages from '../../common/error_messages.json';
 import windowStyles from "./windowStyles.module.scss";
 import styles from "../menu.module.scss";
-import MainTree from '../tree/mainTree';
 import MainMenu from '../menu/mainMenu';
 import MainBody from './mainBody';
 // import useTokenRefresh from '../users/tokenRefresh';
@@ -20,14 +19,11 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 export default function MainWindow() {
     const pathname = useLocation().pathname;
-    const isSearchPage = pathname === '/search';
     const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(pathname);
     // useTokenRefresh();
 
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
 
-    const isOpenNow = useSelector((state: State) => state.open);
-    const shellRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
         const scroller = document.scrollingElement ?? document.documentElement;
@@ -37,26 +33,6 @@ export default function MainWindow() {
         return () => previous.forEach(([element, wasDark]) => element.classList.toggle(styles.dark, wasDark));
     }, [isDarkTheme]);
 
-    useLayoutEffect(() => {
-        const shell = shellRef.current;
-        if (!shell || isLegalPage) return;
-        const header = shell.firstElementChild;
-        const footer = shell.querySelector('footer');
-        if (!header || !footer) return;
-        const measure = () => {
-            shell.style.setProperty('--shell-header-height', `${header.getBoundingClientRect().height}px`);
-            shell.style.setProperty('--shell-footer-height', `${footer.getBoundingClientRect().height}px`);
-        };
-        measure();
-        const observer = new ResizeObserver(measure);
-        observer.observe(header);
-        observer.observe(footer);
-        window.addEventListener('resize', measure);
-        return () => {
-            observer.disconnect();
-            window.removeEventListener('resize', measure);
-        };
-    }, [isLegalPage]);
 
 
     if (isLegalPage) {
@@ -69,16 +45,10 @@ export default function MainWindow() {
 
 
     return (
-        <div ref={shellRef} className={
-            isOpenNow ?
-                (`${windowStyles.container} ${isSearchPage ? windowStyles.searchShell : ''} ${isDarkTheme ? styles.dark : ''}`)
-                    :
-                (`${windowStyles.openContainer} ${isSearchPage ? windowStyles.searchShell : ''} ${isDarkTheme ? styles.dark : ''}`)
-        }>
+        <div className={`${windowStyles.container} ${isDarkTheme ? styles.dark : ''}`}>
 
             <MainMenu />
             <MainBody />
-            {!isLegalPage && <MainTree />}
 
             <footer className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
                 <div style={{fontWeight: '300'}}>{messages.website_credits}</div>

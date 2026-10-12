@@ -9,11 +9,9 @@ import IconButton from '@mui/material/IconButton';
 import styles from "./menuStyles.module.scss"
 
 import { useSelector, useDispatch } from 'react-redux';
-import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
-import type { State, UpdateThemeAction, UpdateOpenCloseAction } from '../../common/types';
+import { UpdateTheme } from '../../redux/actions';
+import type { State, UpdateThemeAction } from '../../common/types';
 import { Link } from 'react-router-dom';
-import MenuIcon from '@mui/icons-material/Menu';
-import ClearIcon from '@mui/icons-material/Clear';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 // import LanguageIcon from '@mui/icons-material/Language';
 // import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
@@ -30,12 +28,6 @@ export default function MainMenu() {
         localStorage.setItem("isDarkTheme", String(!isDarkTheme));
     };
 
-    const isOpenNow = useSelector((state: State) => state.open);
-
-    const toggleOpen = () => {
-        dispatch<UpdateOpenCloseAction>(UpdateOpenClose(!isOpenNow));
-    };
-
     const isSuperuser = localStorage.getItem('isSuperuser') === 'true';
 
 
@@ -43,21 +35,6 @@ export default function MainMenu() {
 
         <div className={`${styles.mainMenuItems} ${isDarkTheme ? styles.dark : ''}`}>
 
-            <MenuButtuon
-                className={`${styles.drawerItem} ${styles.menuButton}`}
-                onClick={toggleOpen}
-                aria-label={isOpenNow ? messages.open_tree : messages.close_tree}
-                aria-expanded={!isOpenNow}
-                aria-controls="rock-type-tree"
-            >
-                <span className={styles.drawerButton}>
-                    {isOpenNow ?
-                        <MenuIcon className={styles.drawerIcon} data-testid="MenuIcon"/>
-                            :
-                        <ClearIcon className={styles.drawerIcon} data-testid="ClearIcon" />
-                    }
-                </span>
-            </MenuButtuon>
 
             <MenuButtuon
                 className={`${styles.homePageItem} ${styles.menuButton}`}
