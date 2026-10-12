@@ -194,3 +194,7 @@
 
 .contentGroup { inline-size: min(100%, 72rem); margin-inline: auto; min-width: 0; }
 .searchShell { --search-panel-height: 36rem; }
+
+.fullScreenContent > .bodyMenuItem {
+    min-height: calc(100dvh - var(--shell-header-height, 3.5rem) + 1rem);
+}

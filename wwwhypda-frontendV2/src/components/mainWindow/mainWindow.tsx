@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
 
@@ -19,6 +19,8 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 export default function MainWindow() {
     const pathname = useLocation().pathname;
+    const fillsFirstScreen = pathname === '/' || pathname === '/search';
+    const shellRef = useRef<HTMLDivElement>(null);
     const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(pathname);
     // useTokenRefresh();
 
@@ -33,6 +35,19 @@ export default function MainWindow() {
         return () => previous.forEach(([element, wasDark]) => element.classList.toggle(styles.dark, wasDark));
     }, [isDarkTheme]);
 
+    useLayoutEffect(() => {
+        const shell = shellRef.current;
+        const header = shell?.firstElementChild;
+        if (!fillsFirstScreen || !shell || !(header instanceof HTMLElement)) return;
+        const measureHeader = () => {
+            shell.style.setProperty('--shell-header-height', `${header.offsetHeight}px`);
+        };
+        measureHeader();
+        const observer = new ResizeObserver(measureHeader);
+        observer.observe(header);
+        return () => observer.disconnect();
+    }, [fillsFirstScreen]);
+
 
 
     if (isLegalPage) {
@@ -45,7 +60,7 @@ export default function MainWindow() {
 
 
     return (
-        <div className={`${windowStyles.container} ${isDarkTheme ? styles.dark : ''}`}>
+        <div ref={shellRef} className={`${windowStyles.container} ${fillsFirstScreen ? windowStyles.fullScreenContent : ''} ${isDarkTheme ? styles.dark : ''}`}>
 
             <MainMenu />
             <MainBody />

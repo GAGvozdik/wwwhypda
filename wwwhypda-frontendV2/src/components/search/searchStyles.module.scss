@@ -54,7 +54,7 @@
   white-space: normal;
 }
 .searchLayout {
-    --search-panel-height: 36rem;
+    --search-panel-height: max(36rem, calc(100dvh - var(--shell-header-height, 3.5rem) - 1rem));
     display: grid;
     grid-template-columns: minmax(0, 36rem);
     grid-template-areas: "tree" "parameters" "results";
