@@ -55,7 +55,7 @@ boolean_settings = (
 integer_settings = (
     "ACCESS_EXPIRES_SECONDS", "REFRESH_EXPIRES_SECONDS", "HSTS_MAX_AGE", "PROXY_X_FOR",
     "PROXY_X_PROTO", "PROXY_X_HOST", "MAIL_PORT", "CONFIRMATION_CODE_TTL_SECONDS",
-    "PASSWORD_RESET_CODE_TTL_SECONDS", "RECAPTCHA_RETRIES", "APP_PORT",
+    "PASSWORD_RESET_CODE_TTL_SECONDS", "AUTH_CODE_CLEANUP_INTERVAL_SECONDS", "RECAPTCHA_RETRIES", "APP_PORT",
 )
 for name in string_settings:
     app.config[name] = env_value(name)
@@ -97,6 +97,10 @@ elif env_value("DB_ENGINE") == "sqlite":
     app.config["SQLALCHEMY_BINDS"] = {"users_db": "sqlite:///" + str(basedir / "instance" / env_value("USERS_DATABASE_FILENAME"))}
 else:
     raise ValueError("DB_ENGINE must be postgres or sqlite")
+if any(app.config[name] <= 0 for name in (
+        "CONFIRMATION_CODE_TTL_SECONDS", "PASSWORD_RESET_CODE_TTL_SECONDS",
+        "AUTH_CODE_CLEANUP_INTERVAL_SECONDS")):
+    raise ValueError("Auth code TTL and cleanup interval must be positive")
 logging.basicConfig(level=app.config["LOG_LEVEL"])
 app.wsgi_app = ProxyFix(app.wsgi_app,
     x_for=app.config["PROXY_X_FOR"], x_proto=app.config["PROXY_X_PROTO"],

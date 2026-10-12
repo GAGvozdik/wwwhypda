@@ -2,15 +2,15 @@
 :root {
     // var(--main-font-size)
 
-    --main-font-size: 2vh;
-    --under-menu-font-size: 2vh;
-    --menu-font-size: 2.5vh;
-    --menu-font-size-little: 2vh;
-    --menu-font-size-smallest: 1.5vh;
-    --head-font-size: 3vh;
-    --button-font-size: 2vh;
-    --input-font-size: 2vh;
-    --tree-font-size: 2vh;
+    --main-font-size: 1rem;
+    --under-menu-font-size: 1rem;
+    --menu-font-size: 1.25rem;
+    --menu-font-size-little: 1rem;
+    --menu-font-size-smallest: 0.75rem;
+    --head-font-size: 1.5rem;
+    --button-font-size: 1rem;
+    --input-font-size: 1rem;
+    --tree-font-size: 1rem;
 
     --color-scheme: light;
 
@@ -57,15 +57,6 @@
 }
 
 .dark {
-    --main-font-size: 2vh;
-    --under-menu-font-size: 2vh;
-    --menu-font-size: 2.5vh;
-    --menu-font-size-little: 2vh;
-    --menu-font-size-smallest: 1.5vh;
-    --head-font-size: 3vh;
-    --button-font-size: 2vh;
-    --input-font-size: 2vh;
-    --tree-font-size: 2vh;
     
     --error-text: #913636;
     --menu: #101316;
@@ -116,8 +107,9 @@
 
 @font-face {
   font-family: "Afacad_Flux";   /*Can be any text*/
-  src: local("AirbnbCerealLight"),
-    url("../assets/fonts/Afacad_Flux/AfacadFlux-VariableFont_slnt,wght.ttf") format("truetype");
+  src: url("../assets/fonts/Afacad_Flux/AfacadFlux-VariableFont_slnt,wght.ttf") format("truetype");
+  font-display: swap;
+  font-weight: 100 900;
 }
 
 
@@ -169,11 +161,11 @@ body {
 .authForm {
     background-color: var(--form-color);
     border-radius: 8px;
-    padding: 2vh;
+    padding: 1rem;
     width: 30%;
 
-    margin-top: 15vh;
-    margin-bottom: 15vh;
+    margin-top: 7.5rem;
+    margin-bottom: 7.5rem;
     margin-left: 35%;
     margin-right: 35%;
     border: 3px solid var(--border);
@@ -186,7 +178,7 @@ body {
 .formTitle {
     color: var(--tree-text);
     text-align: center;
-    margin-bottom: 2vh;
+    margin-bottom: 1rem;
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
 }
@@ -194,10 +186,10 @@ body {
 .inputField {
     border: 0px solid grey;
     color: rgb(51, 51, 51);
-    padding: 1vh;
+    padding: 0.5rem;
     border-radius: 4px;
     width: 80%;
-    margin: 0vh 10% 1vh 10%;
+    margin: 0 10% 0.5rem 10%;
     background-color: var(--input);
     transition: 0.5s;
     &:hover {
@@ -222,7 +214,7 @@ input::placeholder {
 .submitButton {
     background-color: var(--menu);
     color: var(--submit-button-text);
-    padding: 1vh;
+    padding: 0.5rem;
     
     border: none;
     border-radius: 4px;
@@ -257,7 +249,7 @@ input::placeholder {
     font-family: Afacad_Flux !important;
     transition: 0.5s;
     font-weight: 600;
-    font-size: 2.5vh;
+    font-size: var(--menu-font-size);
 }
 
 .link:hover {
@@ -308,10 +300,10 @@ input::placeholder {
 
 
 .custom-header {
-    font-size: 55px;  // Размер шрифта для заголовков
+    font-size: var(--main-font-size);  // Размер шрифта для заголовков
 }
 
 .ag-cell {
-    font-size: 55px;  // Размер шрифта для ячеек
+    font-size: var(--main-font-size);  // Размер шрифта для ячеек
 }
 

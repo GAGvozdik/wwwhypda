@@ -4,8 +4,8 @@
 
 
 .grecaptcha-badge {
-    bottom: 0.3vh !important;
-    right: 0.3vh !important;
+    bottom: 0.15rem !important;
+    right: 0.15rem !important;
     transform: scale(0.9) !important;
     visibility: hidden;
 

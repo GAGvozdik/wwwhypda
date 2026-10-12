@@ -19,7 +19,7 @@ const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, co
             sx={{
                 color: color ? color : 'var(--checkbox-color)',
                 '&.Mui-checked': { color: color ? color : 'var(--checkbox-checked)' },
-                fontFamily: 'MyRuda',
+                fontFamily: 'Afacad_Flux',
                 zIndex: '99',
             }}
         />

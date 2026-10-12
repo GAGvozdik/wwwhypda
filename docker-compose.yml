@@ -64,6 +64,25 @@ services:
     networks:
       - dev
 
+  auth-code-cleanup:
+    image: wwwhypda-dev-backend
+    build:
+      context: .
+      dockerfile: ./wwwhypda-backend/Dockerfile
+    env_file:
+      - path: ./wwwhypda-backend/env.dev
+    environment:
+      APP_ENV: development
+      DB_USER: ${DB_USER:?Use --env-file .env.development}
+      DB_PASSWORD: ${DB_PASSWORD:?Use --env-file .env.development}
+    command: ["python", "-m", "auth.code_cleanup"]
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dev
+
   nginx:
     image: nginx:stable-alpine
     ports:

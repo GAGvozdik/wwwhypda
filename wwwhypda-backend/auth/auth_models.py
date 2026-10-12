@@ -243,21 +243,54 @@ class ConfirmationCode(db.Model):
     @classmethod
     def verify_code(cls, email: str, code: str, type: str):
         """
-        Validates a confirmation code within a 10-minute expiry window.
+        ????????? ??? ? ??????? ???????????? ????? ???????? (???? ? 2 ??????).
         Returns True if valid, otherwise False.
         """
-        confirmation_code = cls.query.filter_by(email=email, code=code, type=type).first()
+        confirmation_code = cls.query.filter_by(email=email, code=code, type=type).with_for_update().first()
         if not confirmation_code:
             return False
         
         # Ensure created_at is timezone-aware
-        if confirmation_code.created_at.tzinfo is None:
-            confirmation_code.created_at = confirmation_code.created_at.replace(tzinfo=timezone.utc)
-        
-        if datetime.now(timezone.utc) - confirmation_code.created_at > timedelta(seconds=current_app.config["PASSWORD_RESET_CODE_TTL_SECONDS" if type == "password_reset" else "CONFIRMATION_CODE_TTL_SECONDS"]):
+        created_at = confirmation_code.created_at
+        ttl = cls.ttl_seconds(type)
+        if created_at is None or ttl is None:
             return False
-        
-        return True
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        now = datetime.now(timezone.utc)
+        return created_at <= now < created_at + timedelta(seconds=ttl)
+
+    @classmethod
+    def ttl_seconds(cls, code_type):
+        """?????????? ???? ???? ????; ??????????? ??? ?? ????????? ???????????."""
+        setting = {"registration": "CONFIRMATION_CODE_TTL_SECONDS",
+                   "password_reset": "PASSWORD_RESET_CODE_TTL_SECONDS"}.get(code_type)
+        return current_app.config[setting] if setting else None
+
+    @classmethod
+    def cleanup_expired(cls, now=None):
+        """??????? ????????/???????????? ???? ????? ???????????, ??? ???????? ?????????."""
+        from sqlalchemy import and_, or_
+        now = now or datetime.now(timezone.utc)
+        if now.tzinfo is None:
+            now = now.replace(tzinfo=timezone.utc)
+        cutoff = now.astimezone(timezone.utc).replace(tzinfo=None)
+        expired = or_(
+            cls.created_at.is_(None),
+            cls.type.notin_(["registration", "password_reset"]),
+            cls.type.is_(None),
+            and_(cls.type == "registration", cls.created_at <= cutoff - timedelta(
+                seconds=cls.ttl_seconds("registration"))),
+            and_(cls.type == "password_reset", cls.created_at <= cutoff - timedelta(
+                seconds=cls.ttl_seconds("password_reset"))),
+        )
+        try:
+            count = cls.query.filter(expired).delete(synchronize_session=False)
+            db.session.commit()
+            return count
+        except Exception:
+            db.session.rollback()
+            raise
 
     @classmethod
     def delete_code(cls, email: str, code: str, type: str):
@@ -265,7 +298,7 @@ class ConfirmationCode(db.Model):
         Deletes a confirmation code after successful verification.
         Returns True if successful, otherwise False.
         """
-        confirmation_code = cls.query.filter_by(email=email, code=code, type=type).first()
+        confirmation_code = cls.query.filter_by(email=email, code=code, type=type).with_for_update().first()
         if confirmation_code:
             db.session.delete(confirmation_code)
             db.session.commit()

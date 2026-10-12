@@ -20,7 +20,7 @@ def error_message(error):
 
 def send_auth_email(subject, recipient, body):
     if current_app.config["MAIL_DELIVERY_MODE"] == "log":
-        current_app.logger.info("Local email %s: %s", subject, body)
+        current_app.logger.info("Authentication email delivery skipped in local log mode")
         return
     mail.send(Message(subject, sender=current_app.config["MAIL_DEFAULT_SENDER"], recipients=[recipient], body=body))
 
