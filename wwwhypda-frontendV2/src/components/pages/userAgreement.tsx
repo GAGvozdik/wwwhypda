@@ -50,7 +50,7 @@ const UserAgreement: React.FC = () => {
       <h2 className={styles.sectionTitle}>7. Termination</h2>
       <p className={styles.text}>
         Access to the service may be suspended or terminated in case of violation of this Agreement.
-        You can permanently delete your own account using Delete account, with your current password and verification. This removes its email address, username, verification codes and submission records directly linked to your account, and revokes existing sessions. Unconfirmed registrations are deleted manually within one month of registration. To request deletion of uploaded scientific data or personal information remaining in separate scientific records, email georgii.gvozdik@studenti.unimi.it and identify the relevant records. The controller currently handles these requests manually, without undue delay and within one month, subject to applicable legal exceptions and any legally permitted extension explained within the first month. You do not need to delete your account to make a request. Delivered emails and backup copies have separate handling described in the Privacy Policy.
+        You can permanently delete your own account using Delete account, with your current password and verification. This removes its email address, username, verification codes and submission records directly linked to your account, and revokes existing sessions. Unconfirmed registrations are deleted manually within one month of registration. To request deletion of uploaded scientific data or personal information remaining in separate scientific records, email wwhypda@gmail.com and identify the relevant records. The controller currently handles these requests manually, without undue delay and within one month, subject to applicable legal exceptions and any legally permitted extension explained within the first month. You do not need to delete your account to make a request. Delivered emails and backup copies have separate handling described in the Privacy Policy.
       </p>
 
       <h2 className={styles.sectionTitle}>8. Governing Law and Jurisdiction</h2>
@@ -69,9 +69,7 @@ const UserAgreement: React.FC = () => {
       <p className={styles.text}>
         Georgii Gvozdik, Milan, Italy.
         <br />
-        <a href="mailto:georgii.gvozdik@studenti.unimi.it">georgii.gvozdik@studenti.unimi.it</a>
-        <br />
-        Additional contact: <a href="mailto:alessandro.comunian@unimi.it">alessandro.comunian@unimi.it</a>
+        <a href="mailto:wwhypda@gmail.com">wwhypda@gmail.com</a>
       </p>
     </div>
   );

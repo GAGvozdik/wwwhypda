@@ -1,0 +1,18 @@
+# Daily rotation, including empty files, bounds the age of inactive logs too.
+# Keep 28 daily archives plus the current file to leave margin below 30 days.
+/var/log/wwwhypda/site.log {
+    daily
+    rotate 28
+    maxage 28
+    missingok
+    ifempty
+    nodateext
+    compress
+    delaycompress
+    su syslog adm
+    create 0640 syslog adm
+    sharedscripts
+    postrotate
+        /usr/bin/systemctl kill --kill-who=main --signal=HUP rsyslog.service
+    endscript
+}
