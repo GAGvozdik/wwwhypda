@@ -25,7 +25,7 @@ const UserAgreement: React.FC = () => {
 
       <h2 className={styles.sectionTitle}>3. User Data</h2>
       <p className={styles.text}>
-        Users retain their rights in submitted material. By submitting a dataset for publication, you permit the service to store, review and display that material for scientific sharing. This permission does not transfer ownership or grant a blanket right to use personal data for unrelated purposes. Submit only material you are entitled to share; respect copyright, attribution and the rights of other people. Do not upload confidential information, credentials or sensitive personal data. Reviewed datasets can become public, be indexed and be copied by others. Contact the operator about unlawful content or personal information requiring correction or removal.
+        Users retain their rights in submitted material. By submitting a dataset, you permit the service to store it and make it available to you and authorised administrators for review and operation of the scientific service. Uploaded submissions are not currently published for visitors. This permission does not transfer ownership or grant a blanket right to use personal data for unrelated purposes. Submit only material you are entitled to share; respect copyright, attribution and the rights of other people. Scientific references may contain necessary author names, but do not upload private contact details, confidential information, credentials or sensitive personal data. Any future public publication requires appropriate information and a lawful basis before it begins. Contact the operator about unlawful content or personal information requiring correction or removal.
       </p>
 
       <h2 className={styles.sectionTitle}>4. Prohibited Conduct</h2>
@@ -50,7 +50,7 @@ const UserAgreement: React.FC = () => {
       <h2 className={styles.sectionTitle}>7. Termination</h2>
       <p className={styles.text}>
         Access to the service may be suspended or terminated in case of violation of this Agreement.
-        You can permanently delete your own account and uploaded submission records using Delete account, with your current password and verification. This also deletes its verification codes and revokes existing sessions. Delivered emails, independent published records and backup copies have separate handling described in the Privacy Policy; contact the operator about other personal information.
+        You can permanently delete your own account using Delete account, with your current password and verification. This removes its email address, username, verification codes and submission records directly linked to your account, and revokes existing sessions. Unconfirmed registrations are deleted manually within one month of registration. To request deletion of uploaded scientific data or personal information remaining in separate scientific records, email georgii.gvozdik@studenti.unimi.it and identify the relevant records. The controller currently handles these requests manually, without undue delay and within one month, subject to applicable legal exceptions and any legally permitted extension explained within the first month. You do not need to delete your account to make a request. Delivered emails and backup copies have separate handling described in the Privacy Policy.
       </p>
 
       <h2 className={styles.sectionTitle}>8. Governing Law and Jurisdiction</h2>
