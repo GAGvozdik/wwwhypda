@@ -5,6 +5,7 @@ import uuid
 from auth.auth_models import db, User, ConfirmationCode
 from auth.validate import validate_email_and_password, validate_user, validate_password, messages
 from auth.terms import CURRENT_TERMS_VERSION
+from auth.transaction_lock import lock_users_transaction
 from sqlalchemy.exc import IntegrityError
 from flask_mail import Message
 from common_defenitions import mail, verify_recaptcha, limiter, send_auth_email, error_message
@@ -173,6 +174,7 @@ def confirm_registration():
         user = User.query.filter_by(email=email, active=False).first()
         if user:
             user.active = True
+            user.registration_completed = True
             ConfirmationCode.query.filter_by(email=email, code=code, type="registration").delete()
             db.session.commit()
             return jsonify(message="Account successfully activated"), 200
@@ -202,6 +204,8 @@ def add_user():
         if user_data.pop('terms_accepted', None) is not True:
             return jsonify(message="Please accept the User Agreement and acknowledge the Privacy and Cookie Policies."), 400
 
+        if {'registered_at', 'registration_completed'} & user_data.keys():
+            return jsonify(message=messages["registration_metadata_forbidden"]), 400
         if 'terms_accepted_at' in user_data:
             return jsonify(message=messages['terms_client_time_forbidden']), 400
         terms_version = user_data.pop('terms_version', None)
@@ -222,12 +226,14 @@ def add_user():
 
         email = user_data["email"]
 
+        lock_users_transaction()
         existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
 
         # 👉 ВСЕГДА создаём/обновляем код
         new_account = existing_user is None
         if new_account:
             existing_user = User(name=user_data["name"], email=email, active=False,
+                registered_at=datetime.now(timezone.utc), registration_completed=False,
                 terms_accepted_at=datetime.now(timezone.utc), terms_version=CURRENT_TERMS_VERSION)
             existing_user.set_password(user_data["password"])
             db.session.add(existing_user)
@@ -241,6 +247,7 @@ def add_user():
                 sqlite_unique = getattr(exc.orig, 'sqlite_errorname', None) == 'SQLITE_CONSTRAINT_UNIQUE'
                 if not (sqlite_unique or (sqlstate == '23505' and constraint == 'users_email_key')):
                     raise
+                lock_users_transaction()
                 existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
                 if existing_user is None:
                     raise
@@ -415,14 +422,10 @@ def delete_own_account():
     if not user.check_password(password):
         return jsonify(message=messages["account_delete_password_invalid"]), 403
     try:
-        InputData.query.filter_by(user_id=user.id).delete(synchronize_session=False)
         # editing_by хранит копию имени администратора, а не FK.
         # При одинаковых именах нельзя приписывать чужую метку удаляемому пользователю.
-        if User.query.filter_by(name=user.name).count() == 1:
-            InputData.query.filter_by(editing_by=user.name).update(
-                {InputData.editing_by: None}, synchronize_session=False)
-        ConfirmationCode.query.filter_by(email=user.email).delete(synchronize_session=False)
-        db.session.delete(user)
+        from maintenance.retention import delete_account_data
+        delete_account_data(user)
         db.session.commit()
     except Exception:
         db.session.rollback()

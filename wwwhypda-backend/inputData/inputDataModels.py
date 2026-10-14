@@ -23,7 +23,7 @@ class InputData(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     name = db.Column(db.String(20))
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     status = db.Column(db.String(20), default='New')
     editing_by = db.Column(db.String(100), nullable=True)
     general_info = db.Column(JSON, nullable=False)
@@ -52,6 +52,8 @@ class InputData(db.Model):
     @classmethod
     def save_submission(cls, user_id: int, data: dict):
         try:
+            from auth.transaction_lock import lock_users_transaction
+            lock_users_transaction()
             user = User.query.filter_by(id=user_id, active=True).populate_existing().with_for_update().first()
             if not user:
                 return None
@@ -72,7 +74,7 @@ class InputData(db.Model):
             db.session.commit()
             return entry.to_dict()
         except SQLAlchemyError as e:
-            current_app.logger.error(f"[DB ERROR] Failed to save InputData: {e}")
+            current_app.logger.error("Failed to save submission transaction")
             db.session.rollback()
             return None
 
@@ -119,7 +121,9 @@ class InputData(db.Model):
     @classmethod
     def delete_by_id_if_owned(cls, entry_id: int, user_id: int) -> bool:
         try:
-            entry = cls.query.filter_by(id=entry_id, user_id=user_id).first()
+            from auth.transaction_lock import lock_users_transaction
+            lock_users_transaction()
+            entry = cls.query.filter_by(id=entry_id, user_id=user_id).populate_existing().with_for_update().first()
             if not entry:
                 return False
 
@@ -127,14 +131,16 @@ class InputData(db.Model):
             db.session.commit()
             return True
         except SQLAlchemyError as e:
-            current_app.logger.error(f"[DB ERROR] (delete_by_id_if_owned) Failed to delete InputData id={entry_id}: {e}")
+            current_app.logger.error("Failed to delete submission transaction")
             db.session.rollback()
             return False
 
     @classmethod
     def set_status(cls, id: int, status: str, editing_by: str = None):
         try:
-            entry = cls.query.filter_by(id=id).first()
+            from auth.transaction_lock import lock_users_transaction
+            lock_users_transaction()
+            entry = cls.query.filter_by(id=id).populate_existing().with_for_update().first()
             if not entry:
                 return None
             
@@ -143,6 +149,6 @@ class InputData(db.Model):
             db.session.commit()
             return entry.to_dict()
         except SQLAlchemyError as e:
-            current_app.logger.error(f"[DB ERROR] Failed to set status for InputData id={id}: {e}")
+            current_app.logger.error("Failed to update submission transaction")
             db.session.rollback()
             return None

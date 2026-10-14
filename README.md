@@ -74,6 +74,7 @@ MAIL_SUPPRESS_SEND=False
 CONFIRMATION_CODE_TTL_SECONDS=120
 PASSWORD_RESET_CODE_TTL_SECONDS=120
 AUTH_CODE_CLEANUP_INTERVAL_SECONDS=60
+DATA_RETENTION_CLEANUP_INTERVAL_SECONDS=3600
 RECAPTCHA_ENABLED=True
 RECAPTCHA_VERIFY_URL=https://www.google.com/recaptcha/api/siteverify
 RECAPTCHA_MIN_SCORE=0.5
@@ -167,6 +168,11 @@ password for `MAIL_PASSWORD`. For SMTP over SSL use `MAIL_SERVER=smtp.gmail.com`
    ![Create an app password](instructions/instruction2.png)
 
 ### Start, stop and rebuild
+
+Before starting a backend built from cycle 002, apply the adding retention migration
+and verify it with `--check` as described below. Do not restart the new backend
+against an unmigrated existing database. The retention worker is opt-in and is
+not started by this ordinary command.
 
 Start the local application:
 
@@ -270,6 +276,7 @@ already tracks. Review the staged diff and keep real credentials out of Git.
 CONFIRMATION_CODE_TTL_SECONDS=120
 PASSWORD_RESET_CODE_TTL_SECONDS=120
 AUTH_CODE_CLEANUP_INTERVAL_SECONDS=60
+DATA_RETENTION_CLEANUP_INTERVAL_SECONDS=3600
 ```
 
 Код действителен 2 минуты от создания; на границе 120 секунд он уже отклоняется. Использованный код удаляется сразу. Отдельный dev-сервис `auth-code-cleanup` запускает проход немедленно, затем каждую минуту; при штатной работе истёкшая запись удаляется примерно в пределах 3 минут от создания. При сбое БД проход откатывается и повторяется. Истёкший код остаётся недействительным, даже пока очистка недоступна. Удаление кода не удаляет незавершённый аккаунт. Таймер не запускается в Gunicorn workers.
@@ -301,3 +308,112 @@ docker compose --env-file .env.development run --rm --build --no-deps frontend n
 Размеры форм, кнопок, подписей, строк таблиц и промежутков переведены в rem/em и общую шкалу CSS-переменных для штатного browser zoom. Оболочка прокручивается целиком: шапка, содержимое и футер; таблицы сохраняют прокрутку строк и столбцов. Узкая раскладка допускает перенос меню и размещение дерева над содержимым; прежнее предупреждение 600×559 больше не закрывает страницу.
 
 Таблицы используют только ag-grid-community и ag-grid-react одной версии 35.2.0. Платное выделение диапазонов/fill handle отключено; редактирование отдельных ячеек и существующий XLSX-экспорт через xlsx сохранены. Закомментированные Enterprise-импорты сохранены по правилам проекта и не подключаются. Визуальная приёмка Chrome/Firefox, обеих тем и масштаба 80–200% остаётся открытой; сборка её не заменяет.
+
+
+## Автоматическое удаление регистраций и приватных заявок (локальный цикл 002)
+
+Локально реализованы `User.registered_at` и `registration_completed`, добавляющая
+PostgreSQL-миграция `auth.migrate_retention` и отдельный процесс
+`maintenance.retention_cleanup`. Реальное включение на VPS не выполнено.
+Подготовленные публичные тексты и договор `2026-10-14.2` выпускаются вместе с
+миграцией и включённым, проверенным worker после отдельного разрешения. Старые
+тексты действующего сайта до выпуска продолжают описывать его прежний режим.
+Оставшаяся обязательная визуальная проверка юридических страниц записана в активном
+[плане 002](docs/stages/002-automatic-data-retention.md).
+
+Срок незавершённой регистрации — один календарный месяц от первоначального
+серверного `registered_at`; повторная регистрация и resend срок не продлевают.
+Условие удаления: `active=False`, `registration_completed=False`, известная дата,
+срок достигнут, аккаунт не superuser. Любая успешная активация сохраняет
+`registration_completed=True`, последующее отключение его не сбрасывает.
+`terms_accepted_at` остаётся отдельным фактом и не используется как дата регистрации.
+Удаление аккаунта одной транзакцией убирает аккаунт/acceptance, его заявки всех
+статусов, коды обоих типов и однозначные чужие метки `editing_by`. При совпадающих
+именах метки сохраняются для рассмотрения оператором.
+
+Заявки `InputData` удаляются через шесть календарных месяцев от исходного
+`created_at` независимо от статуса и редактирования. Удаление заявки сохраняет
+аккаунт и его коды. Даты трактуются в UTC, время суток сохраняется; отсутствующий
+день ограничивается последним днём целевого месяца. Шесть месяцев прибавляются
+сразу, без последовательного округления. Worker делает проход сразу, затем
+ожидает 3600 секунд: удаление происходит на первом успешном проходе после срока,
+обычно в пределах следующего часа плюс длительность прохода. Сбой/остановка могут
+задержать удаление; оператор проверяет последние успешные проходы и просроченное.
+Интервал положительный и не больше 3600, в dev/prod Compose явно одинаковый.
+
+Legacy: миграция не выдумывает возраст и не заполняет прошлым аккаунтам сегодняшнюю
+дату. Старым активным допускается `registration_completed=True`; выключенные с
+неизвестной историей остаются NULL. Такие строки, даты из будущего, заявки без даты
+и superuser-аккаунты требуют операторского разбора перед включением. Dry-run
+показывает только агрегаты `unknown_accounts`, `unknown_submissions` и
+`protected_superusers`, без адресов, имён, ids и тел заявок. Содержимое рабочей
+dev/prod БД в этом цикле не подсчитывалось и не удалялось. Для неизвестных записей
+нельзя считать отсутствие автоматического удаления выполнением срока хранения.
+
+Автоматика не касается публичного rocks/source-каталога, чужих браузеров,
+почтовых ящиков, журналов и backup провайдера. Ручная обработка более ранних
+privacy-запросов, самоудаление и удаление отдельной заявки сохраняются. При
+восстановлении backup до возвращения данных в использование повторно применяются
+как законные запросы удаления, так и достигнутые плановые сроки.
+
+### Порядок будущего включения (не выполнен этим циклом)
+
+Команды ниже — инструкция для отдельного согласованного включения, не разрешение
+применять миграции или удаления к рабочим данным. Сначала проверить сборку на
+изолированном стенде. Для dev выбранный backend-env Docker читает сам; секреты
+не выводить и не использовать `compose config`.
+
+```sh
+docker compose --env-file .env.development build backend
+# db должен быть доступен; старый backend ещё не заменять.
+docker compose --env-file .env.development run --rm --no-deps backend python -m auth.migrate_retention
+docker compose --env-file .env.development run --rm --no-deps backend python -m auth.migrate_retention --check
+# Если ещё не применялась миграция acceptance — отдельно применить/проверить её.
+docker compose --env-file .env.development up -d --no-deps --no-build backend auth-code-cleanup
+# Явно указанный сервис можно запускать одноразово без включения его профиля.
+docker compose --env-file .env.development run --rm --no-deps retention-cleanup python -m maintenance.retention_cleanup --once
+# Разобрать legacy/предохранители, оценить счётчики; только затем разрешить удаление.
+docker compose --env-file .env.development --profile retention up -d --no-deps --no-build retention-cleanup
+docker compose --env-file .env.development logs --since 2h --tail 30 retention-cleanup
+# После проверки worker обновить согласованный frontend bundle и проверить страницы.
+docker compose --env-file .env.development up --build --no-deps frontend
+```
+
+Порядок: добавляющая миграция → `--check` → новый backend → одноразовый dry-run
+worker → разбор legacy и явное включение `--worker --execute` → контроль успешных
+проходов → согласованные тексты/frontend. Обновление frontend и backend версии
+договора должно быть согласованным; прежние принятия не перезаписываются и
+автоматического повторного принятия для старых аккаунтов нет.
+
+`--once` без `--execute` только читает. Одноразовое удаление требует обоих флагов;
+не использовать его для проверки рабочей dev-БД. `--worker` также требует
+`--execute`, корректно обрабатывает SIGTERM/SIGINT, закрывает сессии и после ошибки
+ждёт интервал перед повтором. Не запускается в HTTP/Gunicorn и не отправляет почту.
+При неприменённой/несовместимой схеме старт завершается безопасной ошибкой до удаления.
+
+И dev, и локальный приватный `docker-compose.prod.yml` содержат сервис
+`retention-cleanup` с профилем `retention`. Для prod заранее собрать
+`wwwhypda-backend:local`, доставить конфигурацию отдельно, выполнить миграцию и
+проверку выбранной users_db, dry-run и явное включение профиля по тому же порядку.
+Приватные `docker-compose.prod.yml`, `nginx.conf`, `wwwhypda-backend/env.prod`,
+`wwwhypda-frontendV2/.env.production` и `Dockerfile.prod` игнорируются Git:
+`git pull` их не доставляет. Здесь prod-файл подготовлен только локально.
+
+### Изолированные проверки
+
+```sh
+docker compose --env-file .env.development build backend
+docker run --rm --pull=never --network none -e TEST_AUTH_DATABASE_URI=sqlite:// --entrypoint python wwwhypda-dev-backend -m unittest tests.test_retention_cleanup tests.test_auth_lifecycle tests.test_terms_acceptance tests.test_submission_authors -v
+docker compose -p wwwhypda-retention-tests -f deploy/testing/retention.compose.yml up --abort-on-container-exit --exit-code-from tests
+docker compose -p wwwhypda-retention-tests -f deploy/testing/retention.compose.yml down
+```
+
+Тестовый project использует PostgreSQL 15, tmpfs и открытые синтетические
+реквизиты: нет env_file, опубликованных портов, рабочих volumes и данных. SQLite
+не доказывает row locks; PostgreSQL suites обязательны. `create_all/drop_all` в
+этих tests применяются только к тестовому URI. Транзакции в users_db используют
+общий PostgreSQL advisory lock перед User/InputData locks (SQLite no-op).
+Это консервативно сериализует auth/заявочные операции и исключает deadlock при
+очистке `editing_by` между владельцами; нагрузочные свойства требуют отдельной
+оценки при росте сервиса. Батчи ограничены 100 кандидатами, коммит между батчами;
+при ошибке откатывается текущий батч, ранее завершённые сохраняются. Retry безопасен.

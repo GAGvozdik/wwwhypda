@@ -10,7 +10,10 @@ from flask import jsonify
 from common_defenitions import db
 from auth.auth_models import User, ConfirmationCode
 from auth.terms import CURRENT_TERMS_VERSION
-import test_auth_lifecycle as lifecycle
+try:
+    from tests import test_auth_lifecycle as lifecycle
+except ImportError:
+    import test_auth_lifecycle as lifecycle
 
 
 class TermsAcceptanceTests(unittest.TestCase):
@@ -171,7 +174,8 @@ class TermsAcceptanceTests(unittest.TestCase):
         barrier = Barrier(2)
         engine = db.engines["users_db"]
         def before_insert(conn, cursor, statement, parameters, context, executemany):
-            if statement.startswith("INSERT INTO users"):
+            if statement == "SELECT pg_advisory_xact_lock(207002, 1)" and not conn.info.get("retention_test_synchronized"):
+                conn.info["retention_test_synchronized"] = True
                 barrier.wait(timeout=10)
         event.listen(engine,"before_cursor_execute",before_insert)
         def register(name):

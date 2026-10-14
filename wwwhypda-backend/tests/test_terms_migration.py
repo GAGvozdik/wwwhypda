@@ -88,6 +88,7 @@ class PostgreSQLTermsMigrationTests(unittest.TestCase):
         self.assertEqual(cli().returncode,0)
         with self.engine.begin() as c:
             c.execute(text("SELECT setval(pg_get_serial_sequence('users','id'),2)"))
+            c.execute(text("ALTER TABLE users ADD COLUMN registered_at TIMESTAMPTZ NULL, ADD COLUMN registration_completed BOOLEAN NULL"))
         with Session(self.engine) as session:
             user = User(name="New",email="new@example.test",active=False,
                 terms_accepted_at=datetime.now(timezone.utc),terms_version=CURRENT_TERMS_VERSION)

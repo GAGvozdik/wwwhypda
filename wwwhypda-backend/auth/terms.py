@@ -1,2 +1,2 @@
 """Текущая редакция договора; синхронизировать с frontend при выпуске."""
-CURRENT_TERMS_VERSION = "2026-10-14.1"
+CURRENT_TERMS_VERSION = "2026-10-14.2"

@@ -17,6 +17,10 @@ class User(db.Model):
     """
     __tablename__ = 'users'
 
+    registered_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    registration_completed = db.Column(db.Boolean, nullable=True)
+    __table_args__ = (db.Index("ix_users_retention", "registration_completed", "active", "registered_at"),)
+
     terms_accepted_at = db.Column(db.DateTime(timezone=True), nullable=True)
     terms_version = db.Column(db.String(64), nullable=True)
 
@@ -74,9 +78,12 @@ class User(db.Model):
     
     @classmethod
     def activate_user_by_id(cls, user_id: int) -> bool:
-        user = cls.query.filter_by(id=user_id).first()
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
+        user = cls.query.filter_by(id=user_id).populate_existing().with_for_update().first()
         if user:
             user.active = True
+            user.registration_completed = True
             db.session.commit()
             return True
         return False
@@ -128,6 +135,8 @@ class User(db.Model):
         Creates a new user with a hashed password.
         Returns the created user as a dictionary or None if the email is already taken.
         """
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
         if cls.query.filter_by(email=email).first():
             return None  # Email already in use
 
@@ -135,6 +144,7 @@ class User(db.Model):
             name=name,
             email=email,
             password=generate_password_hash(password),
+            registered_at=datetime.now(timezone.utc), registration_completed=False,
             active=False  # User is inactive until activated
         )
         db.session.add(new_user)
@@ -217,9 +227,12 @@ class User(db.Model):
         Activates a user account.
         Returns True if successful, otherwise False.
         """
-        user = cls.query.filter_by(email=email, active=False).first()
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
+        user = cls.query.filter_by(email=email, active=False).populate_existing().with_for_update().first()
         if user:
             user.active = True
+            user.registration_completed = True
             db.session.commit()
             return True
         return False
@@ -244,8 +257,10 @@ class ConfirmationCode(db.Model):
         Generates a 6-digit confirmation code and stores it in the database.
         Returns the created confirmation code object.
         """
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
         user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
-        if type == "password_reset" and (not user or not user.active):
+        if not user or (type == "password_reset" and not user.active):
             return None
         code = str((secrets.randbelow(900000) + 100000))
         confirmation_code = cls(email=email, code=code, type=type)
@@ -260,6 +275,8 @@ class ConfirmationCode(db.Model):
         Проверяет код в течение настроенного срока действия (цель — 2 минуты).
         Returns True if valid, otherwise False.
         """
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
         user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
         if not user:
             return False

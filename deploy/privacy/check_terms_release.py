@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[2]
-RELEASES = {"2026-10-14.1": "8df5d111e6d2bd35ee62f2b7b18371e493f5acfaae4a9dc238a4783b7235566d"}
+RELEASES = {"2026-10-14.2": "c492f028dc6429017911607d83883edf69b5ac83ce6bcc2f613dbf88f1d804d7", "2026-10-14.1": "8df5d111e6d2bd35ee62f2b7b18371e493f5acfaae4a9dc238a4783b7235566d"}
 
 
 def check():

@@ -11,6 +11,8 @@ def configure_session_security(jwt):
         if not isinstance(identity, str) or not identity.isdecimal():
             return True
         # Блокировка сериализует защищённые операции с удалением аккаунта в users_db.
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
         user = User.query.filter_by(id=int(identity)).populate_existing().with_for_update().first()
         g.auth_user = user
         if user is None or not user.active:

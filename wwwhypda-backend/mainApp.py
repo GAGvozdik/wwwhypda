@@ -101,6 +101,9 @@ if any(app.config[name] <= 0 for name in (
         "CONFIRMATION_CODE_TTL_SECONDS", "PASSWORD_RESET_CODE_TTL_SECONDS",
         "AUTH_CODE_CLEANUP_INTERVAL_SECONDS")):
     raise ValueError("Auth code TTL and cleanup interval must be positive")
+from maintenance.retention import validate_interval
+app.config["DATA_RETENTION_CLEANUP_INTERVAL_SECONDS"] = validate_interval(
+    os.getenv("DATA_RETENTION_CLEANUP_INTERVAL_SECONDS", "3600"))
 logging.basicConfig(level=app.config["LOG_LEVEL"])
 app.wsgi_app = ProxyFix(app.wsgi_app,
     x_for=app.config["PROXY_X_FOR"], x_proto=app.config["PROXY_X_PROTO"],

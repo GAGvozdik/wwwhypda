@@ -18,5 +18,6 @@
   "account_delete_failed": "Account deletion failed. Please try again.",
   "account_deleted": "Account and uploaded submissions deleted.",
   "terms_version_error": "The User Agreement has changed or its version is missing. Please refresh the page, read the current agreement and accept it again.",
-  "terms_client_time_forbidden": "The acceptance time must be recorded by the server."
+  "terms_client_time_forbidden": "The acceptance time must be recorded by the server.",
+  "registration_metadata_forbidden": "Registration metadata is server-managed."
 }
