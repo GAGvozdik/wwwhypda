@@ -1,5 +1,9 @@
 # wwwhypda
 
+## Работа с LLM-чатами и планами
+
+Начни с [короткой инструкции](docs/MANUAL.md). Роли, правила и планы находятся в [docs](docs/README.md). Старый TASKS заменён одним stage-планом на цикл.
+
 ## Local development
 
 This document describes the local development environment. Install Docker with
