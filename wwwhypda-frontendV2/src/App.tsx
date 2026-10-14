@@ -15,7 +15,7 @@ function SiteContent() {
     if (!recaptchaSiteKey) {
         return <div>reCAPTCHA site key not found in environment variables.</div>;
     }
-    return <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey}><MainWindow /></GoogleReCaptchaProvider>;
+    return <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey} useRecaptchaNet><MainWindow /></GoogleReCaptchaProvider>;
 }
 
 export default function App() {
