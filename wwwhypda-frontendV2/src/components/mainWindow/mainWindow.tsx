@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
+import { requiresRecaptcha } from '../commonFeatures/recaptchaRoutes';
 
 import { useSelector } from 'react-redux';
 // import { useDispatch } from 'react-redux';
@@ -80,7 +81,7 @@ export default function MainWindow() {
                 </a>
 
                 <div className={windowStyles.legalDocuments}>
-                    <span>{messages.recaptcha_notice}</span>
+                    {requiresRecaptcha(pathname) && <span>{messages.recaptcha_notice}</span>}
                     <LegalLinks className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`} />
                 </div>
 
