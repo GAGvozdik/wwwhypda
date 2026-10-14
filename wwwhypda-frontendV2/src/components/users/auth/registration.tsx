@@ -8,6 +8,7 @@ import ErrorMessage from './errorMessage';
 import UserButton from './userButton';
 import api from '../../api';
 import messages from '../../../common/error_messages.json';
+import { USER_AGREEMENT_VERSION } from '../../../common/userAgreementVersion';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 import { validateRegistration } from './validation';
@@ -28,6 +29,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [isChecked, setIsChecked] = useState(false);
     const [isAdult, setIsAdult] = useState(false);
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [termsVersionError, setTermsVersionError] = useState(false);
     const termsMissing = hasSubmitted && !isChecked;
     const ageMissing = hasSubmitted && !isAdult;
     const checkboxError = termsMissing && ageMissing
@@ -66,6 +68,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setError(validatRes);
             return;
         }
+        setTermsVersionError(false);
         pendingRequest.current = true;
         setIsLoading(true);
         try {
@@ -77,6 +80,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 recaptcha_token: token,
                 adult_confirmed: isAdult,
                 terms_accepted: isChecked,
+                terms_version: USER_AGREEMENT_VERSION,
             });
 
             if (response.status === 200 || response.status === 201) {
@@ -85,8 +89,13 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 setStep(2);
             }
         } catch (err: unknown) {
-            if (axios.isAxiosError<{ message?: string }>(err) && err.response?.data) {
-                if (err.response.data.message) {
+            if (axios.isAxiosError<{ message?: string; code?: string }>(err) && err.response?.data) {
+                if (err.response.data.code === 'terms_version_mismatch' || err.response.data.code === 'terms_version_required') {
+                    setStep(1);
+                    setIsChecked(false);
+                    setTermsVersionError(true);
+                    setError(messages.terms_version_error);
+                } else if (err.response.data.message) {
                     setError(err.response.data.message);
                 } else {
                     const errorMessages = Object.values(err.response.data);
@@ -238,7 +247,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             required
                         />
 
-                        <ErrorMessage error={checkboxError || error} isError={!!checkboxError || isError} />
+                        <ErrorMessage error={termsVersionError ? error : checkboxError || error} isError={!!checkboxError || isError} />
 
                         <div className={styles.registrationNotice}>
                             <div className={`${styles.checkboxRow} ${termsMissing ? styles.checkboxRowError : ''}`}>

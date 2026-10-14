@@ -172,5 +172,8 @@
   "legal_link_and": "and",
   "search_in": "Search in",
   "input_edit_title": "InputPageEdit",
-  "input_read_title": "Data reading"
+  "input_read_title": "Data reading",
+  "terms_version_error": "The User Agreement has changed or its version is missing. Please refresh the page, read the current agreement and accept it again.",
+  "terms_client_time_forbidden": "The acceptance time must be recorded by the server.",
+  "agreement_version_label": "Version:"
 }

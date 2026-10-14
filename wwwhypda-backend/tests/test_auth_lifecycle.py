@@ -7,6 +7,7 @@ from unittest.mock import patch
 from flask import Flask
 from common_defenitions import db
 from auth.auth_models import User, ConfirmationCode
+from auth.terms import CURRENT_TERMS_VERSION
 from auth.code_cleanup import cleanup_once, run_worker
 from inputData.inputDataModels import InputData
 
@@ -248,7 +249,7 @@ class AuthenticationFlowTests(unittest.TestCase):
     def test_registration_and_reset_use_and_expiry(self):
         client = self.app.test_client()
         with patch("auth.authentication.send_auth_email"):
-            response = client.post("/users/", json={"email": "new@example.test", "name": "New User", "password": "Password1!", "recaptcha_token": "test-token", "adult_confirmed": True, "terms_accepted": True})
+            response = client.post("/users/", json={"email": "new@example.test", "name": "New User", "password": "Password1!", "recaptcha_token": "test-token", "adult_confirmed": True, "terms_accepted": True, "terms_version": CURRENT_TERMS_VERSION})
         self.assertEqual(response.status_code, 200)
         code = ConfirmationCode.query.filter_by(email="new@example.test", type="registration").one().code
         self.assertEqual(client.post("/users/confirm-registration", json={"email": "new@example.test", "code": code, "recaptcha_token": "test-token"}).status_code, 200)

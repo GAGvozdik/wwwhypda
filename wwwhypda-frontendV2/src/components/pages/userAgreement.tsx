@@ -1,10 +1,13 @@
 import React from "react";
 import styles from "./policy.module.scss";
+import messages from "../../common/error_messages.json";
+import { USER_AGREEMENT_VERSION } from "../../common/userAgreementVersion";
 
 const UserAgreement: React.FC = () => {
   return (
     <div className={styles.container}>
-      <h1 className={styles.title}>User Agreement</h1>
+      <h1 className={styles.title}>{messages.user_agreement}</h1>
+      <p className={styles.text}>{messages.agreement_version_label} {USER_AGREEMENT_VERSION}</p>
 
       <p className={styles.text}>
         This User Agreement ("Agreement") governs access to and use of this application.

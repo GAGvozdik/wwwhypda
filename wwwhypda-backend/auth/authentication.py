@@ -3,7 +3,9 @@ import jwt
 import time
 import uuid
 from auth.auth_models import db, User, ConfirmationCode
-from auth.validate import validate_email_and_password, validate_user, validate_password
+from auth.validate import validate_email_and_password, validate_user, validate_password, messages
+from auth.terms import CURRENT_TERMS_VERSION
+from sqlalchemy.exc import IntegrityError
 from flask_mail import Message
 from common_defenitions import mail, verify_recaptcha, limiter, send_auth_email, error_message
 from datetime import datetime, timedelta, timezone
@@ -200,6 +202,14 @@ def add_user():
         if user_data.pop('terms_accepted', None) is not True:
             return jsonify(message="Please accept the User Agreement and acknowledge the Privacy and Cookie Policies."), 400
 
+        if 'terms_accepted_at' in user_data:
+            return jsonify(message=messages['terms_client_time_forbidden']), 400
+        terms_version = user_data.pop('terms_version', None)
+        if not isinstance(terms_version, str) or not terms_version:
+            return jsonify(message=messages['terms_version_error'], code='terms_version_required'), 400
+        if terms_version != CURRENT_TERMS_VERSION:
+            return jsonify(message=messages['terms_version_error'], code='terms_version_mismatch'), 409
+
         is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'))
         if not is_valid:
             return error_response
@@ -217,10 +227,24 @@ def add_user():
         # 👉 ВСЕГДА создаём/обновляем код
         new_account = existing_user is None
         if new_account:
-            existing_user = User(name=user_data["name"], email=email, active=False)
+            existing_user = User(name=user_data["name"], email=email, active=False,
+                terms_accepted_at=datetime.now(timezone.utc), terms_version=CURRENT_TERMS_VERSION)
             existing_user.set_password(user_data["password"])
             db.session.add(existing_user)
-            db.session.flush()
+            try:
+                db.session.flush()
+            except IntegrityError as exc:
+                # Конкурентное создание того же email: принятие победителя не изменяется.
+                db.session.rollback()
+                sqlstate = getattr(exc.orig, 'pgcode', None)
+                constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+                sqlite_unique = getattr(exc.orig, 'sqlite_errorname', None) == 'SQLITE_CONSTRAINT_UNIQUE'
+                if not (sqlite_unique or (sqlstate == '23505' and constraint == 'users_email_key')):
+                    raise
+                existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
+                if existing_user is None:
+                    raise
+                new_account = False
         confirmation_code = ConfirmationCode.create_code(email, "registration", commit=False)
         db.session.commit()
 

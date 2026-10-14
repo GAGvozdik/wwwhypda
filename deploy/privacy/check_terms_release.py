@@ -1,0 +1,31 @@
+"""Проверка редакции договора, словарей и отпечатка выпущенного документа."""
+import hashlib
+import json
+from pathlib import Path
+import re
+
+ROOT = Path(__file__).resolve().parents[2]
+RELEASES = {"2026-10-14.1": "8df5d111e6d2bd35ee62f2b7b18371e493f5acfaae4a9dc238a4783b7235566d"}
+
+
+def check():
+    backend = (ROOT / "wwwhypda-backend/auth/terms.py").read_text(encoding="utf-8")
+    frontend = (ROOT / "wwwhypda-frontendV2/src/common/userAgreementVersion.ts").read_text(encoding="utf-8")
+    version = re.search(r'CURRENT_TERMS_VERSION = "([^"]+)"', backend).group(1)
+    assert re.search(r"USER_AGREEMENT_VERSION = '([^']+)'", frontend).group(1) == version, "Редакции backend/frontend расходятся"
+    document = ROOT / "wwwhypda-frontendV2/src/components/pages/userAgreement.tsx"
+    digest = hashlib.sha256(document.read_text(encoding="utf-8").replace("\r\n", "\n").encode()).hexdigest()
+    assert RELEASES.get(version) == digest, "Документ изменён: выпустите новую редакцию и обновите обе константы и отпечаток"
+    for name in ("terms_version_error", "terms_client_time_forbidden"):
+        server = json.loads((ROOT / "common/error_messages.json").read_text(encoding="utf-8"))
+        client = json.loads((ROOT / "wwwhypda-frontendV2/src/common/error_messages.json").read_text(encoding="utf-8"))
+        assert server[name] == client[name], "Сообщения backend/frontend расходятся"
+    registration = (ROOT / "wwwhypda-frontendV2/src/components/users/auth/registration.tsx").read_text(encoding="utf-8")
+    assert "terms_version: USER_AGREEMENT_VERSION" in registration
+    assert "terms_accepted_at:" not in registration
+    assert "{USER_AGREEMENT_VERSION}" in document.read_text(encoding="utf-8")
+    print("Редакции, документ, payload и словари согласованы.")
+
+
+if __name__ == "__main__":
+    check()

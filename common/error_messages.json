@@ -16,5 +16,7 @@
   "account_delete_invalid_request": "Please provide your current password and verification.",
   "account_delete_password_invalid": "Current password is incorrect.",
   "account_delete_failed": "Account deletion failed. Please try again.",
-  "account_deleted": "Account and uploaded submissions deleted."
+  "account_deleted": "Account and uploaded submissions deleted.",
+  "terms_version_error": "The User Agreement has changed or its version is missing. Please refresh the page, read the current agreement and accept it again.",
+  "terms_client_time_forbidden": "The acceptance time must be recorded by the server."
 }
