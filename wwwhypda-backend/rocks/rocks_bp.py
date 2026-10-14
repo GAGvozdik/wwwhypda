@@ -74,26 +74,18 @@ def api_anonce():
 
 @rocks_bp.route('/rock_type', methods=['GET']) 
 def api_rock_type():
-    recaptcha_token = request.headers.get('X-Recaptcha-Token')
-    success, error_response = verify_recaptcha(recaptcha_token)
-    if not success:
-        return error_response
     results = RockType.getRockTypes()
     return jsonify(results)
 
 @rocks_bp.route('/parameters', methods=['GET'])
 def get_parameters():
-    recaptcha_token = request.headers.get('X-Recaptcha-Token')
-    success, error_response = verify_recaptcha(recaptcha_token)
-    if not success:
-        return error_response
     parameters = Parameter.getParameters()
     return jsonify(parameters)
 
 @rocks_bp.route('/samples/<int:rt_id>/<int:id_Parameter>')
 def get_samples(rt_id, id_Parameter):
     recaptcha_token = request.headers.get('X-Recaptcha-Token')
-    success, error_response = verify_recaptcha(recaptcha_token)
+    success, error_response = verify_recaptcha(recaptcha_token, "search")
     if not success:
         return error_response
     samples = Sample.getSamplesByRockType(rt_id)

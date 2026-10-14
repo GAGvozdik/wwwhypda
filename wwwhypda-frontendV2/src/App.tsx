@@ -4,12 +4,11 @@ import store from './redux/store';
 import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import MainWindow from './components/mainWindow/mainWindow';
 import './App.css';
-import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import RecaptchaProvider from './components/commonFeatures/recaptchaProvider';
 import { requiresRecaptcha } from './components/commonFeatures/recaptchaRoutes';
 
 function SiteContent() {
     const { pathname } = useLocation();
-    const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
     const needsRecaptcha = requiresRecaptcha(pathname);
     const [initialNeedsRecaptcha] = useState(needsRecaptcha);
 
@@ -24,10 +23,7 @@ function SiteContent() {
     if (!needsRecaptcha) {
         return <MainWindow />;
     }
-    if (!recaptchaSiteKey) {
-        return <div>reCAPTCHA site key not found in environment variables.</div>;
-    }
-    return <GoogleReCaptchaProvider reCaptchaKey={recaptchaSiteKey} useRecaptchaNet><MainWindow /></GoogleReCaptchaProvider>;
+    return <RecaptchaProvider><MainWindow /></RecaptchaProvider>;
 }
 
 export default function App() {

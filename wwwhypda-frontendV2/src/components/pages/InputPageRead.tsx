@@ -6,10 +6,8 @@ import CustomStepper from '../inputData/stepper';
 
 import {sendAllDataToServer} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
-import type{ WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
-import withRecaptcha from '../commonFeatures/withRecaptcha';
 
-const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
+const InputPageRead: React.FC = () => {
 
     const { openModal } = useModal();
     const [isLoading, setIsLoading] = useState(false);
@@ -25,21 +23,18 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     // };
 
     const handleSomething = async () => {
-        if (!executeRecaptcha) {
-            console.error('Recaptcha not available'); // Or show an error message to the user
-            return;
-        }
-
-        const token = await executeRecaptcha('submit_data'); // Execute reCAPTCHA here
+        // CAPTCHA removed for this JWT/CSRF-protected operation; historical comments preserved.
+        // Or show an error message to the user
+        // Execute reCAPTCHA here
 
         openModal({
-            title: "Submit dataset?",
+            title: messages.submit_dataset_title,
             description: "",
             buttons: [
                 {
-                    label: "Submit",
+                    label: messages.ui_submit,
                     onClick: () => {
-                        handleSubmitData(token);
+                        handleSubmitData();
                     },
                 },
                 // {
@@ -47,25 +42,25 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 //     onClick: () => console.log("Deny"),
                 // },
                 {
-                    label: "Close",
+                    label: messages.close,
                     onClick: () => {},
                 }
             ]
         });
     };
 
-    const handleSubmitData = async (token: string) => {
+    const handleSubmitData = async () => {
         setIsLoading(true);
         try {
-            await sendAllDataToServer(token);
+            await sendAllDataToServer();
             localStorage.removeItem("generalInfoData");
             localStorage.removeItem("measurementsTableData");
             localStorage.removeItem("sampleMeasurementTableData");
             localStorage.removeItem("siteInfoTableData");
             localStorage.removeItem("sourceTableData");
             localStorage.removeItem('activeStep');
-        } catch (error) {
-            console.error("Error submitting data:", error);
+        } catch {
+            console.warn("Submission request failed");
             // Optionally, display an error message to the user
         } finally {
             setIsLoading(false);
@@ -93,7 +88,7 @@ const InputPageRead: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     );
 };
 
-export default withRecaptcha(InputPageRead);
+export default InputPageRead;
 
 
 

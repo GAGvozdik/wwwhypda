@@ -16,8 +16,6 @@ import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 // import { UpdateMeasurementsData } from '../../../redux/actions';
 import { UpdateSampleMeasurementData } from '../../../redux/actions';
-import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
-import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import Button from '@mui/material/Button';
 
 import {
@@ -80,7 +78,7 @@ interface RockTypeData {
 type MeasurementSampleTableProps = InputStepProps;
 
 
-const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha, clearAction}) => {
+const MeasurementSampleTable: React.FC<MeasurementSampleTableProps> = ({isEditable= true, clearAction}) => {
     const containerStyle = useMemo(() => ({
         width: "100%",
         maxWidth: "72rem",
@@ -115,17 +113,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
             }
 
             try {
-                if (!executeRecaptcha) {
-                    setError("Recaptcha not available.");
-                    setLoading(false);
-                    return;
-                }
-                const token = await executeRecaptcha('get_sample_data');
-
-                const config = {
-                    headers: { 'X-Recaptcha-Token': token },
-                    withCredentials: true
-                };
+                const config = { withCredentials: true };
 
                 const [envResponse, reviewResponse, rocksResponse] = await Promise.all([
                     api.get<Fracturation[]>('/rocks/fracturations', config),
@@ -358,4 +346,4 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps & WithRecaptc
     );
 };
 
-export default withRecaptcha(MeasurementSampleTable);
+export default MeasurementSampleTable;

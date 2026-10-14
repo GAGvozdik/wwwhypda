@@ -34,7 +34,7 @@ def login():
         if not data:
             return jsonify(message="Please provide credentials"), 400
 
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "login")
         if not is_valid:
             return error_response
 
@@ -73,11 +73,7 @@ def login():
 @jwt_required()
 def check_auth():
     # reCAPTCHA v3 verification
-    recaptcha_token = request.headers.get('X-Recaptcha-Token')
-    is_valid, error_response = verify_recaptcha(recaptcha_token)
-    if not is_valid:
-        return error_response
-
+    # Session reads rely on JWT/current account/version; no third-party signal needed.
     identity = get_jwt_identity()
     claims = get_jwt()
     return jsonify(
@@ -161,7 +157,7 @@ def confirm_registration():
         if not data or "email" not in data or "code" not in data:
             return jsonify(message="Please provide email and code", error="Bad request"), 400
         
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "confirm_registration")
         if not is_valid:
             return error_response
 
@@ -214,7 +210,7 @@ def add_user():
         if terms_version != CURRENT_TERMS_VERSION:
             return jsonify(message=messages['terms_version_error'], code='terms_version_mismatch'), 409
 
-        is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'), "register")
         if not is_valid:
             return error_response
 
@@ -288,7 +284,7 @@ def request_password_reset():
         if not data or "email" not in data:
             return jsonify(message="Please provide email", error="Bad request"), 400
 
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), ("request_password_reset", "resend_password_reset"))
         if not is_valid:
             return error_response
 
@@ -323,7 +319,7 @@ def confirm_password_reset():
         if not data or "email" not in data or "code" not in data or "new_password" not in data:
             return jsonify(message="Please provide code and new password", error="Bad request"), 400
 
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "confirm_password_reset")
         if not is_valid:
             return error_response
 
@@ -373,7 +369,7 @@ def resend_confirmation():
         if not data or "email" not in data:
             return jsonify(message="Invalid request", data=None), 400
 
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'))
+        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "resend_code")
         if not is_valid:
             return error_response
 
@@ -415,9 +411,6 @@ def delete_own_account():
     password = data.get("password")
     if not isinstance(password, str) or not password or len(password) > 200:
         return jsonify(message=messages["password_required"]), 400
-    valid, failure = verify_recaptcha(data.get("recaptcha_token"))
-    if not valid:
-        return failure
     user = g.auth_user
     if not user.check_password(password):
         return jsonify(message=messages["account_delete_password_invalid"]), 403

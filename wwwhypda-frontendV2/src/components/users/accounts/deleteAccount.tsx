@@ -3,7 +3,6 @@ import axios from 'axios';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import type { State } from '../../../common/types';
@@ -19,7 +18,6 @@ export default function DeleteAccount() {
     const [pending, setPending] = useState(false);
     const busy = useRef(false);
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
-    const { executeRecaptcha } = useGoogleReCaptcha();
     const navigate = useNavigate();
 
     const close = () => {
@@ -36,15 +34,12 @@ export default function DeleteAccount() {
         if (!password) { setError(messages.password_required); return; }
         const csrf = getCsrfTokenFromCookie();
         if (!csrf) { setError(messages.csrf_missing); return; }
-        const testMode = import.meta.env.VITE_CYPRESS_TEST === 'true';
-        if (!testMode && !executeRecaptcha) { setError(messages.captcha_unavailable); return; }
         busy.current = true;
         setPending(true);
         pauseAccountSession();
         try {
-            const token = testMode ? 'test-token' : await executeRecaptcha!('delete_account');
             await api.delete('/users/me', {
-                data: { password, recaptcha_token: token },
+                data: { password },
                 withCredentials: true,
                 headers: { 'X-CSRF-TOKEN': csrf },
             });

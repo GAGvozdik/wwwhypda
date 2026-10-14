@@ -1,12 +1,10 @@
 import axios from 'axios';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { sessionEvent, sessionUnavailable } from './accountSession';
 import { useEffect } from 'react';
 // import axios from 'axios';
 import api from '../api';
 
 const useTokenRefresh = () => {
-    const { executeRecaptcha } = useGoogleReCaptcha();
     useEffect(() => {
         let disposed = false;
         let busy = false;
@@ -48,13 +46,9 @@ const useTokenRefresh = () => {
         };
 
         const refreshUserData = async () => {
-            if (disposed || sessionUnavailable() || !executeRecaptcha) return;
+            if (disposed || sessionUnavailable()) return;
             try {
-                const token = await executeRecaptcha('check_auth_after_refresh');
-                const res = await api.get('/users/check', {
-                    withCredentials: true,
-                    headers: { 'X-Recaptcha-Token': token },
-                });
+                const res = await api.get('/users/check', { withCredentials: true });
                 if (res.status !== 200) console.warn('Session check failed');
 
             } catch (error) {
@@ -79,7 +73,7 @@ const useTokenRefresh = () => {
             clearInterval(intervalId);
             window.removeEventListener(sessionEvent, onSessionChange);
         };
-    }, [executeRecaptcha]);
+    }, []);
 };
 
 export default useTokenRefresh;

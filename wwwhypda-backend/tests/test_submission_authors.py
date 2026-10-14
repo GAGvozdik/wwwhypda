@@ -46,7 +46,7 @@ class SubmissionAuthorsTests(unittest.TestCase):
         self.assertEqual(response.json['data']['sourceTableData'], rows)
         self.assertEqual(InputData.query.count(), self.initial_count + 1)
         self.assertEqual(InputData.query.filter_by(id=response.json['data']['id']).one().source_info, rows)
-        self.verify.assert_called_once_with('test-token')
+        self.verify.assert_not_called()
 
     def test_omitted_authors_remain_compatible(self):
         self.assertEqual(self.submit([]).status_code, 201)
@@ -64,11 +64,13 @@ class SubmissionAuthorsTests(unittest.TestCase):
         self.assertEqual(self.client.post('/input/submit', json=data).status_code, 401)
         self.assertEqual(InputData.query.count(), self.initial_count)
 
-    def test_captcha_denial_still_prevents_saving(self):
-        from flask import jsonify
-        self.verify.return_value = (False, (jsonify(message='Captcha rejected'), 400))
-        self.assertEqual(self.submit([{'field': 'authors', 'value': ''}]).status_code, 400)
-        self.assertEqual(InputData.query.count(), self.initial_count)
+    def test_submission_does_not_call_google_but_requires_session_and_csrf(self):
+        response=self.client.post('/input/submit',headers=self.headers,
+                                  json={'sourceTableData':[]})
+        self.assertEqual(response.status_code,201)
+        self.verify.assert_not_called()
+        self.assertEqual(InputData.query.count(),self.initial_count+1)
+
 
 
 if __name__ == '__main__':

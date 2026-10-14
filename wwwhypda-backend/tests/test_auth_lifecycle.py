@@ -169,7 +169,6 @@ class AccountDeletionTests(unittest.TestCase):
         self.assertEqual(self.delete(self.app.test_client(), headers).status_code, 401)
         self.assertEqual(self.delete(client, {}).status_code, 401)
         self.assertEqual(self.delete(client, headers, password="wrong").status_code, 403)
-        self.assertEqual(self.delete(client, headers, recaptcha_token=None).status_code, 400)
         self.assertEqual(self.delete(client, headers, user_id=self.other_id).status_code, 400)
         self.assertEqual(User.query.count(), 2)
         self.assertEqual(InputData.query.count(), 6)

@@ -1,6 +1,6 @@
 import MainTree from '../tree/mainTree';
 import messages from '../../common/error_messages.json';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import styles from "./searchStyles.module.scss";
 import FormControl from '@mui/material/FormControl';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -11,8 +11,7 @@ import type { State, UpdateTableDataAction, DynamicRowData } from '../../common/
 import { useSelector, useDispatch } from 'react-redux';
 import SearchResultsTable from './searchResultsTable';
 import api from '../api';
-import withRecaptcha from '../commonFeatures/withRecaptcha';
-import type { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
+import { RecaptchaRequestContext } from '../commonFeatures/recaptchaContext';
 
 interface Parameter {
   id_Parameter: number;
@@ -25,9 +24,10 @@ interface Parameter {
   MinValue: number;
 }
 
-const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
-    let rt_id = useSelector((state: State) => state.currentRTID);
-    let rt_name = useSelector((state: State) => state.currentRTName);
+const Search: React.FC = () => {
+    const executeRecaptcha = useContext(RecaptchaRequestContext);
+    const rt_id = useSelector((state: State) => state.currentRTID);
+    const rt_name = useSelector((state: State) => state.currentRTName);
 
     const dispatch = useDispatch();
 
@@ -43,21 +43,20 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     useEffect(() => {
         const fetchParameters = async () => {
             setLoading(true);
-            if (executeRecaptcha) {
                 try {
-                    const token = await executeRecaptcha('parameters');
-                    const response = await api.get<Parameter[]>('/rocks/parameters', { headers: { 'X-Recaptcha-Token': token } });
+
+                    const response = await api.get<Parameter[]>('/rocks/parameters');
                     setParameters(response.data);
 
-                } catch (error: any) {
-                    setError(error.message);
+                } catch {
+                    setError(messages.catalog_load_failed);
                 } finally {
                     setLoading(false);
                 }
-            }
+
         };
         fetchParameters();
-    }, [executeRecaptcha]);
+    }, []);
 
     const [selectedValue, setSelectedValue] = useState<number | null>(null);
 
@@ -65,9 +64,10 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         event.preventDefault();
         if (selectedValue !== null && executeRecaptcha) {
             setIsSearching(true);
-            const token = await executeRecaptcha('search');
+
             const fetchParameters = async () => {
                 try {
+                    const token = await executeRecaptcha('search');
                     const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } });
                     console.log(`/rocks/samples/${rt_id}/${selectedValue}`)
                     const res = response.data.map((item, index) => ({
@@ -77,8 +77,8 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
                     dispatch<UpdateTableDataAction>(UpdateTableData(res));
 
-                } catch (error: any) {
-                    setError(error.message);
+                } catch {
+                    setError(messages.catalog_load_failed);
                 } finally {
                     setLoading(false);
                     setIsSearching(false);
@@ -86,7 +86,7 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             };
             fetchParameters();
         }
-    }, [selectedValue, executeRecaptcha, rt_id]);
+    }, [selectedValue, rt_id, dispatch, executeRecaptcha]);
 
     return (
         <div
@@ -199,4 +199,4 @@ const Search: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     );
 };
 
-export default withRecaptcha(Search);
+export default Search;

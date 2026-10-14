@@ -50,7 +50,7 @@
   "remove_superuser": "Remove Superuser Status",
   "back_to_website": "Back to the website",
   "website_credits": "This website was created by Gvozdik G. and A. Comunian.",
-  "recaptcha_notice": "This site uses reCAPTCHA for abuse prevention.",
+  "recaptcha_notice": "This site is protected by reCAPTCHA.",
   "menu_home": "Home",
   "menu_search": "Search",
   "menu_add_data": "Add data",
@@ -176,5 +176,9 @@
   "terms_version_error": "The User Agreement has changed or its version is missing. Please refresh the page, read the current agreement and accept it again.",
   "terms_client_time_forbidden": "The acceptance time must be recorded by the server.",
   "agreement_version_label": "Version:",
-  "registration_metadata_forbidden": "Registration metadata is server-managed."
+  "registration_metadata_forbidden": "Registration metadata is server-managed.",
+  "catalog_load_failed": "Could not load scientific data. Please try again.",
+  "submit_dataset_title": "Submit dataset?",
+  "submit_changes_title": "Submit your changes?",
+  "submit_changes_action": "Submit changes"
 }

@@ -1,5 +1,6 @@
 import React from 'react';
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
+import { useContext } from 'react';
+import { RecaptchaRequestContext } from './recaptchaContext';
 
 export interface WithRecaptchaProps {
   executeRecaptcha?: (action?: string) => Promise<string>;
@@ -7,6 +8,7 @@ export interface WithRecaptchaProps {
 
 const withRecaptcha = <P extends object>(WrappedComponent: React.ComponentType<P & WithRecaptchaProps>) => {
   const WithRecaptchaComponent: React.FC<P> = (props) => {
+    const executeRecaptcha = useContext(RecaptchaRequestContext);
     const isCypressTest = import.meta.env.VITE_CYPRESS_TEST === 'true';
 
     if (isCypressTest) {
@@ -17,12 +19,7 @@ const withRecaptcha = <P extends object>(WrappedComponent: React.ComponentType<P
       return <WrappedComponent {...props} executeRecaptcha={dummyExecuteRecaptcha} />;
     }
     
-    const ComponentWithRecaptcha: React.FC<P> = (innerProps) => {
-        const { executeRecaptcha } = useGoogleReCaptcha();
-        return <WrappedComponent {...innerProps} executeRecaptcha={executeRecaptcha} />;
-    }
-
-    return <ComponentWithRecaptcha {...props} />;
+    return <WrappedComponent {...props} executeRecaptcha={executeRecaptcha} />;
   };
 
   return WithRecaptchaComponent;

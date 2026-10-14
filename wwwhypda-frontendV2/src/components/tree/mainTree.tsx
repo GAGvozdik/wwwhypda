@@ -14,8 +14,6 @@ import CustomTreeItem from './customTreeItem';
 // import axios from 'axios';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import api from '../api';
-import type { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
-import withRecaptcha from '../commonFeatures/withRecaptcha';
 
 interface RockTypeData {
     rt_id: number;
@@ -72,17 +70,16 @@ const buildTree = (data: RockTypeData[]): React.ReactNode[] => {
 };
 
 
-const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
+const ModelsTreeDrawer: React.FC = () => {
     const [treeData, setTreeData] = useState<RockTypeData[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchRockTypes = async () => {
-            if (executeRecaptcha) {
                 try {
-                    const token = await executeRecaptcha('rock_type');
-                    const response = await api.get<RockTypeData[]>('/rocks/rock_type', { headers: { 'X-Recaptcha-Token': token } });
+
+                    const response = await api.get<RockTypeData[]>('/rocks/rock_type');
 
                     if (!response.data || response.data.length === 0) {
                         setError(messages.tree_empty);
@@ -92,11 +89,11 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
                 } catch {
                     setError(messages.tree_failed);
                 }
-            }
+
         };
 
         fetchRockTypes();
-    }, [executeRecaptcha]);
+    }, []);
 
     useEffect(() => {
         if (treeData.length > 0 || error) {
@@ -130,4 +127,4 @@ const ModelsTreeDrawer: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) =>
     );
 };
 
-export default withRecaptcha(ModelsTreeDrawer);
+export default ModelsTreeDrawer;

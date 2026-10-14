@@ -16,9 +16,7 @@ import api from '../../api';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import { UpdateMeasurementsData } from '../../../redux/actions';
 // import { UpdateSampleMeasurementData } from '../../../redux/actions';
-import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 import Button from '@mui/material/Button';
-import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import {
     ClientSideRowModelModule,
     ModuleRegistry,
@@ -70,7 +68,7 @@ interface InterpretationMethod {
 
 type MeasurementsProps = InputStepProps;
 
-const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEditable= true, executeRecaptcha, clearAction}) => {
+const Measurements: React.FC<MeasurementsProps> = ({isEditable= true, clearAction}) => {
     const containerStyle = useMemo(() => ({
         width: "100%",
         maxWidth: "72rem",
@@ -106,17 +104,7 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
             }
 
             try {
-                if (!executeRecaptcha) {
-                    setError("Сaptcha not available.");
-                    setLoading(false);
-                    return;
-                }
-                const token = await executeRecaptcha('get_measurement_data');
-
-                const config = {
-                    headers: { 'X-Recaptcha-Token': token },
-                    withCredentials: true
-                };
+                const config = { withCredentials: true };
 
                 const [parameterResponse, qualityResponse, experimentTypeResponse, metodResponse] = await Promise.all([
                     api.get<Parameter[]>('/rocks/parameters', config),
@@ -307,4 +295,4 @@ const Measurements: React.FC<MeasurementsProps & WithRecaptchaProps> = ({isEdita
     );
 };
 
-export default withRecaptcha(Measurements);
+export default Measurements;

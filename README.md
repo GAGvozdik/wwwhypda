@@ -136,7 +136,7 @@ frontend env file; the secret key belongs only in backend `env.dev`.
 Normal local use keeps `RECAPTCHA_ENABLED=True`, `TESTING=False`,
 `ENABLE_TEST_ENDPOINTS=False` and `VITE_CYPRESS_TEST=false`. Public
 `/api/rocks/rock_type` and `/api/rocks/parameters` requests do not require login,
-but still require a valid CAPTCHA token, which the frontend obtains.
+and in the local cycle 003 code no longer require a CAPTCHA token; ordinary request limits remain.
 
 Настройки SMTP независимы от CAPTCHA. Настройте собственный почтовый аккаунт для разработки. В режиме `MAIL_DELIVERY_MODE=log` отправка пропускается и в журнал записывается только факт пропуска; код, адрес получателя и тело письма не выводятся. Этот режим не доставляет код пользователю.
 
@@ -268,7 +268,7 @@ already tracks. Review the staged diff and keep real credentials out of Git.
 
 ## Удаление аккаунта и срок кодов
 
-В новой версии кнопка `Delete account` доступна в обычном и административном аккаунтах. Подтверждение требует текущего пароля, CSRF и CAPTCHA. Сервер удаляет собственный аккаунт, его заявки всех статусов и коды одной транзакцией в users_db; старые access/refresh JWT больше не дают доступа. Независимые исторические научные таблицы не удаляются по совпадению имени автора. После успеха браузер очищает состояние пользователя и черновики, сохраняя тему; другие вкладки того же сайта получают уведомление. Сервер не может сам очистить браузерное хранилище другого устройства. Письма и резервные копии имеют отдельный жизненный цикл.
+В новой версии кнопка `Delete account` доступна в обычном и административном аккаунтах. Подтверждение требует текущей JWT-сессии, пароля и CSRF; в локальном цикле 003 дополнительная CAPTCHA для этой авторизованной операции снята. Сервер удаляет собственный аккаунт, его заявки всех статусов и коды одной транзакцией в users_db; старые access/refresh JWT больше не дают доступа. Независимые исторические научные таблицы не удаляются по совпадению имени автора. После успеха браузер очищает состояние пользователя и черновики, сохраняя тему; другие вкладки того же сайта получают уведомление. Сервер не может сам очистить браузерное хранилище другого устройства. Письма и резервные копии имеют отдельный жизненный цикл.
 
 Несекретные настройки в существующих backend env-файлах:
 
@@ -431,3 +431,63 @@ users_db и повторного --check командами выше, по ра�
 до готовности provider не сопровождается POST и требует дождаться загрузки;
 сохранение этой ошибки после reload требует отдельной диагностики browser/network,
 а не отключения CAPTCHA.
+
+
+## reCAPTCHA — завершённый локальный цикл 003
+
+В коде оставлены только явные search/login/register/confirmation/resend/password-reset
+действия. Скрипт загружается лениво после попытки действия на /search, /login, /register,
+/forgot-password; форма остаётся смонтированной, token не кэшируется. Timeout
+ожидания/ошибка показываются существующим сообщением, сетевой запрос не отправляется
+с молчаливым обходом CAPTCHA. Начальные справочники, /users/check, post-login/refresh
+checks и авторизованные submit/delete не обращаются к Google. JWT/current account,
+CSRF, role/ownership, password и rate limits сохранены. Переход между auth-группой
+и прочими страницами перезагружает документ; localStorage/Redux drafts не очищаются
+этим механизмом. Неактивный tokenRefresh не включён попутно.
+
+Server SiteVerify требует success=True, конечный числовой score и достаточный порог,
+фиксированный endpoint expected action, точный hostname. Google проверяет срок и
+одноразовость токена; success=True с непустым error/error-codes (включая quota
+fallback legacy SiteVerify) также отклоняется; cookie expiry эту проверку не заменяет. Журналы не выводят
+ответы Google, токены, адреса и произвольные hostname/action. Test bypass действует
+только при TESTING=True; production запрещает отключённую или не настроенную CAPTCHA.
+
+Несекретная новая настройка backend: `RECAPTCHA_ALLOWED_HOSTNAMES` — JSON-массив
+точных hostname без scheme/path/port/wildcard. Dev default — ["localhost","127.0.0.1"].
+Production требует явный непустой список действительных доменов владельца и
+не допускает localhost/IP/зарезервированные тестовые домены. Владелец подтвердил
+production-домены wwhypdatestdeployversion.it и www.wwhypdatestdeployversion.it;
+prod-env и VPS в этом цикле не читаются/не меняются. Секретный ключ
+остаётся в выбранном env и не выводится. RECAPTCHA_VERIFY_URL допускает официальный
+HTTPS siteverify Google или recaptcha.net; новые платные assessments не вводились.
+
+Тип v3/настройки записи wwhypdatestdeployversion, домены и адресное уведомление
+Google о CDPA с 02.04.2026 подтверждены владельцем. [Итоговая пофункциональная
+оценка](deploy/privacy/recaptcha-assessment.md) поддерживает ограниченный технический
+security-only режим без дополнительного consent-banner; [DPIA](deploy/privacy/recaptcha-dpia.md)
+учитывает persistent cookie, передачи и ложные отказы. Это оценка конкретного scope,
+не blanket-exemption для новых целей или утверждение о GDPR всего сайта.
+[Browser-проверка](deploy/privacy/recaptcha-browser-check.md) и
+[архив цикла](docs/archive/003-recaptcha-consent-assessment.md) фиксируют выполненные
+проверки, приёмку владельца Firefox и пределы наблюдений. Production-публикация требует отдельного разрешения
+и проверки соответствующей среды; в локальном цикле VPS не затрагивается.
+
+Синтетические тесты без сети/SMTP/рабочих данных:
+
+```sh
+docker compose --env-file .env.development build backend
+docker run --rm --pull=never --network none -e TEST_AUTH_DATABASE_URI=sqlite:// --entrypoint python wwwhypda-dev-backend -m unittest tests.test_recaptcha_policy tests.test_auth_lifecycle tests.test_terms_acceptance tests.test_submission_authors -v
+docker compose --env-file .env.development run --rm --no-deps frontend node --test scripts/test-recaptcha-scope.mjs
+docker compose --env-file .env.development run --rm --no-deps frontend node --experimental-vm-modules --test scripts/test-account-session.mjs
+```
+
+После успешных сборки/тестов dev bundle и backend обновлять согласованно:
+
+```sh
+docker compose --env-file .env.development up -d --no-deps --no-build backend
+docker compose --env-file .env.development up --build --no-deps frontend
+```
+
+Эти команды не запускают retention-профиль, не применяют миграции и не требуют
+создавать/удалять аккаунты. Для browser smoke не отправлять реальные регистрации,
+reset emails или научные данные. Обновление localhost не является deployment на VPS.

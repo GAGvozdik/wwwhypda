@@ -7,35 +7,29 @@ import CustomStepper from '../inputData/stepper';
 
 import {completeSubmission} from '../inputData/steps';
 import { useModal } from '../modal/modalContext';
-import withRecaptcha from '../commonFeatures/withRecaptcha';
-import type { WithRecaptchaProps } from '../commonFeatures/withRecaptcha';
 
-const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
+const InputPageEdit: React.FC = () => {
 
     const { openModal } = useModal();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSomething = async () => {
-        if (!executeRecaptcha) {
-            console.error('Recaptcha not available');
-            return;
-        }
-
+        // CAPTCHA removed for this JWT/CSRF-protected operation; historical comments preserved.
         // const token = await executeRecaptcha('submit_data');
 
         openModal({
-            title: "Submit your changes?",
+            title: messages.submit_changes_title,
             description: "",
             buttons: [
                 {
-                    label: "Submit editings",
+                    label: messages.submit_changes_action,
                     onClick: () => {
                         handleSubmitData();
                     },
                 },
                 {
-                    label: "Close",
+                    label: messages.close,
                     onClick: () => {},
                 }
             ]
@@ -61,8 +55,8 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             localStorage.removeItem('activeStep');
             localStorage.removeItem('submissionId');
             navigate('/superaccount');
-        } catch (error) {
-            console.error("Error submitting data:", error);
+        } catch {
+            console.warn("Submission request failed");
         } finally {
             setIsLoading(false);
         }
@@ -89,4 +83,4 @@ const InputPageEdit: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     );
 };
 
-export default withRecaptcha(InputPageEdit);
+export default InputPageEdit;

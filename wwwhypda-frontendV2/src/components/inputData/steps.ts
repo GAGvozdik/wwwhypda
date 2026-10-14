@@ -9,11 +9,11 @@ import api from '../api';
 import { getCsrfTokenFromCookie } from '../../common/types';
 
 
-export const sendAllDataToServer = async (recaptchaToken: string) => {
+export const sendAllDataToServer = async () => {
   const payload = insertData();
 
   try {
-    await api.post("/input/submit", { ...payload, recaptcha_token: recaptchaToken }, {
+    await api.post("/input/submit", payload, {
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-TOKEN": getCsrfTokenFromCookie(),
@@ -22,8 +22,9 @@ export const sendAllDataToServer = async (recaptchaToken: string) => {
     });
 
     console.log("Данные успешно отправлены");
-  } catch {
+  } catch (error) {
     console.warn("Ошибка при отправке данных");
+    throw error;
   }
 };
 

@@ -96,11 +96,6 @@ def submit_data():
         if row['field'].strip().casefold() == 'authors' and row.get('value') != '':
             return jsonify(message="Author entry is temporarily disabled"), 400
 
-    recaptcha_token = data.get('recaptcha_token')
-    is_valid, error_response = verify_recaptcha(recaptcha_token)
-    if not is_valid:
-        return error_response
-
     current_user_id = get_jwt_identity()
     payload = data
 
