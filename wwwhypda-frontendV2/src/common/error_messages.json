@@ -168,7 +168,7 @@
   "edit_data_unavailable": "You can't edit this data! Please wait ...",
   "edit_data_owner": "This data set is editing by {name}",
   "input_page_title": "INPUT PAGE",
-  "dataset_submission_notice": "Datasets submitted here are intended for review and public sharing. Do not upload private or sensitive personal information. See the",
+  "dataset_submission_notice": "Your submission is accessible only to you and authorised site administrators and is not published for visitors. Author entry is temporarily disabled; do not enter other people's names in other fields. Do not upload private contact details, credentials, confidential material or sensitive personal data. See the",
   "legal_link_and": "and",
   "search_in": "Search in",
   "input_edit_title": "InputPageEdit",

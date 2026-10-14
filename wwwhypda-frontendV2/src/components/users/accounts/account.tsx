@@ -118,8 +118,7 @@ const Account: React.FC = () => {
                     )}
                     <section className={styles.accountPrivacy} aria-label={messages.personal_data_requests}>
                         <p>{messages.personal_data_request_description}</p>
-                        <a className={styles.policyLink} href="mailto:georgii.gvozdik@studenti.unimi.it?subject=Personal%20data%20request">{messages.ui_georgii_gvozdik_studenti_unimi_it}</a>
-                        <a className={styles.policyLink} href="mailto:alessandro.comunian@unimi.it">{messages.ui_alessandro_comunian_unimi_it}</a>
+                        <a className={styles.policyLink} href="mailto:wwhypda@gmail.com?subject=Personal%20data%20request">wwhypda@gmail.com</a>
                         <p>{messages.logout_does_not_delete}</p>
                     </section>
                 </div>

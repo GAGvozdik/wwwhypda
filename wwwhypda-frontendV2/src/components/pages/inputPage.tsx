@@ -38,7 +38,7 @@ const InputPage: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
         openModal({
             title: "Submit dataset?",
-            description: "Submitted datasets are reviewed for public publication. Publish only data you are entitled to share. Do not include private contact details, credentials, or sensitive personal information. Published information may be copied by others.",
+            description: "Your submission is accessible only to you and authorised site administrators and is not published for visitors. Submit only material you are entitled to share. Author entry is temporarily disabled; do not enter other people's names in other fields. Do not include private contact details, credentials, confidential material or sensitive personal data.",
             buttons: [
                 {
                     label: "Submit",

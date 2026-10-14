@@ -84,8 +84,18 @@ def delete_submission(id):
 @jwt_required()
 def submit_data():
     data = request.json
-    if not data:
+    if not isinstance(data, dict) or not data:
         return jsonify(message="Invalid request data"), 400
+
+    source_rows = data.get('sourceTableData', [])
+    if not isinstance(source_rows, list):
+        return jsonify(message="Invalid source data"), 400
+    for row in source_rows:
+        if not isinstance(row, dict) or not isinstance(row.get('field'), str):
+            return jsonify(message="Invalid source data"), 400
+        if row['field'].strip().casefold() == 'authors' and row.get('value') != '':
+            return jsonify(message="Author entry is temporarily disabled"), 400
+
     recaptcha_token = data.get('recaptcha_token')
     is_valid, error_response = verify_recaptcha(recaptcha_token)
     if not is_valid:

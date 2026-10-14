@@ -47,7 +47,7 @@ const insertData = () => {
     measurementsTableData: JSON.parse(localStorage.getItem("measurementsTableData") || "[]"),
     sampleMeasurementTableData: JSON.parse(localStorage.getItem("sampleMeasurementTableData") || "[]"),
     siteInfoTableData: JSON.parse(localStorage.getItem("siteInfoTableData") || "[]"),
-    sourceTableData: JSON.parse(localStorage.getItem("sourceTableData") || "[]"),
+    sourceTableData: (JSON.parse(localStorage.getItem("sourceTableData") || "[]") as Array<{ field: string; value: string }>).map((row) => row.field === "authors" ? { ...row, value: "" } : row),
   };
 };
 

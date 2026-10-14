@@ -21,7 +21,7 @@ ModuleRegistry.registerModules([
 ]);
 
 const getDefaultRowData = () => [
-    { field: "authors", value: "", description: "the source authors (i.e.: Ankeny M.D.,M. Ahmed, T.C. Kaspar, and R. Horton)" },
+    { field: "authors", value: "", description: "Author entry is temporarily disabled." },
     { field: "title", value: "", description: "the source title (i.e. Simple field for determining unsaturated hydraulic conductivity)" },
     { field: "source", value: "", description: "the source (i.e. Journal of Contaminant Hydrology, Vol. 91, Issues 3-4, 14 May 2007)" },
     { field: "year_Source", value: "", description: "the year of publication (i.e.: 1991 )" },
@@ -54,7 +54,7 @@ const SourceInfo = ({isEditable=true, clearAction}: SourceInfoProps) => {
             try {
                 const parsed = JSON.parse(saved);
                 if (Array.isArray(parsed)) {
-                    setTableData(parsed);
+                    setTableData(parsed.map((row: ReturnType<typeof getDefaultRowData>[number]) => isEditable && row.field === "authors" ? { ...row, value: "" } : row));
                 }
             } catch (e) {
                 console.error("Failed to parse saved table data", e);
@@ -80,9 +80,9 @@ const SourceInfo = ({isEditable=true, clearAction}: SourceInfoProps) => {
 
     const columnDefs = useMemo<ColDef[]>(() => [
         { field: "field", editable: false, flex: 1 },
-        { field: "value", editable: isEditable, flex: 1, singleClickEdit: true },
+        { field: "value", editable: (params) => isEditable && params.data?.field !== "authors", flex: 1, singleClickEdit: true },
         { field: "description", editable: false, flex: 2 }
-    ], []);
+    ], [isEditable]);
 
     const defaultColDef = useMemo<ColDef>(() => ({
         editable: isEditable,
