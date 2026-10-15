@@ -112,7 +112,7 @@ class EndpointPolicyTests(unittest.TestCase):
             ('/users/confirm-password-reset',{'email':'owner@example.test','code':'123456','new_password':'OtherPass2!'},'confirm_password_reset')]
         before=User.query.count()
         with patch('auth.authentication.verify_recaptcha',return_value=(False,(jsonify(message='Verification failed'),400))) as verify:
-            with patch('auth.authentication.send_auth_email') as mail:
+            with patch('auth.authentication.send_auth_code_email') as mail:
                 for path,payload,expected in cases:
                     response=client.post(path,json={**payload,'recaptcha_token':'synthetic-token','expected_action':'attacker'})
                     # registration rejects extra fields before verify; use a separate request without spoofed field.

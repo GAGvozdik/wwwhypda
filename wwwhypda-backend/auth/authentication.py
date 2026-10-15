@@ -3,10 +3,12 @@ import jwt
 import time
 import uuid
 from auth.auth_models import db, User, ConfirmationCode
-from auth.validate import validate_email_and_password, validate_user, validate_password, messages
+from auth.validate import validate_email_and_password, validate_user, validate_password, validate_email, messages
 from auth.terms import CURRENT_TERMS_VERSION
+from auth.password_reset_delivery import send_reset_email, send_auth_code_email, wait_for_response_window, wait_for_failed_login
 from auth.transaction_lock import lock_users_transaction
 from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 from flask_mail import Message
 from common_defenitions import mail, verify_recaptcha, limiter, send_auth_email, error_message
 from datetime import datetime, timedelta, timezone
@@ -30,16 +32,21 @@ auth_bp = Blueprint("users", __name__, url_prefix="/users")
 @limiter.limit(lambda: current_app.config["AUTH_LOGIN_RATE_LIMIT"])
 def login():
     try:
-        data = request.json
-        if not data:
+        data = request.get_json(silent=True)
+        if (not isinstance(data, dict) or not isinstance(data.get("email"), str)
+                or not 1 <= len(data["email"]) <= 100 or validate_email(data["email"]) is not True
+                or not isinstance(data.get("password"), str) or not 1 <= len(data["password"]) <= 1024):
             return jsonify(message="Please provide credentials"), 400
 
         is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "login")
         if not is_valid:
             return error_response
 
+        started = time.monotonic()
         user = User.login(data["email"], data["password"])
         if not user:
+            db.session.rollback()
+            wait_for_failed_login(started)
             return jsonify(message="Invalid email or password", error="Unauthorized"), 404
 
         identity = str(user["id"])
@@ -153,10 +160,13 @@ def options_confirm_registration():
 def confirm_registration():
     """Confirm user registration by verifying the activation code."""
     try:
-        data = request.json
-        if not data or "email" not in data or "code" not in data:
+        data = request.get_json(silent=True)
+        if (not isinstance(data, dict) or not isinstance(data.get("email"), str)
+                or not 1 <= len(data["email"]) <= 100 or validate_email(data["email"]) is not True
+                or not isinstance(data.get("code"), str) or len(data["code"]) != 6
+                or not data["code"].isascii() or not data["code"].isdigit() ):
             return jsonify(message="Please provide email and code", error="Bad request"), 400
-        
+
         is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "confirm_registration")
         if not is_valid:
             return error_response
@@ -167,7 +177,7 @@ def confirm_registration():
         if not ConfirmationCode.verify_code(email, code, "registration"):
             return jsonify(message="Invalid or expired confirmation code", error="Unauthorized"), 401
 
-        user = User.query.filter_by(email=email, active=False).first()
+        user = User.query.filter_by(email=email, active=False, registration_completed=False).first()
         if user:
             user.active = True
             user.registration_completed = True
@@ -187,8 +197,8 @@ def confirm_registration():
 def add_user():
     """Register a new user and send an activation email (enumeration-safe)."""
     try:
-        user_data = request.json
-        if not user_data:
+        user_data = request.get_json(silent=True)
+        if not isinstance(user_data, dict) or not user_data:
             return jsonify(
                 message="Please provide user details",
                 error="Bad request",
@@ -216,56 +226,76 @@ def add_user():
 
         user_data.pop('recaptcha_token', None)
 
+        if (any(not isinstance(user_data.get(key), str) for key in ("email", "password", "name"))
+                or len(user_data["email"]) > 100 or len(user_data["password"]) > 1024
+                or len(user_data["name"]) > 100):
+            return jsonify(message=messages["registration_failed"]), 400
         validation_result = validate_user(**user_data)
         if validation_result is not True:
             return jsonify(validation_result), 400
 
         email = user_data["email"]
 
-        lock_users_transaction()
-        existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
+        started = time.monotonic()
+        try:
+            # One hash for every valid registration, before database locks.
+            password_hash = generate_password_hash(user_data["password"])
+            lock_users_transaction()
+            existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
 
-        # 👉 ВСЕГДА создаём/обновляем код
-        new_account = existing_user is None
-        if new_account:
-            existing_user = User(name=user_data["name"], email=email, active=False,
-                registered_at=datetime.now(timezone.utc), registration_completed=False,
-                terms_accepted_at=datetime.now(timezone.utc), terms_version=CURRENT_TERMS_VERSION)
-            existing_user.set_password(user_data["password"])
-            db.session.add(existing_user)
-            try:
-                db.session.flush()
-            except IntegrityError as exc:
-                # Конкурентное создание того же email: принятие победителя не изменяется.
-                db.session.rollback()
-                sqlstate = getattr(exc.orig, 'pgcode', None)
-                constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
-                sqlite_unique = getattr(exc.orig, 'sqlite_errorname', None) == 'SQLITE_CONSTRAINT_UNIQUE'
-                if not (sqlite_unique or (sqlstate == '23505' and constraint == 'users_email_key')):
-                    raise
-                lock_users_transaction()
-                existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
-                if existing_user is None:
-                    raise
-                new_account = False
-        confirmation_code = ConfirmationCode.create_code(email, "registration", commit=False)
-        db.session.commit()
+            # 👉 ВСЕГДА создаём/обновляем код
+            # Historical comment above; current eligibility is explicit below.
+            new_account = existing_user is None
+            if new_account:
+                existing_user = User(name=user_data["name"], email=email, active=False,
+                    registered_at=datetime.now(timezone.utc), registration_completed=False,
+                    terms_accepted_at=datetime.now(timezone.utc), terms_version=CURRENT_TERMS_VERSION)
+                existing_user.password = password_hash
+                db.session.add(existing_user)
+                try:
+                    db.session.flush()
+                except IntegrityError as exc:
+                    # Конкурентное создание того же email: принятие победителя не изменяется.
+                    db.session.rollback()
+                    sqlstate = getattr(exc.orig, 'pgcode', None)
+                    constraint = getattr(getattr(exc.orig, 'diag', None), 'constraint_name', None)
+                    sqlite_unique = getattr(exc.orig, 'sqlite_errorname', None) == 'SQLITE_CONSTRAINT_UNIQUE'
+                    if not (sqlite_unique or (sqlstate == '23505' and constraint == 'users_email_key')):
+                        raise
+                    lock_users_transaction()
+                    existing_user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
+                    if existing_user is None:
+                        raise
+                    new_account = False
+            confirmation_code = None
+            # Only new or explicitly unconfirmed registrations are eligible for codes.
+            if not existing_user.active and existing_user.registration_completed is False:
+                confirmation_code = ConfirmationCode.create_code(email, "registration", commit=False)
+            email_code = confirmation_code.code if confirmation_code is not None else None
+            db.session.commit()
+            db.session.rollback()
 
-        if new_account:
-            try:
-                send_auth_email("Activate your account", email,
-                    f"Your activation code: {confirmation_code.code}")
-            except Exception:
-                current_app.logger.error("Activation email delivery failed")
-            # Аккаунт и код уже сохранены одной транзакцией выше.
-        else:
-            if current_app.config["DEBUG"]:
-                print('user already exists')
+            if new_account and email_code is not None:
+                try:
+                    if not send_auth_code_email("Activate your account", email,
+                            f"Your activation code: {email_code}", started):
+                        current_app.logger.error("Activation email delivery failed")
+                except Exception:
+                    current_app.logger.error("Activation email delivery failed")
+                # Аккаунт и код уже сохранены одной транзакцией выше.
 
-        # 👉 ВСЕГДА одинаковый ответ
-        return jsonify(
-            message="If an account with this email exists, a confirmation code has been sent."
-        ), 200
+            # 👉 ВСЕГДА одинаковый ответ
+            return jsonify(
+                message=messages["registration_requested"]
+            ), 200
+
+        except Exception:
+            db.session.rollback()
+            current_app.logger.error("Registration request could not be processed")
+            return jsonify(message=messages["registration_requested"]), 200
+        finally:
+            db.session.rollback()
+            wait_for_response_window(started)
 
     except Exception as e:
         db.session.rollback()
@@ -279,44 +309,57 @@ def add_user():
 @limiter.limit(lambda: current_app.config["AUTH_PASSWORD_RESET_RATE_LIMIT"])
 def request_password_reset():
     """Send a password reset code to the user's email."""
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify(message=messages["email_required"]), 400
+    email = data.get("email")
+    if (not isinstance(email, str) or not 1 <= len(email) <= 100
+            or "\r" in email or "\n" in email or validate_email(email) is not True):
+        return jsonify(message=messages["email_invalid"]), 400
+
+    is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), ("request_password_reset", "resend_password_reset"))
+    if not is_valid:
+        return error_response
+
+    started = time.monotonic()
     try:
-        data = request.json
-        if not data or "email" not in data:
-            return jsonify(message="Please provide email", error="Bad request"), 400
-
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), ("request_password_reset", "resend_password_reset"))
-        if not is_valid:
-            return error_response
-
-        email = data["email"]
         user = User.get_by_email(email)
-        if not user:
-            return jsonify(message="User not found or inactive", error="Not Found"), 404
-
-        confirmation_code = ConfirmationCode.create_code(email, "password_reset")
-        if confirmation_code is None:
-            return jsonify(message="User not found or inactive"), 404
-        
+        if user:
+            confirmation_code = ConfirmationCode.create_code(email, "password_reset")
+            if confirmation_code is not None:
+                code = confirmation_code.code
+                db.session.rollback()
+                if not send_reset_email(email, code, started):
+                    db.session.rollback()
+                    current_app.logger.warning("Password reset delivery did not complete")
+            else:
+                db.session.rollback()
+    except Exception:
         try:
-            send_auth_email("Password Reset Code", email,
-                f"Your password reset code: {confirmation_code.code}")
-
-        except Exception as e:
             db.session.rollback()
-            return jsonify(message="Mail server is broken", error=error_message(e)), 202
+        except Exception:
+            current_app.logger.error("Password reset rollback failed")
+        current_app.logger.error("Password reset request could not be processed")
+    finally:
+        # Release read transactions/connections before the uniform response wait.
+        try:
+            db.session.rollback()
+        except Exception:
+            current_app.logger.error("Password reset rollback failed")
+        wait_for_response_window(started)
+    return jsonify(message=messages["password_reset_requested"]), 200
 
-        return jsonify(message="Password reset code sent"), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify(message="Something went wrong", error=error_message(e)), 500
-    
 @auth_bp.route("/confirm-password-reset", methods=["POST"])
 @limiter.limit(lambda: current_app.config["AUTH_PASSWORD_RESET_RATE_LIMIT"])
 def confirm_password_reset():
     """Verify the reset code and update the user's password."""
     try:
-        data = request.json
-        if not data or "email" not in data or "code" not in data or "new_password" not in data:
+        data = request.get_json(silent=True)
+        if (not isinstance(data, dict) or not isinstance(data.get("email"), str)
+                or not 1 <= len(data["email"]) <= 100 or validate_email(data["email"]) is not True
+                or not isinstance(data.get("code"), str) or len(data["code"]) != 6
+                or not data["code"].isascii() or not data["code"].isdigit()
+                or not isinstance(data.get("new_password"), str) or len(data["new_password"]) > 1024 ):
             return jsonify(message="Please provide code and new password", error="Bad request"), 400
 
         is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "confirm_password_reset")
@@ -364,39 +407,43 @@ def update_user():
 @auth_bp.route("/resend-confirmation", methods=["POST"])
 @limiter.limit(lambda: current_app.config["AUTH_RESEND_RATE_LIMIT"])
 def resend_confirmation():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict) or not isinstance(data.get("email"), str):
+        return jsonify(message=messages["email_invalid"]), 400
+    email = data["email"]
+    if not 1 <= len(email) <= 100 or "\r" in email or "\n" in email or validate_email(email) is not True:
+        return jsonify(message=messages["email_invalid"]), 400
+    is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "resend_code")
+    if not is_valid:
+        return error_response
+    started = time.monotonic()
     try:
-        data = request.json
-        if not data or "email" not in data:
-            return jsonify(message="Invalid request", data=None), 400
-
-        is_valid, error_response = verify_recaptcha(data.get('recaptcha_token'), "resend_code")
-        if not is_valid:
-            return error_response
-
-        if current_app.config["DEBUG"]:
-            print("RECAPTCHA RESULT:", is_valid)
-
-        email = data["email"]
-
+        lock_users_transaction()
         user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
 
         # ⚠️ Никаких ранних return'ов
-        if user and not user.active:
-            confirmation_code = ConfirmationCode.create_code(email, "registration")
-
+        code = None
+        if user and not user.active and user.registration_completed is False:
+            confirmation_code = ConfirmationCode.create_code(email, "registration", commit=False)
+            code = confirmation_code.code if confirmation_code is not None else None
+        db.session.commit()
+        db.session.rollback()
+        if code is not None:
             try:
-                send_auth_email("Your new activation code", email,
-                    f"Your new activation code: {confirmation_code.code}")
+                if not send_auth_code_email("Your new activation code", email,
+                        f"Your new activation code: {code}", started):
+                    current_app.logger.warning("Activation resend delivery did not complete")
             except Exception:
                 pass  # ❗ не палим ошибку наружу
-
-        # ✅ Всегда одинаковый ответ
-        return jsonify(
-            message="If the account exists, a confirmation code has been sent."
-        ), 200
-
     except Exception:
-        return jsonify(message="Something went wrong"), 500
+        db.session.rollback()
+        current_app.logger.error("Activation resend could not be processed")
+    finally:
+        db.session.rollback()
+        wait_for_response_window(started)
+
+    # ✅ Всегда одинаковый ответ
+    return jsonify(message=messages["registration_requested"]), 200
 
 @auth_bp.route("/me", methods=["DELETE"])
 @jwt_required()

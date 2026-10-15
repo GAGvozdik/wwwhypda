@@ -491,3 +491,30 @@ docker compose --env-file .env.development up --build --no-deps frontend
 Эти команды не запускают retention-профиль, не применяют миграции и не требуют
 создавать/удалять аккаунты. Для browser smoke не отправлять реальные регистрации,
 reset emails или научные данные. Обновление localhost не является deployment на VPS.
+
+
+## Защита auth от раскрытия аккаунтов (локальный цикл 004)
+
+Запрос/resend сброса, регистрация и resend активации возвращают нейтральные
+сообщения; после reset-запроса форма показывает одинаковый шаг ввода кода и
+30-секундный отсчёт. Ответ не подтверждает наличие аккаунта или доставку письма.
+Восстановление разрешено только active, activation — явно незавершённой регистрации.
+Failed login выполняет одну реальную/dummy hash-проверку; пароли/acceptance дубликата
+регистрации не меняются. CAPTCHA и rate limits остаются обязательными.
+
+Для register/resend/reset задан общий elapsed floor 4s, failed login — 0.4s после
+общей валидации/CAPTCHA. SMTP sender ожидается до 3s и завершается до ответа,
+не более двух child на Linux container. Требуется штатный Linux Docker runtime
+(prctl, signals, flock и доступный /tmp); новых env-настроек и миграций нет.
+Ожидание освобождает DB transaction/locks, но занимает HTTP worker. Перед отдельным
+разрешённым production rollout нужны SMTP latency/capacity checks; полный сетевой
+audit локальными synthetic тестами не заменяется.
+
+Дополнительные проверки без сети и рабочей БД после сборки образов:
+
+```sh
+docker run --rm --pull=never --network none -e TEST_AUTH_DATABASE_URI=sqlite:// --entrypoint python wwwhypda-dev-backend -m unittest tests.test_password_reset_privacy tests.test_auth_enumeration -v
+docker run --rm --pull=never --network none --entrypoint node wwwhypda-dev-frontend --experimental-vm-modules --test scripts/test-auth-privacy.mjs
+```
+
+Результаты, измерения и ограничения: [архив цикла 004](docs/archive/004-password-reset-enumeration.md).

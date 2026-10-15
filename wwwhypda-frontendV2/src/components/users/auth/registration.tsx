@@ -84,9 +84,10 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                setError(response.data.message);
+                setError(messages.registration_requested);
                 setIsError(false);
                 setStep(2);
+                setResendTimer(30);
             }
         } catch (err: unknown) {
             if (axios.isAxiosError<{ message?: string; code?: string }>(err) && err.response?.data) {
@@ -169,7 +170,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             const response = await api.post("/users/resend-confirmation", { email, recaptcha_token: token });
 
             if (response.status === 200) {
-                setError(response.data.message || messages.confirmation_code_resent);
+                setError(messages.registration_requested);
                 setIsError(false);
                 setResendTimer(30);
             } else {
@@ -299,7 +300,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
 
                         <ErrorMessage
-                            error={isError ? error : resendTimer > 0 ? messages.resend_countdown.replace('{seconds}', String(resendTimer)) : error}
+                            error={isError ? error : resendTimer > 0 ? `${error} ${messages.resend_countdown.replace('{seconds}', String(resendTimer))}` : error}
                             isError={isError}
                         />
 

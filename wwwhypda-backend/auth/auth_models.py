@@ -9,6 +9,10 @@ from flask import current_app
 # Initialize SQLAlchemy instance (assuming `db` is imported from `auth.mail`)
 from common_defenitions import db
 
+# Prepared once with the current default algorithm/cost, not per login request.
+_DUMMY_LOGIN_HASH = generate_password_hash(secrets.token_urlsafe(32))
+
+
 class User(db.Model):
     __bind_key__ = 'users_db'
     """
@@ -202,7 +206,11 @@ class User(db.Model):
         Returns user data as a dictionary if successful, otherwise None.
         """
         user = cls.query.filter_by(email=email, active=True).first()
-        if user and check_password_hash(user.password, password):
+        try:
+            password_matches = check_password_hash(user.password if user else _DUMMY_LOGIN_HASH, password)
+        except ValueError:
+            password_matches = False
+        if user and password_matches:
             return {"id": user.id, "name": user.name, "email": user.email,"is_superuser": user.is_superuser,  # 👈 обязательно добавь это!
                 "active": user.active, "account_version": user.session_version()}
         return None

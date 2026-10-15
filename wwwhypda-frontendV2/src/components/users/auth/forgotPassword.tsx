@@ -37,10 +37,13 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             const response = await api.post('/users/request-password-reset', { email, recaptcha_token: token });
 
             if (response.status === 200) {
-                setError(response.data.message || messages.code_sent);
+                setError(messages.password_reset_requested);
                 setIsError(false);
                 setStep(2);
                 setResendTimer(30);
+            } else {
+                setError(messages.reset_code_failed);
+                setIsError(true);
             }
         } catch (error: unknown) {
             if (axios.isAxiosError<{ message?: string }>(error) && error.response?.data?.message) {
@@ -66,7 +69,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             const response = await api.post("/users/request-password-reset", { email, recaptcha_token: token });
 
             if (response.status === 200) {
-                setError(response.data.message || messages.confirmation_code_resent);
+                setError(messages.password_reset_requested);
                 setIsError(false);
                 setResendTimer(30);
             } else {
@@ -99,7 +102,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         if (pendingRequest.current) return;
 
         if (newPassword !== confirmPassword) {
-            setError('Passwords do not match!');
+            setError(messages.passwords_do_not_match);
             setIsError(true);
             return;
         }
@@ -206,7 +209,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             required
                         />
                         <ErrorMessage
-                            error={isError ? error : (resendTimer > 0 ? messages.resend_countdown.replace('{seconds}', String(resendTimer)) : error)}
+                            error={isError ? error : (resendTimer > 0 ? `${error} ${messages.resend_countdown.replace('{seconds}', String(resendTimer))}` : error)}
                             isError={isError}
                         />
                         <UserButton

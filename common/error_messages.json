@@ -1,4 +1,6 @@
 {
+  "registration_requested": "If registration can proceed for this email address, activation instructions will be sent.",
+  "password_reset_requested": "If an active account exists for this email address, password reset instructions will be sent.",
   "password_invalid": "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
   "password_required": "Password is required.",
   "passwords_do_not_match": "Passwords do not match!",

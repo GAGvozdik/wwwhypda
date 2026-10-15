@@ -38,7 +38,7 @@ class TermsAcceptanceTests(unittest.TestCase):
         def delivery(*args):
             self.assertEqual(User.query.filter_by(email="new@example.test").count(), 1)
             self.assertEqual(ConfirmationCode.query.filter_by(email="new@example.test").count(), 1)
-        with patch("auth.authentication.send_auth_email", side_effect=delivery) as mail:
+        with patch("auth.authentication.send_auth_code_email", side_effect=delivery) as mail:
             self.assertEqual(self.register().status_code, 200)
         after = datetime.now(timezone.utc)
         user = User.query.filter_by(email="new@example.test").one()
@@ -69,7 +69,7 @@ class TermsAcceptanceTests(unittest.TestCase):
         cases.append((self.payload(terms_accepted_at=None), 400, None))
         cases.append((self.payload(terms_accepted_at="2026-10-14T00:00:00Z"), 400, None))
         baseline = (User.query.count(), ConfirmationCode.query.count())
-        with patch("auth.authentication.send_auth_email") as mail:
+        with patch("auth.authentication.send_auth_code_email") as mail:
             for body, status, code in cases:
                 for email in ("new@example.test", "owner@example.test"):
                     body["email"] = email
@@ -82,7 +82,7 @@ class TermsAcceptanceTests(unittest.TestCase):
             mail.assert_not_called()
 
     def test_invalid_fields_and_captcha_never_record_acceptance(self):
-        with patch("auth.authentication.send_auth_email") as mail:
+        with patch("auth.authentication.send_auth_code_email") as mail:
             for changes in ({"name":"!"}, {"email":"invalid"}, {"password":"short"}):
                 self.assertEqual(self.register(self.payload(**changes)).status_code, 400)
             with patch("auth.authentication.verify_recaptcha", return_value=(False, (jsonify(message="Verification failed"),400))):
@@ -98,12 +98,12 @@ class TermsAcceptanceTests(unittest.TestCase):
             with self.subTest(target=target):
                 mock = patch("auth.authentication.ConfirmationCode.create_code", side_effect=RuntimeError("private")) if target == "code" else patch.object(db.session, target, side_effect=RuntimeError("private"))
                 before_codes = ConfirmationCode.query.count()
-                with mock, patch("auth.authentication.send_auth_email") as mail:
-                    self.assertEqual(self.register().status_code, 500)
+                with mock, patch("auth.authentication.send_auth_code_email") as mail:
+                    self.assertEqual(self.register().status_code, 200)
                     mail.assert_not_called()
                 self.assertIsNone(User.query.filter_by(email="new@example.test").first())
                 self.assertEqual(ConfirmationCode.query.count(), before_codes)
-        with patch("auth.authentication.send_auth_email", side_effect=RuntimeError("private")):
+        with patch("auth.authentication.send_auth_code_email", side_effect=RuntimeError("private")):
             self.assertEqual(self.register().status_code, 200)
         self.assertEqual(User.query.filter_by(email="new@example.test").one().terms_version, CURRENT_TERMS_VERSION)
         self.assertEqual(ConfirmationCode.query.filter_by(email="new@example.test").count(), 1)
@@ -118,7 +118,7 @@ class TermsAcceptanceTests(unittest.TestCase):
                     user.terms_accepted_at = datetime(2020,1,1,tzinfo=timezone.utc) if accepted else None
                     db.session.commit()
                     original = (user.terms_version, user.terms_accepted_at, user.password)
-                    with patch("auth.authentication.send_auth_email") as mail:
+                    with patch("auth.authentication.send_auth_code_email") as mail:
                         response = self.register(self.payload(email=user.email))
                         self.assertEqual(response.status_code, 200)
                         mail.assert_not_called()
@@ -151,7 +151,7 @@ class TermsAcceptanceTests(unittest.TestCase):
 
     def test_auth_actions_keep_acceptance(self):
         client = self.app.test_client()
-        with patch("auth.authentication.send_auth_email"):
+        with patch("auth.authentication.send_auth_code_email"):
             self.assertEqual(client.post("/users/",json=self.payload()).status_code,200)
             user = User.query.filter_by(email="new@example.test").one()
             original = (user.terms_version,user.terms_accepted_at)
@@ -181,7 +181,7 @@ class TermsAcceptanceTests(unittest.TestCase):
             with self.app.app_context():
                 return self.register(self.payload(name=name)).status_code
         try:
-            with patch("auth.authentication.send_auth_email") as mail, ThreadPoolExecutor(max_workers=2) as pool:
+            with patch("auth.authentication.send_auth_code_email") as mail, ThreadPoolExecutor(max_workers=2) as pool:
                 results = list(pool.map(register,["First", "Second"]))
                 self.assertEqual(results,[200,200])
                 mail.assert_called_once()

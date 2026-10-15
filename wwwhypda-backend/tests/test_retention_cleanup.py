@@ -169,14 +169,14 @@ from inputData.inputDataModels import InputData
 
 class RegistrationRetentionTests(TermsAcceptanceTests):
     def test_client_cannot_set_server_metadata(self):
-        with patch('auth.authentication.send_auth_email') as mail:
+        with patch('auth.authentication.send_auth_code_email') as mail:
             for field in ('registered_at','registration_completed'):
                 self.assertEqual(self.register(self.payload(**{field:None})).status_code,400)
             mail.assert_not_called()
         self.assertIsNone(User.query.filter_by(email='new@example.test').first())
 
     def test_duplicate_resend_reset_preserve_original_age_and_all_activation_paths(self):
-        with patch('auth.authentication.send_auth_email'):
+        with patch('auth.authentication.send_auth_code_email'):
             self.assertEqual(self.register().status_code,200)
             user=User.query.filter_by(email='new@example.test').one()
             original=utc(user.registered_at)
@@ -317,7 +317,7 @@ class PostgreSQLRetentionConcurrencyTests(RetentionTests):
             recaptcha_token='test-token',adult_confirmed=True,terms_accepted=True,terms_version=CURRENT_TERMS_VERSION)
         def register():
             return self.app.test_client().post('/users/',json=payload).status_code
-        with patch('auth.authentication.send_auth_email'):
+        with patch('auth.authentication.send_auth_code_email'):
             status,result=self.race(register,lambda:cleanup(self.now,execute=True))
             self.assertEqual(status,200)
             self.assertEqual(result['accounts'],1)
