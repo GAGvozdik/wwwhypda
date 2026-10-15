@@ -8,7 +8,7 @@ async function moduleFor(name) {
     return import(`data:text/javascript;base64,${Buffer.from(output).toString('base64')}`);
 }
 const { createRecaptchaQueue }=await moduleFor('recaptchaQueue');
-const { requiresRecaptcha }=await moduleFor('recaptchaRoutes');
+const { requiresRecaptcha, allowsRecaptchaAction }=await moduleFor('recaptchaRoutes');
 test('only search/auth action routes are eligible, no read/session provider scope',()=>{
     for(const path of ['/search','/login','/register','/forgot-password']) assert.equal(requiresRecaptcha(path),true);
     for(const path of ['/','/input','/read','/edit','/account','/superaccount','/privacy-policy','/cookie-policy','/user-agreement','/about']) assert.equal(requiresRecaptcha(path),false);
@@ -46,4 +46,21 @@ test('document exit rejects queued and in-flight tokens and prevents new executi
     await Promise.resolve(); inflight.cancel();
     complete('stale-token');
     await assert.rejects(pending,/CAPTCHA unavailable/);
+});
+
+
+test('each action stays bound to its actual form route, including activation and reset resends', () => {
+    const expected = {
+        '/search': ['search'], '/login': ['login'],
+        '/register': ['register', 'confirm_registration', 'resend_code'],
+        '/forgot-password': ['request_password_reset', 'resend_password_reset', 'confirm_password_reset'],
+    };
+    const all = Object.values(expected).flat();
+    for (const [route, allowed] of Object.entries(expected)) {
+        for (const action of all) assert.equal(allowsRecaptchaAction(route, action), allowed.includes(action));
+    }
+    for (const route of ['/', '/account', '/input', '/privacy-policy']) {
+        for (const action of all) assert.equal(allowsRecaptchaAction(route, action), false);
+    }
+    for (const bad of [undefined, null, {}, 1, 'session_check']) assert.equal(allowsRecaptchaAction('/login', bad), false);
 });

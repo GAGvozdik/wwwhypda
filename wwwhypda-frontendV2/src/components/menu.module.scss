@@ -66,6 +66,7 @@
     --start-page-text: #4a96a3ae;
 }
 
+:global(:root[data-theme="dark"]),
 .dark {
 
     --error-text: #913636;

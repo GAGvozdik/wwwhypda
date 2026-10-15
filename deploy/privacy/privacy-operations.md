@@ -88,3 +88,21 @@ recaptcha-dpia.md; факты и пределы браузера — recaptcha-b
 ключ/два домена/allowlist/HTTPS/CSP/quota/Network в этой среде. При расширении scope
 или существенных false positives пересмотреть LIA/DPIA до продолжения; новые
 обязательные меры не заменяются ссылкой на локальный архив.
+
+
+## Техническое сопровождение CAPTCHA lifecycle, цикл 005
+
+В локальной реализации Google SDK живёт в создаваемом при explicit search/auth
+действии отдельном same-origin iframe; уход с маршрута удаляет browsing context
+без reload основной оболочки. Provider остаётся, но вне eligible scope executor
+недоступен. Не считать React-unmount/script.remove достаточной очисткой Google
+и не обещать удаление ранее записанных cookies. Bridge не передаёт формы/аккаунты,
+проверяет origin/source/ID/action, отменяет очередь и поздний token, без token log.
+Same-origin iframe не является защитой от злонамеренного same-origin JS.
+
+Проверенные факты/границы — [browser-check](recaptcha-browser-check.md), оценка —
+[assessment](recaptcha-assessment.md) и [DPIA](recaptcha-dpia.md). Нормальный dev Search
+и negative-token 400 подтверждены, production rollout не выполнялся. Перед отдельно
+разрешённым rollout проверить CSP/frame policy, реальные hostname/action/score и
+Network после ухода/возврата; снижение эффективности/существенные false positives
+при новом iframe interaction context требуют пересмотра мер до продолжения.

@@ -14,8 +14,14 @@
 [browser-check](recaptcha-browser-check.md). Google загружается после явного
 search/login/register/confirmation/resend/password-reset действия. Начальные
 справочники, session checks, legal pages и authenticated read/submit/delete
-исключены из CAPTCHA-scope. После активации скрипт может работать в текущем
-документе; уход за пределы четырёх CAPTCHA-маршрутов перезагружает документ.
+исключены из CAPTCHA-scope. В локальном цикле 005 SDK перенесён в отдельный
+same-origin iframe, создаваемый при явном действии; уход с маршрута отменяет
+очередь и удаляет весь browsing context без reload основной оболочки. Возврат
+не загружает Google до нового действия. Это lifetime isolation, не защита от
+злонамеренного same-origin SDK; произвольную невозможность доступа к parent
+и удаление сохранённых cookies не утверждаем. Новое устройство может менять
+доступный Google interaction context/score; dev-проверка не заменяет production
+оценку эффективности и false positives.
 
 Затронуты посетители поиска и люди, использующие account security functions.
 Регистрация рассчитана на взрослых; возраст посетителя поиска не установлен,
@@ -162,3 +168,16 @@ terms/subprocessors/transfer mechanism, иного масштаба/значим
 [EDPB: necessity/менее вмешивающиеся альтернативы](https://www.edpb.europa.eu/news/edpb-adopts-opinion-on-processors-guidelines-on-legitimate-interest-statement-on-draft_ga).
 Шаблон EDPB 2026 на опубликованной странице ещё описан как consultation template;
 он не выдан за обязательный окончательный стандарт.
+
+
+## Техническое уточнение цикла 005
+
+Локальная реализация описана в [browser-check](recaptcha-browser-check.md).
+MainWindow не исчезает при смене scope; сообщения action/token проходят bridge
+с exact origin/source, ограниченными request IDs, deadline/cancel, без account
+payload и логирования токена. Google работает только в создаваемом по действию
+дочернем документе; после ухода он удаляется. Same-origin sandbox не объявляется
+полной границей доверия. Browser/score/provider поведение на VPS не проверялось;
+перед отдельно разрешённым rollout остаются hostname/action/score, CSP/Network
+и оценка существенных false positives. Оценка правовых оснований всего сайта
+этим UI-циклом заново не утверждается. Исторические наблюдения 003 сохраняются.

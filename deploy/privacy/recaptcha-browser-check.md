@@ -1,4 +1,8 @@
-# Локальная browser-проверка reCAPTCHA, цикл 003
+# Локальная browser-проверка reCAPTCHA, циклы 003/005
+
+Текущий lifecycle 005 и его доказательства приведены в последнем разделе.
+Ниже до этого раздела сохранена история цикла 003; её исходные reload/provider
+описания не являются утверждением о новом iframe lifecycle.
 
 Даты: 14–15.10.2026. Статус: минимальная локальная проверка завершена по
 наблюдениям владельца Firefox, коду и синтетическим проверкам; границы ниже.
@@ -150,3 +154,49 @@ settings неизвестны. Это предел проверки, а не у�
 fingerprint-like signals. Реальные registration/reset mail и действия с рабочей
 БД агентом не выполнялись; endpoint/guards проверены синтетически. Production,
 другие браузеры и независимый аудит Google этим отчётом не подтверждены.
+
+
+## Цикл 005: отдельный CAPTCHA document, локальная проверка
+
+CUA по-прежнему apps=[]/browsers=[]; собственный browser audit недоступен.
+По официальной документации Google проверены API v3 ready/execute, action/hostname/
+score SiteVerify, ограничения доменов и CSP. Специальной гарантии совместимости
+нашего iframe-варианта документация не даёт: это кандидат, проверенный локальными
+тестами и пользовательским действием, а не официально рекомендованная архитектура.
+Источники: [v3](https://developers.google.com/recaptcha/docs/v3),
+[SiteVerify](https://developers.google.com/recaptcha/docs/verify),
+[FAQ/CSP](https://developers.google.com/recaptcha/docs/faq),
+[domains](https://developers.google.com/recaptcha/docs/domain_validation).
+
+SDK entry собран отдельно в recaptcha-frame.html/captcha-*.js, в основном window
+SDK не импортируется. Bridge принимает exact same origin/source и ограниченные
+ID/action, token не логируется/не хранится; iframe создаётся только explicit action,
+удаляется при уходе с маршрута/timeout/pagehide. Public/protected/legal не создают
+iframe, на возврате до действия он отсутствует. CSP/X-Frame-Options dev уже допускают
+self frame и внешние SDK-источники; новые широкие разрешения/unsafe script directives
+не добавлены. Header/HTML/JS доступность проверены HTTP. Это не доказательство
+невозможности доступа same-origin SDK к parent и не автоматическое удаление cookies.
+
+Unit доказательства: неверный origin (включая null)/source/ID/extra fields отвергнуты;
+отмена queued/in-flight до позднего token не отправляет форму; timeout/pagehide
+вызывают удаление документа, возврат lazy. Фактическое прекращение browser timers/
+Network нельзя вывести только из DOM-мока. Текущие 26 unit/regression tests — OK;
+это Node VM, не Chrome/Firefox.
+
+HTTP negative control на localhost:8080: samples GET с заведомо фиктивным токеном
+возвращает 400 Verification failed. На объединённую инструкцию после Ctrl+F5:
+чистый Search до действия, реальный Search с результатами, уход на главную и
+Privacy/Cookie без пропадания оболочки/новых Google-запросов владелец ответил
+«ага всё работает нормально». Этот факт — owner acceptance, не агентский Network
+trace. При неизменном fail-closed verifier успешный Search согласуется с принятым
+Google token/action=search/allowed hostname/score >= configured threshold; это
+вывод из результата и проверенного verifier, не сохранённый raw SiteVerify response.
+Точное численное score и новый production token/hostname не измерялись/не логировались.
+
+По визуальной группе владелец ответил «так всё хорошо, кроме того, что там блоки
+недостаточно высоки»; после этого уточнил cap при увеличении zoom, уменьшение ниже
+viewport при уменьшении zoom, padding формы и положение Search. Изменения внесены
+в revision 2; новая height/padding приёмка, точные проверенные браузеры/размеры и
+оставшиеся protected/grid сценарии пока ожидаются. Старые результаты не выдаются
+за приёмку ещё не проверенного layout. Публичные Privacy/Cookie тексты не менялись:
+они не обещают reload, прежний scope/disclosure и консервативные cookie факты сохранены.

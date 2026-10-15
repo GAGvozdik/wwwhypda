@@ -518,3 +518,31 @@ docker run --rm --pull=never --network none --entrypoint node wwwhypda-dev-front
 ```
 
 Результаты, измерения и ограничения: [архив цикла 004](docs/archive/004-password-reset-enumeration.md).
+
+
+## Search, тема и непрерывная навигация (локальный цикл 005)
+
+MainWindow сохраняется при внутренних переходах; смена CAPTCHA scope не делает
+reload и не скрывает оболочку. Google v3 SDK исполняется в отдельной same-origin
+recaptcha-frame.html, создаваемой только при разрешённом действии; уход отменяет
+ожидающую проверку и удаляет frame. SiteVerify/action/hostname/score, API, JWT/CSRF
+и rate limits не менялись. Iframe lifetime не является полной same-origin границей
+доверия; Google cookies удалять не обещает. Реальная production приёмка отдельная.
+
+public/theme-bootstrap.js до React восстанавливает прежний localStorage.isDarkTheme
+в html[data-theme], сохраняя dark default. Палитра общая в menu.module.scss;
+переключение синхронизирует атрибут, Redux и .dark, без light cleanup на навигации.
+Search использует scoped rem limit/viewport cap по уточнённому zoom поведению,
+увеличенные боковые отступы и кнопку внизу формы. Текущие результаты и незавершённая
+приёмка: [план 005](docs/stages/005-search-height-and-navigation.md).
+
+Дополнительные unit-проверки (после штатной Docker-сборки frontend):
+
+```sh
+docker run --rm --pull=never --network none --entrypoint node wwwhypda-dev-frontend --experimental-vm-modules --test scripts/test-navigation-lifecycle.mjs scripts/test-recaptcha-scope.mjs scripts/test-account-session.mjs scripts/test-auth-privacy.mjs
+```
+
+Это не браузерный тест. После исходных правок обновлять раздаваемый bundle штатным
+`docker compose --env-file .env.development up --build --no-deps frontend`, затем
+Ctrl+F5 на localhost:8080. Сборка включает два HTML entry: index и recaptcha-frame;
+новых env-настроек/зависимостей/миграций нет, VPS не затрагивается.

@@ -21,7 +21,7 @@ async function fixture() {
     };
     const window = new EventTarget();
     window.location = { replace: (url) => { window.destination = url; } };
-    const context = vm.createContext({ window, localStorage: storage, crypto: webcrypto,
+    const context = vm.createContext({ window, document: { documentElement: { dataset: {} } }, localStorage: storage, crypto: webcrypto,
         Event, AbortController, console });
     const modules = new Map();
     const sources = new Map([

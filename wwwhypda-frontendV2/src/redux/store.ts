@@ -1,10 +1,11 @@
 import { createStore } from 'redux';
+import { readThemePreference } from '../common/theme';
 import type{ State, Action } from '../common/types';
 
 
 const initialState: State = {
     open: true,
-    isDarkTheme: localStorage.getItem("isDarkTheme") ? localStorage.getItem("isDarkTheme") === "true" : true,
+    isDarkTheme: readThemePreference(),
     currentRTID: '',
     currentRTName: '',
     currentTableData: [], // <-- Обновляем состояние

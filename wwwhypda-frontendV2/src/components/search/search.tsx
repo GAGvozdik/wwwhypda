@@ -1,6 +1,6 @@
 import MainTree from '../tree/mainTree';
 import messages from '../../common/error_messages.json';
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import styles from "./searchStyles.module.scss";
 import FormControl from '@mui/material/FormControl';
 import RadioGroup from '@mui/material/RadioGroup';
@@ -35,6 +35,8 @@ const Search: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [searchError, setSearchError] = useState<string | null>(null);
+    const pendingRequest = useRef(false);
 
     useEffect(() => {
         console.log('rt_name = ', rt_name);
@@ -62,12 +64,17 @@ const Search: React.FC = () => {
 
     const handleSubmit = useCallback(async (event: React.FormEvent) => {
         event.preventDefault();
+        if (pendingRequest.current) return;
         if (selectedValue !== null && executeRecaptcha) {
+            pendingRequest.current = true;
+            setSearchError(null);
             setIsSearching(true);
 
             const fetchParameters = async () => {
+                let verified = false;
                 try {
                     const token = await executeRecaptcha('search');
+                    verified = true;
                     const response = await api.get<DynamicRowData[]>(`/rocks/samples/${rt_id}/${selectedValue}`, { headers: { 'X-Recaptcha-Token': token } });
                     console.log(`/rocks/samples/${rt_id}/${selectedValue}`)
                     const res = response.data.map((item, index) => ({
@@ -78,8 +85,9 @@ const Search: React.FC = () => {
                     dispatch<UpdateTableDataAction>(UpdateTableData(res));
 
                 } catch {
-                    setError(messages.catalog_load_failed);
+                    setSearchError(verified ? messages.catalog_load_failed : messages.captcha_unavailable);
                 } finally {
+                    pendingRequest.current = false;
                     setLoading(false);
                     setIsSearching(false);
                 }
@@ -118,27 +126,14 @@ const Search: React.FC = () => {
             >
                 <SingleSkeleton loading={loading} error={error} height='100%'>
                     <div
-                        className={styles.treeText}
+                        className={`${styles.treeText} ${styles.parametersTitle}`}
                         id="search-parameter-title"
-                        style={{
-                            marginTop: '1rem',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            fontSize: 'var(--head-font-size)',
-                            textAlign: 'center',
-                        }}
                     >
                         {messages.search_in} {rt_name}
                     </div>
 
                     <FormControl
-                        style={{
-                            marginTop: '1rem',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}
+                        className={styles.parametersForm}
                         component="form"
                         onSubmit={handleSubmit}
                     >
@@ -166,7 +161,7 @@ const Search: React.FC = () => {
 
                         </RadioGroup>
 
-                        <button type="submit" className={`${styles.submitButton} ${styles.findButton}`}>
+                        <button type="submit" disabled={isSearching} className={`${styles.submitButton} ${styles.findButton}`}>
                             {messages.ui_find_data}
                         </button>
 
@@ -190,7 +185,7 @@ const Search: React.FC = () => {
 
                 }}
             >
-                <SingleSkeleton loading={isSearching} error={error} height='100%' isLoadIcon={true}>
+                <SingleSkeleton loading={isSearching} error={searchError} height='100%' isLoadIcon={true}>
                     <SearchResultsTable/>
                 </SingleSkeleton>
             </div>

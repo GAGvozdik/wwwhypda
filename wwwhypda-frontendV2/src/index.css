@@ -25,3 +25,10 @@ body {
 button, input, select, textarea {
   font: inherit;
 }
+
+
+html, body, #root {
+  background-color: var(--body-color);
+  color: var(--tree-text);
+}
+#root { min-height: 100%; }

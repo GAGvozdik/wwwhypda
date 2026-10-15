@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
 import { requiresRecaptcha } from '../commonFeatures/recaptchaRoutes';
+import { applyTheme } from '../../common/theme';
 
 import { useSelector } from 'react-redux';
 // import { useDispatch } from 'react-redux';
@@ -31,9 +32,9 @@ export default function MainWindow() {
     useLayoutEffect(() => {
         const scroller = document.scrollingElement ?? document.documentElement;
         const targets = new Set([document.documentElement, scroller]);
-        const previous = [...targets].map(element => [element, element.classList.contains(styles.dark)] as const);
+        applyTheme(isDarkTheme);
         targets.forEach(element => element.classList.toggle(styles.dark, isDarkTheme));
-        return () => previous.forEach(([element, wasDark]) => element.classList.toggle(styles.dark, wasDark));
+        // The document theme persists across route changes and StrictMode cleanup.
     }, [isDarkTheme]);
 
     useLayoutEffect(() => {
@@ -42,11 +43,20 @@ export default function MainWindow() {
         if (!fillsFirstScreen || !shell || !(header instanceof HTMLElement)) return;
         const measureHeader = () => {
             shell.style.setProperty('--shell-header-height', `${header.offsetHeight}px`);
+            const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+            if (Number.isFinite(rem) && rem > 0 && window.outerHeight > 0) {
+                // outerHeight gives a logical window limit without guessing browser zoom/DPR.
+                shell.style.setProperty('--search-window-height', `${window.outerHeight / rem}rem`);
+            }
         };
         measureHeader();
         const observer = new ResizeObserver(measureHeader);
         observer.observe(header);
-        return () => observer.disconnect();
+        window.addEventListener('resize', measureHeader);
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', measureHeader);
+        };
     }, [fillsFirstScreen]);
 
 

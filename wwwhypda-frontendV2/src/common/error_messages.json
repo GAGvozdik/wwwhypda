@@ -26,6 +26,7 @@
   "cancel": "Cancel",
   "account_delete_confirm": "Permanently delete account",
   "account_delete_pending": "Deleting your account…",
+  "captcha_frame_title": "Security verification",
   "captcha_unavailable": "Verification is not ready. Please try again.",
   "account_delete_session_invalid": "Your session or security verification is no longer valid. Please sign in again.",
   "account_title": "Your Account",

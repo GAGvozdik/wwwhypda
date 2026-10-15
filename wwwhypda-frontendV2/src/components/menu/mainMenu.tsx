@@ -10,6 +10,7 @@ import styles from "./menuStyles.module.scss"
 
 import { useSelector, useDispatch } from 'react-redux';
 import { UpdateTheme } from '../../redux/actions';
+import { saveThemePreference } from '../../common/theme';
 import type { State, UpdateThemeAction } from '../../common/types';
 import { Link } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -24,8 +25,8 @@ export default function MainMenu() {
     const dispatch = useDispatch();
 
     const toggleTheme = () => {
+        saveThemePreference(!isDarkTheme);
         dispatch<UpdateThemeAction>(UpdateTheme(!isDarkTheme));
-        localStorage.setItem("isDarkTheme", String(!isDarkTheme));
     };
 
     const isSuperuser = localStorage.getItem('isSuperuser') === 'true';
