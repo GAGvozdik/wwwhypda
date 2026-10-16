@@ -1,0 +1,38 @@
+{
+  "version": "2026-10-16.1",
+  "generator": "ReportLab 4.4.3 / embedded Bitstream Vera / React SSR",
+  "sources": {
+    "wwwhypda-frontendV2/src/components/pages/userAgreement.tsx": "94c8b6f94ac6a87e15177859d74fb136e7799420f140e3eeebd6c49364206e0b",
+    "wwwhypda-frontendV2/src/components/pages/privacyPolicy.tsx": "5323e7664f5b407d6587a6aae727a124e5431204d8c42dd4a8720027c29b43d0",
+    "wwwhypda-frontendV2/src/components/pages/cookiePolicy.tsx": "4ab19fee2695e469da606a876f42f332e1af8153ca8185f25beca984cd0ec5b0",
+    "wwwhypda-frontendV2/src/components/pages/legalDocumentDownload.tsx": "18ae0bdeec15bfb908ec7d58b4ef5548b0b2dde72eb11e1dc742adfd583bef2d",
+    "wwwhypda-frontendV2/src/common/userAgreementVersion.ts": "11265d9dc623c4ae6ba81fe37c6fed7df78a0eaaf810d282e2592876fbccf6de",
+    "wwwhypda-frontendV2/src/common/legalDocuments.ts": "f8f721d0dcbc231bdfd5fbd8bd65afcd36e132382857d7100109344fcd0efa39",
+    "wwwhypda-frontendV2/src/common/error_messages.json": "d6b364b1dbc66dbad042141d569680f03015a08db2ca4f01b1a1eaccfe040afd",
+    "deploy/privacy/render_legal.mjs": "6b9068202f10d0f674ab779cb9bbe38af881e4214d00fa363212654c0d3e7dd1",
+    "deploy/privacy/build_legal_pdfs.py": "7382a5511a76e8f604b1a5f8e5bbdb5703cfa625bcd3728687efd24a56907b4f"
+  },
+  "documents": [
+    {
+      "slug": "user-agreement",
+      "file": "user-agreement-2026-10-16.1.pdf",
+      "pages": 2,
+      "sha256": "ccac03ce251817f27155c80b3502b931e1a185cac3362bc104bea11ecb1ca75a",
+      "content_sha256": "330b9eca328267b78d5329af7ac8aaaa90d060291e6d192eef9c1233ae1b8913"
+    },
+    {
+      "slug": "privacy-policy",
+      "file": "privacy-policy-2026-10-16.1.pdf",
+      "pages": 6,
+      "sha256": "c0ef71367bf0e5f344dd4c9d5903890c8c2fafaf645a545829b743605ad6734b",
+      "content_sha256": "239601461dda85615e690ca3cce2e9b457ca6b4a8cc29abe7bda19ba9601e876"
+    },
+    {
+      "slug": "cookie-policy",
+      "file": "cookie-policy-2026-10-16.1.pdf",
+      "pages": 2,
+      "sha256": "b49a602c5c4feef588763eca4555a5194e237792e0a725320712e5249ece7ec4",
+      "content_sha256": "1251ce9b02dacfe18ad89f00f4dd3c780227d8501a9c143689de47751b1381c6"
+    }
+  ]
+}

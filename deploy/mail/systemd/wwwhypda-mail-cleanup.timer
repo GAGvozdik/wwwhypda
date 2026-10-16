@@ -1,0 +1,12 @@
+[Unit]
+Description=WWHYPDA OVH readonly observation at 01:30 Europe/Rome (uninstalled template)
+
+[Timer]
+OnCalendar=*-*-* 01:30:00 Europe/Rome
+Persistent=false
+RandomizedDelaySec=0
+AccuracySec=1min
+Unit=wwwhypda-mail-cleanup.service
+
+[Install]
+WantedBy=timers.target

@@ -204,5 +204,14 @@
   "search_col_units": "Units",
   "search_col_msr_value": "Value",
   "search_col_error": "Error",
-  "search_col_id_Measure": "Measurement ID"
+  "search_col_id_Measure": "Measurement ID",
+  "legal_download_pdf": "Download PDF",
+  "terms_acceptance_required": "Please review and accept the current User Agreement and acknowledge the Privacy and Cookie Policies.",
+  "terms_version_mismatch": "The document package has changed. Please review the current version and confirm again.",
+  "terms_acceptance_invalid": "Acceptance must be an explicit checked confirmation.",
+  "terms_update_title": "Updated service documents",
+  "terms_accept_sign_in": "Accept and sign in",
+  "terms_decline": "Return without signing in",
+  "terms_review_label": "I accept the User Agreement and acknowledge the Privacy Policy and Cookie Policy.",
+  "terms_restricted_session": "Your existing session requires the current documents. You can still sign out or delete your account."
 }

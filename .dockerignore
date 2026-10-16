@@ -20,3 +20,9 @@
 /db_dumps
 /docker-compose*.yml
 /nginx*.conf
+
+# Private IMAP cleanup state/configuration: never commit or copy into images.
+**/mail-cleanup-state/
+**/mail-cleanup.env
+**/mail-cleanup.env.*
+**/.mail-cleanup/

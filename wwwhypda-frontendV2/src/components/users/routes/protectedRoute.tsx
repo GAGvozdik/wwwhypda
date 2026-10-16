@@ -9,7 +9,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const { isAuth } = useAuthCheck();
+    const { isAuth, termsRequired } = useAuthCheck();
 
     if (isAuth === null) {
         return (
@@ -29,7 +29,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     // delay(1000);
 
     if (!isAuth) {
-        return <Navigate to="/login" />;
+        return <Navigate to="/login" state={{ termsRequired }} />;
     }
     return <>{children}</>;
 };

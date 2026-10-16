@@ -34,3 +34,16 @@
 .listItem {
   margin-bottom: 0.5rem;
 }
+.download {
+  margin: 1rem 0;
+  a {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    color: var(--tree-text);
+    border: 1px solid currentColor;
+    border-radius: 0.5rem;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    &:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+  }
+}

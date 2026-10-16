@@ -10,6 +10,21 @@ const deletionKey = 'accountDeletionEpoch';
 let epoch = 0;
 let paused = false;
 let ended = false;
+let termsRequired = false;
+export const termsEvent = 'account-terms-required';
+export const termsAcceptanceRequired = () => termsRequired;
+
+export function requireCurrentTerms() {
+    if (termsRequired) return;
+    termsRequired = true;
+    window.dispatchEvent(new Event(termsEvent));
+}
+
+export function clearTermsRequirement() {
+    termsRequired = false;
+    window.dispatchEvent(new Event(termsEvent));
+}
+
 
 export const sessionVersion = () => epoch;
 export const sessionUnavailable = () => paused || ended;

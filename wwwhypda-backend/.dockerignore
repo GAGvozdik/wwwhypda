@@ -188,3 +188,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+# Private IMAP cleanup state/configuration: never commit or copy into images.
+**/mail-cleanup-state/
+**/mail-cleanup.env
+**/mail-cleanup.env.*
+**/.mail-cleanup/

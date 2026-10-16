@@ -1,0 +1,13 @@
+[Unit]
+Description=WWHYPDA OVH cleanup dry-run (uninstalled template)
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=oneshot
+# Replace IMAGE_AFTER_LOCAL_BUILD before installing. Private config stays outside Git.
+ExecStart=/usr/bin/docker run --rm --name wwwhypda-mail-cleanup-once --read-only --tmpfs /tmp --env-file /etc/wwwhypda/mail-cleanup.env --mount type=bind,src=/var/lib/wwhypda-mail-cleanup,dst=/mail-state --entrypoint python IMAGE_AFTER_LOCAL_BUILD -B -m maintenance.mail_cleanup --once --dry-run
+TimeoutStartSec=930
+TimeoutStopSec=30
+Restart=no
+UMask=0077

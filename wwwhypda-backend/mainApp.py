@@ -72,10 +72,8 @@ for name, expected_type in (("CSP_POLICY", dict), ("CORS_ORIGINS", list),
         raise ValueError(f"Invalid JSON configuration type: {name}")
 if profile == "production" and any(app.config[name] for name in ("TESTING", "DEBUG", "FLASK_DEBUG", "ENABLE_TEST_ENDPOINTS")):
     raise ValueError("Development/test modes cannot be enabled in production")
-if app.config["MAIL_USE_TLS"] and app.config["MAIL_USE_SSL"]:
-    raise ValueError("MAIL_USE_TLS and MAIL_USE_SSL cannot both be enabled")
-if app.config["MAIL_DELIVERY_MODE"] not in {"smtp", "log"}:
-    raise ValueError("MAIL_DELIVERY_MODE must be smtp or log")
+from smtp_transport import validate_mail_config
+validate_mail_config(app.config)
 from recaptcha_policy import configure_recaptcha_policy
 configure_recaptcha_policy(app.config, profile, os.getenv("RECAPTCHA_ALLOWED_HOSTNAMES"))
 if not 0 <= app.config["RECAPTCHA_MIN_SCORE"] <= 1:

@@ -1,6 +1,7 @@
 # Synthetic isolated DB only: no env_file, published ports or persistent volumes.
 services:
   db:
+    networks: [isolated]
     image: postgres:15-alpine
     pull_policy: never
     environment:
@@ -14,12 +15,24 @@ services:
       timeout: 5s
       retries: 30
   tests:
+    networks: [isolated]
     image: wwwhypda-dev-backend
     pull_policy: never
     environment:
       TEST_AUTH_DATABASE_URI: postgresql+psycopg2://retention_test:isolated-test-only@db:5432/retention_test
-    entrypoint: ["python", "-m", "unittest"]
-    command: ["tests.test_retention_cleanup", "tests.test_retention_migration", "tests.test_auth_lifecycle", "tests.test_terms_acceptance", "tests.test_terms_migration", "tests.test_submission_authors", "-v"]
+    working_dir: /code
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - ../../wwwhypda-backend:/code:ro
+      - ../../common:/common:ro
+    entrypoint: ["python", "-B", "-m", "unittest"]
+    command: ["tests.test_retention_cleanup", "tests.test_retention_migration", "tests.test_auth_lifecycle", "tests.test_terms_acceptance", "tests.test_terms_migration", "tests.test_submission_authors", "tests.test_terms_login", "tests.test_agreement_history_migration", "-v"]
     depends_on:
       db:
         condition: service_healthy
+
+
+networks:
+  isolated:
+    internal: true

@@ -245,6 +245,20 @@ class User(db.Model):
             return True
         return False
 
+
+class UserAgreementAcceptance(db.Model):
+    """Append-only explicit acceptance history; original User fields stay unchanged."""
+    __bind_key__ = "users_db"
+    __tablename__ = "user_agreement_acceptances"
+    __table_args__ = (db.UniqueConstraint("user_id", "version",
+        name="uq_agreement_acceptance_user_version"),)
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    version = db.Column(db.String(64), nullable=False)
+    accepted_at = db.Column(db.DateTime(timezone=True), nullable=False)
+
+
 class ConfirmationCode(db.Model):
     __bind_key__ = 'users_db'
 

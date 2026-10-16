@@ -1,5 +1,5 @@
 import axios, { CanceledError } from 'axios';
-import { sessionEvent, sessionVersion, sessionUnavailable, resumeAccountSession, endAccountSession } from './users/accountSession';
+import { sessionEvent, sessionVersion, sessionUnavailable, resumeAccountSession, endAccountSession, requireCurrentTerms, clearTermsRequirement } from './users/accountSession';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -31,11 +31,16 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use((response) => {
   requests.delete(response.config);
   if (versions.get(response.config) !== sessionVersion()) throw new CanceledError('Session changed');
-  if (response.config.url === '/users/login') resumeAccountSession();
+  if (response.config.url === '/users/login') {
+    resumeAccountSession();
+    clearTermsRequirement();
+  }
   return response;
 }, (error: unknown) => {
   if (axios.isAxiosError(error) && error.config) {
     requests.delete(error.config);
+    if (error.response?.status === 409 && error.response.data?.code === 'terms_acceptance_required' &&
+        error.config.url !== '/users/login') requireCurrentTerms();
     if (error.response?.status === 401 && error.response.data?.code === 'account_unavailable') {
       endAccountSession();
     }

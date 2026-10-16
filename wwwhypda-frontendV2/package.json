@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node scripts/check-legal-pdfs.mjs && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check:legal-pdfs": "node scripts/check-legal-pdfs.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

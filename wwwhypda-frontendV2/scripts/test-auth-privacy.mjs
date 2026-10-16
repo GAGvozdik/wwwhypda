@@ -12,7 +12,7 @@ function fixture(file, post = async () => ({ status: 200, data: {} })) {
         createElement: (type, props, ...children) => ({ type, props: { ...props, children } }),
         useState: initial => {
             const index = cursor++;
-            if (!(index in slots)) slots[index] = initial;
+            if (!(index in slots)) slots[index] = typeof initial === 'function' ? initial() : initial;
             return [slots[index], value => { slots[index] = typeof value === 'function' ? value(slots[index]) : value; }];
         },
         useRef: initial => {
@@ -27,7 +27,7 @@ function fixture(file, post = async () => ({ status: 200, data: {} })) {
     const output = ts.transpileModule(source, { compilerOptions: {
         module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022,
         jsx: ts.JsxEmit.React, esModuleInterop: true,
-    } }).outputText;
+    } }).outputText.replaceAll('import.meta.env.BASE_URL', "'/'");
     const exports = {};
     const components = { UserButton: 'UserButton', ErrorMessage: 'ErrorMessage' };
     const dependencies = {
@@ -45,6 +45,12 @@ function fixture(file, post = async () => ({ status: 200, data: {} })) {
             if (name.endsWith('/withRecaptcha')) return value => value;
             if (name === './userButton') return components.UserButton;
             if (name === './errorMessage') return components.ErrorMessage;
+            if (name.endsWith('/accounts/deleteAccount')) return 'DeleteAccount';
+            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => false, termsEvent: 'terms-required' };
+            if (name.endsWith('/legalDocuments')) return {
+                legalDocuments: ['user-agreement','privacy-policy','cookie-policy'].map(slug => ({slug,label:slug,route:'/'+slug})),
+                legalPdfPath: (slug,version) => 'legal/'+slug+'-'+version+'.pdf',
+            };
             if (name.endsWith('/customCheckbox')) return 'CustomCheckbox';
             if (name.endsWith('/userAgreementVersion')) return { USER_AGREEMENT_VERSION: 'synthetic-version' };
             if (name === './validation') return { validateRegistration: () => null };
@@ -53,8 +59,9 @@ function fixture(file, post = async () => ({ status: 200, data: {} })) {
         setInterval: callback => { timers.add(callback); return callback; },
         clearInterval: callback => timers.delete(callback),
         localStorage: { setItem: () => {} },
+        window: new EventTarget(),
     });
-    const execute = async action => { actions.push(action); return 'synthetic-token'; };
+    const execute = async action => { actions.push(action); return 'synthetic-token-' + actions.length; };
     let cleanups = [];
     function render() {
         cursor = 0;
@@ -165,4 +172,48 @@ test('failed login has safe error; successful login preserves check and destinat
     good.input('email', 'synthetic@example.test'); good.input('password', 'Password1!');
     await good.find('form').props.onSubmit(event);
     assert.equal(good.destinations.at(-1)[0], '/account');
+});
+
+test('terms review requires an unchecked choice, fresh CAPTCHA and keeps password out of links', async () => {
+    let n=0;
+    const view=fixture('login',async () => {
+        if(n++===0) throw {isAxiosError:true,response:{status:409,data:{
+            code:'terms_acceptance_required',terms_version:'new-edition'}}};
+        return {status:200,data:{}};
+    });
+    view.input('email','synthetic@example.test');view.input('password','Password1!');
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.find('input',props=>props.type==='checkbox').props.checked,false);
+    assert.equal(view.find('UserButton').props.disabled,true);
+    assert.equal(view.destinations.length,0);
+    assert.equal(view.find('input',props=>props.type==='password').props.value,'Password1!');
+    const links=view.nodes().filter(node=>node.type==='a');
+    assert.equal(links.length,6);
+    assert.ok(links.every(node=>node.props.target==='_blank' && !node.props.href.includes('Password')));
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.calls.length,1);
+    view.find('input',props=>props.type==='checkbox').props.onChange({target:{checked:true}});
+    await view.find('form').props.onSubmit(event);
+    assert.deepEqual(view.actions,['login','login']);
+    assert.notEqual(view.calls[0][1].recaptcha_token,view.calls[1][1].recaptcha_token);
+    assert.equal(view.calls[1][1].terms_accepted,true);
+    assert.equal(view.calls[1][1].terms_version,'new-edition');
+    assert.equal(view.destinations.at(-1)[0],'/account');
+});
+
+test('changed release resets acceptance and refusal makes no acceptance request', async () => {
+    let n=0;
+    const view=fixture('login',async () => {throw {isAxiosError:true,response:{status:409,data:{
+        code:n++===0?'terms_acceptance_required':'terms_version_mismatch',
+        terms_version:n===1?'first':'second'}}};});
+    view.input('email','synthetic@example.test');view.input('password','Password1!');
+    await view.find('form').props.onSubmit(event);
+    view.find('input',props=>props.type==='checkbox').props.onChange({target:{checked:true}});
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.find('input',props=>props.type==='checkbox').props.checked,false);
+    assert.equal(view.find('ErrorMessage').props.error,messages.terms_version_mismatch);
+    const decline=view.find('button',props=>props.children.includes(messages.terms_decline));
+    decline.props.onClick();
+    assert.equal(view.destinations.at(-1)[0],'/');
+    assert.equal(view.calls.length,2);
 });

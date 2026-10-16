@@ -4,12 +4,13 @@ import math
 
 import requests
 from flask import current_app, jsonify
-from flask_mail import Mail, Message
+from flask_mail import Message
+from smtp_transport import VerifiedMail
 from flask_sqlalchemy import SQLAlchemy
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
-mail = Mail()
+mail = VerifiedMail()
 db = SQLAlchemy()
 limiter = Limiter(key_func=get_remote_address)
 

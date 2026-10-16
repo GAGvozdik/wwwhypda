@@ -5,6 +5,8 @@ import uuid
 from auth.auth_models import db, User, ConfirmationCode
 from auth.validate import validate_email_and_password, validate_user, validate_password, validate_email, messages
 from auth.terms import CURRENT_TERMS_VERSION
+from auth import terms
+import hmac
 from auth.password_reset_delivery import send_reset_email, send_auth_code_email, wait_for_response_window, wait_for_failed_login
 from auth.transaction_lock import lock_users_transaction
 from sqlalchemy.exc import IntegrityError
@@ -49,6 +51,41 @@ def login():
             wait_for_failed_login(started)
             return jsonify(message="Invalid email or password", error="Unauthorized"), 404
 
+        # Password/CAPTCHA work is complete before taking transaction/User locks.
+        db.session.rollback()
+        lock_users_transaction()
+        current = User.query.filter_by(id=user["id"]).populate_existing().with_for_update().first()
+        if (current is None or not current.active or
+                not hmac.compare_digest(user["account_version"], current.session_version())):
+            db.session.rollback()
+            wait_for_failed_login(started)
+            return jsonify(message="Invalid email or password", error="Unauthorized"), 404
+
+        if "terms_accepted_at" in data:
+            db.session.rollback()
+            return jsonify(message=messages["terms_client_time_forbidden"]), 400
+        if "terms_accepted" in data and data["terms_accepted"] is not True:
+            db.session.rollback()
+            return jsonify(message=messages["terms_acceptance_invalid"]), 400
+        version = terms.current_version()
+        if "terms_version" in data and data["terms_version"] != version:
+            db.session.rollback()
+            return terms.acceptance_response("terms_version_mismatch")
+        if not terms.has_current_acceptance(current, version):
+            if data.get("terms_accepted") is not True:
+                db.session.rollback()
+                return terms.acceptance_response()
+            if data.get("terms_version") != version:
+                db.session.rollback()
+                return terms.acceptance_response("terms_version_mismatch")
+            terms.record_acceptance(current, version)
+            db.session.flush()
+        if terms.current_version() != version:
+            db.session.rollback()
+            return terms.acceptance_response("terms_version_mismatch")
+        # No ordinary JWT/cookie before a successful committed acceptance transaction.
+        user.update(is_superuser=current.is_superuser, account_version=current.session_version())
+        db.session.commit()
         identity = str(user["id"])
 
         access_expires_seconds = (session.get('ACCESS_EXPIRES_SECONDS', current_app.config['ACCESS_EXPIRES_SECONDS']) if current_app.config['TESTING'] else current_app.config['ACCESS_EXPIRES_SECONDS'])
@@ -217,7 +254,7 @@ def add_user():
         terms_version = user_data.pop('terms_version', None)
         if not isinstance(terms_version, str) or not terms_version:
             return jsonify(message=messages['terms_version_error'], code='terms_version_required'), 400
-        if terms_version != CURRENT_TERMS_VERSION:
+        if terms_version != terms.current_version():
             return jsonify(message=messages['terms_version_error'], code='terms_version_mismatch'), 409
 
         is_valid, error_response = verify_recaptcha(user_data.get('recaptcha_token'), "register")
@@ -249,7 +286,7 @@ def add_user():
             if new_account:
                 existing_user = User(name=user_data["name"], email=email, active=False,
                     registered_at=datetime.now(timezone.utc), registration_completed=False,
-                    terms_accepted_at=datetime.now(timezone.utc), terms_version=CURRENT_TERMS_VERSION)
+                    terms_accepted_at=datetime.now(timezone.utc), terms_version=terms.current_version())
                 existing_user.password = password_hash
                 db.session.add(existing_user)
                 try:
@@ -267,6 +304,11 @@ def add_user():
                     if existing_user is None:
                         raise
                     new_account = False
+            if new_account:
+                if terms_version != terms.current_version():
+                    db.session.rollback()
+                    return terms.acceptance_response("terms_version_mismatch")
+                terms.record_acceptance(existing_user, terms_version, existing_user.terms_accepted_at)
             confirmation_code = None
             # Only new or explicitly unconfirmed registrations are eligible for codes.
             if not existing_user.active and existing_user.registration_completed is False:

@@ -10,13 +10,13 @@ interface SuperProtectedRouteProps {
 }
 
 const SuperProtectedRoute: React.FC<SuperProtectedRouteProps> = ({ children, redirectIfSuperuser = false }) => {
-    const { isAuth, isSuperuser } = useAuthCheck();
+    const { isAuth, isSuperuser, termsRequired } = useAuthCheck();
     if (isAuth === null || isSuperuser === null) {
         return <></>;
     }
 
     if (!isAuth) {
-        return <Navigate to="/login" />;
+        return <Navigate to="/login" state={{ termsRequired }} />;
     }
 
     // If the route should redirect superusers away (e.g., the /account page)

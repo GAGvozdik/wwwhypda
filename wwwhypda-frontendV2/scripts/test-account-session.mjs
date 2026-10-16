@@ -117,3 +117,23 @@ test('other tabs clear drafts and leave protected page', async () => {
     assert.equal(values.get('isDarkTheme'), 'true');
     assert.equal(session.sessionEnded(), true);
 });
+
+test('terms-required response preserves drafts, cookies epoch and deletion availability', async () => {
+    const {api,session,values,store}=await fixture();
+    const before=session.sessionVersion();
+    const state=store.getState();
+    api.defaults.adapter=async config=>{throw new axios.AxiosError('Review current terms','ERR_BAD_REQUEST',config,null,
+        {data:{code:'terms_acceptance_required'},status:409,statusText:'Conflict',headers:{},config});};
+    await assert.rejects(api.get('/users/check'),error=>error.response?.status===409);
+    assert.equal(session.termsAcceptanceRequired(),true);
+    assert.equal(session.sessionVersion(),before);
+    assert.equal(session.sessionEnded(),false);
+    assert.equal(values.get('generalInfoData'),'["private draft"]');
+    assert.equal(values.has('accountDeletionEpoch'),false);
+    assert.equal(store.getState(),state);
+    api.defaults.adapter=async config=>response(config);
+    assert.equal((await api.delete('/users/me')).status,200);
+    await api.post('/users/login');
+    assert.equal(session.termsAcceptanceRequired(),false);
+    assert.equal(values.get('generalInfoData'),'["private draft"]');
+});

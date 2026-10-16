@@ -26,7 +26,8 @@ class AuthLifecycleTests(unittest.TestCase):
         self.context.push()
         db.create_all()
         self.now = datetime(2026, 10, 12, 12, 0, tzinfo=timezone.utc)
-        user = User(name="Owner", email="owner@example.test", active=True)
+        user = User(name="Owner", email="owner@example.test", active=True,
+            terms_version=CURRENT_TERMS_VERSION, terms_accepted_at=datetime.now(timezone.utc))
         user.set_password("Password1!")
         db.session.add(user)
         db.session.commit()
@@ -133,7 +134,8 @@ class AccountDeletionTests(unittest.TestCase):
         self.app.register_blueprint(admin_bp)
         self.app.register_blueprint(input_bp)
         self.owner_id = User.query.one().id
-        other = User(name="Other", email="other@example.test", active=True)
+        other = User(name="Other", email="other@example.test", active=True,
+            terms_version=CURRENT_TERMS_VERSION, terms_accepted_at=datetime.now(timezone.utc))
         other.set_password("Password1!")
         db.session.add(other)
         db.session.flush()

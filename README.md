@@ -1,4 +1,4 @@
-# wwwhypda
+﻿# wwwhypda
 
 ## Работа с LLM-чатами и планами
 
@@ -578,3 +578,20 @@ docker run --rm --pull=never --network none --entrypoint python wwwhypda-dev-bac
 
 Frontend suites запускаются прежней командой четырёх scripts из раздела 005;
 они дополнены проверками all/stale/panels/tree/XLSX/accounts, не заменяют browser QA.
+
+
+## SMTP OVH (локальная подготовка, цикл 007)
+
+Flask-Mail сохранён; SSL/TLS проверяет сертификат и hostname, SMTP fallback отсутствует.
+Существующие переменные MAIL_* и оставшиеся действия владельца:
+[инструкция OVH SMTP](deploy/mail/ovh-smtp.md).
+IMAP/очистка, env, публичные контакты и VPS в этом цикле не изменены.
+Проверки и ограничения: [архив 007](docs/archive/007-ovh-smtp.md).
+
+
+## IMAP OVH — локальная подготовка цикла 008
+
+Независимая задача по умолчанию readonly DRY_RUN; не включена в обычный запуск.
+[Настройка, ограничения и реальная приёмка Zimbra](deploy/mail/ovh-cleanup.md).
+Автоудаление поддержки запрещено; реальный ящик ещё не проверен. Локальная
+Gmail-инструкция выше сохраняется. Никакой timer/deployment автоматически не выполняется.

@@ -29,3 +29,12 @@ wwwhypda-backend/.env.prod
 # Private local SQLite database copies.
 /wwwhypda-backend/instance/*.db
 /wwwhypda-backend/wwhypda.db
+
+# Private IMAP cleanup state/configuration: never commit or copy into images.
+**/mail-cleanup-state/
+**/mail-cleanup.env
+**/mail-cleanup.env.*
+**/.mail-cleanup/
+
+# Reproducible legal PDF render intermediates.
+/tmp/pdfs/
