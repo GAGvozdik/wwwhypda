@@ -221,3 +221,14 @@ browser-проверка агента не выполнялась. Числен�
 не измерялось и не сохранялось. Прежние pending записи — история проверок.
 План [005](../../docs/archive/005-search-height-and-navigation.md) архивирован.
 Production-включение и независимый аудит этим не подтверждаются.
+
+
+## Синхронизация контакта редакции 2026-10-16.1
+
+В новом локальном комплекте публичных документов контакт human review/privacy —
+support@wwhypdatestdeployversion.it, OVH Zimbra Starter. Прежние ссылки на Gmail
+выше относятся к предыдущей схеме и её исторической оценке. reCAPTCHA provider,
+security-only scope, роли/передачи и cookies от смены SMTP не исчезают.
+Фактический lifecycle: stable shell, lazy same-origin frame после явного action,
+удаление frame при уходе без document reload; сохранённые Google cookies не стираются.
+Это не подтверждение публикации новой редакции или проверка нового SMTP-кода на VPS.

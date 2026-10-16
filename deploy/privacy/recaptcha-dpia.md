@@ -181,3 +181,14 @@ payload и логирования токена. Google работает толь
 перед отдельно разрешённым rollout остаются hostname/action/score, CSP/Network
 и оценка существенных false positives. Оценка правовых оснований всего сайта
 этим UI-циклом заново не утверждается. Исторические наблюдения 003 сохраняются.
+
+
+## Синхронизация контакта редакции 2026-10-16.1
+
+В новом локальном комплекте публичных документов контакт human review/privacy —
+support@wwhypdatestdeployversion.it, OVH Zimbra Starter. Прежние ссылки на Gmail
+выше относятся к предыдущей схеме и её исторической оценке. reCAPTCHA provider,
+security-only scope, роли/передачи и cookies от смены SMTP не исчезают.
+Фактический lifecycle: stable shell, lazy same-origin frame после явного action,
+удаление frame при уходе без document reload; сохранённые Google cookies не стираются.
+Это не подтверждение публикации новой редакции или проверка нового SMTP-кода на VPS.
