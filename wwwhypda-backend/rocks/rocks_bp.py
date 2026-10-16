@@ -93,3 +93,29 @@ def get_samples(rt_id, id_Parameter):
     measures = Measure.getMeasuresBySampleIdAndParam(sample_ids, id_Parameter)
     
     return jsonify(measures)
+
+@rocks_bp.route('/search', methods=['GET'])
+def search_public_catalog():
+    from rocks.catalog_search import parse_id, search_catalog
+    from sqlalchemy.exc import SQLAlchemyError
+    from common_defenitions import db
+
+    success, error_response = verify_recaptcha(request.headers.get('X-Recaptcha-Token'), "search")
+    if not success:
+        return error_response
+    try:
+        if set(request.args) != {"rock_type_id", "parameter_id"} or any(
+                len(request.args.getlist(key)) != 1 for key in request.args):
+            raise ValueError("Invalid catalog filter")
+        rock_id = parse_id(request.args["rock_type_id"])
+        parameter = request.args["parameter_id"]
+        parameter_id = "all" if parameter == "all" else parse_id(parameter)
+        return jsonify(search_catalog(rock_id, parameter_id))
+    except ValueError:
+        return jsonify(message="Invalid catalog filters"), 400
+    except LookupError:
+        return jsonify(message="Catalog filter not found"), 404
+    except (SQLAlchemyError, RuntimeError):
+        db.session.rollback()
+        current_app.logger.error("Catalog search failed")
+        return jsonify(message="Catalog search unavailable"), 500

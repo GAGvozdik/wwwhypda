@@ -547,3 +547,34 @@ docker run --rm --pull=never --network none --entrypoint node wwwhypda-dev-front
 `docker compose --env-file .env.development up --build --no-deps frontend`, затем
 Ctrl+F5 на localhost:8080. Сборка включает два HTML entry: index и recaptcha-frame;
 новых env-настроек/зависимостей/миграций нет, VPS не затрагивается.
+
+
+## Публичный поиск и управление панелями (локальный цикл 006)
+
+Search использует GET /api/rocks/search?rock_type_id=<ID>&parameter_id=<ID|all>:
+обычная порода/параметр, порода/все параметры, All rock types/параметр и оба all.
+All rock types — подпись исходного корня каталога, ID не заменяется константой;
+обычные папки сохраняют точное равенство породы без потомков. Ответ — плоские строки
+измерений с row_id, образцом/породой/параметром/единицами, без агрегации. All parameters выбран по умолчанию и
+включает образцы без измерений (null); повторы/нули сохраняются в таблице и XLSX.
+CAPTCHA header/action search и глобальный rate limit прежние; старый int/int endpoint
+совместим. Частные заявки в поиск не включаются. Схема/миграции/новые env не нужны.
+
+View переключает Tree/Search form/Results независимо, Show all восстанавливает панели.
+Размер страницы таблицы автоматически подбирается по её высоте (paginationAutoPageSize),
+чтобы строки помещались без внутреннего вертикального scroll; горизонтальный scroll сохранён.
+Состояние живёт в текущем Search, панели/AG Grid не размонтируются; единственная панель
+занимает весь workspace. Общая высота wide 38rem вместе с View (высота панелей уменьшена на toolbar и отступ), есть reduced-motion. Корень/группы дерева
+выделены, отступ растёт с глубиной. Корневая полоса прокрутки CSS запрошена постоянно,
+но OS overlay/auto-hide может иметь приоритет. Logout расположен сверху справа в нейтральном контурном стиле,
+Delete account — внизу по центру, без изменения auth/confirmation. Функциональная приёмка владельцем получена; формальная матрица/набор скриншотов
+исключены владельцем из этого цикла, ограничения записаны в [архиве 006](docs/archive/006-search-all-parameters.md).
+
+Изолированная серверная проверка без рабочей DB/env/network после build backend:
+
+```sh
+docker run --rm --pull=never --network none --entrypoint python wwwhypda-dev-backend -m unittest tests.test_catalog_search tests.test_recaptcha_policy.VerifierTests -q
+```
+
+Frontend suites запускаются прежней командой четырёх scripts из раздела 005;
+они дополнены проверками all/stale/panels/tree/XLSX/accounts, не заменяют browser QA.

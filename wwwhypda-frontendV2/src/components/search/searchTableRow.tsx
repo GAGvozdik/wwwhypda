@@ -1,4 +1,5 @@
 import React from 'react';
+import type { SearchParameterSelection } from '../../common/types';
 import styles from "./searchStyles.module.scss";
 import Radio from '@mui/material/Radio';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -12,9 +13,9 @@ interface SearchTableRowProps {
     name: string;
     desc: string;
     unit: string;
-    value: number; // Добавьте значение для радиокнопки
-    onChange: (value: number) => void; // Функция для изменения состояния
-    selectedValue: number | null;
+    value: Exclude<SearchParameterSelection, null>; // Добавьте значение для радиокнопки
+    onChange?: (value: Exclude<SearchParameterSelection, null>) => void; // Функция для изменения состояния
+    selectedValue: SearchParameterSelection;
 }
 
 const SearchTableRow: React.FC<SearchTableRowProps> = ({ name, desc, unit, value, onChange, selectedValue }) => {
@@ -34,14 +35,14 @@ const SearchTableRow: React.FC<SearchTableRowProps> = ({ name, desc, unit, value
                     }}
                     checked={selectedValue === value} // Управляемый компонент: checked по значению selectedValue
                     value={value}
-                    onChange={() => onChange(value)}
+                    onChange={onChange ? () => onChange(value) : undefined}
                 />
             }
             label={
-                <span className={styles.parameterText}>
-                    <span dangerouslySetInnerHTML={{ __html: name }} />
+                <span className={`${styles.parameterText} ${value === 'all' ? styles.allParameter : ''}`}>
+                    {value === 'all' ? <span>{name}</span> : <span dangerouslySetInnerHTML={{ __html: name }} />}
                     <span dangerouslySetInnerHTML={{ __html: desc }} />
-                    <span>[ <span dangerouslySetInnerHTML={{ __html: unit }} /> ]</span>
+                    {value !== 'all' && <span>[ <span dangerouslySetInnerHTML={{ __html: unit }} /> ]</span>}
                 </span>
             }
         />

@@ -121,3 +121,37 @@
 }
 
 .accountPage { inline-size: min(100%, 72rem); max-inline-size: 72rem; margin-inline: auto; min-width: 0; }
+
+
+.accountPage { display: flex; flex-direction: column; }
+.topActions, .bottomActions { width: 100%; display: flex; justify-content: flex-start; }
+.topActions { margin-block-end: 1rem; justify-content: flex-end; }
+.bottomActions { margin-block-start: auto; padding-block-start: 2rem; justify-content: center; }
+.topActions button, .bottomActions button { min-inline-size: min(10rem, 100%); }
+.topActions button { margin: 0 !important; }
+.bottomActions .deleteAction { margin: 0; justify-content: center; text-align: center; }
+
+.neutralLogout {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    inline-size: max-content;
+    max-inline-size: 100%;
+    min-height: 2.5rem;
+    box-sizing: border-box;
+    padding: .5rem 1.25rem;
+    background: var(--transparent-color);
+    color: var(--tree-text);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: Afacad_Flux, sans-serif;
+    font-size: var(--button-font-size);
+    white-space: normal;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: background-color 160ms ease-in-out;
+    &:hover { background: var(--tree-hover); }
+    &:focus-visible { outline: 2px solid var(--border); outline-offset: 2px; }
+    &:disabled { opacity: .5; cursor: default; }
+}
+@media (prefers-reduced-motion: reduce) { .neutralLogout { transition: none; } }

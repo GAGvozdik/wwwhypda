@@ -30,3 +30,21 @@
   синхронно ожидаемым изолированным Linux child с deadline до 3s, cleanup/reap и
   container-wide cap 2. Нейтральный ответ не обещает доставку. Не заменять это
   одним random sleep и не объявлять устранёнными все сетевые timing side channels.
+
+
+### Публичный каталог Search — цикл 006
+
+- GET /rocks/search?rock_type_id=<ID>&parameter_id=<ID|all>, через Axios params;
+  X-Recaptcha-Token с прежним expected action search и глобальными rate limits.
+  Lookups без CAPTCHA, JWT-only /rocks/samples и старый /samples/<int>/<int> сохранены.
+- Корень определяется уникальной top-level записью (parent=-1) с точным нормализованным
+  generic earth material, включая декоративные дефисы/регистр/пробелы; используется
+  её фактический rt_id, числовой sentinel не вводится. В UI только label All rock types,
+  исходное rt_name/ID/Redux не переименовываются; другие папки не включают потомков.
+- Корень снимает фильтр пород; all снимает фильтр параметра. Одна строка на измерение,
+  повторы/нули/error/null сохраняются. All включает образцы без измерений, все Measure
+  поля у них null. row_id measure:<id> или sample:<id>:no-measure; единый набор ключей:
+  прежний Measure.to_dict плюс id_Sample/sample_name/rt_id/rt_name/param_name/parameter_code/units/row_id.
+- Некорректные/отсутствующие/дублированные/лишние query значения 400, неизвестный ID 404,
+  известные без результатов 200 [], SQL/неоднозначный корень 500 без внутренних деталей.
+  В запросах только публичные Sample/Measure/Rock_type/Parameter; users_db/InputData не участвуют.

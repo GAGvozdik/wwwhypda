@@ -91,6 +91,11 @@ const Account: React.FC = () => {
                 width: '100%'
             }}
         >
+            <div className={accountStyles.topActions}>
+                <button onClick={handleLogout} className={accountStyles.neutralLogout}>
+                    {messages.logout}
+                </button>
+            </div>
             <div
                 // className={styles.authForm}
                 style={{
@@ -103,7 +108,6 @@ const Account: React.FC = () => {
                     {messages.account_title}
                 </div>
 
-                <DeleteAccount />
                 <UserSuggestions />
 
 
@@ -122,10 +126,9 @@ const Account: React.FC = () => {
                         <p>{messages.logout_does_not_delete}</p>
                     </section>
                 </div>
-                <button onClick={handleLogout} className={`${styles.submitButton} ${styles.logoutButton}`}>
-                    {messages.logout}
-                </button>
+
             </div>
+            <div className={accountStyles.bottomActions}><DeleteAccount /></div>
         </div>
     );
 };

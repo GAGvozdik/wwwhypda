@@ -7,70 +7,20 @@ import styles from './treeStyles.module.scss';
 // import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 // import { UpdateTheme, UpdateOpenClose } from '../../redux/actions';
 import {useEffect, useState} from 'react';
-import CustomTreeItem from './customTreeItem';
+import { findAllRockTypesId } from '../../common/catalog';
+import { buildTree } from './treeBuilder';
+import type { RockTypeData } from '../../common/types';
 // import IconButton from '@mui/material/IconButton';
 // import ClearIcon from '@mui/icons-material/Clear';
 // import MenuIcon from '@mui/icons-material/Menu';
 // import axios from 'axios';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import api from '../api';
+import { useDispatch } from 'react-redux';
+import { UpdateRTID, UpdateRTName } from '../../redux/actions';
 
-interface RockTypeData {
-    rt_id: number;
-    rt_name: string;
-    rt_description: string | null;
-    rt_wiki_link: string | null;
-    rt_left: number;
-    rt_right: number;
-    rt_id_parent: number;
-    rt_USCS: string | null;
-    UID: string | null;
-    PARENTUID: string | null;
-    rt_status: number;
-    status_name: string | null;
-}
-
-
-const buildTree = (data: RockTypeData[]): React.ReactNode[] => {
-
-    if (!Array.isArray(data)) {
-        return [];
-    }
-
-    const nodeMap: { [key: number]: RockTypeData } = {};
-    data.forEach(node => nodeMap[node.rt_id] = node);
-
-
-    const rootNodes = data.filter(node => node.rt_id_parent === -1);
-
-
-    const createTreeItem = (nodeId: number): React.ReactNode => {
-        const node = nodeMap[nodeId];
-        if (!node) {
-            return(<></>)
-        };
-
-        const children = data.filter(child => child.rt_id_parent === node.rt_id);
-        const childItems = children.map(child => createTreeItem(child.rt_id));
-
-        return (
-            <CustomTreeItem
-                key={node.rt_id}
-                name={node.rt_name}
-                rt_id={node.rt_id.toFixed()}
-                rt_name={node.rt_name}
-            >
-                    {childItems}
-            </CustomTreeItem>
-        );
-    };
-
-
-    return rootNodes.map(rootNode => createTreeItem(rootNode.rt_id));
-};
-
-
-const ModelsTreeDrawer: React.FC = () => {
+const ModelsTreeDrawer: React.FC<{ onRootKnown?: (id: string | null) => void }> = ({ onRootKnown }) => {
+    const dispatch = useDispatch();
     const [treeData, setTreeData] = useState<RockTypeData[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -85,6 +35,7 @@ const ModelsTreeDrawer: React.FC = () => {
                         setError(messages.tree_empty);
                     } else {
                         setTreeData(response.data);
+                        onRootKnown?.(findAllRockTypesId(response.data));
                     }
                 } catch {
                     setError(messages.tree_failed);
@@ -93,7 +44,7 @@ const ModelsTreeDrawer: React.FC = () => {
         };
 
         fetchRockTypes();
-    }, []);
+    }, [onRootKnown]);
 
     useEffect(() => {
         if (treeData.length > 0 || error) {
@@ -113,6 +64,13 @@ const ModelsTreeDrawer: React.FC = () => {
             }}>
                     <SingleSkeleton loading={loading} error={error}>
                         <SimpleTreeView
+                            onItemSelectionToggle={(_event, itemId, selected) => {
+                                const node = treeData.find(item => String(item.rt_id) === itemId);
+                                if (selected && node) {
+                                    dispatch(UpdateRTID(String(node.rt_id)));
+                                    dispatch(UpdateRTName(node.rt_name));
+                                }
+                            }}
                             sx={{
                                 color: 'var(--tree-text)',
                                 fontFamily: 'Afacad_Flux !important',

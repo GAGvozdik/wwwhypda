@@ -19,7 +19,7 @@ App.SiteContent сразу при посещении перечисленных 
 
 | Route / роль | Запрошенная функция / момент execute | Action → endpoint | Реальная серверная защита / источник |
 | --- | --- | --- | --- |
-| /search, посетитель | mount дерева и списка параметров; выбор параметра/породы | rock_type → GET /rocks/rock_type; parameters → GET /rocks/parameters; search → GET /rocks/samples/{rock}/{parameter} | CAPTCHA + общие rate limits, без JWT. search.tsx/MainTree и rocks_bp.py |
+| /search, посетитель | mount дерева и списка параметров; выбор параметра/породы | rock_type → GET /rocks/rock_type; parameters → GET /rocks/parameters; search → GET /rocks/search?rock_type_id=<ID>&parameter_id=<ID or all> (006) | CAPTCHA + общие rate limits, без JWT. search.tsx/MainTree и rocks_bp.py |
 | /login, посетитель | submit входа; затем лишний check | login → POST /users/login; check_auth_after_login → GET /users/check | CAPTCHA/password + login rate limit; check дополнительно JWT/current account/version. auth/login.tsx, authentication.py |
 | /register, взрослый посетитель | submit, подтверждение, resend | register → POST /users/; confirm_registration → POST /users/confirm-registration; resend_code → POST /users/resend-confirmation | CAPTCHA/rate limits/validation/consent version; confirmation code TTL/verification. registration.tsx/authentication.py |
 | /forgot-password, посетитель | запрос, resend, подтверждение | request_password_reset и resend_password_reset → POST /users/request-password-reset; confirm_password_reset → POST /users/confirm-password-reset | CAPTCHA/rate limits + active account, одноразовый код/TTL, password validation. forgotPassword.tsx/authentication.py |
@@ -162,7 +162,7 @@ browser-фактом для оценки, не обещанием нулевог
 | registration resend | resend_code | POST /users/resend-confirmation | Кнопка resend с существующим countdown/rate + exact verifier |
 | reset request/resend | request_password_reset / resend_password_reset | POST /users/request-password-reset | Explicit request/resend; endpoint принимает только эти два action, active user/rate |
 | reset confirm | confirm_password_reset | POST /users/confirm-password-reset | Submit кода/нового пароля; code/TTL/one-use/validation/rate |
-| search | search | GET /rocks/samples/{rock}/{parameter} | После явного submit поиска; exact verifier/rate limits, не фоновый execute |
+| search | search | GET /rocks/search?rock_type_id=<ID>&parameter_id=<ID or all> | После явного submit поиска; exact verifier/rate limits, не фоновый execute |
 | rock_type/parameters/lookup/session/read | Нет execute/provider | Прежние GET /rocks и /users/check | Начальные справочники public с прежними limits; JWT-only GET сохраняют JWT/ownership/role |
 | authenticated submit/edit/account delete | Нет execute/provider | Прежние /input и DELETE /users/me | Существующие JWT/CSRF/role/ownership; delete также current password/rate. Retention не менялся |
 
@@ -410,3 +410,12 @@ browsing context прерывает его дальнейшую работу; у
 нужны production score/false-positive проверки до отдельно разрешённого rollout.
 Старые наблюдения 003 не переносятся автоматически на 005. Новых юридических
 оснований либо общей готовности GDPR данный UI-цикл не устанавливает.
+
+
+## Поисковая ручка цикла 006
+
+Текущий frontend вызывает GET /rocks/search с query rock_type_id/parameter_id (ID
+или all для параметра), тем же X-Recaptcha-Token и expected action search. Старый
+/rocks/samples/<int>/<int> остаётся совместимым; исторические записи выше описывают
+прежний URL. Расширена только фильтрация публичного научного каталога; InputData,
+users_db, CAPTCHA purpose/scope и правила verifier/iframe не менялись.

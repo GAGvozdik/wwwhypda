@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import messages from '../../common/error_messages.json';
 import { useSelector } from 'react-redux';
 import type { State, DynamicRowData } from '../../common/types';
 import { generateColumns } from '../../common/types'; 
@@ -10,8 +11,9 @@ const SearchResultsTable: React.FC = () => {
     const rows = useSelector((state: State) => state.currentTableData);
 
     // Генерируем колонки динамически на основе данных
-    const columns = generateColumns(rows);
-    console.log(columns);
+    const columns = useMemo(() => generateColumns(rows).map(column => ({ ...column,
+        headerName: messages[`search_col_${column.field}` as keyof typeof messages] ?? column.headerName,
+    })), [rows]);
     return (
         <>
             <DataTable rows={rows as DynamicRowData[]} columns={columns} />

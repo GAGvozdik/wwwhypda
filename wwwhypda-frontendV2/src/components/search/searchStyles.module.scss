@@ -53,20 +53,45 @@
   word-break: break-word;
   white-space: normal;
 }
+ .searchWorkspace { inline-size: min(100%, 94rem); margin-inline: auto; min-width: 0; }
 .searchLayout {
-    --search-panel-height: 44rem;
+    --search-panel-height: max(8rem, calc(38rem - var(--search-toolbar-height, 3rem) - 1rem));
     display: grid;
-    grid-template-columns: minmax(0, 36rem);
-    grid-template-areas: "tree" "parameters" "results";
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: var(--tree-height) var(--first-gap) var(--form-height) var(--second-gap) var(--results-height);
     min-width: 0;
-    inline-size: min(100%, 36rem);
-    margin-inline: auto;
+    inline-size: 100%;
+    transition: grid-template-rows 220ms ease-in-out;
 }
+.panelSlot { display: flex; min-width: 0; min-height: 0; overflow: clip; opacity: 1; visibility: visible; transition: opacity 160ms ease-in-out, visibility 0s; }
+.treeSlot { grid-row: 1; grid-column: 1; }
+.formSlot { grid-row: 3; grid-column: 1; }
+.resultsSlot { grid-row: 5; grid-column: 1; }
+.panelHidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 160ms ease-in-out, visibility 0s 220ms; }
+.panelSlot > * { width: 100%; height: 100%; }
+.panelToolbar {
+    display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-block-end: 1rem;
+    :global(.MuiToggleButtonGroup-root) { flex-wrap: wrap; gap: .25rem; }
+    :global(.MuiToggleButton-root), :global(.MuiButton-root) {
+        font-family: Afacad_Flux; font-size: var(--button-font-size); text-transform: none;
+        color: var(--tree-text); border: 1px solid var(--border); white-space: normal;
+        display: flex; gap: .375rem; padding: .375rem .75rem;
+        &:hover { background: var(--tree-hover); }
+        &:focus-visible { outline: 2px solid var(--border); outline-offset: 2px; }
+    }
+    :global(.MuiToggleButton-root.Mui-selected) {
+        background: var(--menu); color: var(--submit-button-text); border-width: 2px;
+        &:hover { background: var(--submit-button-active); color: var(--submit-button-text); }
+    }
+    :global(.MuiButton-root.Mui-disabled) { color: var(--tree-text); opacity: .5; }
+    .showAll { margin-inline-start: auto; }
+}
+.noPanels { padding: 1rem; background: var(--drawer-color); border-radius: 4px; }
+.tableLayer { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.resultsOverlay { position: absolute; inset: 0; z-index: 1; background: var(--drawer-color); }
 .resultsPanel, .parametersPanel { min-width: 0; min-height: 0; box-sizing: border-box; }
-.resultsPanel { grid-area: results; display: flex; flex-direction: column; height: min(32rem, var(--search-panel-height)); }
+.resultsPanel { display: flex; flex-direction: column; height: min(32rem, var(--search-panel-height)); }
 .parametersPanel {
-    grid-area: parameters;
     display: flex;
     flex-direction: column;
     height: min(24rem, var(--search-panel-height));
@@ -102,13 +127,18 @@
 .resultsGrid { flex: 1; min-height: 0; min-width: 0; }
 @container workspace (min-width: 65rem) {
     .searchLayout {
-        inline-size: min(100%, 94rem);
-        grid-template-columns: minmax(15rem, 20rem) minmax(24rem, 1fr) minmax(24rem, 1fr);
-        grid-template-areas: "tree parameters results";
+        grid-template-columns: minmax(0, var(--tree-track)) var(--first-gap) minmax(0, var(--form-track)) var(--second-gap) minmax(0, var(--results-track));
+        grid-template-rows: minmax(0, 1fr);
         height: var(--search-panel-height);
+        transition: grid-template-columns 220ms ease-in-out, height 220ms ease-in-out;
     }
-    .resultsPanel { height: 100%; }
-    .parametersPanel { height: 100%; max-height: none; }
+    .treeSlot { grid-row: 1; grid-column: 1; }
+    .formSlot { grid-row: 1; grid-column: 3; }
+    .resultsSlot { grid-row: 1; grid-column: 5; }
+    .noPanelLayout { height: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .searchLayout, .panelSlot, .panelHidden { transition: none; }
 }
 .searchLayout :global(.MuiRadio-root .MuiSvgIcon-root) { font-size: var(--menu-font-size); }
 
@@ -139,3 +169,7 @@
 .searchParameter { width: 100%; margin: 0 !important; font-family: Afacad_Flux; font-size: var(--main-font-size); color: var(--tree-text); }
 .parameterText { display: grid; grid-template-columns: minmax(3rem, 5rem) minmax(0, 1fr) auto; align-items: center; gap: 0.5rem; min-width: 0; flex: 1; overflow-wrap: anywhere; }
 @container workspace (max-width: 30rem) { .parameterText { grid-template-columns: minmax(0, 1fr) auto; } .parameterText > :nth-child(2) { grid-row: 2; grid-column: 1 / -1; } }
+
+.panelSlot > .resultsPanel, .panelSlot > .parametersPanel { height: 100%; max-height: none; }
+
+.allParameter { display: block; }

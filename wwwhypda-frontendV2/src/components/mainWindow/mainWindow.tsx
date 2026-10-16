@@ -69,7 +69,7 @@ export default function MainWindow() {
 
 
     return (
-        <div ref={shellRef} className={`${windowStyles.container} ${fillsFirstScreen ? windowStyles.fullScreenContent : ''} ${isDarkTheme ? styles.dark : ''}`}>
+        <div ref={shellRef} className={`${windowStyles.container} ${pathname === '/' ? windowStyles.fullScreenContent : ''} ${isDarkTheme ? styles.dark : ''}`}>
 
             <MainMenu />
             <MainBody />

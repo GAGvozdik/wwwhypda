@@ -1,16 +1,19 @@
 import useRemColumns from '../commonFeatures/useRemColumns';
 import messages from '../../common/error_messages.json';
 import { AgGridReact } from "ag-grid-react";
-import type { ColDef } from "ag-grid-community";
+import type { DynamicRowData } from '../../common/types';
+import type { ColDef, GetRowIdParams } from "ag-grid-community";
 import * as XLSX from "xlsx";
 import React, { useMemo } from "react";
 import styles from "./searchStyles.module.scss";
 import { useStepsTheme } from '../inputData/steps';
 
 interface DataTableProps {
-    rows: any[];
+    rows: DynamicRowData[];
     columns: ColDef[];
 }
+
+const getRowId = ({ data }: GetRowIdParams<DynamicRowData>) => String(data.row_id ?? data.id ?? data.id_Measure);
 
 const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
     const containerStyle = useMemo(
@@ -60,12 +63,14 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
                 <AgGridReact
                     theme={themeDarkBlue}
                     rowData={rows}
+                    getRowId={getRowId}
+                    overlayNoRowsTemplate={messages.search_empty}
                     columnDefs={reversedColumns}
                     // columnDefs={columns}
                     defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true, ...defaultColDef }}
                     pagination={true}
-                    paginationPageSize={10}
-                    paginationPageSizeSelector={[10, 20, 50, 100]}
+                    paginationAutoPageSize={true}
+                    paginationPageSizeSelector={false}
                 />
             </div>
 

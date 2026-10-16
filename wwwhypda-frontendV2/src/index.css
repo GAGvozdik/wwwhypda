@@ -32,3 +32,11 @@ html, body, #root {
   color: var(--tree-text);
 }
 #root { min-height: 100%; }
+
+
+/* One document scrollbar; OS overlay/auto-hide settings can still take precedence. */
+html {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
+}

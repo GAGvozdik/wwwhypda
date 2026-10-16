@@ -167,3 +167,35 @@ export interface InputStepProps {
     isEditable: boolean;
     clearAction?: ReactNode;
 }
+
+
+export type SearchParameterSelection = number | 'all' | null;
+export interface CatalogParameter {
+    id_Parameter: number; code: string; param_name: string; units: string;
+    html_code: string; html_units: string; MaxValue: number; MinValue: number;
+}
+export interface CatalogSearchRow extends DynamicRowData {
+    row_id: string; id_Sample: number; sample_name: string; rt_id: number; rt_name: string;
+    param_name: string | null; parameter_code: string | null; units: string | null;
+    id_Measure: number | null; msr_value: number | null; error: number | null;
+    msr_comment: string | null; coher_date: string | null; coher_n_val: number | null;
+    id_smpl: number | null; id_coh: number | null; id_ex_ty: number | null;
+    id_par_msr: number | null; id_int_mtd: number | null; id_qlt: number | null;
+}
+export type SearchPanel = 'tree' | 'form' | 'results';
+export type SearchPanels = Record<SearchPanel, boolean>;
+
+export interface RockTypeData {
+    rt_id: number;
+    rt_name: string;
+    rt_description: string | null;
+    rt_wiki_link: string | null;
+    rt_left: number;
+    rt_right: number;
+    rt_id_parent: number;
+    rt_USCS: string | null;
+    UID: string | null;
+    PARENTUID: string | null;
+    rt_status: number;
+    status_name: string | null;
+}

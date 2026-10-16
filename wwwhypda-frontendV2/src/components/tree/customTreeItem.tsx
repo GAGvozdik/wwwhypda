@@ -4,9 +4,6 @@ import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { Link } from 'react-router-dom';
 // import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 
-import type { UpdateRTIDAction, UpdateRTNameAction } from '../../common/types';
-import { useDispatch } from 'react-redux';
-import { UpdateRTID, UpdateRTName } from '../../redux/actions';
 // import {useState} from 'react';
 
 interface CustomTreeItemProps {
@@ -16,11 +13,13 @@ interface CustomTreeItemProps {
     path?: string;
     rt_id: string;
     rt_name: string;
+    depth?: number;
+    isRoot?: boolean;
+    isGroup?: boolean;
 }
 
-const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, path, name, rt_id, rt_name}) => {
+const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, path, name, rt_id, depth = 0, isRoot = false, isGroup = false}) => {
 
-    const dispatch = useDispatch();
 
 
     // const toggleTheme = (e: React.MouseEvent) => {
@@ -35,37 +34,25 @@ const CustomTreeItem: React.FC<CustomTreeItemProps> = ({ children, path, name, r
     //     console.log('ci rt_name = ', rt_name);
     // };
 
-const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
-    const clickedTreeItem = (e.target as HTMLElement).closest('[role="treeitem"]');
-
-    if (clickedTreeItem !== e.currentTarget) {
-        return;
-    }
-
-    dispatch<UpdateRTIDAction>(UpdateRTID(rt_id));
-    dispatch<UpdateRTNameAction>(UpdateRTName(rt_name));
-    console.log('ci rt_name = ', rt_name);
-};
-
-
+    const labelSize = isRoot ? 'var(--tree-root-font-size)' : isGroup ? 'var(--tree-group-font-size)' : 'var(--tree-font-size)';
+    const indentation = `calc(0.75rem + ${depth} * 1.25rem)`;
     return (
         <>
         {path ?
             <Link to={path} style={{borderRadius: '15px',fontFamily: 'Afacad_Flux !important', textDecoration: 'none', fontSize: 'var(--tree-font-size)'}}>
                 <TreeItem
-                    onClick={toggleTheme}
-                    itemId={name}
+                    itemId={rt_id}
                     label={name}
                     sx={{
-                        '.MuiTreeItem-label': {borderRadius: '15px',fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
+                        '& > .MuiTreeItem-content > .MuiTreeItem-label': {borderRadius: '15px',fontFamily: 'Afacad_Flux !important', fontSize: labelSize, fontWeight: isRoot || isGroup ? 700 : 400},
                         // '& .MuiTreeItem-content.Mui-selected ': { borderRadius: '0px', backgroundColor: 'red' },
-                        '& .MuiTreeItem-content:hover': {borderRadius: '15px', backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
+                        '& > .MuiTreeItem-content:hover': {borderRadius: '15px', backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
                         // '& .MuiTreeItem-conten': { paddingLeft: '100px' },
                         // '& .MuiTreeItem- group': { padding: '6vh' },
                         color: 'var(--tree-text)',
-                        '--TreeView-itemChildrenIndentation': '1.5rem',
-                        '& .MuiTreeItem-content': {paddingLeft: '0.75rem', borderRadius: '15px',},
-                        '& .MuiTreeItem-iconContainer': {width: '0px',borderRadius: '15px',},
+                        '--TreeView-itemChildrenIndentation': '0rem',
+                        '& > .MuiTreeItem-content': {paddingLeft: indentation, borderRadius: '15px',},
+                        '& .MuiTreeItem-iconContainer': {width: '1rem',borderRadius: '15px',},
                     }}
                 >
                     {children ? children : ''}
@@ -73,19 +60,18 @@ const toggleTheme = (e: React.MouseEvent<HTMLElement>) => {
             </Link>
             :
             <TreeItem
-                onClick={toggleTheme}
-                itemId={name}
+                itemId={rt_id}
                 label={name}
                 sx={{
-                    '.MuiTreeItem-label': {fontFamily: 'Afacad_Flux !important', fontSize: 'var(--tree-font-size)'},
+                    '& > .MuiTreeItem-content > .MuiTreeItem-label': {fontFamily: 'Afacad_Flux !important', fontSize: labelSize, fontWeight: isRoot || isGroup ? 700 : 400},
                     // '& .MuiTreeItem-content.Mui-selected ': { borderRadius: '0px', backgroundColor: 'red' },
-                    '& .MuiTreeItem-content:hover': { backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
+                    '& > .MuiTreeItem-content:hover': { backgroundColor: 'var(--tree-hover)', color: 'var(--tree-text)' },
                     // '& .MuiTreeItem-conten': { paddingLeft: '100px' },
                     // '& .MuiTreeItem-group': { padding: '6vh' },
 
                     color: 'var(--tree-text)',
-                    '--TreeView-itemChildrenIndentation': '1.25rem',
-                    '& .MuiTreeItem-content': {paddingLeft: '0.75rem', backgroundColor: ''},
+                    '--TreeView-itemChildrenIndentation': '0rem',
+                    '& > .MuiTreeItem-content': {paddingLeft: indentation, backgroundColor: ''},
                     '& .MuiTreeItem-iconContainer': {display: children ? '' : ''},
                     borderRadius: '15px',
                 }}

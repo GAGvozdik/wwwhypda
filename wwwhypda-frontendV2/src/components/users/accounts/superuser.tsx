@@ -183,6 +183,14 @@ const SuperuserAccount: React.FC = () => {
 
     return (
         <div className={accountStyles.accountPage} style={{ color: 'var(--tree-text)', fontSize: 'var(--main-font-size)', fontFamily: 'Afacad_Flux !important' }}>
+            <div className={accountStyles.topActions}>
+            <button
+                onClick={handleLogout}
+                className={accountStyles.neutralLogout}
+            >
+                {messages.logout}
+            </button>
+            </div>
             <div className={styles.formTitle} style={{ fontSize: 'calc(var(--main-font-size) * 2.25)' }}>{messages.superaccount_title}</div>
             <div style={{ margin: '1rem 0' }}>
 
@@ -221,16 +229,11 @@ const SuperuserAccount: React.FC = () => {
 
             </div>
 
-            <DeleteAccount />
             <InputSuggestions />
 
-            <button
-                onClick={handleLogout}
-                className={`${styles.submitButton} ${styles.logoutButton}`}
-            >
-                {messages.logout}
-            </button>
 
+
+            <div className={accountStyles.bottomActions}><DeleteAccount /></div>
         </div>
     );
 };

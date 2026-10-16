@@ -57,6 +57,8 @@
 .searchDrawer .treeBody { max-height: 100%; }
 @container shell (min-width: 71rem) { .searchDrawer { height: var(--search-panel-height); } }
 
-.treePanel { grid-area: tree; min-width: 0; min-height: 0; height: min(12rem, var(--search-panel-height)); box-sizing: border-box; border-radius: 5px; background-color: var(--drawer-color); }
-.treePanel .treeBody { height: 100%; max-height: 100%; min-height: 0; }
+.treePanel { grid-area: tree; min-width: 0; min-height: 0; height: min(12rem, var(--search-panel-height)); box-sizing: border-box; border-radius: 8px; background-color: var(--drawer-color); overflow: hidden; }
+.treePanel .treeBody { height: 100%; max-height: 100%; min-height: 0; border-radius: inherit; }
 @container workspace (min-width: 65rem) { .treePanel { height: var(--search-panel-height); } }
+
+.treePanel .treeBody::-webkit-scrollbar-corner { background: var(--drawer-color); }
