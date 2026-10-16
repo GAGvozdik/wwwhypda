@@ -43,11 +43,9 @@ export default function MainWindow() {
         if (!fillsFirstScreen || !shell || !(header instanceof HTMLElement)) return;
         const measureHeader = () => {
             shell.style.setProperty('--shell-header-height', `${header.offsetHeight}px`);
-            const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
-            if (Number.isFinite(rem) && rem > 0 && window.outerHeight > 0) {
-                // outerHeight gives a logical window limit without guessing browser zoom/DPR.
-                shell.style.setProperty('--search-window-height', `${window.outerHeight / rem}rem`);
-            }
+            // Previous assumption, disproved by owner zoom testing:
+            // outerHeight gives a logical window limit without guessing browser zoom/DPR.
+            // Search now uses a fixed rem height; only the shell header is measured.
         };
         measureHeader();
         const observer = new ResizeObserver(measureHeader);
