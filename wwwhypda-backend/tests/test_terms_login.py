@@ -74,6 +74,20 @@ class TermsLoginTests(unittest.TestCase):
         self.assertEqual(UserAgreementAcceptance.query.count(),1)
         self.assertEqual(UserAgreementAcceptance.query.one().accepted_at,original)
 
+    def test_previous_published_edition_is_preserved_and_next_release_needs_explicit_acceptance(self):
+        user=db.session.get(User,self.owner_id)
+        user.terms_version='2026-10-16.1'
+        user.terms_accepted_at=self.original_time
+        db.session.commit()
+        self.assertNotEqual(CURRENT,'2026-10-16.1')
+        response=self.login()
+        self.assertEqual(response.status_code,409)
+        self.assertEqual(response.json['terms_version'],CURRENT)
+        self.assertEqual(self.accept().status_code,200)
+        self.assertEqual(db.session.get(User,self.owner_id).terms_version,'2026-10-16.1')
+        self.assertEqual(UserAgreementAcceptance.query.one().version,CURRENT)
+        self.assertEqual(self.login().status_code,200)
+
     def test_current_original_fact_needs_no_new_checkbox(self):
         user=db.session.get(User,self.owner_id)
         user.terms_version=CURRENT

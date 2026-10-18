@@ -38,3 +38,6 @@ wwwhypda-backend/.env.prod
 
 # Reproducible legal PDF render intermediates.
 /tmp/pdfs/
+
+# Disposable browser fixture bundle.
+/tmp/terms-preview/

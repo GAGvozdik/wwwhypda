@@ -366,7 +366,9 @@ class CleanupTests(unittest.TestCase):
         self.fake.add(b"WWHYPDA-Closed",4,email("support"))
         first=self.call();self.assertEqual(first["closed"],1);self.assertEqual(first["expired"],0)
         self.assertEqual(self.call(datetime(2026,2,28,12,tzinfo=UTC))["expired"],0)
-        self.assertEqual(self.call(LATER)["expired"],1)
+        self.assertEqual(self.call(LATER)["expired"],0)
+        self.assertEqual(self.call(datetime(2026,7,31,12,tzinfo=UTC))["expired"],0)
+        self.assertEqual(self.call(datetime(2026,7,31,12,0,1,tzinfo=UTC))["expired"],1)
         with State(self.directory) as state:
             self.assertEqual(state.db.execute("SELECT closed_at FROM threads").fetchone()[0],NOW.isoformat())
 
@@ -382,12 +384,62 @@ class CleanupTests(unittest.TestCase):
         with State(self.directory) as state:
             self.assertEqual(state.db.execute("SELECT closed_at FROM threads").fetchone()[0],LATER.isoformat())
 
-    def test_explicit_reclose_is_narrow_and_restarts_month_without_mail_mutation(self):
+    def test_explicit_reclose_is_narrow_and_restarts_support_period_without_mail_mutation(self):
         self.fake.add(b"WWHYPDA-Closed",4,email("support"));self.call()
         self.fake.add(b"INBOX",2,email("reply",refs=["support"]));self.call()
         self.fake.messages[b"INBOX"].clear();self.call()
         with State(self.directory) as state:token=state.db.execute("SELECT token FROM threads").fetchone()[0]
         self.assertEqual(self.call(LATER,reclose=token)["closed"],1)
+        self.assertEqual(self.fake.mutations,[])
+
+    def test_private_due_lookup_matches_message_without_exposing_raw_ids(self):
+        self.fake.add(b"WWHYPDA-Closed",4,email("owner-map"))
+        self.call()
+        output=io.StringIO()
+        with redirect_stdout(output):
+            self.call(list_state=True,lookup_message_id='<owner-map@example.test>')
+        row=json.loads(output.getvalue().splitlines()[0])
+        self.assertEqual(row["due_at"],datetime(2026,7,31,12,tzinfo=UTC).isoformat())
+        self.assertNotIn('owner-map',output.getvalue())
+        self.assertEqual(len(row['handle']),64)
+        with self.assertRaisesRegex(MailSafetyError,"configuration"):
+            self.call(lookup_message_id='<owner-map@example.test>')
+        output=io.StringIO()
+        with redirect_stdout(output):self.call(list_state=True,lookup_message_id='<missing@example.test>')
+        self.assertEqual(output.getvalue(),'')
+        self.assertEqual(self.fake.mutations,[])
+
+    def test_existing_monthly_expired_state_recomputes_six_months_without_resetting_closure(self):
+        self.fake.add(b"WWHYPDA-Closed",4,email("old-rule"));self.call()
+        with State(self.directory) as state:
+            with state.transaction():
+                state.db.execute("UPDATE threads SET status='expired'")
+        report=self.call(LATER)
+        self.assertEqual(report["expired"],0)
+        self.assertEqual(report["closed"],1)
+        with State(self.directory) as state:
+            self.assertEqual(state.db.execute("SELECT closed_at FROM threads").fetchone()[0],NOW.isoformat())
+        self.assertEqual(self.fake.mutations,[])
+
+    def test_six_month_calendar_keeps_original_day_and_leap_boundary(self):
+        self.assertEqual(month_after(datetime(2023,8,31,12,tzinfo=UTC),6),datetime(2024,2,29,12,tzinfo=UTC))
+        self.assertEqual(month_after(datetime(2024,8,31,12,tzinfo=UTC),6),datetime(2025,2,28,12,tzinfo=UTC))
+        self.assertEqual(month_after(NOW,6),datetime(2026,7,31,12,tzinfo=UTC))
+        self.assertTrue(old_enough(NOW,LATER))  # Unchanged one-month service rule.
+        self.assertFalse(old_enough(NOW,LATER,6))
+
+    def test_reply_cancels_six_month_due_and_explicit_reclose_restarts_it(self):
+        self.fake.add(b"WWHYPDA-Closed",4,email("six-month-reopen"));self.call()
+        future=datetime(2026,8,1,12,tzinfo=UTC)
+        self.fake.add(b"INBOX",2,email("new-reply",refs=["six-month-reopen"]))
+        self.assertEqual(self.call(future)["reopened"],1)
+        self.fake.messages[b"INBOX"].clear()
+        with State(self.directory) as state:
+            token,status,closed_at=state.db.execute("SELECT token,status,closed_at FROM threads").fetchone()
+            self.assertIsNone(closed_at)
+        self.assertEqual(self.call(future,reclose=token)["closed"],1)
+        self.assertEqual(self.call(datetime(2026,9,2,12,tzinfo=UTC))["expired"],0)
+        self.assertEqual(self.call(datetime(2027,2,1,12,0,1,tzinfo=UTC))["expired"],1)
         self.assertEqual(self.fake.mutations,[])
 
     def test_support_flag_cannot_bypass_unresolved_cross_folder_race(self):

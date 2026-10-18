@@ -7,7 +7,7 @@ export default function CookiePolicy() {
     return <article className={styles.container}>
         <h1 className={styles.title}>Cookie and browser storage policy</h1>
     <LegalDocumentDownload slug="cookie-policy" />
-        <p className={styles.text}>Updated: 16 October 2026. Document package: {USER_AGREEMENT_VERSION}. Read this page together with our <Link to="/privacy-policy">Privacy Policy</Link>.</p>
+        <p className={styles.text}>Updated: 18 October 2026. Document package: {USER_AGREEMENT_VERSION}. Read this page together with our <Link to="/privacy-policy">Privacy Policy</Link>.</p>
         <h2 className={styles.sectionTitle}>Authentication and security</h2>
         <p className={styles.text}>When you sign in, first-party authentication cookies keep you signed in and allow your session to be renewed. Separate anti-CSRF cookies protect requests that change account data. Authentication cookies are removed by the logout endpoint. Token validity and cookie persistence are different: a token can expire while a browser session cookie remains. These cookies serve the account service you request, rather than advertising.</p>
         <h2 className={styles.sectionTitle}>Preferences and dataset drafts</h2>

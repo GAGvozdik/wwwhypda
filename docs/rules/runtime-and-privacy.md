@@ -40,7 +40,8 @@
 
 - maintenance.mail_cleanup независим от Flask/auth/SMTP/DB/env loader. Linux CLI
   по умолчанию readonly DRY_RUN, PEEK, полный bounded snapshot всех selectable папок.
-  Реальная Zimbra и SMTP Sent-копии пока не подтверждены: deploy/mail/ovh-cleanup.md.
+  Реальная owner-приёмка Zimbra и отсутствие наблюдаемой SMTP Sent-копии
+  подтверждены агрегатами: deploy/mail/ovh-cleanup.md.
 - Exact UIDPLUS service/probe путь не использует CLOSE/plain EXPUNGE/fallback.
   Execute требует двух явных разрешений, свежих проверок и зрелого baseline.
   Автоудаление поддержки жёстко запрещено из-за межпапочной гонки IMAP.
@@ -49,9 +50,11 @@
   наблюдения целиком закрытой цепочки. Reopened устойчив; reclose только явно.
   После любого restore state обязательны readonly rebaseline и новый месяц:
   согласованный откат всех локальных файлов автоматически не обнаруживается.
-- Timer/service только шаблоны. Реальная адресная synthetic UIDPLUS приёмка требует
-  отдельного разрешения; локальные fake tests её не заменяют. Шаги новых политик,
-  PDF и повторного принятия редакции пока не реализованы; план 008 остаётся активным.
+- Timer/service только шаблоны, автоматическая очистка не включена. Владелец отдельно
+  разрешил и выполнил адресное удаление одной synthetic цели; оба control сообщения
+  сохранены, включая прежний Deleted. Повторное удаление этой процедурой не разрешено.
+  Новые политики/PDF/повторное принятие реализованы и локально приняты владельцем;
+  ручной шестимесячный режим выбран владельцем вместо автоматического support-delete.
 
 
 ### Owner-приёмка IMAP 008
@@ -61,4 +64,50 @@ Draft veto, закрытие/reopened, адресное удаление одн�
 controls_preserved=true (включая прежний Deleted). Код регистрации после
 изменения production env пришёл от support; SMTP Sent-копия не найдена.
 Это не deployment нового кода или включение автоматической очистки.
-Support-delete остаётся запрещён из-за межпапочной гонки; шаг 4 не завершён.
+Support-delete остаётся запрещён из-за межпапочной гонки; с revision 4 ручной режим принят в объём завершения.
+
+
+## Комплект документов и повторное принятие: локальная реализация 008
+
+- Единая редакция 2026-10-18.1 (прежние PDF сохранены): три React HTML страницы, backend/frontend константы,
+  RELEASES и public/legal/manifest.json синхронизированы. Download PDF анонимен;
+  статические PDF генерируются из настоящего React SSR, без runtime PDF-сервиса.
+  Root checks сверяют source digest/версии/отпечатки; npm build проверяет frontend
+  sources и checksum. Полный PDF текст сверяется с SSR; визуальная QA обязательна.
+- Login проверяет credentials/CAPTCHA до 409 terms_acceptance_required без обычных JWT.
+  Выбор текущей редакции показывается в общей ModalWindow с CustomCheckbox, как
+  остальные modal actions сайта; закрытие без принятия сохраняет поля входа.
+  Уведомление существующей ограниченной сессии с Logout/Delete также модальное;
+  его закрытие не снимает server gate, открыть повторно можно из login.
+  Новое принятие требует literal True и показанную текущую версию; время серверное.
+  UserAgreementAcceptance хранит append-only версии/UTC время с unique(user_id,version),
+  FK/cascade. Исходные User.terms_* не переписываются; неизвестная история не создаётся.
+- Смена редакции блокирует ordinary active/refresh/direct JWT APIs до принятия.
+  JWT expiry/CSRF/active/account version/roles сохраняются; logout и authenticated
+  self-delete не требуют нового принятия. Terms-статус не считается удалением аккаунта
+  и не очищает drafts/Redux через accountDeletionEpoch. Отказ не удаляет аккаунт.
+- auth.migrate_agreement_history additive, без backfill. Пока применялась только к
+  изолированной PostgreSQL fixture; не применять к рабочей dev/production базе без
+  отдельного согласованного rollout. Backend/frontend/PDF/migration выкладывать вместе.
+- Тексты Privacy/User Agreement явно описывают ручную обработку закрытых цепочек;
+  Cookie Policy сохраняет фактический lazy iframe lifecycle. Локальная owner-приёмка
+  документов/PDF/login/modal flow завершена; публикация и проверка VPS не выполнялись.
+  Release: deploy/privacy/legal-pdf-release.md;
+  disposable browser fixture: deploy/testing/terms-preview.md.
+
+
+### Ручной срок поддержки: revision 4
+
+- Служебная копия: один календарный месяц по INTERNALDATE/first-seen; support due:
+  исходный closedAt + шесть календарных месяцев напрямую, UTC/end-of-month. Старый
+  месячный expired пересчитывается без сброса closedAt/state. Новый ответ/reopen
+  отменяет дату; явное новое закрытие начинает новый шестимесячный срок.
+- Автоматическое support-delete исключено владельцем из обязательного объёма и
+  жёстко запрещено кодом. Ручное окончательное удаление конкретной цепочки сопровождается
+  приватной записью связи/даты/напоминания и проверкой новых ответов/черновиков/ранних
+  запросов. Не очищать всю папку. Максимум шесть месяцев требует реальной необходимости;
+  ненужное удаляется раньше, права GDPR и чувствительные данные оцениваются отдельно.
+- Owner-only --list-state показывает due_at; --lookup-message приватно спрашивает
+  Message-ID и выбирает связанную строку по HMAC. Сырые IDs не хранятся/не печатаются
+  и не передаются в argv/обычный aggregate log. Не использовать один непонятный handle
+  вместо проверки связи с реальной цепочкой. Процедура: deploy/mail/ovh-cleanup.md.

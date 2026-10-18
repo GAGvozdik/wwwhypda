@@ -88,17 +88,23 @@ class Config:
             integer(env, "MAIL_CLEANUP_MAX_BODY_BYTES", 131072, 1024, 1048576))
 
 
-def month_after(value):
+SERVICE_RETENTION_MONTHS = 1
+SUPPORT_RETENTION_MONTHS = 6
+
+
+def month_after(value, months=SERVICE_RETENTION_MONTHS):
     if value.tzinfo is None:
         raise MailSafetyError("state")
     value = value.astimezone(UTC)
-    year = value.year + (value.month == 12)
-    month = 1 if value.month == 12 else value.month + 1
+    if type(months) is not int or months < 1:
+        raise MailSafetyError("state")
+    year, month_index = divmod(value.year * 12 + value.month - 1 + months, 12)
+    month = month_index + 1
     return value.replace(year=year, month=month, day=min(value.day, calendar.monthrange(year, month)[1]))
 
 
-def old_enough(value, now):
-    return value is not None and value.tzinfo is not None and value <= now and month_after(value) < now
+def old_enough(value, now, months=SERVICE_RETENTION_MONTHS):
+    return value is not None and value.tzinfo is not None and value <= now and month_after(value, months) < now
 
 
 def scheduled_window(now):

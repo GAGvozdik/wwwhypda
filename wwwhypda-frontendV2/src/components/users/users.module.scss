@@ -272,33 +272,32 @@ input::placeholder {
 .policyLink:visited, .policyLink:focus-visible { color: var(--tree-text); }
 .policyLink:focus-visible { outline: 2px solid var(--tree-text); outline-offset: 0.125rem; }
 
-.termsReview {
-  margin: 1rem 0;
-  padding: 1rem;
-  border: 1px solid var(--tree-text);
-  border-radius: 0.5rem;
+// Terms dialog uses the shared modal shell and CustomCheckbox/checkboxRow.
+.termsDialog {
+  width: 100%;
+  min-width: 0;
   color: var(--tree-text);
+  font-family: Afacad_Flux;
   font-size: var(--main-font-size);
-  h2 { font-size: 1.15em; margin: 0 0 0.7rem; }
-  ul { padding-left: 1.3rem; }
-  li { margin: 0.5rem 0; }
-  a { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
-  a:focus-visible, button:focus-visible, input:focus-visible {
-    outline: 2px solid currentColor; outline-offset: 3px;
-  }
 }
-.termsConfirmation {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
+.termsDocuments {
+  padding-left: 1.25rem;
   margin: 1rem 0;
-  input { margin-top: 0.2rem; flex: 0 0 auto; width: auto; }
+  li { margin: 0.7rem 0; overflow-wrap: anywhere; }
+  a { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; }
+  a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 }
-.termsDecline {
-  padding: 0.5rem 0.7rem;
-  border: 1px solid currentColor;
-  border-radius: 0.4rem;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
+.termsActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  button { width: 100% !important; min-width: 0; }
+}
+.authForm .termsReopen {
+  width: 80% !important;
+  margin: 1rem 10% 0;
+  min-width: 0;
+  text-transform: none;
 }

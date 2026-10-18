@@ -213,5 +213,6 @@
   "terms_accept_sign_in": "Accept and sign in",
   "terms_decline": "Return without signing in",
   "terms_review_label": "I accept the User Agreement and acknowledge the Privacy Policy and Cookie Policy.",
-  "terms_restricted_session": "Your existing session requires the current documents. You can still sign out or delete your account."
+  "terms_restricted_session": "The documents have changed. Sign in again to review and accept them. You can still sign out or delete your account.",
+  "terms_review_sign_in": "Sign in to review documents"
 }

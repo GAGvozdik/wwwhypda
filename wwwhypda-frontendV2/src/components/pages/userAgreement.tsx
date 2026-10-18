@@ -9,7 +9,7 @@ const UserAgreement: React.FC = () => {
     <div className={styles.container}>
       <h1 className={styles.title}>{messages.user_agreement}</h1>
       <LegalDocumentDownload slug="user-agreement" />
-      <p className={styles.text}>Updated: 16 October 2026. {messages.agreement_version_label} {USER_AGREEMENT_VERSION}</p>
+      <p className={styles.text}>Updated: 18 October 2026. {messages.agreement_version_label} {USER_AGREEMENT_VERSION}</p>
 
       <p className={styles.text}>
         This User Agreement ("Agreement") governs access to and use of this application.
@@ -65,7 +65,7 @@ const UserAgreement: React.FC = () => {
       </p>
 
       <p className={styles.text}>
-        Requested account codes and support correspondence use OVHcloud Zimbra Starter at support@wwhypdatestdeployversion.it. No Sent copy of the tested SMTP code message was observed; the application does not create extra copies. Delivered emails and provider technical records are separate from code expiry in the database. Completed support enquiries are due for erasure one calendar month after recorded closure, which starts at the first complete observation of the whole chain in the manually designated Closed folder. New replies or reopening cancel that date. Automatic support erasure is not enabled; the operator reviews and handles due or ambiguous correspondence manually. The prepared daily task uses 01:30 Europe/Rome when enabled, with erasure at the first successful pass after the period. Technical skips do not authorise indefinite retention. Necessary limited legal exceptions and legacy Gmail handling are explained in the Privacy Policy.
+        Requested account codes and support correspondence use OVHcloud Zimbra Starter at support@wwhypdatestdeployversion.it. No Sent copy of the tested SMTP code message was observed; the application does not create extra copies. Delivered emails and provider technical records are separate from code expiry in the database. Ordinary completed support enquiries are manually erased no later than six calendar months after recorded closure, which starts at the first complete observation of the whole chain in the manually designated Closed folder. New replies or reopening cancel that date. Automatic support erasure is not enabled; the operator reviews and handles due or ambiguous correspondence manually. Retaining ordinary support context serves related follow-ups or verification of the answer; six months is a maximum, not a minimum, and unnecessary material or valid earlier erasure requests are handled sooner. Rights-request evidence and sensitive information receive a separate necessity review. The prepared daily task uses 01:30 Europe/Rome for eligible service-message copies when enabled, with their separate one-calendar-month period; it does not automatically erase support chains. Technical skips do not authorise indefinite retention. Necessary limited legal exceptions and legacy Gmail handling are explained in the Privacy Policy.
       </p>
 
       <h2 className={styles.sectionTitle}>8. Governing Law and Jurisdiction</h2>

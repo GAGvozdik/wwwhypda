@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import ts from 'typescript';
 
 const messages = JSON.parse(readFileSync('src/common/error_messages.json', 'utf8'));
-function fixture(file, post = async () => ({ status: 200, data: {} })) {
+function fixture(file, post = async () => ({ status: 200, data: {} }), restricted = false) {
     const slots = [], effects = [], timers = new Set(), calls = [], actions = [], destinations = [];
     let cursor = 0;
     const react = {
@@ -39,14 +39,17 @@ function fixture(file, post = async () => ({ status: 200, data: {} })) {
         exports, require: name => {
             if (name in dependencies) return dependencies[name];
             if (name.endsWith('error_messages.json')) return messages;
-            if (name.endsWith('users.module.scss')) return {};
+            if (name.endsWith('.module.scss')) return {};
+            if (name.endsWith('/modalWindow')) return 'ModalWindow';
+            if (name.endsWith('/modalContext')) return { useModal: () => ({ modalRootRef: {current:null} }) };
+            if (name === '@mui/material/Button') return 'Button';
             if (name.endsWith('/api')) return { post: async (...args) => { calls.push(args); return post(...args); },
                 get: async () => ({ data: { is_superuser: false } }) };
             if (name.endsWith('/withRecaptcha')) return value => value;
             if (name === './userButton') return components.UserButton;
             if (name === './errorMessage') return components.ErrorMessage;
             if (name.endsWith('/accounts/deleteAccount')) return 'DeleteAccount';
-            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => false, termsEvent: 'terms-required' };
+            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; } };
             if (name.endsWith('/legalDocuments')) return {
                 legalDocuments: ['user-agreement','privacy-policy','cookie-policy'].map(slug => ({slug,label:slug,route:'/'+slug})),
                 legalPdfPath: (slug,version) => 'legal/'+slug+'-'+version+'.pdf',
@@ -182,18 +185,18 @@ test('terms review requires an unchecked choice, fresh CAPTCHA and keeps passwor
         return {status:200,data:{}};
     });
     view.input('email','synthetic@example.test');view.input('password','Password1!');
-    await view.find('form').props.onSubmit(event);
-    assert.equal(view.find('input',props=>props.type==='checkbox').props.checked,false);
-    assert.equal(view.find('UserButton').props.disabled,true);
+    await view.nodes().filter(node=>node.type==='form').at(-1).props.onSubmit(event);
+    assert.equal(view.find('CustomCheckbox').props.isChecked,false);
+    assert.equal(view.find('Button',props=>props.type==='submit').props.disabled,true);
     assert.equal(view.destinations.length,0);
     assert.equal(view.find('input',props=>props.type==='password').props.value,'Password1!');
     const links=view.nodes().filter(node=>node.type==='a');
     assert.equal(links.length,6);
     assert.ok(links.every(node=>node.props.target==='_blank' && !node.props.href.includes('Password')));
-    await view.find('form').props.onSubmit(event);
+    await view.nodes().filter(node=>node.type==='form').at(-1).props.onSubmit(event);
     assert.equal(view.calls.length,1);
-    view.find('input',props=>props.type==='checkbox').props.onChange({target:{checked:true}});
-    await view.find('form').props.onSubmit(event);
+    view.find('CustomCheckbox').props.onChange(true);
+    await view.nodes().filter(node=>node.type==='form').at(-1).props.onSubmit(event);
     assert.deepEqual(view.actions,['login','login']);
     assert.notEqual(view.calls[0][1].recaptcha_token,view.calls[1][1].recaptcha_token);
     assert.equal(view.calls[1][1].terms_accepted,true);
@@ -207,13 +210,61 @@ test('changed release resets acceptance and refusal makes no acceptance request'
         code:n++===0?'terms_acceptance_required':'terms_version_mismatch',
         terms_version:n===1?'first':'second'}}};});
     view.input('email','synthetic@example.test');view.input('password','Password1!');
-    await view.find('form').props.onSubmit(event);
-    view.find('input',props=>props.type==='checkbox').props.onChange({target:{checked:true}});
-    await view.find('form').props.onSubmit(event);
-    assert.equal(view.find('input',props=>props.type==='checkbox').props.checked,false);
+    await view.nodes().filter(node=>node.type==='form').at(-1).props.onSubmit(event);
+    view.find('CustomCheckbox').props.onChange(true);
+    await view.nodes().filter(node=>node.type==='form').at(-1).props.onSubmit(event);
+    assert.equal(view.find('CustomCheckbox').props.isChecked,false);
     assert.equal(view.find('ErrorMessage').props.error,messages.terms_version_mismatch);
-    const decline=view.find('button',props=>props.children.includes(messages.terms_decline));
+    const decline=view.find('Button',props=>props.children.includes(messages.terms_decline));
     decline.props.onClick();
     assert.equal(view.destinations.at(-1)[0],'/');
     assert.equal(view.calls.length,2);
+});
+
+
+test('terms modal close preserves credentials, clears choice and makes no request', async () => {
+    const view=fixture('login',async()=>{throw {isAxiosError:true,response:{status:409,data:{
+        code:'terms_acceptance_required',terms_version:'new-edition'}}};});
+    view.input('email','synthetic@example.test');view.input('password','Password1!');
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.find('ModalWindow',props=>props.labelledBy==='updated-terms-title').props.open,true);
+    assert.equal(view.find('ModalWindow',props=>props.labelledBy==='updated-terms-title').props.labelledBy,'updated-terms-title');
+    assert.equal(view.find('CustomCheckbox').props.autoFocus,true);
+    assert.equal(view.find('CustomCheckbox').props.labelledBy,'updated-terms-label');
+    view.find('CustomCheckbox').props.onChange(true);
+    view.find('ModalWindow',props=>props.labelledBy==='updated-terms-title').props.onClose();
+    assert.equal(view.find('ModalWindow',props=>props.labelledBy==='updated-terms-title').props.open,false);
+    assert.equal(view.find('CustomCheckbox'),undefined);
+    assert.equal(view.find('input',props=>props.type==='password').props.value,'Password1!');
+    assert.equal(view.calls.length,1);
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.find('CustomCheckbox').props.isChecked,false);
+    assert.equal(view.calls[1][1].terms_accepted,undefined);
+});
+
+
+test('old-session notice is modal; closing or choosing sign-in never accepts documents', () => {
+    for (const method of ['close','sign-in']) {
+        const view=fixture('login',undefined,true);
+        const modal=()=>view.find('ModalWindow',props=>props.labelledBy==='restricted-session-title');
+        assert.equal(modal().props.open,true);
+        assert.equal(modal().props.describedBy,'restricted-session-description');
+        assert.ok(view.find('DeleteAccount'));
+        if(method==='close')modal().props.onClose();
+        else view.find('Button',props=>props.children.includes(messages.terms_review_sign_in)).props.onClick();
+        assert.equal(modal().props.open,false);
+        view.find('Button',props=>props.children.includes(messages.terms_update_title)).props.onClick();
+        assert.equal(modal().props.open,true);
+        assert.equal(view.calls.length,0);
+        assert.equal(view.destinations.length,0);
+    }
+});
+
+test('old-session modal logout remains available without accepting documents', async () => {
+    const view=fixture('login',undefined,true);
+    await view.find('Button',props=>props.children.includes(messages.logout)).props.onClick();
+    assert.equal(view.calls.length,1);
+    assert.equal(view.calls[0][0],'/users/logout');
+    assert.equal(view.calls[0][1].terms_accepted,undefined);
+    assert.equal(view.destinations.at(-1)[0],'/');
 });

@@ -1,0 +1,34 @@
+# Disposable local browser fixture; no env_file, SMTP or working DB/volumes.
+services:
+  build:
+    image: wwwhypda-dev-frontend
+    pull_policy: never
+    network_mode: none
+    working_dir: /app
+    environment:
+      VITE_API_BASE_URL: /api
+      VITE_RECAPTCHA_SITE_KEY: disposable-preview
+    volumes:
+      - ../../wwwhypda-frontendV2/src:/app/src:ro
+      - ../../wwwhypda-frontendV2/public:/app/public:ro
+      - ../../wwwhypda-frontendV2/scripts:/app/scripts:ro
+      - ../../wwwhypda-frontendV2/package.json:/app/package.json:ro
+      - ../../tmp/terms-preview:/out
+    entrypoint: [sh, -c]
+    command: ['npm run build -- --mode development && cp -R dist/. /out/']
+  web:
+    image: wwwhypda-dev-backend
+    pull_policy: never
+    read_only: true
+    tmpfs: [/tmp]
+    working_dir: /code
+    ports: ['127.0.0.1:8082:8082']
+    volumes:
+      - ../../wwwhypda-backend:/code:ro
+      - ../../common:/common:ro
+      - ./terms_preview.py:/testing/terms_preview.py:ro
+      - ../../tmp/terms-preview:/preview:ro
+    environment:
+      PYTHONPATH: /code
+      PYTHONDONTWRITEBYTECODE: '1'
+    entrypoint: [python, -B, /testing/terms_preview.py]

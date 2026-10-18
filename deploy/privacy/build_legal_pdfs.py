@@ -2,7 +2,6 @@
 Build-only: reportlab==4.4.3. Verification: pypdf; rendering: PyMuPDF.
 Run from repo root: python -B deploy/privacy/build_legal_pdfs.py
 """
-from functools import partial
 from hashlib import sha256
 from html import escape
 from html.parser import HTMLParser
@@ -112,6 +111,12 @@ def verify_text(path,expected):
     return len(reader.pages)
 
 
+def invariant_canvas(*args, **kwargs):
+    # SimpleDocTemplate passes invariant=None explicitly; override it, not a partial default.
+    kwargs['invariant'] = 1
+    return Canvas(*args, **kwargs)
+
+
 def generate():
     subprocess.run(["node",str(ROOT/"deploy/privacy/render_legal.mjs")],cwd=ROOT,check=True)
     rendered=json.loads((TEMP/"legal-rendered.json").read_text(encoding="utf-8"))
@@ -121,13 +126,16 @@ def generate():
     for name,file in (("Legal","Vera.ttf"),("LegalBold","VeraBd.ttf"),("LegalItalic","VeraIt.ttf")):
         pdfmetrics.registerFont(TTFont(name,str(fontdir/file)))
     pdfmetrics.registerFontFamily("Legal",normal="Legal",bold="LegalBold",italic="LegalItalic",boldItalic="LegalBold")
-    base=ParagraphStyle("body",fontName="Legal",fontSize=9.5,leading=14,
-        textColor=colors.HexColor("#1c2630"),spaceAfter=8,alignment=TA_LEFT)
+    base=ParagraphStyle("body",fontName="Legal",fontSize=9.5,leading=13.2,
+        textColor=colors.HexColor("#1c2630"),spaceAfter=6,alignment=TA_LEFT)
     styles={"p":base,
         "li":ParagraphStyle("li",parent=base,leftIndent=13,firstLineIndent=-10),
         "h1":ParagraphStyle("h1",parent=base,fontName="LegalBold",fontSize=20,leading=25,spaceAfter=14,keepWithNext=True),
-        "h2":ParagraphStyle("h2",parent=base,fontName="LegalBold",fontSize=12,leading=17,spaceBefore=12,spaceAfter=7,keepWithNext=True),
+        "h2":ParagraphStyle("h2",parent=base,fontName="LegalBold",fontSize=12,leading=17,spaceBefore=10,spaceAfter=6,keepWithNext=True),
         "h3":ParagraphStyle("h3",parent=base,fontName="LegalBold",fontSize=10.5,leading=15,spaceBefore=8,spaceAfter=6,keepWithNext=True)}
+    manifest_path=OUT/'manifest.json'
+    previous=json.loads(manifest_path.read_text(encoding='utf-8')) if manifest_path.is_file() else {}
+    previous_records={item['file']:item for item in previous.get('documents',[])}
     records=[]
     for document in rendered["documents"]:
         tree=Tree();tree.feed(document["html"]);tree.close()
@@ -137,6 +145,16 @@ def generate():
             raise ValueError("Document package version missing")
         filename=document["slug"]+"-"+version+".pdf"
         path=OUT/filename
+        content_digest=sha256(json.dumps(content,sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+        if path.is_file():
+            old=previous_records.get(filename)
+            if (not old or old['content_sha256']!=content_digest or
+                    old['sha256']!=sha256(path.read_bytes()).hexdigest()):
+                raise ValueError('Existing PDF edition differs; release a new version: '+filename)
+            if verify_text(path,expected)!=old['pages']:
+                raise ValueError('Existing PDF page count differs: '+filename)
+            records.append(old)
+            continue  # Published/versioned bytes must not change for an unrelated UI edit.
         story=[]
         for block in content:
             value=("\u2022 " if block["kind"]=="li" else "")+block["html"]
@@ -151,11 +169,11 @@ def generate():
         doc=SimpleDocTemplate(str(path),pagesize=A4,leftMargin=45,rightMargin=45,
             topMargin=40,bottomMargin=45,title=content[0]["text"],
             author="Georgii Gvozdik",pageCompression=1)
-        doc.build(story,onFirstPage=decorate,onLaterPages=decorate,canvasmaker=partial(Canvas,invariant=1))
+        doc.build(story,onFirstPage=decorate,onLaterPages=decorate,canvasmaker=invariant_canvas)
         pages=verify_text(path,expected)
         records.append(dict(slug=document["slug"],file=filename,pages=pages,
             sha256=sha256(path.read_bytes()).hexdigest(),
-            content_sha256=sha256(json.dumps(content,sort_keys=True,ensure_ascii=False).encode()).hexdigest()))
+            content_sha256=content_digest))
     sources=[
         "src/components/pages/userAgreement.tsx","src/components/pages/privacyPolicy.tsx",
         "src/components/pages/cookiePolicy.tsx","src/components/pages/legalDocumentDownload.tsx",

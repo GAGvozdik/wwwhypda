@@ -11,7 +11,7 @@ import secrets
 import sqlite3
 import stat
 
-from maintenance.mail_common import MailSafetyError, UTC, old_enough
+from maintenance.mail_common import MailSafetyError, UTC, old_enough, SUPPORT_RETENTION_MONTHS
 
 
 def private_file(path, create=False):
@@ -320,7 +320,7 @@ def observe(state, snapshot, now, reclose=None):
                 elif old_status == "open":
                     status, closed_at, outside_seen = "recently_closed", now.isoformat(), False
                 else:
-                    status = "expired" if closed_at and old_enough(datetime.fromisoformat(closed_at), now) else "recently_closed"
+                    status = "expired" if closed_at and old_enough(datetime.fromisoformat(closed_at), now, SUPPORT_RETENTION_MONTHS) else "recently_closed"
             else:
                 status = "reopened" if old_status != "open" else "open"
                 closed_at = None

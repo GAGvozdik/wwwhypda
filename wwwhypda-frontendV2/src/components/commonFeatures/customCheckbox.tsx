@@ -8,12 +8,16 @@ interface CustomCheckboxProps {
     color?: string;
     required?: boolean;
     labelledBy?: string;
+    autoFocus?: boolean;
+    disabled?: boolean;
 }
 
-const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, color, required, labelledBy }) => {
+const CustomCheckbox: React.FC<CustomCheckboxProps> = ({ isChecked, onChange, color, required, labelledBy, autoFocus, disabled }) => {
     return (
         <Checkbox
             checked={isChecked}
+            autoFocus={autoFocus}
+            disabled={disabled}
             slotProps={{ input: { 'aria-labelledby': labelledBy, 'aria-required': required } }}
             onChange={(event) => onChange(event.target.checked)}
             sx={{

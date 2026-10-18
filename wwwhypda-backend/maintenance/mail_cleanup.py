@@ -10,8 +10,8 @@ import os
 import re
 import sys
 
-from maintenance.mail_common import Budget, Config, MailSafetyError, UTC, old_enough, process_deadline, scheduled_window, execution_seconds
-from maintenance.mail_imap import Mailbox
+from maintenance.mail_common import Budget, Config, MailSafetyError, UTC, old_enough, month_after, SUPPORT_RETENTION_MONTHS, process_deadline, scheduled_window, execution_seconds
+from maintenance.mail_imap import Mailbox, ID
 from maintenance.mail_state import State, graph, observe
 
 
@@ -139,8 +139,11 @@ def probe_targets(config, snapshot, digest, env, expected=None):
 
 def run(config, *, execute=False, dry_run=False, preflight=False, list_folders=False,
         rebaseline=False, reclose=None, probe=False, outside_window=False, env=None,
-        now=None, factory=imaplib.IMAP4_SSL, result=None, list_state=False, probe_expected=None):
+        now=None, factory=imaplib.IMAP4_SSL, result=None, list_state=False, probe_expected=None, lookup_message_id=None):
     now = now or datetime.now(UTC)
+    if lookup_message_id is not None and (not list_state or not isinstance(lookup_message_id,str)
+            or not re.fullmatch(ID,lookup_message_id)):
+        raise MailSafetyError("configuration")
     effective = execute and not dry_run and not config.dry_run and not (preflight or list_folders or list_state)
     result = summary(not effective) if result is None else result
     if effective and (rebaseline or reclose):
@@ -198,8 +201,14 @@ def run(config, *, execute=False, dry_run=False, preflight=False, list_folders=F
             result.update(counts)
             if list_state:
                 # Explicit owner-only diagnostics, excluded from ordinary aggregate logs.
+                lookup = state.db.execute("SELECT token FROM members WHERE mid=?",
+                    (state.digest('id',lookup_message_id),)).fetchone() if lookup_message_id else None
                 for handle,status,closed_at in state.db.execute("SELECT token,status,closed_at FROM threads ORDER BY token"):
-                    print(json.dumps(dict(handle=handle,status=status,closed_at=closed_at)))
+                    if lookup_message_id and (lookup is None or handle!=lookup[0]):
+                        continue
+                    due_at = month_after(datetime.fromisoformat(closed_at), SUPPORT_RETENTION_MONTHS).isoformat() if closed_at else None
+                    record=dict(handle=handle,status=status,closed_at=closed_at,due_at=due_at)
+                    print(json.dumps(record))
             first_seen=state.observe_copies(current,now)
             matched=[m for m in current.messages.values() if m.service]
             selected=candidates(current,first_seen,now)
@@ -255,6 +264,7 @@ def main(argv=None):
         mode.add_argument("--preflight",action="store_true")
         mode.add_argument("--list-folders",action="store_true",help="Owner-only local folder map; never share this output.")
         mode.add_argument("--list-state",action="store_true",help="Owner-only pseudonymous handles for explicit reclose; never share output.")
+        parser.add_argument("--lookup-message",action="store_true",help="Only with --list-state: privately prompt for one Message-ID to find its handle/due date.")
         parser.add_argument("--dry-run",action="store_true")
         parser.add_argument("--execute",action="store_true")
         parser.add_argument("--rebaseline",action="store_true")
@@ -263,9 +273,12 @@ def main(argv=None):
         parser.add_argument("--allow-outside-window",action="store_true")
         parser.add_argument("--prompt-password",action="store_true")
         args=parser.parse_args(argv)
+        if args.lookup_message and not args.list_state:
+            raise MailSafetyError("configuration")
         if args.reclose and not re.fullmatch(r"[0-9a-f]{64}",args.reclose):
             raise MailSafetyError("configuration")
         password=getpass.getpass("Mailbox password: ") if args.prompt_password else None
+        lookup_message_id=getpass.getpass("Message-ID (private): ").strip() if args.lookup_message else None
         config=Config.from_env(password=password)
         effective=args.execute and not args.dry_run and not config.dry_run and not(args.preflight or args.list_folders or args.list_state)
         result["dry_run"]=not effective
@@ -273,7 +286,7 @@ def main(argv=None):
         with process_deadline(execution_seconds(datetime.now(UTC),config.max_seconds) if effective and not args.allow_outside_window else config.max_seconds):
             run(config,execute=args.execute,dry_run=args.dry_run,preflight=args.preflight,list_folders=args.list_folders,
                 rebaseline=args.rebaseline,reclose=args.reclose,probe=args.probe_delete,
-                outside_window=args.allow_outside_window,result=result,list_state=args.list_state)
+                outside_window=args.allow_outside_window,result=result,list_state=args.list_state,lookup_message_id=lookup_message_id)
         print(json.dumps(result,sort_keys=True))
         return 0
     except MailSafetyError as error:

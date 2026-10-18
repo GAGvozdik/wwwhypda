@@ -6,10 +6,15 @@ import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
+import CustomCheckbox from '../../commonFeatures/customCheckbox';
+import ModalWindow from '../../modal/modalWindow';
+import { useModal } from '../../modal/modalContext';
+import modalStyles from '../../modal/modalStyles.module.scss';
+import Button from '@mui/material/Button';
 import api from '../../api';
 import DeleteAccount from '../accounts/deleteAccount';
 import { legalDocuments, legalPdfPath } from '../../../common/legalDocuments';
-import { termsAcceptanceRequired, termsEvent } from '../accountSession';
+import { termsAcceptanceRequired, termsEvent, clearTermsRequirement } from '../accountSession';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
@@ -24,13 +29,17 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [termsVersion, setTermsVersion] = useState<string | null>(null);
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [restrictedSession, setRestrictedSession] = useState(termsAcceptanceRequired);
-    const acceptanceCheckbox = useRef<HTMLInputElement>(null);
+    const [restrictedNoticeOpen, setRestrictedNoticeOpen] = useState(termsAcceptanceRequired);
+    const { modalRootRef } = useModal();
     useEffect(() => {
-        const update = () => setRestrictedSession(termsAcceptanceRequired());
+        const update = () => {
+            const required = termsAcceptanceRequired();
+            setRestrictedSession(required);
+            setRestrictedNoticeOpen(required);
+        };
         window.addEventListener(termsEvent, update);
         return () => window.removeEventListener(termsEvent, update);
     }, []);
-    useEffect(() => { if (termsVersion) acceptanceCheckbox.current?.focus(); }, [termsVersion]);
 
 
     const navigate = useNavigate();
@@ -43,6 +52,27 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             navigate(location.pathname, { replace: true, state: {} });
         }
     }, [location, navigate]);
+
+    const closeRestrictedNotice = () => {
+        if (pendingRequest.current) return;
+        setRestrictedNoticeOpen(false);
+    };
+
+    const handleRestrictedLogout = async () => {
+        if (pendingRequest.current) return;
+        pendingRequest.current = true;
+        setIsLoading(true);
+        try {
+            await api.post('/users/logout', {}, { withCredentials: true });
+            clearTermsRequirement();
+            navigate('/');
+        } catch {
+            setError(messages.login_failed); setIsError(true);
+        } finally {
+            pendingRequest.current = false;
+            setIsLoading(false);
+        }
+    };
 
     const handleLogin = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
@@ -131,39 +161,71 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         required
                     />
 
-                    {termsVersion && <section className={styles.termsReview} aria-labelledby="updated-terms-title">
-                        <h2 id="updated-terms-title">{messages.terms_update_title}</h2>
-                        <p>{messages.agreement_version_label} {termsVersion}</p>
-                        <ul>
+                    {!termsVersion && !restrictedNoticeOpen && <ErrorMessage error={error} isError={isError} />}
+
+                    <UserButton text={messages.login_button} isLoading={isLoading} />
+                </form>
+
+                <ModalWindow open={Boolean(termsVersion)} modalRootRef={modalRootRef}
+                    labelledBy="updated-terms-title" describedBy="updated-terms-version"
+                    onClose={() => {
+                        if (pendingRequest.current) return;
+                        setTermsVersion(null); setTermsAccepted(false); setError(''); setIsError(false);
+                    }}>
+                    {termsVersion && <form className={styles.termsDialog} onSubmit={handleLogin}>
+                        <h2 id="updated-terms-title" className={modalStyles.modalTitle}>{messages.terms_update_title}</h2>
+                        <p id="updated-terms-version" className={modalStyles.modalDescription}>
+                            {messages.agreement_version_label} {termsVersion}
+                        </p>
+                        <ul className={styles.termsDocuments}>
                             {legalDocuments.map((document) => <li key={document.slug}>
                                 <a href={import.meta.env.BASE_URL + document.route.slice(1)} target="_blank" rel="noopener noreferrer">{document.label}</a>
                                 {' · '}
                                 <a href={import.meta.env.BASE_URL + legalPdfPath(document.slug, termsVersion)} target="_blank" rel="noopener noreferrer">{messages.legal_download_pdf}</a>
                             </li>)}
                         </ul>
-                        <label className={styles.termsConfirmation}>
-                            <input ref={acceptanceCheckbox} type="checkbox" checked={termsAccepted}
-                                onChange={(event) => setTermsAccepted(event.target.checked)} required />
-                            <span>{messages.terms_review_label}</span>
+                        <label className={styles.checkboxRow}>
+                            <CustomCheckbox key={termsVersion} isChecked={termsAccepted} onChange={setTermsAccepted}
+                                required autoFocus disabled={isLoading} labelledBy="updated-terms-label" />
+                            <span id="updated-terms-label">{messages.terms_review_label}</span>
                         </label>
-                        <button type="button" className={styles.termsDecline} onClick={() => navigate('/')}>
-                            {messages.terms_decline}
-                        </button>
-                    </section>}
-                    <ErrorMessage error={error} isError={isError} />
+                        <ErrorMessage error={error} isError={isError} />
+                        <div className={styles.termsActions}>
+                            <Button type="submit" className={modalStyles.submitButton}
+                                disabled={!termsAccepted || isLoading} aria-busy={isLoading}>
+                                {messages.terms_accept_sign_in}
+                            </Button>
+                            <Button type="button" className={modalStyles.submitButton} disabled={isLoading}
+                                onClick={() => navigate('/')}>
+                                {messages.terms_decline}
+                            </Button>
+                        </div>
+                    </form>}
+                </ModalWindow>
 
-                    <UserButton text={termsVersion ? messages.terms_accept_sign_in : messages.login_button}
-                        isLoading={isLoading} disabled={Boolean(termsVersion && !termsAccepted)} />
-                </form>
-
-                {restrictedSession && <section className={styles.termsReview}>
-                    <p>{messages.terms_restricted_session}</p>
-                    <button type="button" className={styles.termsDecline} onClick={async () => {
-                        try { await api.post('/users/logout', {}, { withCredentials: true }); navigate('/'); }
-                        catch { setError(messages.login_failed); setIsError(true); }
-                    }}>{messages.logout}</button>
-                    <DeleteAccount />
-                </section>}
+                {restrictedSession && !restrictedNoticeOpen && !termsVersion &&
+                    <Button type="button" className={`${modalStyles.submitButton} ${styles.termsReopen}`}
+                        aria-haspopup="dialog" onClick={() => setRestrictedNoticeOpen(true)}>
+                        {messages.terms_update_title}
+                    </Button>}
+                <ModalWindow open={restrictedSession && restrictedNoticeOpen && !termsVersion}
+                    modalRootRef={modalRootRef} onClose={closeRestrictedNotice}
+                    labelledBy="restricted-session-title" describedBy="restricted-session-description">
+                    <div className={styles.termsDialog}>
+                        <h2 id="restricted-session-title" className={modalStyles.modalTitle}>{messages.terms_update_title}</h2>
+                        <p id="restricted-session-description" className={modalStyles.modalDescription}>
+                            {messages.terms_restricted_session}
+                        </p>
+                        <ErrorMessage error={error} isError={isError} />
+                        <div className={styles.termsActions}>
+                            <Button type="button" className={modalStyles.submitButton} disabled={isLoading}
+                                onClick={closeRestrictedNotice}>{messages.terms_review_sign_in}</Button>
+                            <Button type="button" className={modalStyles.submitButton} disabled={isLoading}
+                                onClick={handleRestrictedLogout}>{messages.logout}</Button>
+                            <DeleteAccount />
+                        </div>
+                    </div>
+                </ModalWindow>
                 <div style={{ margin: '0.5rem 0rem 0rem 0rem', fontSize: 'var(--main-font-size)', color: 'var(--tree-text)', textAlign: 'center' }}>
                     <div style={{ fontSize: 'var(--menu-font-size)' }}>{messages.have_account_prompt}</div>
                     <div>
