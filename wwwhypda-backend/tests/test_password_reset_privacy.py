@@ -69,7 +69,7 @@ class PasswordResetPrivacyTests(unittest.TestCase):
                         self.assertEqual((response.status_code,response.json),(200,expected))
                         captcha.assert_called_once_with('test-token',('request_password_reset','resend_password_reset'))
             self.assertEqual(sender.call_count,2)
-        self.assertEqual(ConfirmationCode.query.count(),2)
+        self.assertEqual(ConfirmationCode.query.count(),1)
         self.assertTrue(all(c.email=='owner@example.test' and c.type=='password_reset' for c in ConfirmationCode.query.all()))
         self.assertEqual(passwords,{u.id:(u.password,u.active,u.registered_at) for u in User.query.all()})
 

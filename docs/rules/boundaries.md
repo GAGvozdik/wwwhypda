@@ -66,3 +66,21 @@
   legal/PDF/assets/ACME исключения без backend. Не обходить rate limits/security/TLS.
   SPA использует прежний Axios и отдельное неаккаунтное состояние; при manual503
   guards сохраняют прежний auth state, после off делают обычный recheck.
+
+
+### Stage 010: серверный отзыв сессий и reset budget
+- AuthSession в users_db связывает access/refresh одной сессии через случайный sid;
+  JWT без sid требуют нового входа. Проверяются принадлежность, срок и revoked_at.
+  Logout отзывает только текущую сессию, deactivate/password change/reset — все.
+  Activate старые сессии не восстанавливает. Роль по-прежнему берётся из БД.
+- POST /users/refresh/logout использует прежний refresh cookie path и refresh CSRF,
+  работает при истёкшем access. Подпись/type/expiry/CSRF обязательны; повторный
+  logout идемпотентен. Cookies очищаются только после успешного DB commit.
+  Logout frontend завершает protected request epoch, сохраняя Redux/drafts.
+- ResetLimit хранит общий для workers/IP бюджет: 3 выдачи/15min и 5 неверных
+  проверок текущего challenge. При допустимой выдаче остаётся один reset-код;
+  successful reset атомарно меняет hash, удаляет все reset-коды и отзывает сессии.
+  TTL2min/CSPRNG/нейтральный200/4s сохранены. Unknown/disabled не получают state.
+- auth.migrate_security_state additive apply/check до нового backend и cleanup.
+  Две таблицы/FK/index/check constraints, без DML/backfill истории. Очистка сессий
+  только после refresh expiry; удаление User очищает связанные state записи.

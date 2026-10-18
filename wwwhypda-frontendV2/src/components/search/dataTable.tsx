@@ -4,6 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import type { DynamicRowData } from '../../common/types';
 import type { ColDef, GetRowIdParams } from "ag-grid-community";
 import * as XLSX from "xlsx";
+import { createDataWorkbook } from '../../common/exportWorkbook';
 import React, { useMemo } from "react";
 import styles from "./searchStyles.module.scss";
 import { useStepsTheme } from '../inputData/steps';
@@ -49,10 +50,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
             return;
         }
 
-        const mutableRows = [...rows];
-        const worksheet = XLSX.utils.json_to_sheet(mutableRows);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+        const workbook = createDataWorkbook(rows);
         XLSX.writeFile(workbook, "table_data.xlsx");
     };
     const reversedColumns = useRemColumns(useMemo(() => [...columns].reverse(), [columns]));

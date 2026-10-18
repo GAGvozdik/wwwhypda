@@ -1,6 +1,7 @@
 .logoWrapper {
   width: 100%;
-  height: 13vh;
+  height: auto;
+  padding-block: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,11 +10,11 @@
 //   background-color: green;
 }
 
-.logoWrapper #logo-webbab {
+.logoWrapper > svg {
   display: block;
-  width: 42rem;
+  width: min(42rem, 100%);
   height: auto;
-  max-width: 95vw;
+  max-width: 100%;
   overflow: visible;
 }
 

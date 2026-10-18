@@ -1,0 +1,19 @@
+services:
+  build:
+    image: wwwhypda-stage010-frontend
+    pull_policy: never
+    network_mode: none
+    working_dir: /app
+    environment:
+      VITE_API_BASE_URL: /api
+      VITE_RECAPTCHA_SITE_KEY: disposable-preview
+    volumes:
+      - ../../../wwwhypda-frontendV2/src:/app/src:ro
+      - ../../../wwwhypda-frontendV2/scripts:/app/scripts:ro
+      - ../../../wwwhypda-frontendV2/public:/app/public:ro
+      - ../../../tmp/stage010-lint-baseline.json:/baseline.json:ro
+      - ../../../tmp/stage010-frontend:/out
+      - ../../../deploy/maintenance:/maintenance-source:ro
+      - ../../../tmp/stage010-maintenance-public:/maintenance-out
+    entrypoint: [sh, -c]
+    command: ['npm run build -- --mode development && MAINTENANCE_SOURCE=/maintenance-source MAINTENANCE_OUTPUT=/maintenance-out node scripts/build-maintenance.mjs && cp -R dist/. /out/']

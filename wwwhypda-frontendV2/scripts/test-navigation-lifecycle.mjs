@@ -541,7 +541,7 @@ test('Both account layouts place the existing logout before content and deletion
         react:{default:{},useState:value=>[value,()=>{}],useEffect(){},useMemo:callback=>callback()},
         'react/jsx-runtime':jsxRuntime,'react-redux':{useSelector:callback=>callback({isDarkTheme:true})},
         'react-router-dom':{useNavigate:()=>()=>{}},'../../api':{default:{}},axios:{default:{}},
-        './deleteAccount':{default:'DeleteAccount'},'./userSuggestions':{default:'Suggestions'},'./inputSuggestions':{default:'Suggestions'},
+        '../accountSession':{signOutAccountSession(){}},'./deleteAccount':{default:'DeleteAccount'},'./userSuggestions':{default:'Suggestions'},'./inputSuggestions':{default:'Suggestions'},
         '../../commonFeatures/loadIcon':{default:'Loading'},'../../commonFeatures/singleSkeleton':{default:'Skeleton'},
         '../../commonFeatures/useRemColumns':{default:columns=>columns},'../../inputData/steps':{useStepsTheme:()=>({})},
         'ag-grid-react':{AgGridReact:'Grid'},'@mui/icons-material/CheckCircle':{default:'Icon'},

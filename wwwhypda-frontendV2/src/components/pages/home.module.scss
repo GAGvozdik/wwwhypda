@@ -30,7 +30,7 @@
   margin: 0;
   max-width: 20ch;
 
-  font-size: calc(var(--head-font-size) * 2);
+  font-size: var(--home-title-font-size);
   line-height: 1.1;
 
   color: var(--start-page-text);

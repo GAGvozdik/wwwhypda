@@ -1,3 +1,4 @@
+import { getCsrfTokenFromCookie } from '../../../common/types';
 import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
 import messages from '../../../common/error_messages.json';
@@ -16,7 +17,7 @@ import Button from '@mui/material/Button';
 import api from '../../api';
 import DeleteAccount from '../accounts/deleteAccount';
 import { legalDocuments, legalPdfPath } from '../../../common/legalDocuments';
-import { termsAcceptanceRequired, termsEvent, clearTermsRequirement } from '../accountSession';
+import { termsAcceptanceRequired, termsEvent, clearTermsRequirement, signOutAccountSession } from '../accountSession';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
@@ -68,11 +69,12 @@ const Login: React.FC<LoginProps> = ({ executeRecaptcha, checkingAccess = false 
         pendingRequest.current = true;
         setIsLoading(true);
         try {
-            await api.post('/users/logout', {}, { withCredentials: true });
+            await api.post('/users/refresh/logout', {}, { withCredentials: true, headers: {'X-CSRF-TOKEN': getCsrfTokenFromCookie(true)} });
+            signOutAccountSession();
             clearTermsRequirement();
             navigate('/');
         } catch {
-            setError(messages.login_failed); setIsError(true);
+            setError(messages.account_action_failed); setIsError(true);
         } finally {
             pendingRequest.current = false;
             setIsLoading(false);

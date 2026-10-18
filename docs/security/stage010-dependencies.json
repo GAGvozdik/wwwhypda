@@ -1,0 +1,186 @@
+{
+  "source": "OSV public API; PyPI ecosystem, explicit package/version for every nonempty query",
+  "packages": [
+    {
+      "name": "blinker",
+      "version": "1.9.0",
+      "advisories": []
+    },
+    {
+      "name": "certifi",
+      "version": "2025.8.3",
+      "advisories": []
+    },
+    {
+      "name": "charset-normalizer",
+      "version": "3.4.3",
+      "advisories": []
+    },
+    {
+      "name": "click",
+      "version": "8.1.8",
+      "advisories": []
+    },
+    {
+      "name": "colorama",
+      "version": "0.4.6",
+      "advisories": []
+    },
+    {
+      "name": "Deprecated",
+      "version": "1.3.1",
+      "advisories": []
+    },
+    {
+      "name": "dotenv",
+      "version": "0.9.9",
+      "advisories": []
+    },
+    {
+      "name": "Flask",
+      "version": "3.1.3",
+      "advisories": []
+    },
+    {
+      "name": "Flask-Cors",
+      "version": "6.0.5",
+      "advisories": []
+    },
+    {
+      "name": "Flask-JWT-Extended",
+      "version": "4.7.1",
+      "advisories": []
+    },
+    {
+      "name": "Flask-Limiter",
+      "version": "4.1.1",
+      "advisories": []
+    },
+    {
+      "name": "Flask-Login",
+      "version": "0.6.3",
+      "advisories": []
+    },
+    {
+      "name": "Flask-Mail",
+      "version": "0.10.0",
+      "advisories": []
+    },
+    {
+      "name": "Flask-SQLAlchemy",
+      "version": "3.1.1",
+      "advisories": []
+    },
+    {
+      "name": "flask-swagger-ui",
+      "version": "4.11.1",
+      "advisories": []
+    },
+    {
+      "name": "flask-talisman",
+      "version": "1.1.0",
+      "advisories": []
+    },
+    {
+      "name": "Flask-WTF",
+      "version": "1.2.2",
+      "advisories": []
+    },
+    {
+      "name": "greenlet",
+      "version": "3.1.1",
+      "advisories": []
+    },
+    {
+      "name": "gunicorn",
+      "version": "23.0.0",
+      "advisories": []
+    },
+    {
+      "name": "idna",
+      "version": "3.20",
+      "advisories": []
+    },
+    {
+      "name": "itsdangerous",
+      "version": "2.2.0",
+      "advisories": []
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "advisories": []
+    },
+    {
+      "name": "limits",
+      "version": "5.8.0",
+      "advisories": []
+    },
+    {
+      "name": "MarkupSafe",
+      "version": "3.0.2",
+      "advisories": []
+    },
+    {
+      "name": "ordered-set",
+      "version": "4.1.0",
+      "advisories": []
+    },
+    {
+      "name": "packaging",
+      "version": "25.0",
+      "advisories": []
+    },
+    {
+      "name": "psycopg2-binary",
+      "version": "2.9.12",
+      "advisories": []
+    },
+    {
+      "name": "PyJWT",
+      "version": "2.15.1",
+      "advisories": []
+    },
+    {
+      "name": "python-dotenv",
+      "version": "1.2.4",
+      "advisories": []
+    },
+    {
+      "name": "requests",
+      "version": "2.34.2",
+      "advisories": []
+    },
+    {
+      "name": "SQLAlchemy",
+      "version": "2.0.37",
+      "advisories": []
+    },
+    {
+      "name": "typing_extensions",
+      "version": "4.12.2",
+      "advisories": []
+    },
+    {
+      "name": "urllib3",
+      "version": "2.8.0",
+      "advisories": []
+    },
+    {
+      "name": "Werkzeug",
+      "version": "3.1.9",
+      "advisories": []
+    },
+    {
+      "name": "wrapt",
+      "version": "2.1.2",
+      "advisories": []
+    },
+    {
+      "name": "WTForms",
+      "version": "3.2.1",
+      "advisories": []
+    }
+  ],
+  "advisories": {}
+}

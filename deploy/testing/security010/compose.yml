@@ -1,0 +1,16 @@
+services:
+  regression:
+    image: wwwhypda-stage010-backend
+    pull_policy: never
+    network_mode: none
+    read_only: true
+    tmpfs: [/tmp]
+    working_dir: /code
+    environment:
+      PYTHONPATH: /code
+      TEST_AUTH_DATABASE_URI: sqlite://
+    volumes:
+      - ../../../wwwhypda-backend:/code:ro
+      - ../../../common:/common:ro
+      - .:/probes:ro
+    entrypoint: [python, -B]

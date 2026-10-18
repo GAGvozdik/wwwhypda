@@ -1,0 +1,38 @@
+services:
+  backend:
+    image: wwwhypda-stage010-backend
+    pull_policy: never
+    read_only: true
+    tmpfs: [/tmp]
+    working_dir: /code
+    environment:
+      PYTHONPATH: /code:/probes
+      TEST_AUTH_DATABASE_URI: sqlite://
+    volumes:
+      - ../../../wwwhypda-backend:/code:ro
+      - ../../../common:/common:ro
+      - .:/probes:ro
+    entrypoint: [gunicorn, --config, /code/gunicorn.conf.py, "capacity_app:create_app()"]
+    networks: [isolated]
+  nginx:
+    image: nginx:stable-alpine
+    pull_policy: never
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    volumes:
+      - ./capacity.nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on: [backend]
+    networks: [isolated]
+  probe:
+    image: wwwhypda-stage010-backend
+    pull_policy: never
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - .:/probes:ro
+    entrypoint: [python, -B, /probes/capacity_probe.py]
+    depends_on: [nginx]
+    networks: [isolated]
+networks:
+  isolated:
+    internal: true

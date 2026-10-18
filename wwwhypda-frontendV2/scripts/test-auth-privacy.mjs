@@ -43,6 +43,7 @@ function fixture(file, post = async () => ({ status: 200, data: {} }), restricte
             if (name.endsWith('/modalWindow')) return 'ModalWindow';
             if (name.endsWith('/modalContext')) return { useModal: () => ({ modalRootRef: {current:null} }) };
             if (name === '@mui/material/Button') return 'Button';
+            if (name.endsWith('/types')) return {getCsrfTokenFromCookie: refresh => refresh ? 'synthetic-refresh-csrf' : 'synthetic-access-csrf'};
             if (name.endsWith('/api')) return { post: async (...args) => { calls.push(args); return post(...args); },
                 get: async () => ({ data: { is_superuser: false } }) };
             if (name.endsWith('/authSkeleton')) return 'AuthSkeleton';
@@ -51,7 +52,7 @@ function fixture(file, post = async () => ({ status: 200, data: {} }), restricte
             if (name === './errorMessage') return components.ErrorMessage;
             if (name === './registrationConfirmation') return 'RegistrationConfirmation';
             if (name.endsWith('/accounts/deleteAccount')) return 'DeleteAccount';
-            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; } };
+            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; }, signOutAccountSession() {} };
             if (name.endsWith('/legalDocuments')) return {
                 legalDocuments: ['user-agreement','privacy-policy','cookie-policy'].map(slug => ({slug,label:slug,route:'/'+slug})),
                 legalPdfPath: (slug,version) => 'legal/'+slug+'-'+version+'.pdf',
@@ -263,7 +264,7 @@ test('old-session modal logout remains available without accepting documents', a
     const view=fixture('login',undefined,true);
     await view.find('Button',props=>props.children.includes(messages.logout)).props.onClick();
     assert.equal(view.calls.length,1);
-    assert.equal(view.calls[0][0],'/users/logout');
+    assert.equal(view.calls[0][0],'/users/refresh/logout');
     assert.equal(view.calls[0][1].terms_accepted,undefined);
     assert.equal(view.destinations.at(-1)[0],'/');
 });

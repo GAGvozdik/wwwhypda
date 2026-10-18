@@ -176,7 +176,7 @@ class TermsLoginTests(unittest.TestCase):
         db.session.add(UserAgreementAcceptance(user_id=self.owner_id,version="older-record",
             accepted_at=self.original_time));db.session.commit()
         client,headers,_=self.client_for()
-        self.assertEqual(self.app.test_client().post("/users/logout").status_code,200)
+        self.assertEqual(self.app.test_client().post("/users/logout").status_code,401)
         self.assertEqual(self.delete(client,{}).status_code,401)
         self.assertEqual(self.delete(client,headers,password="wrong").status_code,403)
         self.assertEqual(self.delete(client,headers).status_code,200)

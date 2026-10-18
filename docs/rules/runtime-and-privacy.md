@@ -135,3 +135,23 @@ Support-delete остаётся запрещён из-за межпапочно�
   VPS/Nginx/DNS этой страницей не покрывается. deploy/maintenance/README.md.
 - Stage009 работал только с synthetic local fixtures; VPS/env/secrets/реальные
   письма/таймеры не изменены. Browser acceptance ещё ожидается, AVG включён.
+
+
+### Stage 010: запуск и согласованный rollout
+- Backend Dockerfile запускает gunicorn.conf.py: default 2 workers ×4 gthread.
+  GUNICORN_WORKERS ограничен1..8, GUNICORN_THREADS2..16; default4 threads.
+  Тяжёлые auth POST допускаются неблокирующим kernel flock cap4/container,
+  дополнительно максимум3 на worker при4 threads (threads-1). Overflow429 до
+  проверки email/DB/CAPTCHA, slot освобождается при исключении и смерти worker.
+  Это не распределённый cap нескольких контейнеров и не DDoS/SLA гарантия.
+- SMTP child cap2/deadline3s, response floors и ожидание вне DB tx сохранены.
+  Nginx rate limits не увеличены: admission может раньше вернуть429.
+- Новая migration auth.migrate_security_state apply/check предшествует запуску
+  новых backend/cleanup/retention workers. Старые JWT требуют повторного входа.
+  Инструкция: deploy/security/stage010-rollout.md. Проверка VPS не выполнялась.
+- UI-проверка владельца — обычный dev8080; отдельные security DB/Nginx контейнеры
+  нужны только автотестам, без опубликованных портов/пользовательских volumes.
+  По явному разрешению владельца security migration применена к локальной тестовой БД.
+- Публичные policies/PDF остаются2026-10-18.2: цели обработки, набор auth/CSRF
+  cookies, сроки и ручная работа с почтой не изменились. Server-side enforcement
+  существующего logout/reset не создаёт новую цель/cookie и не требует reaccept.

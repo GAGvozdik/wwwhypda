@@ -20,4 +20,6 @@
 
 [009 — возобновление регистрации, auth skeleton, напоминания и режим техработ](009-activation-loading-reminders-maintenance.md).
 
+[010 — отзыв сессий, reset budget, auth capacity и мобильный Home/Search](010-security-and-mobile.md).
+
 Каталог legacy содержит исходные роли и TASKS до миграции. Это исторические снимки, не подтверждение завершения старых задач. Старые инструкции о TASKS и запрете stage/archive больше не действуют; текущий процесс — ../WORKFLOW.md.

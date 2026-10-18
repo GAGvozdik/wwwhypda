@@ -26,4 +26,4 @@ COPY --chown=app:app wwwhypda-backend/ .
 USER app
 
 # запуск
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "mainApp:app"]
+CMD ["gunicorn", "--config", "/gunicorn.conf.py", "mainApp:app"]

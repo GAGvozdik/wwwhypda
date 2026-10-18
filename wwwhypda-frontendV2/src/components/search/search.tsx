@@ -156,7 +156,7 @@ const Search: React.FC = () => {
                 '--form-track': panels.form ? '1fr' : '0fr',
                 '--results-track': panels.results ? '1fr' : '0fr',
                 '--tree-height': panels.tree ? '12rem' : '0rem',
-                '--form-height': panels.form ? '24rem' : '0rem',
+                '--form-height': panels.form ? '1fr' : '0fr',
                 '--results-height': panels.results ? '32rem' : '0rem',
                 '--first-gap': panels.tree && (panels.form || panels.results) ? '1rem' : '0rem',
                 '--second-gap': panels.form && panels.results ? '1rem' : '0rem',

@@ -10,6 +10,10 @@ from auth.auth_models import ConfirmationCode
 def cleanup_once(app):
     with app.app_context():
         try:
+            from auth.sessions import cleanup_expired
+            from auth.transaction_lock import lock_users_transaction
+            lock_users_transaction()
+            cleanup_expired()
             count = ConfirmationCode.cleanup_expired()
             app.logger.info("Expired authentication code cleanup: %s records", count)
             return True

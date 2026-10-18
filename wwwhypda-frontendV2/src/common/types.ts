@@ -144,10 +144,10 @@ export function clearAllCookies() {
     });
 };
 // Вспомогательная функция, если надо получить csrf_token из cookie
-export function getCsrfTokenFromCookie() {
+export function getCsrfTokenFromCookie(refresh = false) {
     const csrf = document.cookie
     .split('; ')
-    .find(row => row.startsWith('csrf_token='))
+    .find(row => row.startsWith(refresh ? 'csrf_refresh_token=' : 'csrf_token='))
     ?.split('=')[1];
     return csrf || '';
 };

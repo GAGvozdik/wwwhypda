@@ -1,0 +1,42 @@
+services:
+  web:
+    image: wwwhypda-stage010-backend
+    pull_policy: never
+    read_only: true
+    tmpfs: [/tmp]
+    working_dir: /code
+    environment:
+      PYTHONPATH: /code
+    volumes:
+      - ../../../wwwhypda-backend:/code:ro
+      - ../../../common:/common:ro
+      - ./nginx_upstream.py:/testing/nginx_upstream.py:ro
+      - ../../../tmp/stage010-frontend:/preview:ro
+    entrypoint: [python, -B, /testing/nginx_upstream.py]
+    networks: [isolated]
+  transport:
+    image: wwwhypda-stage010-backend
+    pull_policy: never
+    read_only: true
+    tmpfs: [/tmp]
+    volumes:
+      - ./nginx_request.py:/testing/nginx_request.py:ro
+    entrypoint: [python, -B, -c, "from threading import Event; Event().wait()"]
+    networks: [isolated]
+  nginx:
+    image: nginx:stable-alpine
+    pull_policy: never
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../../maintenance:/etc/nginx/maintenance:ro
+      - ../../../tmp/stage010-maintenance-state:/maintenance-state:ro
+      - ../../../tmp/stage010-maintenance-public:/maintenance-public:ro
+      - ../../../tmp/stage010-frontend:/usr/share/nginx/html:ro
+      - ../../../tmp/stage010-acme:/preview-acme:ro
+    depends_on: [web]
+    networks: [isolated]
+networks:
+  isolated:
+    internal: true

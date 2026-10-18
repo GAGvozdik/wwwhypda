@@ -27,6 +27,10 @@ import requests
 import os
 
 auth_bp = Blueprint("users", __name__, url_prefix="/users")
+from auth.admission import admit, finish
+# Admission precedes CAPTCHA/hash/DB and the uniform response wait.
+auth_bp.before_request(admit)
+auth_bp.teardown_request(finish)
 
 
 
@@ -95,6 +99,10 @@ def login():
             return terms.acceptance_response("terms_version_mismatch")
         # No ordinary JWT/cookie before a successful committed acceptance transaction.
         user.update(is_superuser=current.is_superuser, account_version=current.session_version())
+        from auth.sessions import issue
+        access_expires_seconds = (session.get('ACCESS_EXPIRES_SECONDS', current_app.config['ACCESS_EXPIRES_SECONDS']) if current_app.config['TESTING'] else current_app.config['ACCESS_EXPIRES_SECONDS'])
+        refresh_expires_seconds = current_app.config['REFRESH_EXPIRES_SECONDS']
+        sid = issue(current, refresh_expires_seconds)
         db.session.commit()
         identity = str(user["id"])
 
@@ -107,9 +115,9 @@ def login():
         access_token = create_access_token(
             identity=identity,
             expires_delta=access_expires,
-            additional_claims={"is_superuser": user["is_superuser"], "account_version": user["account_version"]}
+            additional_claims={"is_superuser": user["is_superuser"], "account_version": user["account_version"], "sid": sid}
         )
-        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires, additional_claims={"account_version": user["account_version"]})
+        refresh_token = create_refresh_token(identity=identity, expires_delta=refresh_expires, additional_claims={"account_version": user["account_version"], "sid": sid})
 
         response = jsonify(message="Successfully logged in")
         set_access_cookies(response, access_token)
@@ -153,7 +161,7 @@ def refresh():
         access_expires_seconds = current_app.config['ACCESS_EXPIRES_SECONDS']
         new_access_token = create_access_token(
             identity=identity,
-            additional_claims={"is_superuser": is_superuser, "account_version": user.session_version()},
+            additional_claims={"is_superuser": is_superuser, "account_version": user.session_version(), "sid": get_jwt()["sid"]},
             expires_delta=timedelta(seconds=access_expires_seconds)
         )
 
@@ -165,7 +173,7 @@ def refresh():
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error refreshing access token: {e}")
+        current_app.logger.error("Error refreshing access token")
         return jsonify(message="Failed to refresh access token"), 500
 
 @auth_bp.route('/super_check', methods=['GET'])
@@ -190,6 +198,28 @@ def get_current_user():
 
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
+    return _logout_verified(refresh=False)
+
+
+@auth_bp.route('/refresh/logout', methods=['POST'])
+def logout_with_refresh():
+    # Existing refresh cookie path includes this child endpoint. No wider cookie path.
+    return _logout_verified(refresh=True)
+
+
+def _logout_verified(refresh):
+    from flask_jwt_extended import verify_jwt_in_request
+    from auth.sessions import revoke_current
+    # Repeated revocation is safe; signature, expiry, token type and CSRF still required.
+    verify_jwt_in_request(refresh=refresh, locations=['cookies'], skip_revocation_check=True)
+    try:
+        if not revoke_current(get_jwt()):
+            db.session.rollback()
+            return jsonify(message='Session is no longer valid'), 401
+    except Exception:
+        db.session.rollback()
+        current_app.logger.error('Logout revocation failed')
+        return jsonify(message='Logout could not be completed'), 500
     response = jsonify(message="Logged out")
     unset_jwt_cookies(response)
     return response
@@ -430,16 +460,19 @@ def confirm_password_reset():
             return jsonify(message=password_validation, error="Bad password"), 400
 
         if not ConfirmationCode.verify_code(email, code, "password_reset"):
+            # Persist shared wrong-attempt budget, including across HTTP workers.
+            db.session.commit()
             return jsonify(message="Invalid or expired reset code", error="Unauthorized"), 401
 
         user = User.query.filter_by(email=email, active=True).first()
         if user:
             user.set_password(new_password)
-            ConfirmationCode.query.filter_by(email=email, code=code, type="password_reset").delete()
+            ConfirmationCode.query.filter_by(email=email, type="password_reset").delete(synchronize_session="fetch")
             db.session.commit()
             return jsonify(message="Password successfully updated"), 200
         
-        return jsonify(message="User not found or inactive", error="Not Found"), 404
+        db.session.rollback()
+        return jsonify(message="Invalid or expired reset code", error="Unauthorized"), 401
     except Exception as e:
         db.session.rollback()
         return jsonify(message="Something went wrong", error=error_message(e)), 500

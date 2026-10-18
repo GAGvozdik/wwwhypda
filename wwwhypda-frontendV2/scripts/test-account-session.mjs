@@ -171,3 +171,16 @@ test('ordinary 500/502/503/504 without manual machine code stays local', async (
         assert.equal(maintenance.maintenanceActive(),false);
     }
 });
+
+
+test('logout cancels old account responses without clearing drafts or theme',async()=>{
+    const {session,values,api}=await fixture();
+    const before=new Map(values);
+    session.signOutAccountSession();
+    assert.equal(session.sessionEnded(),true);
+    assert.equal(session.sessionUnavailable(),true);
+    assert.deepEqual(values,before);
+    await assert.rejects(api.get('/users/check'),error=>axios.isCancel(error));
+    session.resumeAccountSession();
+    assert.equal(session.sessionUnavailable(),false);
+});

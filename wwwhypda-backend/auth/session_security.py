@@ -23,6 +23,9 @@ def configure_session_security(jwt):
         version = payload.get("account_version")
         if not isinstance(version, str) or not hmac.compare_digest(version, user.session_version()):
             return True
+        from auth.sessions import valid_session
+        if not valid_session(user, payload):
+            return True
         # JWT/active/version (and cookie CSRF) remain prior to the terms gate.
         if request.endpoint not in {"users.logout", "users.delete_own_account"} and not terms.has_current_acceptance(user):
             g.auth_terms_required = True

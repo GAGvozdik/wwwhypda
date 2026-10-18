@@ -157,8 +157,11 @@ class AccountDeletionTests(unittest.TestCase):
         from flask_jwt_extended import create_access_token, create_refresh_token, get_csrf_token
         uid = self.owner_id if uid is None else uid
         version = db.session.get(User, uid).session_version()
-        access = create_access_token(identity=str(uid), additional_claims={"account_version": version, **(claims or {})})
-        refresh = create_refresh_token(identity=str(uid), additional_claims={"account_version": version})
+        from auth.sessions import issue
+        sid = issue(db.session.get(User, uid), 300)
+        db.session.commit()
+        access = create_access_token(identity=str(uid), additional_claims={"account_version": version, "sid": sid, **(claims or {})})
+        refresh = create_refresh_token(identity=str(uid), additional_claims={"account_version": version, "sid": sid})
         client = self.app.test_client()
         client.set_cookie("access_token_cookie", access)
         client.set_cookie("refresh_token_cookie", refresh, path="/users/refresh")
@@ -247,7 +250,7 @@ class AuthenticationFlowTests(unittest.TestCase):
         self.assertEqual(client.get("/users/check", headers={"X-Recaptcha-Token": "test-token"}).status_code, 200)
         csrf = client.get_cookie("csrf_refresh_token").value
         self.assertEqual(client.post("/users/refresh", headers={"X-CSRF-TOKEN": csrf}).status_code, 200)
-        self.assertEqual(client.post("/users/logout").status_code, 200)
+        self.assertEqual(client.post("/users/refresh/logout", headers={"X-CSRF-TOKEN": csrf}).status_code, 200)
         self.assertEqual(client.get("/users/check").status_code, 401)
 
     def test_registration_and_reset_use_and_expiry(self):

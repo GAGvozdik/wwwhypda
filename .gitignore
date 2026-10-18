@@ -48,3 +48,6 @@ wwwhypda-backend/.env.prod
 
 /deploy/maintenance/state/**/enabled
 /deploy/maintenance/state/**/.maintenance-*
+
+# Disposable stage010 build/test output (never release data).
+/tmp/stage010-*

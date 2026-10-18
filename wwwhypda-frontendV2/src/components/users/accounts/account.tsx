@@ -1,3 +1,4 @@
+import { signOutAccountSession } from '../accountSession';
 import accountStyles from './accountsStyles.module.scss';
 import React, { useState, useEffect } from 'react';
 import styles from './../users.module.scss';
@@ -59,25 +60,22 @@ const Account: React.FC = () => {
 
     const handleLogout = async () => {
         try {
-            const res = await api.post('/users/logout', {}, {
+            const res = await api.post('/users/refresh/logout', {}, {
                 withCredentials: true, // обязательно для куков
                 headers: {
-                    'X-CSRF-TOKEN': getCsrfTokenFromCookie(), // если у вас проверяется CSRF
+                    'X-CSRF-TOKEN': getCsrfTokenFromCookie(true), // если у вас проверяется CSRF
                 }
             });
 
             if (res.status === 200) {
+                signOutAccountSession();
                 localStorage.removeItem('isSuperuser');
                 clearAllCookies();
                 navigate('/login', { replace: true });
             }
         } catch (err) {
-            if (!axios.isCancel(err)) console.warn('Logout failed');
+            if (!axios.isCancel(err)) setError(messages.account_action_failed);
 
-        } finally {
-            localStorage.removeItem('isSuperuser');
-            clearAllCookies();
-            navigate('/login', { replace: true });
         }
     };
 

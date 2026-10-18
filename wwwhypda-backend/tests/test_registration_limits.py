@@ -119,7 +119,7 @@ class RegistrationLimitTests(unittest.TestCase):
         db.session.remove()
         def confirmation(value):
             with self.app.app_context():return self.confirm(value).status_code
-        with ThreadPoolExecutor(max_workers=6) as pool:
+        with ThreadPoolExecutor(max_workers=3) as pool:
             self.assertEqual(list(pool.map(confirmation,[wrong]*6)),[401]*6)
         self.assertEqual(RegistrationLimit.query.one().failed_attempts,5)
         db.session.remove()

@@ -47,6 +47,14 @@ export function resumeAccountSession() {
     notify();
 }
 
+// Logout cancels stale account responses but preserves scientific drafts and theme.
+export function signOutAccountSession() {
+    paused = false;
+    ended = true;
+    epoch += 1;
+    notify();
+}
+
 export function endAccountSession(broadcast = true) {
     paused = false;
     ended = true;

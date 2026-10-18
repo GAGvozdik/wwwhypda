@@ -40,9 +40,13 @@ const SearchTableRow: React.FC<SearchTableRowProps> = ({ name, desc, unit, value
             }
             label={
                 <span className={`${styles.parameterText} ${value === 'all' ? styles.allParameter : ''}`}>
-                    {value === 'all' ? <span>{name}</span> : <span dangerouslySetInnerHTML={{ __html: name }} />}
-                    <span dangerouslySetInnerHTML={{ __html: desc }} />
-                    {value !== 'all' && <span>[ <span dangerouslySetInnerHTML={{ __html: unit }} /> ]</span>}
+                    {value === 'all' ? <span>{name}</span> : <>
+                        <span className={styles.parameterDescription}>
+                            <span dangerouslySetInnerHTML={{ __html: desc }} />{' '}
+                            <span dangerouslySetInnerHTML={{ __html: name }} />
+                        </span>
+                        <span className={styles.parameterUnit}>[ <span dangerouslySetInnerHTML={{ __html: unit }} /> ]</span>
+                    </>}
                 </span>
             }
         />

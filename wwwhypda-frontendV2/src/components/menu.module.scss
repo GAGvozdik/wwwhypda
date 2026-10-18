@@ -9,6 +9,7 @@
     --menu-font-size-little: 1rem;
     --menu-font-size-smallest: 0.75rem;
     --head-font-size: 1.5rem;
+    --home-title-font-size: 3rem;
     --button-font-size: 1rem;
     --input-font-size: 1rem;
     --tree-font-size: 1rem;
@@ -333,4 +334,8 @@ input::placeholder {
 
 .ag-cell {
     font-size: var(--main-font-size);  // Размер шрифта для ячеек
+}
+
+@media (max-width: 40rem) {
+    :root { --home-title-font-size: 2rem; }
 }

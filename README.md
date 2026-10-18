@@ -626,3 +626,17 @@ flag выключен по умолчанию. Рабочую users_db пере�
 проверки migration/backup оператором. Этот цикл рабочую БД не изменяет.
 Настройка Gmail для обычной local development выше сохраняется; production
 reminder требует отдельно проверенный OVH transport и явное включение.
+
+
+## Stage010: сессии и локальный запуск
+
+Backend использует persistent sid и reset budget; перед первым запуском новой
+версии требуется additive migration `python -B -m auth.migrate_security_state`
+и затем `--check` через backend Docker Compose. В текущей локальной тестовой БД
+они уже выполнены. Обычный UI dev остаётся http://localhost:8080; после правки
+frontend пересобрать `docker compose build frontend`, затем `docker compose up -d frontend`
+и дождаться `docker compose wait frontend` перед Ctrl+F5.
+Старые JWT требуют нового входа. Инструкция будущего согласованного rollout:
+[stage010-rollout](deploy/security/stage010-rollout.md). Изолированные автотесты:
+[security010](deploy/testing/security010/README.md). Secrets/env здесь не приводятся;
+универсальная локальная Gmail-инструкция выше сохраняется.

@@ -50,6 +50,10 @@ class User(db.Model):
     def set_password(self, password):
         """Хэширует пароль и сохраняет его"""
         self.password = generate_password_hash(password)
+        from sqlalchemy import inspect
+        if inspect(self).persistent:
+            from auth.sessions import revoke_all
+            revoke_all(self.id)
 
     def session_version(self):
         """Привязывает JWT к аккаунту, защищая от повторного использования id после удаления."""
@@ -73,8 +77,12 @@ class User(db.Model):
         Deactivates a user account.
         Returns True if successful, otherwise False.
         """
-        user = cls.query.filter_by(id=user_id).first()
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
+        user = cls.query.filter_by(id=user_id).populate_existing().with_for_update().first()
         if user:
+            from auth.sessions import revoke_all
+            revoke_all(user.id)
             user.active = False
             db.session.commit()
             return True
@@ -192,8 +200,12 @@ class User(db.Model):
         Deactivates a user account, preventing further access.
         Returns True if successful, otherwise False.
         """
-        user = cls.query.filter_by(id=user_id, active=True).first()
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
+        user = cls.query.filter_by(id=user_id, active=True).populate_existing().with_for_update().first()
         if user:
+            from auth.sessions import revoke_all
+            revoke_all(user.id)
             user.active = False
             db.session.commit()
             return True
@@ -222,9 +234,11 @@ class User(db.Model):
         Updates a user's password.
         Returns True if successful, otherwise False.
         """
-        user = cls.query.filter_by(email=email).first()
+        from auth.transaction_lock import lock_users_transaction
+        lock_users_transaction()
+        user = cls.query.filter_by(email=email).populate_existing().with_for_update().first()
         if user:
-            user.password = generate_password_hash(new_password)
+            user.set_password(new_password)
             db.session.commit()
             return True
         return False
@@ -244,6 +258,16 @@ class User(db.Model):
             db.session.commit()
             return True
         return False
+
+
+class AuthSession(db.Model):
+    """Persistent revocation shared by all HTTP workers; no bearer tokens stored."""
+    __bind_key__ = 'users_db'
+    __tablename__ = 'auth_sessions'
+    sid = db.Column(db.String(64), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    expires_at = db.Column(db.DateTime(timezone=True), nullable=False, index=True)
+    revoked_at = db.Column(db.DateTime(timezone=True), nullable=True)
 
 
 class UserAgreementAcceptance(db.Model):
@@ -271,6 +295,21 @@ class RegistrationLimit(db.Model):
     __table_args__ = (
         db.CheckConstraint('failed_attempts >= 0', name='ck_registration_failed_nonnegative'),
         db.CheckConstraint('sent_count >= 0', name='ck_registration_sent_nonnegative'),
+    )
+
+
+class ResetLimit(db.Model):
+    """Shared target budget; challenge expiry never removes the resend window."""
+    __bind_key__ = 'users_db'
+    __tablename__ = 'reset_limits'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
+    challenge_id = db.Column(db.Integer, nullable=True)
+    failed_attempts = db.Column(db.Integer, nullable=False, default=0)
+    sent_count = db.Column(db.Integer, nullable=False, default=0)
+    window_started = db.Column(db.DateTime(timezone=True), nullable=True)
+    __table_args__ = (
+        db.CheckConstraint('failed_attempts >= 0', name='ck_reset_failed_nonnegative'),
+        db.CheckConstraint('sent_count >= 0', name='ck_reset_sent_nonnegative'),
     )
 
 
@@ -305,6 +344,12 @@ class ConfirmationCode(db.Model):
             if commit:
                 db.session.commit()
             return confirmation_code
+        if type == 'password_reset':
+            from auth.reset_limits import issue_code
+            confirmation_code = issue_code(user)
+            if commit:
+                db.session.commit()
+            return confirmation_code
         code = str((secrets.randbelow(900000) + 100000))
         confirmation_code = cls(email=email, code=code, type=type)
         db.session.add(confirmation_code)
@@ -325,6 +370,9 @@ class ConfirmationCode(db.Model):
             return False
         if type == 'registration':
             from auth.registration_limits import verify_code
+            return verify_code(user, code, now=datetime.now(timezone.utc))
+        if type == 'password_reset':
+            from auth.reset_limits import verify_code
             return verify_code(user, code, now=datetime.now(timezone.utc))
         confirmation_code = cls.query.filter_by(email=email, code=code, type=type).with_for_update().first()
         if not confirmation_code:

@@ -151,3 +151,20 @@ hover/focus сохранены. Все tokens находятся в menu.module.
 
 В правой части MainMenu сначала иконка аккаунта, затем переключатель темы;
 margin-left:auto у accountItem сохраняет выравнивание пары справа.
+
+
+### Stage 010: Home и Search
+- Home h1 использует общий token3rem, до40rem —2rem; остальные заголовки прежние.
+  AnimatedLogo: root SVG в пределах42rem/100%, natural aspect ratio, tight viewBox
+  реальных букв, без13vh/95vw и counter-zoom. GSAP/masks сохранены; reduced-motion
+  завершает timeline, listener/timeline очищаются, конфигурация букв memoized.
+- В stacked Search форма растёт по содержимому без внутреннего scroll параметров;
+  wide workspace>=65rem сохраняет прежнюю высоту/внутренний scroll длинного списка.
+  Radio+описание+символ слева, units справа; grid допускает переносы без ellipsis.
+  All parameters — отдельный вариант; sup/sub и единое radio label сохранены.
+- Parameter HTML поступает из публичного каталога, не из InputData заявки.
+  Новый пользовательский/import путь в каталог должен отдельно проверять доверие
+  и sanitization; наличие dangerouslySetInnerHTML не является разрешением HTML ввода.
+- XLSX экспорт использует official SheetJS CE0.20.3 (Apache-2.0), все переданные
+  результаты, не только страницу. Общий helper проверен roundtrip125 строк,
+  zero/null/Unicode и строкой, похожей на formula. AG Grid остаётся Community.

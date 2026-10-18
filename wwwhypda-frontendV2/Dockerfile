@@ -5,7 +5,7 @@ WORKDIR /app
 RUN apk add --no-cache libc6-compat
 
 COPY package*.json ./
-RUN npm install
+RUN CYPRESS_INSTALL_BINARY=0 npm ci
 
 COPY . .
 # Compose builds with the selected environment at container startup.

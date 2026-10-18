@@ -20,6 +20,10 @@ const useAuthCheck = (): AuthState => {
             else if (!sessionUnavailable()) void checkAuth();
         };
         const checkAuth = async () => {
+            if (sessionEnded()) {
+                setAuth({ isAuth: false, isSuperuser: false, termsRequired: termsAcceptanceRequired() });
+                return;
+            }
             if (cancelled || sessionUnavailable()) return;
             if (termsAcceptanceRequired()) {
                 setAuth({ isAuth: false, isSuperuser: false, termsRequired: true });
