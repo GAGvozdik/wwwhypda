@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import useAuthCheck from '../useAuthCheck';
+import Login from '../auth/login';
 // import LoadIcon from '../../commonFeatures/loadIcon';
 
 
@@ -12,7 +13,7 @@ interface SuperProtectedRouteProps {
 const SuperProtectedRoute: React.FC<SuperProtectedRouteProps> = ({ children, redirectIfSuperuser = false }) => {
     const { isAuth, isSuperuser, termsRequired } = useAuthCheck();
     if (isAuth === null || isSuperuser === null) {
-        return <></>;
+        return <Login checkingAccess />;
     }
 
     if (!isAuth) {

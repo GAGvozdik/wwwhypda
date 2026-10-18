@@ -169,7 +169,7 @@
 }
 .mainMenuItems > .menuLabel { width: auto; height: auto; }
 .mainMenuItems > .drawerItem { flex: 0 0 auto; }
-.mainMenuItems > .themeItem { margin-left: auto; }
+.mainMenuItems > .accountItem { margin-left: auto; }
 .mainMenuItems :global(.MuiIconButton-root) { padding: 0.75rem; }
 .mainMenuItems :global(.MuiSvgIcon-root) { font-size: var(--menu-font-size); }
 .mainMenuItems a:focus-visible, .mainMenuItems button:focus-visible {

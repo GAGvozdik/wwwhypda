@@ -1,3 +1,4 @@
+import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
 import messages from '../../../common/error_messages.json';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -6,6 +7,7 @@ import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import UserButton from './userButton';
 import ErrorMessage from './errorMessage';
+import RegistrationConfirmation from './registrationConfirmation';
 import CustomCheckbox from '../../commonFeatures/customCheckbox';
 import ModalWindow from '../../modal/modalWindow';
 import { useModal } from '../../modal/modalContext';
@@ -19,8 +21,10 @@ import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
 
-const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
+interface LoginProps extends WithRecaptchaProps { checkingAccess?: boolean; }
+const Login: React.FC<LoginProps> = ({ executeRecaptcha, checkingAccess = false }) => {
     const [username, setUsername] = useState('');
+    const [pendingEmail, setPendingEmail] = useState<string | null>(null);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const pendingRequest = useRef(false);
@@ -46,12 +50,13 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const location = useLocation();
 
     useEffect(() => {
-        if (location.state?.message) {
+        if (!checkingAccess && location.state?.message) {
+            if (typeof location.state.email === 'string') setUsername(location.state.email);
             setError(location.state.message);
             setIsError(false);
             navigate(location.pathname, { replace: true, state: {} });
         }
-    }, [location, navigate]);
+    }, [location, navigate, checkingAccess]);
 
     const closeRestrictedNotice = () => {
         if (pendingRequest.current) return;
@@ -110,6 +115,11 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
             setIsError(false);
         } catch (error: unknown) {
             setIsLoading(false);
+            if (axios.isAxiosError<{code?: string}>(error) && error.response?.status === 409 &&
+                error.response.data?.code === 'email_confirmation_required') {
+                setPendingEmail(username); setTermsVersion(null); setTermsAccepted(false);
+                setError(''); setIsError(false); return;
+            }
             if (axios.isAxiosError<{ code?: string; terms_version?: string }>(error) &&
                 error.response?.status === 409 &&
                 ['terms_acceptance_required', 'terms_version_mismatch'].includes(error.response.data?.code || '') &&
@@ -129,9 +139,19 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     }, [executeRecaptcha, username, password, navigate, termsVersion, termsAccepted]);
 
 
+    if (pendingEmail) return <div className={styles.authPage}>
+        <AuthSkeleton loading={isLoading}><div className={styles.authForm}>
+            <div className={styles.formTitle}>{messages.confirm_email_title}</div>
+            <RegistrationConfirmation key={pendingEmail} email={pendingEmail} executeRecaptcha={executeRecaptcha}
+                onBusyChange={setIsLoading} onBack={() => setPendingEmail(null)} onConfirmed={message => {
+                    setPendingEmail(null); setError(message); setIsError(false);
+                }} />
+        </div></AuthSkeleton>
+    </div>;
+
     return (
-        <div className={styles.authPage}>
-            <div className={styles.authForm}>
+        <div className={styles.authPage} data-auth-check={checkingAccess || undefined}>
+            <AuthSkeleton loading={checkingAccess || isLoading}><div className={styles.authForm}>
                 <div className={styles.formTitle}>{messages.auth_title}</div>
 
                 <form onSubmit={handleLogin}>
@@ -145,6 +165,7 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             className={styles.inputField}
                             name="email"
                             autoComplete="username"
+                            disabled={isLoading}
                             required
                             list="emailSuggestions"
                         />
@@ -158,6 +179,7 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         onChange={(e) => { setPassword(e.target.value); setTermsVersion(null); setTermsAccepted(false); }}
                         className={styles.inputField}
                         autoComplete="current-password"
+                        disabled={isLoading}
                         required
                     />
 
@@ -166,7 +188,7 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                     <UserButton text={messages.login_button} isLoading={isLoading} />
                 </form>
 
-                <ModalWindow open={Boolean(termsVersion)} modalRootRef={modalRootRef}
+                <ModalWindow open={!checkingAccess && Boolean(termsVersion)} modalRootRef={modalRootRef}
                     labelledBy="updated-terms-title" describedBy="updated-terms-version"
                     onClose={() => {
                         if (pendingRequest.current) return;
@@ -208,7 +230,7 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         aria-haspopup="dialog" onClick={() => setRestrictedNoticeOpen(true)}>
                         {messages.terms_update_title}
                     </Button>}
-                <ModalWindow open={restrictedSession && restrictedNoticeOpen && !termsVersion}
+                <ModalWindow open={!checkingAccess && restrictedSession && restrictedNoticeOpen && !termsVersion}
                     modalRootRef={modalRootRef} onClose={closeRestrictedNotice}
                     labelledBy="restricted-session-title" describedBy="restricted-session-description">
                     <div className={styles.termsDialog}>
@@ -242,7 +264,7 @@ const Login: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         </Link>
                     </div>
                 </div>
-            </div>
+            </div></AuthSkeleton>
         </div>
     );
 };

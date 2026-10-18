@@ -1,3 +1,4 @@
+import { maintenanceActive, setMaintenance } from './commonFeatures/maintenanceState';
 import axios, { CanceledError } from 'axios';
 import { sessionEvent, sessionVersion, sessionUnavailable, resumeAccountSession, endAccountSession, requireCurrentTerms, clearTermsRequirement } from './users/accountSession';
 
@@ -18,6 +19,7 @@ window.addEventListener(sessionEvent, () => {
 });
 api.interceptors.request.use((config) => {
   const path = '/' + (config.url || '').replace(/^\//, '');
+  if (maintenanceActive() && path !== '/maintenance-status') throw new CanceledError('Temporary maintenance');
   const protectedRequest = path.startsWith('/input/') || path.startsWith('/admin/') ||
     ['/users/check', '/users/super_check', '/users/refresh'].includes(path) ||
     (path === '/users/' && config.method !== 'post' && config.method !== 'options');
@@ -39,6 +41,7 @@ api.interceptors.response.use((response) => {
 }, (error: unknown) => {
   if (axios.isAxiosError(error) && error.config) {
     requests.delete(error.config);
+    if (error.response?.status === 503 && error.response.data?.code === 'site_maintenance') setMaintenance(true);
     if (error.response?.status === 409 && error.response.data?.code === 'terms_acceptance_required' &&
         error.config.url !== '/users/login') requireCurrentTerms();
     if (error.response?.status === 401 && error.response.data?.code === 'account_unavailable') {

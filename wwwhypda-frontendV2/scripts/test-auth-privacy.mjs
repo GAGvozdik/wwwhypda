@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import ts from 'typescript';
 
 const messages = JSON.parse(readFileSync('src/common/error_messages.json', 'utf8'));
-function fixture(file, post = async () => ({ status: 200, data: {} }), restricted = false) {
+function fixture(file, post = async () => ({ status: 200, data: {} }), restricted = false, componentProps = {}) {
     const slots = [], effects = [], timers = new Set(), calls = [], actions = [], destinations = [];
     let cursor = 0;
     const react = {
@@ -45,9 +45,11 @@ function fixture(file, post = async () => ({ status: 200, data: {} }), restricte
             if (name === '@mui/material/Button') return 'Button';
             if (name.endsWith('/api')) return { post: async (...args) => { calls.push(args); return post(...args); },
                 get: async () => ({ data: { is_superuser: false } }) };
+            if (name.endsWith('/authSkeleton')) return 'AuthSkeleton';
             if (name.endsWith('/withRecaptcha')) return value => value;
             if (name === './userButton') return components.UserButton;
             if (name === './errorMessage') return components.ErrorMessage;
+            if (name === './registrationConfirmation') return 'RegistrationConfirmation';
             if (name.endsWith('/accounts/deleteAccount')) return 'DeleteAccount';
             if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; } };
             if (name.endsWith('/legalDocuments')) return {
@@ -70,7 +72,7 @@ function fixture(file, post = async () => ({ status: 200, data: {} }), restricte
         cursor = 0;
         cleanups.forEach(callback => callback?.());
         effects.length = 0;
-        const tree = exports.default({ executeRecaptcha: execute });
+        const tree = exports.default({ executeRecaptcha: execute, ...componentProps });
         cleanups = effects.map(callback => callback());
         return tree;
     }
@@ -153,14 +155,11 @@ test('registration terms/adult requirements and neutral initial/resend states re
         assert.equal(view.calls.length, 1);
         assert.equal(view.calls[0][1].terms_accepted, true);
         assert.equal(view.calls[0][1].adult_confirmed, true);
-        assert.equal(view.find('ErrorMessage').props.isError, false);
-        assert.ok(view.find('ErrorMessage').props.error.includes(messages.registration_requested));
-        const resend = () => view.find('UserButton', props => props.text === messages.resend_code_button);
-        assert.equal(resend().props.disabled, true);
-        for (let n = 0; n < 30; n++) view.tick();
-        await resend().props.onclick();
-        assert.deepEqual(view.actions, ['register', 'resend_code']);
-        assert.equal(view.find('ErrorMessage').props.isError, false);
+        const confirmation=view.find('RegistrationConfirmation').props;
+        assert.equal(confirmation.email,`${category}@example.test`);
+        assert.equal(confirmation.initialNotice,messages.registration_requested);
+        assert.equal(confirmation.initialCooldown,30);
+
     }
 });
 
@@ -267,4 +266,102 @@ test('old-session modal logout remains available without accepting documents', a
     assert.equal(view.calls[0][0],'/users/logout');
     assert.equal(view.calls[0][1].terms_accepted,undefined);
     assert.equal(view.destinations.at(-1)[0],'/');
+});
+
+
+test('pending login reuses the registration confirmation step and never creates a session on confirmation alone', async () => {
+    const view=fixture('login',async()=>{throw {isAxiosError:true,response:{status:409,data:{code:'email_confirmation_required'}}};});
+    view.input('email','pending@example.test');view.input('password','Password1!');
+    await view.find('form').props.onSubmit(event);
+    const step=view.find('RegistrationConfirmation').props;
+    assert.equal(step.email,'pending@example.test');
+    assert.equal(view.calls.length,1);
+    step.onConfirmed('Activated');
+    assert.equal(view.find('RegistrationConfirmation'),undefined);
+    assert.equal(view.find('input',props=>props.type==='email').props.value,'pending@example.test');
+    assert.equal(view.calls.length,1);
+    assert.equal(view.find('ErrorMessage').props.error,'Activated');
+});
+
+test('shared confirmation uses fresh tokens, explicit resend, countdown and one-time-code input', async () => {
+    const completed=[];
+    const view=fixture('registrationConfirmation',async()=>({status:200,data:{message:'Activated'}}),false,
+        {email:'pending@example.test',onConfirmed:message=>completed.push(message)});
+    assert.equal(view.calls.length,0);
+    assert.equal(view.find('input').props.autoComplete,'one-time-code');
+    await view.find('UserButton',props=>props.text===messages.resend_code_button).props.onclick();
+    assert.equal(view.calls[0][0],'/users/resend-confirmation');
+    assert.equal(view.find('UserButton',props=>props.text===messages.resend_code_button).props.disabled,true);
+    view.input('text','123456');
+    await view.find('form').props.onSubmit(event);
+    assert.equal(view.calls[1][0],'/users/confirm-registration');
+    assert.deepEqual(view.actions,['resend_code','confirm_registration']);
+    assert.notEqual(view.calls[0][1].recaptcha_token,view.calls[1][1].recaptcha_token);
+    assert.deepEqual(completed,['Activated']);
+});
+
+test('shared confirmation rejects non-ASCII code and keeps retry errors local', async () => {
+    const view=fixture('registrationConfirmation',async()=>{throw {isAxiosError:true,response:{status:401,data:{message:'Invalid or expired confirmation code'}}};},false,
+        {email:'pending@example.test',onConfirmed:()=>{throw new Error('No success');}});
+    view.input('text','１２３４５６');await view.find('form').props.onSubmit(event);
+    assert.equal(view.calls.length,0);
+    view.input('text','000000');await view.find('form').props.onSubmit(event);
+    assert.equal(view.find('ErrorMessage').props.isError,true);
+    assert.equal(view.find('input').props.value,'000000');
+});
+
+
+test('manual 503 preserves login/registration/confirmation/reset values and terms choice without navigation',async()=>{
+    const failure=()=>{throw {isAxiosError:true,response:{status:503,data:{code:'site_maintenance',message:'Temporary maintenance'}}};};
+    for(const name of ['login','registration','forgotPassword']) {
+        const view=fixture(name,failure);
+        view.input('email','synthetic@example.test');
+        if(name!=='forgotPassword')view.input('password','Password1!');
+        if(name==='registration') {
+            view.input('text','Researcher');view.input('password','Password1!',1);
+            view.nodes().filter(n=>n.type==='CustomCheckbox').forEach(n=>n.props.onChange(true));
+        }
+        await view.find('form').props.onSubmit(event);
+        assert.equal(view.find('input',p=>p.type==='email').props.value,'synthetic@example.test');
+        if(name!=='forgotPassword')assert.equal(view.find('input',p=>p.type==='password').props.value,'Password1!');
+        assert.equal(view.destinations.length,0);assert.equal(view.calls.length,1);
+    }
+    const confirmation=fixture('registrationConfirmation',failure,false,{email:'pending@example.test',onConfirmed:()=>assert.fail('No activation')});
+    confirmation.input('text','123456');await confirmation.find('form').props.onSubmit(event);
+    assert.equal(confirmation.find('input').props.value,'123456');assert.equal(confirmation.calls.length,1);
+    let n=0;
+    const terms=fixture('login',()=>{if(n++===0)throw {isAxiosError:true,response:{status:409,data:{code:'terms_acceptance_required',terms_version:'current'}}};return failure();});
+    terms.input('email','synthetic@example.test');terms.input('password','Password1!');
+    await terms.find('form').props.onSubmit(event);terms.find('CustomCheckbox').props.onChange(true);
+    await terms.nodes().filter(n=>n.type==='form').at(-1).props.onSubmit(event);
+    assert.equal(terms.find('CustomCheckbox').props.isChecked,true);
+    assert.equal(terms.find('input',p=>p.type==='password').props.value,'Password1!');
+    assert.equal(terms.destinations.length,0);assert.equal(terms.calls.length,2);
+});
+
+
+test('confirmation masks the address, uses a site-styled back link and separates resend from confirmation',async()=>{
+    const busy=[],completed=[];
+    const view=fixture('registrationConfirmation',async()=>({status:200,data:{message:'Activated'}}),false,
+        {email:'pending@example.test',onBack:()=>{},onBusyChange:value=>busy.push(value),onConfirmed:value=>completed.push(value)});
+    const text=JSON.stringify(view.render());
+    assert.equal(text.includes('pending@example.test'),false);
+    assert.equal(text.includes('p***@e***.test'),true);
+    assert.ok(view.find('Link',p=>p.to==='/login'));
+    assert.equal(view.find('UserButton',p=>p.text===messages.back_to_sign_in),undefined);
+    await view.find('UserButton',p=>p.text===messages.resend_code_button).props.onclick();
+    assert.deepEqual(view.calls.map(c=>c[0]),['/users/resend-confirmation']);
+    assert.equal(view.find('ErrorMessage').props.isError,false);
+    view.input('text','123456');await view.find('form').props.onSubmit(event);
+    assert.deepEqual(busy,[true,false,true,false]);
+    assert.deepEqual(completed,['Activated']);
+});
+
+test('checking access uses the actual login markup inside its auth skeleton without modal or request',()=>{
+    const view=fixture('login',undefined,false,{checkingAccess:true});
+    assert.equal(view.find('AuthSkeleton').props.loading,true);
+    assert.ok(view.find('input',p=>p.type==='email'));
+    assert.ok(view.find('input',p=>p.type==='password'));
+    assert.ok(view.nodes().filter(n=>n.type==='ModalWindow').every(n=>!n.props.open));
+    assert.equal(view.calls.length,0);
 });

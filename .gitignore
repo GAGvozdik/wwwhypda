@@ -41,3 +41,10 @@ wwwhypda-backend/.env.prod
 
 # Disposable browser fixture bundle.
 /tmp/terms-preview/
+
+# Disposable stage009 outputs; flag is local/operator state, never a release asset.
+/tmp/stage009*/
+/tmp/maintenance-public/
+
+/deploy/maintenance/state/**/enabled
+/deploy/maintenance/state/**/.maintenance-*

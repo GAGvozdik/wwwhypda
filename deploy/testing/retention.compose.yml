@@ -27,7 +27,7 @@ services:
       - ../../wwwhypda-backend:/code:ro
       - ../../common:/common:ro
     entrypoint: ["python", "-B", "-m", "unittest"]
-    command: ["tests.test_retention_cleanup", "tests.test_retention_migration", "tests.test_auth_lifecycle", "tests.test_terms_acceptance", "tests.test_terms_migration", "tests.test_submission_authors", "tests.test_terms_login", "tests.test_agreement_history_migration", "-v"]
+    command: ["tests.test_retention_cleanup", "tests.test_retention_migration", "tests.test_auth_lifecycle", "tests.test_terms_acceptance", "tests.test_terms_migration", "tests.test_submission_authors", "tests.test_pending_login", "tests.test_registration_limits", "tests.test_terms_login", "tests.test_agreement_history_migration", "-v"]
     depends_on:
       db:
         condition: service_healthy

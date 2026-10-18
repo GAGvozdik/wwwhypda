@@ -48,3 +48,21 @@
 - Некорректные/отсутствующие/дублированные/лишние query значения 400, неизвестный ID 404,
   известные без результатов 200 [], SQL/неоднозначный корень 500 без внутренних деталей.
   В запросах только публичные Sample/Measure/Rock_type/Parameter; users_db/InputData не участвуют.
+
+
+### Stage 009: защищённая continuation и manual maintenance
+- User.login(allow_pending=True) разрешён только login endpoint: один real/dummy
+  hash, recheck User/account_version под прежним common/User lock. Inactive +
+  completed is False + правильный пароль ->409 email_confirmation_required, без
+  JWT/cookies/PII/SMTP. Disabled/NULL/wrong/unknown neutral404, floor.4s вне tx.
+- RegistrationLimit/users_db — additive migration auth.migrate_registration_limits
+  apply/check до новых routes; не DML/backfill/reset acceptance. 5wrong/current
+  challenge;3issues/15min через initial/duplicate/resend вместе, общие DB locks
+  между workers/IP. Один current registration code, reset codes не изменяются.
+  Wrong attempt commit, activation/consume/guard delete atomic; expiry2min, permitted
+  new issue сбрасывает wrong budget, window15min. Public resend neutral200/4s.
+- Ручной flag только filesystem/operator CLI; readonly Nginx status не имеет setter.
+  Gates до каждого ordinary proxy/SPA location; API503 code site_maintenance,
+  legal/PDF/assets/ACME исключения без backend. Не обходить rate limits/security/TLS.
+  SPA использует прежний Axios и отдельное неаккаунтное состояние; при manual503
+  guards сохраняют прежний auth state, после off делают обычный recheck.

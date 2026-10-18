@@ -97,3 +97,57 @@ Search не использует fullScreenContent min-height общей обо�
 В Search внешний treePanel имеет radius 8px и overflow:hidden, treeBody наследует
 radius, сохраняя внутреннюю прокрутку. Это обрезает углы области в Chrome/Firefox;
 нативная форма thumb Firefox остаётся системной, одинаковый radius thumb не гарантируется.
+
+
+### Stage 009: continuation, loading, maintenance (local)
+- Одна RegistrationConfirmation для register/login continuation; только явно заданный
+  email, локальный ASCII code, fresh confirm_registration/resend_code token на каждое
+  действие. Подтверждение возвращает к обычному login; пароли/коды вне URL/store/logs.
+- /login recaptchaRoutes разрешает login + confirm_registration + resend_code;
+  iframe остаётся lazy и уничтожается при уходе. Mock provider preview не доказывает
+  реальную доступность Google. No automatic send/activation/JWT on pending login.
+- По уточнению владельца новый AuthSkeleton относится ТОЛЬКО к login/register/
+  forgot-password/confirmation. Реальная разметка текущей формы остаётся mounted,
+  invisible/inert при ожидании; она задаёт точный natural size. Контур как authForm
+  (общий formContour: 1px/25px + прежняя modal shadow), прежний form-color, MUI wave слева направо и existing LoadIcon по центру.
+  Search/tree/table/profile loaders возвращены к прежнему коду SingleSkeleton;
+  никаких новых borders/background/min-height для них.
+- Проверка доступа рендерит реальный Login checkingAccess под auth skeleton, без
+  requests/модальных окон из самого login. После auth guard действуют прежние
+  redirect/terms/role gates. Account-shaped 34rem placeholder удалён.
+- Проверка подтверждения/явный resend показывают skeleton именно confirmation
+  формы; callback busy true/false не теряется при переходе к обычному login.
+  Email на шаге подтверждения маскируется (p***@e***.test); Back to sign in — Link
+  с существующим users.link, не submitButton.
+- MaintenanceNotice над mounted page через existing ModalWindow; legal links в
+  отдельных вкладках. Status проверяется на route/focus/manual retry, throttle1.5s,
+  без polling. Никакого logout, очищения drafts, смешивания с terms или POST replay.
+
+Во время Login checkingAccess на /account/input footer показывает ту же
+reCAPTCHA подпись, что у обычного login: data-auth-check marker и CSS :has без
+отдельного state/effect. После проверки действует обычная route visibility.
+Это только текстовый notice; allowlist/provider/iframe lifecycle не расширяются.
+
+Footer notice скрывается через visibility:hidden, не display:none: его реальная
+ширина/высота и переносы сохраняются при route/guard transition. LegalLinks не
+перецентрируются из-за исчезновения строки. Никакой фиксированной угаданной
+высоты footer, новых Google requests или публичного текста документов это не вводит.
+
+Общий formContour задаёт рамку1px, скругление25px и тень для auth форм,
+их skeleton и ModalWindow (включая edit/submit choice, updated terms и техработы).
+Фон и размеры существующих форм сохранены; панели Search/tree не меняются.
+Maintenance mailto/legal links используют users.link, как под login; static
+maintenance build получает те же канонические Sass правила и палитру.
+
+inputContour включает formContour, переопределяя скругление на прежние4px
+и цвет на field-contour-border. Фон/текст, отступы, autofill/error/disabled
+сохранены, checkbox/radio используют прежние компоненты.
+
+В светлой теме form-contour-border — смесь30% tree-text +70% form-color;
+field-contour-border ссылается на него. Hover полей —45% tree-text, focus/active —85%,
+остальное form-color. Form-contour-shadow — нейтральная полупрозрачная тень.
+В тёмной теме цвет рамки — menu-border, тень — under-body-color; прежние
+hover/focus сохранены. Все tokens находятся в menu.module.scss.
+
+В правой части MainMenu сначала иконка аккаунта, затем переключатель темы;
+margin-left:auto у accountItem сохраняет выравнивание пары справа.

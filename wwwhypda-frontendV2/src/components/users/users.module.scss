@@ -1,10 +1,12 @@
 @use '../commonFeatures/inputContour';
+@use '../commonFeatures/formContour';
 .treeLink{
     text-decoration: none;
 }
 
 
 .authForm {
+    @include formContour.contour;
     background-color: var(--form-color);
 
     width: min(22.5rem, 100%);
@@ -13,20 +15,18 @@
     // margin-bottom: 3vh;
     padding-bottom: 1rem;
 
-    border-radius: 8px;
-    border: 3px solid var(--border);
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
 }
 
 .skeletonAuthForm {
+    @include formContour.contour;
     background-color: var(--form-color);
 
     width: min(22.5rem, 100%);
     box-sizing: border-box;
     padding-bottom: 1rem;
 
-    border-radius: 8px;
     font-family: Afacad_Flux !important;
     font-size: var(--head-font-size);
 }
@@ -301,3 +301,12 @@ input::placeholder {
   min-width: 0;
   text-transform: none;
 }
+.confirmationEmail {
+  margin: 0.5rem 10% 1rem;
+  color: var(--tree-text);
+  font-size: var(--main-font-size);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.confirmationBack { text-align: center; margin: 1rem 10%; }

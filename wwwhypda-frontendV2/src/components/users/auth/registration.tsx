@@ -1,10 +1,12 @@
+import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
 import CustomCheckbox from '../../commonFeatures/customCheckbox';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styles from '../users.module.scss';
 import ErrorMessage from './errorMessage';
+import RegistrationConfirmation from './registrationConfirmation';
 import UserButton from './userButton';
 import api from '../../api';
 import messages from '../../../common/error_messages.json';
@@ -18,11 +20,9 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [confirmationCode, setConfirmationCode] = useState('');
     const [error, setError] = useState<string | null>(null);
     const pendingRequest = useRef(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isResending, setIsResending] = useState(false);
     const [step, setStep] = useState(1);
     const [isError, setIsError] = useState<boolean>(false);
     const navigate = useNavigate();
@@ -87,7 +87,6 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                 setError(messages.registration_requested);
                 setIsError(false);
                 setStep(2);
-                setResendTimer(30);
             }
         } catch (err: unknown) {
             if (axios.isAxiosError<{ message?: string; code?: string }>(err) && err.response?.data) {
@@ -113,94 +112,9 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
         }
     }, [executeRecaptcha, username, password, confirmPassword, email, isChecked, isAdult]);
 
-    const confirmRegistration = useCallback(async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (pendingRequest.current) return;
-        if (!executeRecaptcha) {
-            setError(messages.captcha_unavailable);
-            setIsError(true);
-            return;
-        }
-
-        const validatRes: string | null = validateRegistration(username, email, password);
-
-        if (validatRes != null) {
-            setIsError(true);
-            setError(validatRes);
-            return;
-        }
-        setIsError(false);
-        pendingRequest.current = true;
-        setIsLoading(true);
-
-        try {
-            const token = await executeRecaptcha('confirm_registration');
-            const response = await api.post("/users/confirm-registration", {
-                email: email,
-                code: confirmationCode,
-                recaptcha_token: token,
-            });
-
-            if (response.status === 200) {
-                const successMessage = response.data.message || messages.account_activated;
-                navigate('/login', { state: { message: successMessage } });
-            } else {
-                setError(response.data.message || messages.invalid_confirmation_code);
-                setIsError(true);
-            }
-        } catch (err: unknown) {
-            setError((axios.isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined) || messages.confirmation_failed);
-            setIsError(true);
-        } finally {
-            pendingRequest.current = false;
-            setIsLoading(false);
-        }
-    }, [executeRecaptcha, email, confirmationCode, navigate, username, password]);
-
-    const [resendTimer, setResendTimer] = useState(0);
-
-    const handleResendCode = useCallback(async () => {
-        if (resendTimer > 0 || !executeRecaptcha) return;
-
-        if (pendingRequest.current) return;
-        pendingRequest.current = true;
-        setIsResending(true);
-        try {
-            const token = await executeRecaptcha('resend_code');
-            const response = await api.post("/users/resend-confirmation", { email, recaptcha_token: token });
-
-            if (response.status === 200) {
-                setError(messages.registration_requested);
-                setIsError(false);
-                setResendTimer(30);
-            } else {
-                setError(response.data.message || messages.resend_failed);
-                setIsError(true);
-            }
-        } catch (err: unknown) {
-            setError((axios.isAxiosError<{ message?: string }>(err) ? err.response?.data?.message : undefined) || messages.resend_error);
-            setIsError(true);
-        } finally {
-            pendingRequest.current = false;
-            setIsResending(false);
-        }
-    }, [executeRecaptcha, email, resendTimer]);
-
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval> | undefined;
-        if (resendTimer > 0) {
-            interval = setInterval(() => {
-                setResendTimer((prev) => prev - 1);
-            }, 1000);
-        }
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [resendTimer]);
-
     return (
         <div className={styles.registrationPage}>
-            <div className={styles.authForm}>
+            <AuthSkeleton loading={isLoading}><div className={styles.authForm}>
                 <div className={styles.formTitle}>{messages.registration_title}</div>
                 {step === 1 && (
                     <form onSubmit={handleRegister} onInvalid={() => setHasSubmitted(true)}>
@@ -287,35 +201,11 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         </div>
                     </form>
                 )}
-                {step === 2 && (
-                    <form onSubmit={confirmRegistration}>
-                        <input
-                            type="text"
-                            placeholder={messages.confirmation_code_label}
-                            aria-label={messages.confirmation_code_label}
-                            value={confirmationCode}
-                            onChange={(e) => setConfirmationCode(e.target.value)}
-                            className={styles.inputField}
-                            required
-                        />
+                {step === 2 && <RegistrationConfirmation key={email} email={email}
+                    onBusyChange={setIsLoading} executeRecaptcha={executeRecaptcha} initialNotice={messages.registration_requested} initialCooldown={30}
+                    onConfirmed={message => navigate('/login', {state: {message, email}})} />}
 
-                        <ErrorMessage
-                            error={isError ? error : resendTimer > 0 ? `${error} ${messages.resend_countdown.replace('{seconds}', String(resendTimer))}` : error}
-                            isError={isError}
-                        />
-
-                        <UserButton
-                            text={messages.resend_code_button}
-                            isLoading={isResending}
-                            onclick={handleResendCode}
-                            disabled={resendTimer > 0 || isLoading}
-                        />
-                        <div style={{height: '0.5rem'}}></div>
-
-                        <UserButton text={messages.confirm_button} isLoading={isLoading} />
-                    </form>
-                )}
-            </div>
+            </div></AuthSkeleton>
         </div>
     );
 };

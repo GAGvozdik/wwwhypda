@@ -56,6 +56,7 @@ async function fixture() {
     });
     await root.evaluate();
     return { api: root.namespace.default, values, window,
+        maintenance: modules.get(path.resolve('src/components/commonFeatures/maintenanceState.ts')).namespace,
         session: modules.get(path.resolve('src/components/users/accountSession.ts')).namespace,
         store: modules.get(path.resolve('src/redux/store.ts')).namespace.default };
 }
@@ -136,4 +137,37 @@ test('terms-required response preserves drafts, cookies epoch and deletion avail
     await api.post('/users/login');
     assert.equal(session.termsAcceptanceRequired(),false);
     assert.equal(values.get('generalInfoData'),'["private draft"]');
+});
+
+
+test('manual maintenance preserves session/drafts, blocks ordinary requests and never replays POST', async () => {
+    const {api,session,values,store,maintenance}=await fixture();
+    const version=session.sessionVersion(),state=store.getState();
+    let calls=0;
+    api.defaults.adapter=async config=>{calls++;throw new axios.AxiosError('Temporary','ERR_BAD_RESPONSE',config,null,
+        {data:{code:'site_maintenance'},status:503,statusText:'Unavailable',headers:{},config});};
+    await assert.rejects(api.post('/input/submit',{private:'unsaved'}),error=>error.response?.status===503);
+    assert.equal(maintenance.maintenanceActive(),true);
+    await assert.rejects(api.post('/users/login',{password:'not-replayed'}),axios.isCancel);
+    assert.equal(calls,1);
+    assert.equal(session.sessionVersion(),version);
+    assert.equal(session.sessionEnded(),false);
+    assert.equal(store.getState(),state);
+    assert.equal(values.get('generalInfoData'),'["private draft"]');
+    api.defaults.adapter=async config=>{calls++;return {...response(config),data:{maintenance:false}};};
+    const result=await api.get('/maintenance-status',{baseURL:''});
+    maintenance.setMaintenance(result.data.maintenance);
+    assert.equal(calls,2); // status only, no hidden replay
+    await api.post('/input/submit',{private:'explicit retry'});
+    assert.equal(calls,3);
+});
+
+test('ordinary 500/502/503/504 without manual machine code stays local', async () => {
+    const {api,maintenance}=await fixture();
+    for(const status of [400,401,403,429,500,502,503,504]) {
+        api.defaults.adapter=async config=>{throw new axios.AxiosError('Local','ERR_BAD_RESPONSE',config,null,
+            {data:{},status,statusText:'Error',headers:{},config});};
+        await assert.rejects(api.get('/rocks/types'));
+        assert.equal(maintenance.maintenanceActive(),false);
+    }
 });

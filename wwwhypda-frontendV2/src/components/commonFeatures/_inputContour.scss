@@ -1,7 +1,9 @@
+@use "./formContour";
+
 @mixin contour {
-    border: 2px solid var(--field-border);
+    @include formContour.contour;
     border-radius: 4px;
-    box-sizing: border-box;
+    border-color: var(--field-contour-border);
     background-color: var(--field-background);
     color: var(--input-text);
     &:hover { border-color: var(--field-border-hover); background-color: var(--field-background); }

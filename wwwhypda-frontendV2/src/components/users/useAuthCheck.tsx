@@ -1,3 +1,4 @@
+import { maintenanceActive, maintenanceEvent } from '../commonFeatures/maintenanceState';
 import axios from 'axios';
 import { sessionEvent, sessionUnavailable, sessionEnded, termsEvent, termsAcceptanceRequired } from './accountSession';
 import { useEffect, useState } from 'react';
@@ -34,16 +35,19 @@ const useAuthCheck = (): AuthState => {
                     isSuperuser: response.data.is_superuser || false,
                 });
             } catch (error) {
-                if (cancelled || axios.isCancel(error) || sessionUnavailable()) return;
+                if (cancelled || axios.isCancel(error) || sessionUnavailable() || maintenanceActive()) return;
                 setAuth({ isAuth: false, isSuperuser: false, termsRequired: termsAcceptanceRequired() });
             }
         };
 
+        const maintenanceChanged = () => { if (!maintenanceActive()) void checkAuth(); };
+        window.addEventListener(maintenanceEvent, maintenanceChanged);
         window.addEventListener(sessionEvent, onSessionChange);
         window.addEventListener(termsEvent, onSessionChange);
         void checkAuth();
         return () => {
             cancelled = true;
+            window.removeEventListener(maintenanceEvent, maintenanceChanged);
             window.removeEventListener(sessionEvent, onSessionChange);
             window.removeEventListener(termsEvent, onSessionChange);
         };

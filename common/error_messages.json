@@ -31,5 +31,12 @@
   "terms_decline": "Return without signing in",
   "terms_review_label": "I accept the User Agreement and acknowledge the Privacy Policy and Cookie Policy.",
   "terms_restricted_session": "The documents have changed. Sign in again to review and accept them. You can still sign out or delete your account.",
-  "terms_review_sign_in": "Sign in to review documents"
+  "terms_review_sign_in": "Sign in to review documents",
+  "email_confirmation_required": "Confirm your email to finish registration. Request a new code if needed.",
+  "back_to_sign_in": "Back to sign in",
+  "confirm_email_title": "Confirm your email",
+  "maintenance_title": "Temporary maintenance",
+  "maintenance_description": "The service is temporarily unavailable. Your entries remain in this tab. Try again later; nothing will be submitted automatically.",
+  "maintenance_retry": "Try again",
+  "maintenance_check_failed": "The service could not be reached. Please try again later."
 }

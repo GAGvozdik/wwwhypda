@@ -200,17 +200,17 @@ class User(db.Model):
         return False
 
     @classmethod
-    def login(cls, email: str, password: str):
+    def login(cls, email: str, password: str, allow_pending=False):
         """
         Authenticates a user by verifying email and password.
         Returns user data as a dictionary if successful, otherwise None.
         """
-        user = cls.query.filter_by(email=email, active=True).first()
+        user = cls.query.filter_by(email=email).first()
         try:
             password_matches = check_password_hash(user.password if user else _DUMMY_LOGIN_HASH, password)
         except ValueError:
             password_matches = False
-        if user and password_matches:
+        if user and password_matches and (user.active or (allow_pending and user.registration_completed is False)):
             return {"id": user.id, "name": user.name, "email": user.email,"is_superuser": user.is_superuser,  # 👈 обязательно добавь это!
                 "active": user.active, "account_version": user.session_version()}
         return None
@@ -259,6 +259,21 @@ class UserAgreementAcceptance(db.Model):
     accepted_at = db.Column(db.DateTime(timezone=True), nullable=False)
 
 
+class RegistrationLimit(db.Model):
+    """Shared target budget; challenge expiry never removes the resend window."""
+    __bind_key__ = 'users_db'
+    __tablename__ = 'registration_limits'
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), primary_key=True)
+    challenge_id = db.Column(db.Integer, nullable=True)
+    failed_attempts = db.Column(db.Integer, nullable=False, default=0)
+    sent_count = db.Column(db.Integer, nullable=False, default=0)
+    window_started = db.Column(db.DateTime(timezone=True), nullable=True)
+    __table_args__ = (
+        db.CheckConstraint('failed_attempts >= 0', name='ck_registration_failed_nonnegative'),
+        db.CheckConstraint('sent_count >= 0', name='ck_registration_sent_nonnegative'),
+    )
+
+
 class ConfirmationCode(db.Model):
     __bind_key__ = 'users_db'
 
@@ -284,6 +299,12 @@ class ConfirmationCode(db.Model):
         user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
         if not user or (type == "password_reset" and not user.active):
             return None
+        if type == 'registration':
+            from auth.registration_limits import issue_code
+            confirmation_code = issue_code(user)
+            if commit:
+                db.session.commit()
+            return confirmation_code
         code = str((secrets.randbelow(900000) + 100000))
         confirmation_code = cls(email=email, code=code, type=type)
         db.session.add(confirmation_code)
@@ -302,6 +323,9 @@ class ConfirmationCode(db.Model):
         user = User.query.filter_by(email=email).populate_existing().with_for_update().first()
         if not user:
             return False
+        if type == 'registration':
+            from auth.registration_limits import verify_code
+            return verify_code(user, code, now=datetime.now(timezone.utc))
         confirmation_code = cls.query.filter_by(email=email, code=code, type=type).with_for_update().first()
         if not confirmation_code:
             return False

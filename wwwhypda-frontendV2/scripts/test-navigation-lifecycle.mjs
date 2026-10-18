@@ -403,13 +403,15 @@ test('existing guards conceal private children during loading and preserve role 
     let auth = { isAuth: null, isSuperuser: null };
     const dependencies = { react: { default: {} }, 'react/jsx-runtime': jsxRuntime,
         'react-router-dom': { Navigate: 'Navigate' }, '../useAuthCheck': { default: () => auth },
-        '../../commonFeatures/singleSkeleton': { default: 'Skeleton' } };
+        '../auth/login': { default: 'Login' } };
     const protectedRoute = await moduleFor('src/components/users/routes/protectedRoute.tsx', {}, dependencies);
     const superRoute = await moduleFor('src/components/users/routes/superProtectedRoute.tsx', {}, dependencies);
     const privateChild = { private: true };
     for (const guard of [protectedRoute.default, superRoute.default]) {
         const node = guard({ children: privateChild });
         assert.notEqual(node.props.children, privateChild);
+        assert.equal(node.type,'Login');
+        assert.equal(node.props.checkingAccess,true);
     }
     auth = { isAuth: false, isSuperuser: false };
     for (const guard of [protectedRoute.default, superRoute.default]) assert.equal(guard({ children: privateChild }).props.to, '/login');

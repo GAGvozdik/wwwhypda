@@ -139,7 +139,7 @@ def probe_targets(config, snapshot, digest, env, expected=None):
 
 def run(config, *, execute=False, dry_run=False, preflight=False, list_folders=False,
         rebaseline=False, reclose=None, probe=False, outside_window=False, env=None,
-        now=None, factory=imaplib.IMAP4_SSL, result=None, list_state=False, probe_expected=None, lookup_message_id=None):
+        now=None, factory=imaplib.IMAP4_SSL, result=None, list_state=False, probe_expected=None, lookup_message_id=None, observation_hook=None):
     now = now or datetime.now(UTC)
     if lookup_message_id is not None and (not list_state or not isinstance(lookup_message_id,str)
             or not re.fullmatch(ID,lookup_message_id)):
@@ -199,6 +199,8 @@ def run(config, *, execute=False, dry_run=False, preflight=False, list_folders=F
             result["pending"]=state.reconcile(current)
             counts,_,_=observe(state,current,now,reclose=reclose)
             result.update(counts)
+            if observation_hook is not None:
+                observation_hook(state, current, counts, now)
             if list_state:
                 # Explicit owner-only diagnostics, excluded from ordinary aggregate logs.
                 lookup = state.db.execute("SELECT token FROM members WHERE mid=?",

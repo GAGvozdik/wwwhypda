@@ -1,0 +1,19 @@
+[Unit]
+Description=WWHYPDA aggregate support retention reminder
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=wwwhypda-mail
+Group=wwwhypda-mail
+WorkingDirectory=/opt/wwwhypda/wwwhypda-backend
+EnvironmentFile=/etc/wwwhypda/mail-reminder.env
+ExecStart=/opt/wwwhypda/venv/bin/python -B -m maintenance.mail_reminder --send
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/wwwhypda-mail
+TimeoutStartSec=960

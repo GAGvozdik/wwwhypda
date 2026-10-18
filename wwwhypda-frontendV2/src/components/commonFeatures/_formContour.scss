@@ -1,0 +1,8 @@
+// Shared contour of authentication forms, their skeletons, dialogs and input fields.
+// Search/tree/table panels keep their existing styles.
+@mixin contour {
+    box-sizing: border-box;
+    border: 1px solid var(--form-contour-border);
+    border-radius: 25px;
+    box-shadow: 0 0.5rem 1.5rem var(--form-contour-shadow);
+}

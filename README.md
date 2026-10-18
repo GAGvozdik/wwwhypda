@@ -600,7 +600,7 @@ Gmail-инструкция выше сохраняется. Никакой timer
 ## Документы/PDF и принятие редакции — локальный цикл 008
 
 [Сборка трёх PDF и согласованный release](deploy/privacy/legal-pdf-release.md).
-Текущая локальная редакция 2026-10-18.1, текущие HTML и PDF имеют один источник; прежние PDF сохранены.
+Текущая локальная редакция 2026-10-18.2, текущие HTML и PDF имеют один источник; прежние PDF сохранены.
 При обновлении редакции login/active/refresh/direct APIs требуют явного принятия;
 история сохраняется отдельно, старые User факты не перезаписываются.
 Перед будущим rollout обязательна новая добавочная миграция users_db
@@ -615,3 +615,14 @@ auth.migrate_agreement_history и --check, пока она проверяетс�
 Процедура приватной связи цепочки с dueAt и напоминаниями — deploy/mail/ovh-cleanup.md.
 Новая редакция активируется после согласованного backend/frontend/PDF rollout;
 commit/git pull сами по себе не обновляют контейнеры и не требуют сброса acceptance.
+
+
+Локальный цикл 009: [изолированная приёмка](deploy/testing/stage009-preview.md),
+[manual maintenance](deploy/maintenance/README.md),
+[no-send reminders и будущий timer](deploy/mail/reminders.md).
+Dev frontend готовит отдельный maintenance assets volume из canonical sources;
+flag выключен по умолчанию. Рабочую users_db перед новым backend обновлять только
+добавочной auth.migrate_registration_limits с последующим --check, после обычной
+проверки migration/backup оператором. Этот цикл рабочую БД не изменяет.
+Настройка Gmail для обычной local development выше сохраняется; production
+reminder требует отдельно проверенный OVH transport и явное включение.

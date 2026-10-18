@@ -1,3 +1,4 @@
+import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
 import messages from '../../../common/error_messages.json';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
@@ -142,7 +143,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
     return (
         <div className={styles.authPage}>
 
-            <div className={styles.authForm}>
+            <AuthSkeleton loading={isLoading || isResending}><div className={styles.authForm}>
                 <div className={styles.formTitle}>{messages.forgot_password_title}</div>
                 {step === 1 && (
                     <form onSubmit={handleSendCode}>
@@ -225,7 +226,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                         />
                     </form>
                 )}
-            </div>
+            </div></AuthSkeleton>
         </div>
     );
 };

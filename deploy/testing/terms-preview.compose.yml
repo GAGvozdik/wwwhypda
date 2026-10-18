@@ -14,8 +14,11 @@ services:
       - ../../wwwhypda-frontendV2/scripts:/app/scripts:ro
       - ../../wwwhypda-frontendV2/package.json:/app/package.json:ro
       - ../../tmp/terms-preview:/out
+      - ../maintenance:/maintenance-source:ro
+      - ./loading-preview.tsx:/testing/loading-preview.tsx:ro
+      - ../../tmp/stage009-maintenance-public:/maintenance-out
     entrypoint: [sh, -c]
-    command: ['npm run build -- --mode development && cp -R dist/. /out/']
+    command: ['npm run build -- --mode development && MAINTENANCE_SOURCE=/maintenance-source MAINTENANCE_OUTPUT=/maintenance-out node scripts/build-maintenance.mjs && cp -R dist/. /out/ && node scripts/build-loading-preview.mjs']
   web:
     image: wwwhypda-dev-backend
     pull_policy: never
@@ -31,4 +34,19 @@ services:
     environment:
       PYTHONPATH: /code
       PYTHONDONTWRITEBYTECODE: '1'
+      STAGE009_AUTH_DELAY_SECONDS: '3'
     entrypoint: [python, -B, /testing/terms_preview.py]
+
+  nginx:
+    image: nginx:stable-alpine
+    pull_policy: never
+    ports: ['127.0.0.1:8083:80']
+    read_only: true
+    tmpfs: [/var/cache/nginx, /var/run, /tmp]
+    volumes:
+      - ./maintenance.preview.conf:/etc/nginx/nginx.conf:ro
+      - ../maintenance:/etc/nginx/maintenance:ro
+      - ../../tmp/stage009-maintenance-state:/maintenance-state:ro
+      - ../../tmp/stage009-maintenance-public:/maintenance-public:ro
+      - ../../tmp/terms-preview:/usr/share/nginx/html:ro
+      - ../../tmp/stage009-acme:/preview-acme:ro

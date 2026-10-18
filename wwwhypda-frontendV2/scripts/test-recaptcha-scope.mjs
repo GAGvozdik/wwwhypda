@@ -51,7 +51,7 @@ test('document exit rejects queued and in-flight tokens and prevents new executi
 
 test('each action stays bound to its actual form route, including activation and reset resends', () => {
     const expected = {
-        '/search': ['search'], '/login': ['login'],
+        '/search': ['search'], '/login': ['login', 'confirm_registration', 'resend_code'],
         '/register': ['register', 'confirm_registration', 'resend_code'],
         '/forgot-password': ['request_password_reset', 'resend_password_reset', 'confirm_password_reset'],
     };

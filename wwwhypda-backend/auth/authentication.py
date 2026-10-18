@@ -45,7 +45,7 @@ def login():
             return error_response
 
         started = time.monotonic()
-        user = User.login(data["email"], data["password"])
+        user = User.login(data["email"], data["password"], allow_pending=True)
         if not user:
             db.session.rollback()
             wait_for_failed_login(started)
@@ -55,10 +55,20 @@ def login():
         db.session.rollback()
         lock_users_transaction()
         current = User.query.filter_by(id=user["id"]).populate_existing().with_for_update().first()
-        if (current is None or not current.active or
+        if (current is None or
                 not hmac.compare_digest(user["account_version"], current.session_version())):
             db.session.rollback()
             wait_for_failed_login(started)
+            return jsonify(message="Invalid email or password", error="Unauthorized"), 404
+
+        if not current.active:
+            pending_registration = current.registration_completed is False
+            db.session.rollback()
+            # Waiting never retains the User/advisory transaction lock; no SMTP here.
+            wait_for_failed_login(started)
+            if pending_registration:
+                return jsonify(message=messages["email_confirmation_required"],
+                    code="email_confirmation_required"), 409
             return jsonify(message="Invalid email or password", error="Unauthorized"), 404
 
         if "terms_accepted_at" in data:
@@ -212,13 +222,16 @@ def confirm_registration():
         code = data["code"]
 
         if not ConfirmationCode.verify_code(email, code, "registration"):
+            db.session.commit()  # Persist wrong-attempt budget across IPs and workers.
             return jsonify(message="Invalid or expired confirmation code", error="Unauthorized"), 401
 
         user = User.query.filter_by(email=email, active=False, registration_completed=False).first()
         if user:
             user.active = True
             user.registration_completed = True
-            ConfirmationCode.query.filter_by(email=email, code=code, type="registration").delete()
+            ConfirmationCode.query.filter_by(email=email, type="registration").delete()
+            from auth.auth_models import RegistrationLimit
+            RegistrationLimit.query.filter_by(user_id=user.id).delete(synchronize_session=False)
             db.session.commit()
             return jsonify(message="Account successfully activated"), 200
         

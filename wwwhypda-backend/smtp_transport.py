@@ -32,22 +32,11 @@ def validate_mail_config(config):
 
 class VerifiedConnection(Connection):
     def configure_host(self):
-        context = ssl.create_default_context()
-        if self.mail.use_ssl:
-            host = smtplib.SMTP_SSL(self.mail.server, self.mail.port, context=context, timeout=3)
-        else:
-            host = smtplib.SMTP(self.mail.server, self.mail.port, timeout=3)
-        try:
-            # SMTP debug output can disclose authentication data and email bodies.
-            host.set_debuglevel(0)
-            if self.mail.use_tls:
-                host.starttls(context=context)
-            if self.mail.username and self.mail.password:
-                host.login(self.mail.username, self.mail.password)
-            return host
-        except Exception:
-            host.close()
-            raise
+        return open_verified_smtp({
+            "MAIL_USE_SSL": self.mail.use_ssl, "MAIL_USE_TLS": self.mail.use_tls,
+            "MAIL_SERVER": self.mail.server, "MAIL_PORT": self.mail.port,
+            "MAIL_USERNAME": self.mail.username, "MAIL_PASSWORD": self.mail.password,
+        })
 
 
 class VerifiedMail(Mail):
@@ -57,3 +46,22 @@ class VerifiedMail(Mail):
             return VerifiedConnection(app.extensions["mail"])
         except KeyError as error:
             raise RuntimeError("The current application was not configured with Flask-Mail") from error
+
+
+def open_verified_smtp(config):
+    context = ssl.create_default_context()
+    if config["MAIL_USE_SSL"]:
+        host = smtplib.SMTP_SSL(config["MAIL_SERVER"], config["MAIL_PORT"], context=context, timeout=3)
+    else:
+        host = smtplib.SMTP(config["MAIL_SERVER"], config["MAIL_PORT"], timeout=3)
+    try:
+        # SMTP debug output can disclose authentication data and email bodies.
+        host.set_debuglevel(0)
+        if config["MAIL_USE_TLS"]:
+            host.starttls(context=context)
+        if config["MAIL_USERNAME"] and config["MAIL_PASSWORD"]:
+            host.login(config["MAIL_USERNAME"], config["MAIL_PASSWORD"])
+        return host
+    except Exception:
+        host.close()
+        raise

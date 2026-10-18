@@ -1,0 +1,5 @@
+@use './formContour';
+.frame { width: min(22.5rem, 100%); position: relative; box-sizing: border-box; margin-block: auto; }
+.cover { @include formContour.contour; position: absolute; inset: 0; box-sizing: border-box; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+.cover > :global(.MuiCircularProgress-root) { position: relative; z-index: 1; }
+@media (prefers-reduced-motion: reduce) { .cover :global(.MuiSkeleton-root)::after { animation: none; } }

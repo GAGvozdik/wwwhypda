@@ -198,3 +198,10 @@
 .fullScreenContent > .bodyMenuItem {
     min-height: calc(100dvh - var(--shell-header-height, 3.5rem) + 1rem);
 }
+
+// A protected route temporarily shows the actual login while checking access.
+// Match that visible form's footer without enabling CAPTCHA on the route.
+// Reserve the actual notice's natural height/width, including wrapping. Removing
+// its box would shrink and recenter the entire legal column during auth checks.
+.guardRecaptchaNotice { visibility: hidden; }
+.container:has([data-auth-check='true']) .guardRecaptchaNotice { visibility: visible; }

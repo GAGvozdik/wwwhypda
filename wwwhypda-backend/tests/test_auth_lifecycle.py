@@ -46,6 +46,9 @@ class AuthLifecycleTests(unittest.TestCase):
 
     def test_boundary_and_both_code_types(self):
         for kind in ("registration", "password_reset"):
+            user=User.query.filter_by(email='owner@example.test').one()
+            user.active=kind!='registration';user.registration_completed=kind!='registration'
+            db.session.commit()
             record = self.code(119, kind)
             with patch("auth.auth_models.datetime") as clock:
                 clock.now.return_value = self.now

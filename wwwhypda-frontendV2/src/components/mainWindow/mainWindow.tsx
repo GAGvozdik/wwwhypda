@@ -1,3 +1,4 @@
+import MaintenanceNotice from '../commonFeatures/maintenanceNotice';
 import { useLayoutEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
@@ -61,6 +62,7 @@ export default function MainWindow() {
 
     if (isLegalPage) {
         return <div className={`${windowStyles.legalPage} ${isDarkTheme ? styles.dark : ''}`}>
+            <MaintenanceNotice legalPage />
             <header><Link to="/">{messages.back_to_website}</Link></header>
             <MainBody />
             <footer><LegalLinks /></footer>
@@ -73,6 +75,7 @@ export default function MainWindow() {
 
             <MainMenu />
             <MainBody />
+            <MaintenanceNotice />
 
             <footer className={`${windowStyles.underMenu} ${isDarkTheme ? styles.dark : ''}`}>
                 <div style={{fontWeight: '300'}}>{messages.website_credits}</div>
@@ -89,7 +92,7 @@ export default function MainWindow() {
                 </a>
 
                 <div className={windowStyles.legalDocuments}>
-                    {requiresRecaptcha(pathname) && <span>{messages.recaptcha_notice}</span>}
+                    <span className={requiresRecaptcha(pathname) ? undefined : windowStyles.guardRecaptchaNotice}>{messages.recaptcha_notice}</span>
                     <LegalLinks className={`${windowStyles.undermenuLink} ${isDarkTheme ? styles.dark : ''}`} />
                 </div>
 

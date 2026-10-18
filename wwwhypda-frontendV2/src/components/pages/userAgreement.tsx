@@ -23,6 +23,7 @@ const UserAgreement: React.FC = () => {
       </p>
 
       <h2 className={styles.sectionTitle}>2. User Accounts</h2>
+      <p className={styles.text}>If email confirmation is unfinished, signing in with the correct password lets you continue the same confirmation process. This does not open an ordinary account session or send another email automatically. Use your still-valid code or explicitly request a new one. Confirmation and resend use reCAPTCHA and server-side limits; a new code replaces earlier registration codes. After activation, sign in normally and, where required, review the current documents.</p>
       <p className={styles.text}>
         Registration is available only to people aged 18 or over. Users are responsible for maintaining the confidentiality of their credentials
         and for all activities performed under their account.

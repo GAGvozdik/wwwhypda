@@ -62,7 +62,8 @@ def delete_account_data(user):
         InputData.query.filter_by(editing_by=user.name).update(
             {InputData.editing_by: None}, synchronize_session=False)
     codes = ConfirmationCode.query.filter_by(email=user.email).delete(synchronize_session=False)
-    from auth.auth_models import UserAgreementAcceptance
+    from auth.auth_models import UserAgreementAcceptance, RegistrationLimit
+    RegistrationLimit.query.filter_by(user_id=user.id).delete(synchronize_session=False)
     UserAgreementAcceptance.query.filter_by(user_id=user.id).delete(synchronize_session=False)
     db.session.delete(user)
     return submissions, codes

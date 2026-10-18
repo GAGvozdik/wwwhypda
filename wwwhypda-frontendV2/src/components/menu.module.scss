@@ -26,6 +26,9 @@
     --body-color: #f2dcb3;
     --form-color: #fff2d9;
     --under-body-color: #4a96a3ca;
+    --form-contour-shadow: rgba(52, 59, 54, 0.14);
+    --form-contour-border: color-mix(in srgb, var(--tree-text) 30%, var(--form-color));
+    --field-contour-border: var(--form-contour-border);
     --drawer-icon: #f7f6fc;
     --menu-labels: #f7f6fc;
     --icons: white;
@@ -39,8 +42,8 @@
     --input: rgb(255, 255, 255);
     --field-background: var(--input);
     --field-border: var(--border);
-    --field-border-hover: var(--buttons);
-    --field-border-active: var(--step-color-active);
+    --field-border-hover: color-mix(in srgb, var(--tree-text) 45%, var(--form-color));
+    --field-border-active: color-mix(in srgb, var(--tree-text) 85%, var(--form-color));
     --input-hover: rgba(255, 255, 255, 0.543);
     --input-placeholder: grey;
     --input-text: #333333;
@@ -79,6 +82,9 @@
     --body-color: #191e24;
     --form-color: #242a31;
     --under-body-color: #2c333a;
+    --form-contour-shadow: var(--under-body-color);
+    --form-contour-border: var(--menu-border);
+    --field-contour-border: var(--menu-border);
     --drawer-icon: #949494;
     --drawer-icon-hover: #949494;
     --menu-labels: #949494;

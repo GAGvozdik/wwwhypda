@@ -1,4 +1,4 @@
-# Единый локальный комплект документов 2026-10-18.1
+# Единый локальный комплект документов 2026-10-18.2
 
 Три HTML React страницы остаются каноническим источником. Download PDF указывает
 на public/legal/<slug>-<version>.pdf. Регистрация и login reaccept используют одну
@@ -171,3 +171,15 @@ deploy/mail/ovh-cleanup.md, deploy/privacy/privacy-operations.md.
 baseline 58 errors/15 warnings. Owner UI/real IMAP приёмка действительна; revision 4
 не требует повторять неизменённые сценарии. Publication/VPS/timer не выполнялись.
 Архив: docs/archive/008-ovh-mail-cleanup.md. AVG для localhost остаётся включённым.
+
+
+### Локальная редакция 2026-10-18.2 — stage009
+Только фактически новые утверждения: продолжение регистрации после пароля без
+сессии/auto SMTP, explicit fresh CAPTCHA, общие challenge/issue counters и их
+retention, минимальный owner reminder. Выпущены новые три PDF, hashes/manifest
+и синхронные version constants. Все12страниц (3/7/2) просмотрены после render;
+полный текст совпадает с SSR, прежние опубликованные PDF SHA256 неизменны.
+Принятие в рабочей DB не сбрасывалось. Новая registration_limits migration
+добавляет технический budget, а не acceptance facts. Static maintenance snapshots
+строятся отдельно из тех же canonical sources и копируют все версии PDF.
+Stage009 user visual acceptance пока ожидается; VPS release не выполнялся.

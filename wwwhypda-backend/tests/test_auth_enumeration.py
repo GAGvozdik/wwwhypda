@@ -298,6 +298,9 @@ class AuthEnumerationTests(unittest.TestCase):
         with patch('auth.auth_models.check_password_hash',return_value=True) as check:
             for email in ('missing@example.test','unconfirmed@example.test','disabled@example.test'):
                 response=self.login(email)
-                self.assertEqual(response.status_code,404)
+                # A real pending password match may reveal only the continuation status.
+                self.assertEqual(response.status_code,409 if email=='unconfirmed@example.test' else 404)
+                if email=='unconfirmed@example.test':
+                    self.assertEqual(response.json['code'],'email_confirmation_required')
                 self.assertNotIn('Set-Cookie',response.headers)
             self.assertEqual(check.call_count,3)

@@ -41,7 +41,9 @@ services:
       - path: ./wwwhypda-frontendV2/.env.development
     volumes:
       - frontend_dev_dist:/frontend-dist
-    command: sh -c "npm run build -- --mode development && cp -r /app/dist/. /frontend-dist"
+      - maintenance_dev_public:/maintenance-public
+      - ./deploy/maintenance:/maintenance-source:ro
+    command: sh -c "npm run build -- --mode development && MAINTENANCE_SOURCE=/maintenance-source MAINTENANCE_OUTPUT=/maintenance-public node scripts/build-maintenance.mjs && cp -r /app/dist/. /frontend-dist"
     working_dir: /app
     restart: "no"
     networks:
@@ -112,6 +114,9 @@ services:
     volumes:
       - ./nginx.dev.conf:/etc/nginx/nginx.conf:ro
       - frontend_dev_dist:/usr/share/nginx/html:ro
+      - maintenance_dev_public:/maintenance-public:ro
+      - ./deploy/maintenance:/etc/nginx/maintenance:ro
+      - ./deploy/maintenance/state/dev:/maintenance-state:ro
     depends_on:
       backend:
         condition: service_started
@@ -123,4 +128,5 @@ services:
 
 volumes:
   frontend_dev_dist:
+  maintenance_dev_public:
   postgres_dev_data:

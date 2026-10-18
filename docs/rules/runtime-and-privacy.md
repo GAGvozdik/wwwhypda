@@ -69,7 +69,7 @@ Support-delete остаётся запрещён из-за межпапочно�
 
 ## Комплект документов и повторное принятие: локальная реализация 008
 
-- Единая редакция 2026-10-18.1 (прежние PDF сохранены): три React HTML страницы, backend/frontend константы,
+- Единая редакция 2026-10-18.2 (прежние PDF сохранены): три React HTML страницы, backend/frontend константы,
   RELEASES и public/legal/manifest.json синхронизированы. Download PDF анонимен;
   статические PDF генерируются из настоящего React SSR, без runtime PDF-сервиса.
   Root checks сверяют source digest/версии/отпечатки; npm build проверяет frontend
@@ -111,3 +111,27 @@ Support-delete остаётся запрещён из-за межпапочно�
   Message-ID и выбирает связанную строку по HMAC. Сырые IDs не хранятся/не печатаются
   и не передаются в argv/обычный aggregate log. Не использовать один непонятный handle
   вместо проверки связи с реальной цепочкой. Процедура: deploy/mail/ovh-cleanup.md.
+
+
+### Stage 009 — локальные напоминания и maintenance
+- Текущий комплект 2026-10-18.2: canonical HTML + новые 3 PDF/hash/manifest.
+  2026-10-18.1/16.1 PDF сохранены побайтно. Новая редакция не требует DB reset
+  принятия; действует существующий login/session explicit review и ledger.
+- Registration security counters описаны в Privacy; удаляются при activation/
+  account deletion/unfinished retention. Code TTL и account age не продлеваются
+  простым pending login/resend. Cookie описывает fresh continuation actions.
+- mail_reminder использует только свежую полную стабильную readonly observation
+  и тот же private SQLite lock/witness. За7дней, catch-up/overdue, per-closure dedup,
+  reopen cancellation. Письмо count/nearest due/Rome без переписки/handles/IDs.
+  --send + MAIL_REMINDER_ENABLED=true и exact authorized owner/OVH settings; default
+  no-send, log/suppression/fallback запрещены. Persistent bounded retries, не
+  exactly-once и не доказательство Inbox delivery. Support deletion остаётся
+  ручной максимум6calendar months; reminder не удаляет/не продлевает.
+  deploy/mail/reminders.md; ordinary compose up не включает timer.
+- Maintenance flag раздельный dev/preview/prod, atomic on/off/status, bind readonly
+  Nginx, survives recreate. Отдельные canonical static legal/PDF/font/palette
+  assets не зависят от dist/backend/DB. 503+RetryAfter/no-store, CSP/security headers
+  сохранены; HSTS value берётся из существующего production config. Полный отказ
+  VPS/Nginx/DNS этой страницей не покрывается. deploy/maintenance/README.md.
+- Stage009 работал только с synthetic local fixtures; VPS/env/secrets/реальные
+  письма/таймеры не изменены. Browser acceptance ещё ожидается, AVG включён.

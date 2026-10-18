@@ -2,7 +2,7 @@
 from datetime import datetime, timezone
 from flask import jsonify
 
-CURRENT_TERMS_VERSION = "2026-10-18.1"
+CURRENT_TERMS_VERSION = "2026-10-18.2"
 
 
 def current_version():

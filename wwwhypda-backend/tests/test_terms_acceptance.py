@@ -192,4 +192,7 @@ class TermsAcceptanceTests(unittest.TestCase):
         self.assertEqual(len(users),1)
         self.assertEqual(users[0].terms_version,CURRENT_TERMS_VERSION)
         self.assertIsNotNone(users[0].terms_accepted_at)
-        self.assertEqual(ConfirmationCode.query.filter_by(email="new@example.test").count(),2)
+        # Concurrent registration now leaves one current challenge, preserving the first acceptance.
+        self.assertEqual(ConfirmationCode.query.filter_by(email="new@example.test").count(),1)
+        from auth.auth_models import RegistrationLimit
+        self.assertEqual(RegistrationLimit.query.one().sent_count,2)

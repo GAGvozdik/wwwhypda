@@ -80,13 +80,12 @@ export default function MainMenu() {
                 </IconButton>
             </div> */}
 
-            <div className={`${styles.themeItem} ${styles.menuLabel}`}>
-                <IconButton onClick={toggleTheme} aria-label={isDarkTheme ? messages.light_theme : messages.dark_theme}>
-                    {isDarkTheme ?
-                        (<Brightness4Icon className={styles.themeIcon}/>)
-                            :
-                        (<Brightness7Icon className={styles.themeIcon}/>)
-                    }
+            <div className={`${styles.accountItem} ${styles.menuLabel}`}>
+                <IconButton component={Link} aria-label={messages.menu_account} to={
+                    // isSuperuser === null ? '/login' :
+                    isSuperuser ? '/superaccount' : '/account'
+                }>
+                        <AccountCircleIcon className={styles.themeIcon} />
                 </IconButton>
             </div>
 
@@ -96,12 +95,13 @@ export default function MainMenu() {
                 </IconButton>
             </div> */}
 
-            <div className={`${styles.accountItem} ${styles.menuLabel}`}>
-                <IconButton component={Link} aria-label={messages.menu_account} to={
-                    // isSuperuser === null ? '/login' :
-                    isSuperuser ? '/superaccount' : '/account'
-                }>
-                        <AccountCircleIcon className={styles.themeIcon} />
+            <div className={`${styles.themeItem} ${styles.menuLabel}`}>
+                <IconButton onClick={toggleTheme} aria-label={isDarkTheme ? messages.light_theme : messages.dark_theme}>
+                    {isDarkTheme ?
+                        (<Brightness4Icon className={styles.themeIcon}/>)
+                            :
+                        (<Brightness7Icon className={styles.themeIcon}/>)
+                    }
                 </IconButton>
             </div>
 

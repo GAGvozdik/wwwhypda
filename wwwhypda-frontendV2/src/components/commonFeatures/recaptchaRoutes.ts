@@ -1,7 +1,7 @@
 // Keep this list aligned with the routes that make CAPTCHA-protected API requests.
 const actions: Record<string, readonly string[]> = {
     '/search': ['search'],
-    '/login': ['login'],
+    '/login': ['login', 'confirm_registration', 'resend_code'],
     '/register': ['register', 'confirm_registration', 'resend_code'],
     '/forgot-password': ['request_password_reset', 'resend_password_reset', 'confirm_password_reset'],
 };
