@@ -3,15 +3,17 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createRequire} from 'node:module';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 import ts from 'typescript';
 const base=createRequire(import.meta.url), modules=new Map();
 function load(path) {
+    if (path.endsWith('.json')) return {default:JSON.parse(readFileSync(path,'utf8'))};
     if (modules.has(path)) return modules.get(path);
     if (path.endsWith('?raw')) return {default:readFileSync(path.slice(0,-4),'utf8')};
     const exports={}; modules.set(path,exports);
     const resolve=name => {
         if (!name.startsWith('.')) return base(name);
-        const absolute=new URL(name+(name.endsWith('?raw')?'':'.ts'),new URL(path,`file://${process.cwd()}/`));
+        const absolute=new URL(name+(name.endsWith('?raw')||name.endsWith('.json')?'':'.ts'),new URL(path,`file://${process.cwd()}/`));
         return load(absolute.pathname+absolute.search);
     };
     vm.runInNewContext(ts.transpileModule(readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
@@ -127,4 +129,30 @@ test('frozen catalogue snapshot contains complete unique names and stable source
     const extracted=rocks.extractRockNames(snapshot.map(node=>({...node,rt_id_parent:-2})));
     assert.equal(JSON.stringify(snapshot),JSON.stringify(extracted));
     assert.ok(snapshot.some(node=>node.rt_name.includes(',')));
+});
+
+test('frozen vector words match the exact catalogue and font, and measure by outline bounds at any size',()=>{
+    const snapshot=JSON.parse(readFileSync('src/components/logoLab/wordOutlines.snapshot.json','utf8'));
+    const names=JSON.parse(readFileSync('src/components/logoLab/rockNames.snapshot.json','utf8'));
+    assert.equal(snapshot.font_sha256,createHash('sha256').update(readFileSync('src/assets/fonts/Afacad_Flux/AfacadFlux-VariableFont_slnt,wght.ttf')).digest('hex'));
+    assert.equal(Object.keys(snapshot.words).length,names.length);
+    const outlines=load('src/components/logoLab/wordOutlines.ts');
+    for(const name of names){
+        const shape=snapshot.words[String(name.rt_id)];
+        assert.equal(shape.name,name.rt_name);
+        assert.ok(shape.path.length>0);
+        const [left,top,right,bottom]=shape.bounds;
+        assert.ok(right>left && bottom>top);
+        for(const size of [12,48,80,112,144]){
+            const measured=outlines.outlineMetrics(name.rt_name,size);
+            assert.ok(Math.abs(measured.left+measured.right-(right-left)*size/snapshot.unitsPerEm)<1e-9);
+            assert.ok(Math.abs(measured.ascent+measured.descent-(bottom-top)*size/snapshot.unitsPerEm)<1e-9);
+        }
+    }
+});
+test('C hole is enlarged and its filled-area centroid is aligned with the disc centre',()=>{
+    const spec=geometry.geometrySpec('C');
+    assert.equal(spec.scale,9.6);
+    assert.ok(Math.abs(spec.tx+53.480778027633036*spec.scale-700)<.001);
+    assert.ok(Math.abs(spec.ty+38.21029965343391*spec.scale-700)<.001);
 });

@@ -1,3 +1,5 @@
+Revision 8 актуальнее исторических проверок ниже: 18 вариантов (A3/A4/A6/A7/A8, B1–B8, C1–C3/C7/C8), только Multicolour, три reveal. Проверить увеличенную W и её оптическое положение, различимость новых больших слов, три анимации на SVG-контурах. Прежний отчёт о неподвижных координатах не подтвердил отсутствие видимого дрожания; владелец сообщил о его сохранении.
+
 
 Актуально с revision 6: 12 вариантов A3/A4/A6, B1–B6, C1–C3; три анимации Left to right (default), Word sequence, Centre outward. Soft reveal и A1/A2/A5/C4/C5/C6 исключены. Стенды используют штатный тёмный фон/controls сайта локально; переключение общей темы не должно осветлять lab. Предыдущие количества и матрицы ниже — история прежней реализации.
 # Stage 011 — локальная приёмка и проверка владельца
@@ -47,3 +49,9 @@ Revision 5: прежние проверки explicit light/dark surface отно
 Проверки revision 6: build pass после исправления завершающей запятой JSON; tests 7/7, scoped lint pass, полный lint — прежние 58 errors/14 warnings. В браузере подтверждены ровно 12 ожидаемых IDs, 3 режима без Soft reveal, default Left to right. При общей light теме lab/preview сохраняют dark rgb(25,30,36) и светлый ink; общая тема восстановлена dark. Replay A3 работает, boundsMismatches=0.
 
 Revision 7: только Multicolour, без выбора палитры. Build/scoped lint pass; полный lint — прежние 58 errors/14 warnings. В браузере 12 карточек, в A3 восемь цветов и только селект Animation; старые проверки выбора палитры больше не обязательны.
+
+Revision 8 local QA: build/scoped lint pass, tests9/9; полный lint — прежние58errors/14warnings. Все18:outside/overlaps/boundsMismatches=0, SVG text=0, duplicate IDs=0. 54mode/replay комбинации прошли с двойным запуском, геометрия не меняется. Крупные варианты после настройки: A7/A8=41/18 слов, B7/B8=97/50, C7/C8=73/36, нулевые пересечения/выходы/bounds mismatches. C7:16–27 слов в промежуточном opacity на четырёх кадрах, max pixel-bounds drift0.0000401CSSpx; screenshots осмотрены в протоколе. 390px без горизонтального overflow. Проверить в браузере владельца именно SVG-контуры после refresh нового bundle, а не прошлый SVG text renderer.
+
+Окончательные шесть крупных вариантов повторно проверены после настройки B8:18 mode/replay сочетаний с двойным запуском pass; все границы/пересечения0. Временный mobile viewport снят.
+
+Revision 9: меню Logo lab→/logo-lab, штатный MenuButton, видимость по LOGO_LAB_ENABLED. Browser: переходы с Home/Search pass, 390dark/320light без горизонтального overflow; screenshot меню осмотрен. Build/scoped lint pass, полный lint — прежние58errors/14warnings. Временный viewport снят, общая тема восстановлена dark.

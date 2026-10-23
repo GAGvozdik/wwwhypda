@@ -1,7 +1,8 @@
 import type { Box, Composition, Layout, RockName, WordPlacement } from './types';
 import { getOccupancy } from './geometry';
+import { outlineMetrics } from './wordOutlines';
 import { wordmarkRegion, wordmarkRegions } from './regions';
-export const PACKING_VERSION = 'afacad-600-grid-v5';
+export const PACKING_VERSION = 'afacad-600-outlines-v7';
 export const yieldToControls = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 export function intersects(a: Box, b: Box) {
     return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
@@ -11,33 +12,7 @@ export function padded(box: Box, gap: number): Box {
 }
 export interface Metrics { left: number; right: number; ascent: number; descent: number }
 export type Measure = (name: string, size: number) => Metrics;
-export function browserMeasure(): Measure & {dispose:()=>void} {
-    const context = document.createElement('canvas').getContext('2d')!;
-    const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
-    svg.setAttribute('aria-hidden','true');
-    Object.assign(svg.style,{position:'absolute',width:'0',height:'0',overflow:'hidden',visibility:'hidden'});
-    text.style.textRendering='geometricPrecision';
-    svg.append(text); document.body.append(svg);
-    const cache = new Map<string, Metrics>();
-    const measure: Measure = (name, size) => {
-        const key = `${size}:${name}`;
-        let value = cache.get(key);
-        if (!value) {
-            context.font = `600 ${size}px Afacad_Flux`;
-            const measured = context.measureText(name);
-            text.textContent=name; text.style.font=`600 ${size}px Afacad_Flux`;
-            const bounds=text.getBBox();
-            value = { left: Math.max(measured.actualBoundingBoxLeft,-bounds.x),
-                right: Math.max(measured.actualBoundingBoxRight,bounds.x+bounds.width),
-                ascent: Math.max(measured.actualBoundingBoxAscent,-bounds.y),
-                descent: Math.max(measured.actualBoundingBoxDescent,bounds.y+bounds.height) };
-            cache.set(key, value);
-        }
-        return value;
-    };
-    return Object.assign(measure,{dispose:()=>svg.remove()});
-}
+export const vectorMeasure: Measure = outlineMetrics;
 // Spatial hash indexes padded boxes, independent of glyph rendering and palette.
 export class BoxIndex {
     private cells = new Map<string, Box[]>();
@@ -65,7 +40,7 @@ export async function pack(config: Composition, names: RockName[], measure: Meas
     for (let sizeIndex = 0; sizeIndex < config.sizes.length; sizeIndex++) {
         const size = config.sizes[sizeIndex];
         attempts = 0;
-        const step = Math.max(7, Math.floor(size * .65 + config.gap));
+        const step = Math.max(7, config.gridStep ?? Math.floor(size * .65 + config.gap));
         const positions: {x:number;y:number;rank:number}[] = [];
         for (let y=step; y<mask.height-step; y+=step) for (let x=step; x<mask.width-step; x+=step) {
             let rank = y*mask.width+x;
@@ -114,7 +89,7 @@ export async function pack(config: Composition, names: RockName[], measure: Meas
             const preferVertical = direction.vertical < Math.round((direction.total+1)*target);
             let placed = false;
             for (const {name} of candidates) {
-                if ((uses.get(name.rt_id)||0) >= Math.max(3,Math.floor((words.length+1)*.045))) continue;
+                if ((uses.get(name.rt_id)||0) >= (config.repeatLimit ?? Math.max(3,Math.floor((words.length+1)*.045)))) continue;
                 for (const rotation of (preferVertical ? [90] : [0]) as (0|90)[]) {
                     attempts++;
                     const metrics = measure(name.rt_name,size);

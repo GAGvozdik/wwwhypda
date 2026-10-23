@@ -2,7 +2,7 @@ import wSvg from '../../logos/logo/W.svg?raw';
 import wordmarkSvg from '../../logos/logo/WWHYPDA.svg?raw';
 import type { Box, Group } from './types';
 
-export const GEOMETRY_VERSION = 'svg-original-v2';
+export const GEOMETRY_VERSION = 'svg-original-v3-optical-c';
 // These checked assets use absolute M/L/H/V/C/Z paths and no transforms.
 // For the wordmark take the filled silhouette IN the mask, never its outer stroke.
 export function assetPath(svg: string) {
@@ -15,7 +15,8 @@ export const W_PATH = assetPath(wSvg);
 export const WORDMARK_PATH = assetPath(wordmarkSvg);
 export function geometrySpec(group: Group) {
     if (group === 'B') return { width: 5800, height: 1050, path: WORDMARK_PATH, scale: 10, tx: 0, ty: 0 };
-    if (group === 'C') return { width: 1400, height: 1400, path: W_PATH, scale: 8, tx: 270, ty: 358 };
+    // W area centroid (53.480778, 38.210300), enlarged 20% and optically centred at 700,700.
+    if (group === 'C') return { width: 1400, height: 1400, path: W_PATH, scale: 9.6, tx: 186.585, ty: 333.181 };
     return { width: 1400, height: 1120, path: W_PATH, scale: 12.5, tx: 25, ty: 25 };
 }
 export interface Occupancy { width: number; height: number; contains: (box: Box) => boolean }
@@ -64,7 +65,7 @@ export function getOccupancy(group: Group): Occupancy {
         // Known solid/empty points validate the original nonzero winding, counters and subtraction.
     const fixtures: [number,number,boolean][] = group === 'A' ? [[10,10,true],[54,80,false],[-2,10,false]] :
         group === 'B' ? [[370,40,true],[390,40,false],[435,50,true],[460,50,false],[537,74,true],[537,60,false]] :
-        [[10,10,false],[700,100,true],[450,500,false]];
+        [[10,10,false],[700,100,true],[spec.tx+10*spec.scale,spec.ty+10*spec.scale,false]];
     for (const [x,y,expected] of fixtures) {
         const point = group === 'A' ? {x:25+x*12.5,y:25+y*12.5} : group === 'B' ? {x:x*10,y:y*10} : {x,y};
         if (mask.contains({...point,width:1,height:1}) !== expected) throw new Error(`Invalid ${group} geometry at ${x},${y}`);

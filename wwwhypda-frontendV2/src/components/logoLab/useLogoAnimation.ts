@@ -6,7 +6,7 @@ export function useLogoAnimation(ref: RefObject<SVGSVGElement | null>, layout: L
     useEffect(() => {
         const svg=ref.current;
         if (!svg) return;
-        // Animate only wrapper attributes: text coordinates and SVG rotation stay untouched.
+        // Animate only wrapper attributes: outline geometry and SVG rotation stay untouched.
         const elements=Array.from(svg.querySelectorAll<SVGGElement>('[data-word-reveal]'));
         const motion=window.matchMedia('(prefers-reduced-motion: reduce)');
         const timeline=gsap.timeline({paused:true});

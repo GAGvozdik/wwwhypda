@@ -1,6 +1,7 @@
 // import * as React from 'react';
 
 import messages from '../../common/error_messages.json';
+import { LOGO_LAB_ENABLED } from '../../common/experimentalFeatures';
 import MenuButtuon from './menuButton';
 // import {useEffect, useState, useRef} from 'react';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -51,6 +52,9 @@ export default function MainMenu() {
                 {messages.menu_search}
             </MenuButtuon>
 
+            {LOGO_LAB_ENABLED && <MenuButtuon className={styles.menuButton} path="/logo-lab">
+                {messages.menu_logo_lab}
+            </MenuButtuon>}
             {/* <MenuButtuon
                 className={`${styles.contributeItem} ${styles.menuButton}`}
                 path={'contribute'}

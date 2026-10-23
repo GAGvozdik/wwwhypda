@@ -28,7 +28,7 @@ export default function LogoLabCard({composition,names}: Props) {
     },[composition,names,retry]);
     const diagnostics=useMemo(()=>layout ? diagnoseLayout(layout,composition) : undefined,[layout,composition]);
     const change=(value:CardSettings)=>setSettings({...value,replayVersion:0});
-    return <article ref={ref} className={styles.card} data-card={composition.id} data-layout-diagnostics={diagnostics ? JSON.stringify(diagnostics) : undefined}>
+    return <article ref={ref} className={`${styles.card} ${composition.group==="B" && /[78]$/.test(composition.id) ? styles.wideCard : ""}`} data-card={composition.id} data-layout-diagnostics={diagnostics ? JSON.stringify(diagnostics) : undefined}>
         <h3>{composition.id} · {title}</h3>
         <p>{messages[`logo_lab_composition_${composition.id.toLowerCase()}_description` as keyof typeof messages]}</p>
         <div className={styles.preview} aria-busy={!layout && !error}>

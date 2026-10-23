@@ -173,21 +173,19 @@ margin-left:auto у accountItem сохраняет выравнивание па
 
 - Публичный `/logo-lab` включается `LOGO_LAB_ENABLED` в common/experimentalFeatures.ts;
   после изменения нужен rebuild. При false — существующий NotFound, без mount lab,
-  API каталога и загрузки lab chunk. Lazy импорт, ссылки в меню нет; это выключатель
+  API каталога и загрузки lab chunk. Lazy импорт; при LOGO_LAB_ENABLED=true пункт Logo lab в основном меню ведёт на /logo-lab; это выключатель
   эксперимента, не access control. Redux/auth/CAPTCHA/transport не менялись.
 - Для lab используется статический rockNames.snapshot.json: 85 полных имён и ID из
   публичного Search, снимок от 2026-10-23. Запросов каталога и автоматического обновления
   на lab нет; Search/дерево используют актуальный API без изменений. При создании снимка
   исключены parent=-1 и узлы с детьми; trim только краёв, стабильные ordinal sort/dedup,
   moderation status не фильтруется. Loading/error/retry и abort относятся к подготовке
-  раскладок/шрифта; пустой снимок показывает empty. Данные снимка проверяются unit test.
+  раскладок; пустой снимок показывает empty. Данные снимка проверяются unit test.
 - SVG paths исходных W.svg/WWHYPDA.svg, включая nonzero countersP/D/A. C — диск минус W,
   а не заливка поверх слов. Packing принимает целые padded bbox через raster integral
-  с erosion; пространственный индекс исключает пересечения. ТекстSVG остаётся текстом.
-- Шрифт Afacad_Flux600 загружается до расчёта. Canvas actual bounds расширяются SVG
-  getBBox; geometricPrecision делает метрики независимыми от уменьшенного hinting.
-  После mount/resize проверяется getBBox, packing заново не запускается.
-- 12 configs различаются rows/columns/blocks/anchors/cells, квотами направлений,
+  с erosion; пространственный индекс исключает пересечения. Слова рисуются SVG-контурами, полные имена сохранены в title.
+- Afacad Flux600 заранее преобразован в wordOutlines.snapshot.json. Packing использует bounds этих же контуров; font loading/canvas/text hinting не участвуют. После mount/resize проверяется getBBox обёрток use, packing заново не запускается.
+- 18 configs различаются rows/columns/blocks/anchors/cells, квотами направлений,
   промежутками и размерами. Обход чередует регионы, чтобы bounded budget не оставлял
   только верхнюю половину. Кэш по каталогу/версии геометрии/шрифта/packing/config ID,
   очередь одна с yield/abort; palette/theme/replay/resize не являются ключами.
@@ -195,7 +193,7 @@ margin-left:auto у accountItem сохраняет выравнивание па
   используют тёмный набор; lab локально применяет существующий класс dark из menu.module.scss. Фон --body-color, без отдельного surface selector; тема остальных страниц не изменяется.
   Только Multicolour (8 цветов), без селекта палитры. Проверенные inks>=4.5:1.
 - Новые карточки открываются в финальном состоянии. Три opacity reveal (left/sequence/centre; default left) конечны,
-  меняют только атрибут opacity обёрток слов, не CSS/transform самого text; settings останавливают replay и показывают итог. Timeline и
+  меняют только атрибут opacity обёрток слов, не геометрию/transform контуров; settings останавливают replay и показывают итог. Timeline и
   media/resize listeners очищаются; reduced motion сразу показывает все слова.
 - Логотипы показываются в карточках с независимой анимацией на штатном тёмном фоне сайта. Кнопки используют общий submitButton, селекты — inputField из menu.module.scss; UI полностью английский (Play animation). Увеличенный просмотр и его controls удалены по указанию владельца.
 - AnimatedLogo/Home не изменены. Lab-only wrapper до replay рисует статичный snapshot
@@ -205,4 +203,6 @@ margin-left:auto у accountItem сохраняет выравнивание па
 - Реализация ещё проходит owner QA. Точные результаты и оставшиеся Firefox/media/
   zoom/roles/smoke/artifacts проверки: docs/artifacts/stage-011/acceptance.md.
 
-- По revision 6 в lab оставлены 12 вариантов с сохранением IDs: A3/A4/A6, B1–B6, C1–C3. Soft reveal исключён.
+- По revision 6 в lab после дополнения revision 8 доступны 18 вариантов: A3/A4/A6/A7/A8, B1–B8, C1–C3/C7/C8. Soft reveal исключён.
+
+- Revision 8: в новых композициях названия рисуются SVG defs/use из wordOutlines.snapshot.json (Afacad Flux600, wght600/slnt0). Packing берёт bounds из того же snapshot; renderer не использует живой text/font/canvas. Snapshot генерируется scripts/generate-logo-word-paths.py, без новых browser deps. SVG title сохраняет полное имя. Контуры и transforms статичны; reveal меняет только opacity обёртки. C: W scale9.6/translate186.585,333.181, центроид площади700,700. A7/A8, B7/B8, C7/C8 имеют крупные/очень крупные слова; B7/B8 — полный ряд.

@@ -19,7 +19,7 @@ export function diagnoseLayout(layout: Layout, config: Composition) {
             (word.bbox.x>=layout.width/2 ? 1 : 0)+(word.bbox.y>=layout.height/2 ? 2 : 0);
         regions[region]++;
     }
-    return { id:layout.id,words:layout.words.length,nodes:layout.words.length+2,unique:counts.size,
+    return { id:layout.id,words:layout.words.length,nodes:layout.words.length*3+counts.size+3,unique:counts.size,
         vertical:vertical/Math.max(1,layout.words.length),outside,overlaps,
         maxRepeat:Math.max(0,...counts.values())/Math.max(1,layout.words.length),
         sizes:[...new Set(layout.words.map(word => word.fontSize))],regions,

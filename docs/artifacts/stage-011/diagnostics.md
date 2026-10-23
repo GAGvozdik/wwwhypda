@@ -43,3 +43,24 @@ B1–B6,C1–C6 соблюдены целевые направления с до
 в протоколе browser tool; файловые изображения/контактный лист ещё требуется сохранить.
 
 Revision 3: тот же набор из 85 публичных названий сохранён в rockNames.snapshot.json без автоматического обновления. Исторические агрегаты выше описывают этот набор; после перехода C6 повторно проверена: 255 слов, те же регионы/bboxCoverage, outside=overlaps=boundsMismatches=0.
+
+## Revision 8 — SVG outlines and larger studies
+
+C W scale9.6, translate186.585,333.181; filled-area centroid aligned with700,700.
+All 18 initial outline layouts: outside=overlaps=boundsMismatches=0.
+The six large variants were then refined without changing renderer/animation:
+gridStep A7/A8=20, B7/B8=16, C7=20/C8=24, repeatLimit12.
+
+| ID | Words | SVG sizes | Outside / overlaps / bounds mismatch |
+| --- | ---: | --- | --- |
+| A7 | 41 | 64/56/48 | 0/0/0 |
+| A8 | 18 | 112/96/80 | 0/0/0 |
+| B7 | 97 | 80/64/56 | 0/0/0 |
+| B8 | 50 | 112/96/80 | 0/0/0 |
+| C7 | 73 | 64/56/48 | 0/0/0 |
+| C8 | 36 | 112/96/80 | 0/0/0 |
+
+54 reveal/replay combinations (double replay): static transforms/hrefs, no duplicate IDs,
+no live SVG text. Mid-animation C7 screen bounds drift <=0.0000401 CSS px with16–27
+partially visible words in four captured frames. This is float rounding, not a glyph shift.
+Screenshots inspected in browser protocol. Owner-browser visual QA remains separate.

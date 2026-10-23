@@ -16,7 +16,7 @@
 }
 .preview { height: 23rem; display: flex; align-items: center; justify-content: center; border-radius: .5rem; padding: .75rem; box-sizing: border-box; overflow: hidden; }
 .wordLogo { width: 100%; height: 100%; display: block; overflow: visible; font-family: Afacad_Flux; text-rendering: geometricPrecision; }
-.wordLogo text { fill: var(--word-color); }
+.wordLogo [data-word-shape] { fill: var(--word-color); }
 .controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-block: 1rem; }
 .control { display: flex; flex: 1 1 10rem; min-width: 0; flex-direction: column; gap: .35rem; }
 .controls select { width: 100%; margin: 0; box-sizing: border-box; }
@@ -29,3 +29,6 @@
 .original > div { flex: 1; min-width: 0; }
 @media(max-width: 65rem) { .grid { grid-template-columns: minmax(0,1fr); } }
 @media(max-width: 30rem) { .page { padding: .5rem; } .card { padding: .75rem; } .page h1 { font-size: var(--head-font-size); } .preview { height: 18rem; } .original { height: 7rem; } }
+
+// Larger wordmarks span both columns so their larger words remain readable in the overview.
+.wideCard { grid-column: 1 / -1; }
