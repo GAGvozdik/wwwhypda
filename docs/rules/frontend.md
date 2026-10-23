@@ -187,20 +187,22 @@ margin-left:auto у accountItem сохраняет выравнивание па
 - Шрифт Afacad_Flux600 загружается до расчёта. Canvas actual bounds расширяются SVG
   getBBox; geometricPrecision делает метрики независимыми от уменьшенного hinting.
   После mount/resize проверяется getBBox, packing заново не запускается.
-- 18 configs различаются rows/columns/blocks/anchors/cells/sectors, квотами направлений,
+- 12 configs различаются rows/columns/blocks/anchors/cells, квотами направлений,
   промежутками и размерами. Обход чередует регионы, чтобы bounded budget не оставлял
   только верхнюю половину. Кэш по каталогу/версии геометрии/шрифта/packing/config ID,
   очередь одна с yield/abort; palette/theme/replay/resize не являются ключами.
 - Новые palette/size tokens только в menu.module.scss. Наборы inks
-  выбираются текущей темой сайта; preview и карточки используют --body-color без отдельного surface selector.
-  Mono1/duo2/tones6 оттенков двух семейств/multi8 цветов. Проверенные inks>=4.5:1.
-- Новые карточки открываются в финальном состоянии. Четыре opacity reveal конечны,
+  используют тёмный набор; lab локально применяет существующий класс dark из menu.module.scss. Фон --body-color, без отдельного surface selector; тема остальных страниц не изменяется.
+  Только Multicolour (8 цветов), без селекта палитры. Проверенные inks>=4.5:1.
+- Новые карточки открываются в финальном состоянии. Три opacity reveal (left/sequence/centre; default left) конечны,
   меняют только атрибут opacity обёрток слов, не CSS/transform самого text; settings останавливают replay и показывают итог. Timeline и
   media/resize listeners очищаются; reduced motion сразу показывает все слова.
-- Логотипы показываются в карточках с независимыми палитрой и анимацией на фоне текущей темы сайта. Кнопки используют общий submitButton, селекты — inputField из menu.module.scss; UI полностью английский (Play animation). Увеличенный просмотр и его controls удалены по указанию владельца.
+- Логотипы показываются в карточках с независимой анимацией на штатном тёмном фоне сайта. Кнопки используют общий submitButton, селекты — inputField из menu.module.scss; UI полностью английский (Play animation). Увеличенный просмотр и его controls удалены по указанию владельца.
 - AnimatedLogo/Home не изменены. Lab-only wrapper до replay рисует статичный snapshot
   активных исходных paths/masks/transforms, затем remount AnimatedLogo; W mark добавлен
   только в lab по решению владельца. Прежние GSAP warnings отсутствующего знака в
   AnimatedLogo сохраняются, не скрываются глобальным подавлением предупреждений.
 - Реализация ещё проходит owner QA. Точные результаты и оставшиеся Firefox/media/
   zoom/roles/smoke/artifacts проверки: docs/artifacts/stage-011/acceptance.md.
+
+- По revision 6 в lab оставлены 12 вариантов с сохранением IDs: A3/A4/A6, B1–B6, C1–C3. Soft reveal исключён.

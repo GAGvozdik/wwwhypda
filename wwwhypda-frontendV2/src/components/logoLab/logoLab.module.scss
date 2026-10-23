@@ -1,4 +1,4 @@
-.page { max-width: 96rem; width: 100%; min-width: 0; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; color: var(--tree-text); font-size: var(--main-font-size); }
+.page { max-width: 96rem; width: 100%; min-width: 0; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; color: var(--tree-text); background: var(--body-color); font-size: var(--main-font-size); }
 .page h1 { font-size: var(--home-title-font-size); margin: .3em 0; }
 .page h2 { font-size: var(--head-font-size); }
 .page h3 { font-size: var(--menu-font-size); margin: 0; }
@@ -12,19 +12,11 @@
 }
 .preview {
 
-    @for $i from 1 through 10 { --ink-#{$i}: var(--logo-lab-ink-light-#{$i}); }
-}
-:global(:root[data-theme='dark']) .preview {
-
     @for $i from 1 through 10 { --ink-#{$i}: var(--logo-lab-ink-dark-#{$i}); }
 }
 .preview { height: 23rem; display: flex; align-items: center; justify-content: center; border-radius: .5rem; padding: .75rem; box-sizing: border-box; overflow: hidden; }
 .wordLogo { width: 100%; height: 100%; display: block; overflow: visible; font-family: Afacad_Flux; text-rendering: geometricPrecision; }
 .wordLogo text { fill: var(--word-color); }
-// Tones uses two hue families; multi adds neutral and clay accents.
-.wordLogo[data-palette='tones'] {
-    --ink-5: var(--ink-9); --ink-6: var(--ink-10); --ink-7: var(--ink-3); --ink-8: var(--ink-4);
-}
 .controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-block: 1rem; }
 .control { display: flex; flex: 1 1 10rem; min-width: 0; flex-direction: column; gap: .35rem; }
 .controls select { width: 100%; margin: 0; box-sizing: border-box; }

@@ -16,7 +16,7 @@ export function useLogoAnimation(ref: RefObject<SVGSVGElement | null>, layout: L
         else {
             gsap.set(elements,{attr:{opacity:0}});
             layout.words.forEach((word,index)=>{
-                const delay=mode==='soft' ? 0 : mode==='left' ? word.bbox.x/layout.width*1.2 :
+                const delay=mode==='left' ? word.bbox.x/layout.width*1.2 :
                     mode==='centre' ? Math.hypot((word.bbox.x-layout.width/2)/layout.width,(word.bbox.y-layout.height/2)/layout.height)*2 :
                     index/Math.max(1,layout.words.length-1)*1.6;
                 timeline.to(elements[index],{attr:{opacity:1},duration:.75,ease:'power2.inOut'},delay);

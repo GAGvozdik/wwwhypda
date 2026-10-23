@@ -93,9 +93,9 @@ function animationHarness(reduced) {
         {exports,require,window:{matchMedia:()=>media}});
     return {run:exports.useLogoAnimation,effects,timelines,listeners,media};
 }
-test('four finite reveal modes preserve coordinates, replay is local and reduced motion finishes immediately and on change',()=>{
+test('three finite reveal modes preserve coordinates, replay is local and reduced motion finishes immediately and on change',()=>{
     const layout={width:100,height:100,words:[{bbox:{x:10,y:10}},{bbox:{x:40,y:30}},{bbox:{x:80,y:60}}]};
-    for(const mode of ['soft','left','sequence','centre']) {
+    for(const mode of ['left','sequence','centre']) {
         const harness=animationHarness(false),elements=[{opacity:1},{opacity:1},{opacity:1}];
         const ref={current:{querySelectorAll:selector=>{assert.equal(selector,'[data-word-reveal]');return elements;}}};
         harness.run(ref,layout,1,mode);
@@ -111,7 +111,7 @@ test('four finite reveal modes preserve coordinates, replay is local and reduced
         harness.effects[1]();
     }
     const reduced=animationHarness(true),elements=[{opacity:0},{opacity:0},{opacity:0}];
-    reduced.run({current:{querySelectorAll:()=>elements}},layout,1,'soft');
+    reduced.run({current:{querySelectorAll:()=>elements}},layout,1,'left');
     assert.equal(reduced.timelines[0].played,false);assert.ok(elements.every(element=>element.opacity===1));
     reduced.effects[0]();assert.equal(reduced.listeners.size,0);
     const initial=animationHarness(false);

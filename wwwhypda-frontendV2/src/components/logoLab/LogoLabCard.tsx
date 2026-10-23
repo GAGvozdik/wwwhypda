@@ -11,7 +11,7 @@ interface Props { composition: Composition; names: RockName[] }
 export default function LogoLabCard({composition,names}: Props) {
     const ref=useRef<HTMLElement>(null);
     const [layout,setLayout]=useState<Layout>(),[error,setError]=useState(false),[retry,setRetry]=useState(0);
-    const [settings,setSettings]=useState<CardSettings>({palette:'mono',reveal:'soft',replayVersion:0});
+    const [settings,setSettings]=useState<CardSettings>({reveal:'left',replayVersion:0});
     const title=messages[`logo_lab_composition_${composition.id.toLowerCase()}_name` as keyof typeof messages];
     useEffect(()=>{
         const controller=new AbortController();
@@ -32,7 +32,7 @@ export default function LogoLabCard({composition,names}: Props) {
         <h3>{composition.id} · {title}</h3>
         <p>{messages[`logo_lab_composition_${composition.id.toLowerCase()}_description` as keyof typeof messages]}</p>
         <div className={styles.preview} aria-busy={!layout && !error}>
-            {layout ? <WordLogo layout={layout} palette={settings.palette} reveal={settings.reveal} replay={settings.replayVersion} title={title}/> :
+            {layout ? <WordLogo layout={layout} reveal={settings.reveal} replay={settings.replayVersion} title={title}/> :
                 <p role="status">{error ? messages.logo_lab_failed : messages.logo_lab_loading}</p>}
         </div>
         {error && <button type="button" className={siteStyles.submitButton} onClick={()=>{setError(false);setRetry(value=>value+1);}}>{messages.maintenance_retry}</button>}

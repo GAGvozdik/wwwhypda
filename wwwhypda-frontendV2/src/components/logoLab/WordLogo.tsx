@@ -1,10 +1,10 @@
 import { useId, useLayoutEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
-import type { Layout, PaletteMode, RevealMode } from './types';
+import type { Layout, RevealMode } from './types';
 import { useLogoAnimation } from './useLogoAnimation';
 import styles from './logoLab.module.scss';
-interface Props { layout: Layout; palette: PaletteMode; reveal: RevealMode; replay: number; title: string }
-export default function WordLogo({layout,palette,reveal,replay,title}: Props) {
+interface Props { layout: Layout; reveal: RevealMode; replay: number; title: string }
+export default function WordLogo({layout,reveal,replay,title}: Props) {
     const ref=useRef<SVGSVGElement>(null), titleId=useId();
     useLogoAnimation(ref,layout,replay,reveal);
     useLayoutEffect(()=>{
@@ -30,12 +30,12 @@ export default function WordLogo({layout,palette,reveal,replay,title}: Props) {
         return ()=>observer.disconnect();
     },[layout]);
     return <svg ref={ref} viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-labelledby={titleId}
-        className={styles.wordLogo} data-composition={layout.id} data-palette={palette}>
+        className={styles.wordLogo} data-composition={layout.id} data-palette="multi">
         <title id={titleId}>{title}</title>
         {layout.words.map(word=><g key={word.order} data-word-reveal=""><text x={word.x} y={word.y}
             transform={word.rotation ? `rotate(90 ${word.x} ${word.y})` : undefined}
             style={{fontSize:`var(--logo-lab-word-${word.fontSize})`,fontWeight:word.weight,
-                '--word-color':`var(--ink-${palette==='mono' ? 1 : palette==='duo' ? word.colorSlot%2+1 : word.colorSlot+1})`} as CSSProperties}
+                '--word-color':`var(--ink-${word.colorSlot+1})`} as CSSProperties}
             data-order={word.order} data-rock-id={word.rt_id}>{word.rt_name}</text></g>)}
     </svg>;
 }

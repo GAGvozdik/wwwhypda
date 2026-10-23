@@ -5,12 +5,13 @@ import LogoLabCard from './LogoLabCard';
 import OriginalLogoPreview from './OriginalLogoPreview';
 import messages from '../../common/error_messages.json';
 import styles from './logoLab.module.scss';
+import siteStyles from '../menu.module.scss';
 
 // A deliberately frozen public-catalogue snapshot. Search continues to use the live API.
 const names: RockName[] = rockNamesSnapshot;
 
 export default function LogoLabPage() {
-    return <main className={styles.page}>
+    return <main className={`${styles.page} ${siteStyles.dark}`}>
         <header><p className={styles.eyebrow}>WWHYPDA</p><h1>{messages.logo_lab_title}</h1><p>{messages.logo_lab_intro}</p></header>
         <OriginalLogoPreview/>
         {!names.length ? <p role="status">{messages.logo_lab_empty}</p> :

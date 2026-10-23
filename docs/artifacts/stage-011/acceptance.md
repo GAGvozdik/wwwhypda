@@ -1,3 +1,5 @@
+
+Актуально с revision 6: 12 вариантов A3/A4/A6, B1–B6, C1–C3; три анимации Left to right (default), Word sequence, Centre outward. Soft reveal и A1/A2/A5/C4/C5/C6 исключены. Стенды используют штатный тёмный фон/controls сайта локально; переключение общей темы не должно осветлять lab. Предыдущие количества и матрицы ниже — история прежней реализации.
 # Stage 011 — локальная приёмка и проверка владельца
 
 Статус: локальная реализация есть; финальная приёмка не завершена, план активен.
@@ -39,3 +41,9 @@ Revision 4: Enlarge и весь увеличенный просмотр с zoom/
 Проверка revision 4: build и scoped lint LogoLabCard прошли, tests 7/7, полный lint остаётся 58 errors/14 warnings. Обновлённый localhost bundle: 18 карточек, Enlarge/zoom/Fit=0, dialog=0; A1 содержит palette/reveal/surface и replay, запуск проверен в браузере.
 
 Revision 5: прежние проверки explicit light/dark surface относятся к предыдущей реализации. Сейчас отдельного выбора подложки нет: preview использует --body-color общей темы, палитра автоматически выбирает соответствующие inks. Все подписи английские. Для проверки подёргивания повторить четыре reveal (в том числе replay во время движения) на своём браузере/Vercel; SVG text больше не является целью анимации, opacity меняется только у обёртки через AttrPlugin.
+
+Локальная проверка revision 5: 18 карточек; кириллицы в main нет, surface controls отсутствуют; кнопки/селекты используют общие CSS classes. Body/preview: light rgb(242,220,179), dark rgb(25,30,36). A2: x/y/rotation/style не менялись при четырёх replay, opacity обёрток принимает промежуточные значения; boundsMismatches=0. На 390px controls помещаются без горизонтального overflow. Скриншот недоступен (браузер отказал в захвате); оценку подёргивания на Vercel владельцем не считать выполненной.
+
+Проверки revision 6: build pass после исправления завершающей запятой JSON; tests 7/7, scoped lint pass, полный lint — прежние 58 errors/14 warnings. В браузере подтверждены ровно 12 ожидаемых IDs, 3 режима без Soft reveal, default Left to right. При общей light теме lab/preview сохраняют dark rgb(25,30,36) и светлый ink; общая тема восстановлена dark. Replay A3 работает, boundsMismatches=0.
+
+Revision 7: только Multicolour, без выбора палитры. Build/scoped lint pass; полный lint — прежние 58 errors/14 warnings. В браузере 12 карточек, в A3 восемь цветов и только селект Animation; старые проверки выбора палитры больше не обязательны.

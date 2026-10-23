@@ -648,9 +648,9 @@ It uses a frozen snapshot of complete public Search leaf names in
 `wwwhypda-frontendV2/src/components/logoLab/rockNames.snapshot.json` (85 names captured
 on 2026-10-23). The JSON is bundled with the lazy lab page: no catalogue request or
 automatic update is made. Search keeps using the live server catalogue. The page contains a lab-only W mark with the existing Home wordmark,
-six W studies (A1–A6), six WWHYPDA studies (B1–B6), and six disc studies with a
-transparent W (C1–C6). Each study has four palettes, four finite reveals, an
-replay in each card, using the current site background. Controls reuse the site button and field styles; all labels are English.
+three W studies (A3/A4/A6), six WWHYPDA studies (B1–B6), and three disc studies with a
+transparent W (C1–C3). Each study uses Multicolour and three finite reveals, with
+replay in each card (Left to right by default). Stands use the existing site dark theme locally, independently of the surrounding page theme. Controls reuse the site button and field styles; all labels are English.
 
 The single switch is `LOGO_LAB_ENABLED` in
 `wwwhypda-frontendV2/src/common/experimentalFeatures.ts` (currently `true`).
