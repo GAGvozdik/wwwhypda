@@ -1,3 +1,5 @@
+Revision10: актуальны15 композиций A3/A4/A6/A9, B1–B6/B9, C1–C3/C9. A7/A8/B7/B8/C7/C8 удалены. A9/B9/C9 — промежуточные размеры; сведения о прежних парах ниже исторические.
+
 Revision 8 актуальнее исторических проверок ниже: 18 вариантов (A3/A4/A6/A7/A8, B1–B8, C1–C3/C7/C8), только Multicolour, три reveal. Проверить увеличенную W и её оптическое положение, различимость новых больших слов, три анимации на SVG-контурах. Прежний отчёт о неподвижных координатах не подтвердил отсутствие видимого дрожания; владелец сообщил о его сохранении.
 
 
@@ -55,3 +57,5 @@ Revision 8 local QA: build/scoped lint pass, tests9/9; полный lint — п�
 Окончательные шесть крупных вариантов повторно проверены после настройки B8:18 mode/replay сочетаний с двойным запуском pass; все границы/пересечения0. Временный mobile viewport снят.
 
 Revision 9: меню Logo lab→/logo-lab, штатный MenuButton, видимость по LOGO_LAB_ENABLED. Browser: переходы с Home/Search pass, 390dark/320light без горизонтального overflow; screenshot меню осмотрен. Build/scoped lint pass, полный lint — прежние58errors/14warnings. Временный viewport снят, общая тема восстановлена dark.
+
+Revision10 QA: build/scoped lint/tests9/9 pass; полный lint — прежние58errors/14warnings. Browser: A9/B9/C9=53/148/90слов, outside/overlaps/boundsMismatches=0; все9mode/replay сочетаний с двойным запуском pass, transforms неизменны, селекты возвращены Left to right. В DOM15 ожидаемых IDs,7/8 нет; screenshots B9/C9 осмотрены.

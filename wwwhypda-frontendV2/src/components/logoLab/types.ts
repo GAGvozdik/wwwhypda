@@ -1,6 +1,6 @@
 import type { RockTypeData } from '../../common/types';
 export type Group = 'A' | 'B' | 'C';
-export type CompositionId = `${Group}${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
+export type CompositionId = `${Group}${1 | 2 | 3 | 4 | 5 | 6 | 9}`;
 export type RevealMode = 'left' | 'sequence' | 'centre';
 export type RockName = Pick<RockTypeData, 'rt_id' | 'rt_name'>;
 export interface Box { x: number; y: number; width: number; height: number }

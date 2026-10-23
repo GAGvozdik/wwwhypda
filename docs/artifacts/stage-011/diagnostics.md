@@ -64,3 +64,16 @@ gridStep A7/A8=20, B7/B8=16, C7=20/C8=24, repeatLimit12.
 no live SVG text. Mid-animation C7 screen bounds drift <=0.0000401 CSS px with16–27
 partially visible words in four captured frames. This is float rounding, not a glyph shift.
 Screenshots inspected in browser protocol. Owner-browser visual QA remains separate.
+## Revision 10 — three intermediate studies replace all six 7/8 studies
+
+15 current compositions. Former 7/8 rows above are historical.
+
+| ID | Words | SVG sizes | Outside / overlaps / bounds mismatch |
+| --- | ---: | --- | --- |
+| A9 | 53 | 42/36/30 | 0/0/0 |
+| B9 | 148 | 50/40/34 | 0/0/0 |
+| C9 | 90 | 44/38/32 | 0/0/0 |
+
+Nine mode/replay combinations with double replay passed; outline transforms unchanged.
+Default animation restored to Left to right. A9 has maxRepeat3/53=5.66% with the
+standard minimum repeat limit3; B9/C9 remain below5%. No names were shortened.

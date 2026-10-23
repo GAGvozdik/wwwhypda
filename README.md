@@ -648,8 +648,8 @@ It uses a frozen snapshot of complete public Search leaf names in
 `wwwhypda-frontendV2/src/components/logoLab/rockNames.snapshot.json` (85 names captured
 on 2026-10-23). The JSON is bundled with the lazy lab page: no catalogue request or
 automatic update is made. Search keeps using the live server catalogue. The page contains a lab-only W mark with the existing Home wordmark,
-five W studies (A3/A4/A6/A7/A8), eight WWHYPDA studies (B1–B8), and five disc studies with a
-transparent W (C1–C3/C7/C8). Each study uses Multicolour and three finite reveals, with
+four W studies (A3/A4/A6/A9), seven WWHYPDA studies (B1–B6/B9), and four disc studies with a
+transparent W (C1–C3/C9). Each study uses Multicolour and three finite reveals, with
 replay in each card (Left to right by default). Stands use the existing site dark theme locally, independently of the surrounding page theme. Controls reuse the site button and field styles; all labels are English.
 
 The single switch is `LOGO_LAB_ENABLED` in
@@ -671,4 +671,4 @@ reload. A one-off validation build does not update the served volume.
 Implementation and remaining owner checks: [stage 011 acceptance](docs/artifacts/stage-011/acceptance.md).
 The plan remains active until its required acceptance is complete.
 
-Logo Lab revision 8: A7/A8, B7/B8 and C7/C8 compare large and extra-large words; B7/B8 use a full-width card. C has a 20% larger W, centred by its filled-area centroid. New compositions use frozen SVG outlines of Afacad Flux 600 instead of live SVG text, so opacity animation does not rerasterize font glyphs. Bounds and drawing use the same outlines. To intentionally regenerate after changing the snapshot/font, run python wwwhypda-frontendV2/scripts/generate-logo-word-paths.py with fontTools installed; ordinary builds need no Python or font parser. Outlines use the fixed ASCII names and font advances (no complex-script shaping).
+Logo Lab revision 10: A9/B9/C9 replace the former six large studies with intermediate word sizes; B9 uses a full-width card. C has a 20% larger W, centred by its filled-area centroid. New compositions use frozen SVG outlines of Afacad Flux 600 instead of live SVG text, so opacity animation does not rerasterize font glyphs. Bounds and drawing use the same outlines. To intentionally regenerate after changing the snapshot/font, run python wwwhypda-frontendV2/scripts/generate-logo-word-paths.py with fontTools installed; ordinary builds need no Python or font parser. Outlines use the fixed ASCII names and font advances (no complex-script shaping).

@@ -225,7 +225,7 @@
   "maintenance_check_failed": "The service could not be reached. Please try again later.",
 
   "logo_lab_title": "Word logo laboratory",
-  "logo_lab_intro": "Eighteen vector studies made from complete rock names in the Search catalogue. Choose a study, explore its colours and replay its animation.",
+  "logo_lab_intro": "Fifteen vector studies made from complete rock names in the Search catalogue. Choose a study, explore its colours and replay its animation.",
   "logo_lab_group_a": "A · The W silhouette",
   "logo_lab_group_b": "B · WWHYPDA",
   "logo_lab_group_c": "C · A disc around W",
@@ -273,16 +273,10 @@
   "logo_lab_composition_c2_description": "Open horizontal rows and varied complete name lengths.",
   "logo_lab_composition_c3_name": "Mixed disc mosaic",
   "logo_lab_composition_c3_description": "Balanced directional blocks surround the transparent W.",
-  "logo_lab_composition_a7_name": "Large word W",
-  "logo_lab_composition_a7_description": "Larger complete names form the W silhouette.",
-  "logo_lab_composition_a8_name": "Extra-large word W",
-  "logo_lab_composition_a8_description": "Very large complete names make a bold, open W.",
-  "logo_lab_composition_b7_name": "Large wordmark",
-  "logo_lab_composition_b7_description": "Larger names fill WWHYPDA in a full-width preview.",
-  "logo_lab_composition_b8_name": "Extra-large wordmark",
-  "logo_lab_composition_b8_description": "Very large names create an open WWHYPDA wordmark.",
-  "logo_lab_composition_c7_name": "Large word disc",
-  "logo_lab_composition_c7_description": "Larger names surround the enlarged, optically centred W.",
-  "logo_lab_composition_c8_name": "Extra-large word disc",
-  "logo_lab_composition_c8_description": "Very large names form a bold disc around the transparent W."
+  "logo_lab_composition_a9_name": "Medium word W",
+  "logo_lab_composition_a9_description": "Moderately sized complete names preserve the W silhouette.",
+  "logo_lab_composition_b9_name": "Medium wordmark",
+  "logo_lab_composition_b9_description": "Moderately sized names form WWHYPDA in a full-width preview.",
+  "logo_lab_composition_c9_name": "Medium word disc",
+  "logo_lab_composition_c9_description": "Moderately sized names surround the enlarged, optically centred W."
 }
