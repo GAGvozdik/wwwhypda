@@ -7,7 +7,9 @@
 // import logo2 from './logo4.png';
 
 // import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-import { useRef} from 'react';
+import { lazy, Suspense, useRef} from 'react';
+import { LOGO_LAB_ENABLED } from '../../common/experimentalFeatures';
+import messages from '../../common/error_messages.json';
 // import {useEffect, useState, useRef} from 'react';
 // import Brightness4Icon from '@mui/icons-material/Brightness4';
 // import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -51,6 +53,8 @@ import SuperuserAccount from '../users/accounts/superuser';
 import SuperProtectedRoute from '../users/routes/superProtectedRoute';
 import { ModalProvider } from '../modal/modalContext';
 
+const LogoLabPage = LOGO_LAB_ENABLED ? lazy(() => import('../logoLab/LogoLabPage')) : null;
+
 export default function MainMenu() {
 
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
@@ -60,6 +64,7 @@ export default function MainMenu() {
         <div ref={modalRootRef} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
             <ModalProvider modalRootRef={modalRootRef}>
                 <Routes>
+                    <Route path="/logo-lab" element={LogoLabPage ? <Suspense fallback={<p role="status">{messages.logo_lab_loading}</p>}><LogoLabPage /></Suspense> : <NotFound />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/search" element={<Search />} />
                     {/* <Route path="/contribute" element={<Contribute />} /> */}

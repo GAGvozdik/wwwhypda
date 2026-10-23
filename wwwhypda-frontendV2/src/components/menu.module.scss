@@ -339,3 +339,35 @@ input::placeholder {
 @media (max-width: 40rem) {
     :root { --home-title-font-size: 2rem; }
 }
+
+// Logo Lab: explicit surfaces are available inside either global theme.
+:root {
+    --logo-lab-surface-light: #fff2d9;
+    --logo-lab-surface-dark: #18272b;
+    --logo-lab-ink-light-1: #164e59;
+    --logo-lab-ink-light-2: #69471f;
+    --logo-lab-ink-light-3: #24636c;
+    --logo-lab-ink-light-4: #80572c;
+    --logo-lab-ink-light-5: #384b50;
+    --logo-lab-ink-light-6: #4e5361;
+    --logo-lab-ink-light-7: #764539;
+    --logo-lab-ink-light-8: #3f5e4b;
+    --logo-lab-ink-dark-1: #93d5db;
+    --logo-lab-ink-dark-2: #ead0a2;
+    --logo-lab-ink-dark-3: #69b6c1;
+    --logo-lab-ink-dark-4: #c5a16c;
+    --logo-lab-ink-dark-5: #b9cacb;
+    --logo-lab-ink-dark-6: #b7bed5;
+    --logo-lab-ink-dark-7: #d6aaa0;
+    --logo-lab-ink-dark-8: #a7c9ad;
+    --logo-lab-ink-light-9: #2a6a75;
+    --logo-lab-ink-light-10: #735022;
+    --logo-lab-ink-dark-9: #80c4cb;
+    --logo-lab-ink-dark-10: #d9b680;
+    --logo-lab-word-12: 12px;
+    --logo-lab-word-16: 16px;
+    --logo-lab-word-20: 20px;
+    --logo-lab-word-24: 24px;
+    --logo-lab-word-32: 32px;
+    --logo-lab-word-40: 40px;
+}
