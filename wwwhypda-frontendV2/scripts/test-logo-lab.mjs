@@ -59,7 +59,7 @@ test('packing is deterministic, uses whole names and rejects every padded out-of
 });
 
 
-test('all logo inks meet 4.5:1 on their explicit surfaces, independent of the page theme',()=>{
+test('all logo inks meet 4.5:1 on the corresponding site body background',()=>{
     const css=readFileSync('src/components/menu.module.scss','utf8');
     const token=name=>css.match(new RegExp(`--logo-lab-${name}:\\s*(#[a-f0-9]{6})`,'i'))[1];
     const luminance=hex=>{
@@ -67,7 +67,8 @@ test('all logo inks meet 4.5:1 on their explicit surfaces, independent of the pa
         return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
     };
     for(const surface of ['light','dark'])for(let slot=1;slot<=10;slot++){
-        const a=luminance(token(`surface-${surface}`)),b=luminance(token(`ink-${surface}-${slot}`));
+        const backgrounds=[...css.matchAll(/--body-color:\s*(#[a-f0-9]{6})/gi)].map(match=>match[1]);
+        const a=luminance(backgrounds[surface==='light'?0:1]),b=luminance(token(`ink-${surface}-${slot}`));
         const ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
         assert.ok(ratio>=4.5,`${surface}/${slot}: ${ratio}`);
     }
@@ -77,12 +78,12 @@ function animationHarness(reduced) {
     const effects=[],timelines=[],listeners=new Set();
     const media={matches:reduced,addEventListener:(_,callback)=>listeners.add(callback),removeEventListener:(_,callback)=>listeners.delete(callback)};
     const gsap={
-        set:(elements,values)=>elements.forEach(element=>Object.assign(element,values)),
+        set:(elements,values)=>elements.forEach(element=>Object.assign(element,values.attr)),
         timeline:()=>{
             const timeline={tweens:[],played:false,killed:false,paused:false,
                 pause(){this.paused=true;return this;},kill(){this.killed=true;},
                 to(element,values,delay){this.tweens.push({element,values,delay});return this;},
-                play(){this.played=true;return this;},complete(){this.tweens.forEach(({element,values})=>Object.assign(element,values));}};
+                play(){this.played=true;return this;},complete(){this.tweens.forEach(({element,values})=>Object.assign(element,values.attr));}};
             timelines.push(timeline);return timeline;
         }
     };
@@ -96,12 +97,12 @@ test('four finite reveal modes preserve coordinates, replay is local and reduced
     const layout={width:100,height:100,words:[{bbox:{x:10,y:10}},{bbox:{x:40,y:30}},{bbox:{x:80,y:60}}]};
     for(const mode of ['soft','left','sequence','centre']) {
         const harness=animationHarness(false),elements=[{opacity:1},{opacity:1},{opacity:1}];
-        const ref={current:{querySelectorAll:()=>elements}};
+        const ref={current:{querySelectorAll:selector=>{assert.equal(selector,'[data-word-reveal]');return elements;}}};
         harness.run(ref,layout,1,mode);
         const timeline=harness.timelines[0];
         assert.ok(timeline.played);assert.equal(timeline.tweens.length,3);
         assert.ok(timeline.tweens.every(tween=>tween.delay>=0 && tween.delay+tween.values.duration<=3));
-        assert.ok(timeline.tweens.every(tween=>Object.keys(tween.values).sort().join(',')==='duration,ease,opacity'));
+        assert.ok(timeline.tweens.every(tween=>Object.keys(tween.values).sort().join(',')==='attr,duration,ease'));
         timeline.complete(); assert.ok(elements.every(element=>element.opacity===1));
         harness.effects[0](); assert.ok(timeline.killed);assert.equal(harness.listeners.size,0);
         harness.run(ref,layout,2,mode);assert.ok(harness.timelines[1].played);
@@ -115,4 +116,15 @@ test('four finite reveal modes preserve coordinates, replay is local and reduced
     reduced.effects[0]();assert.equal(reduced.listeners.size,0);
     const initial=animationHarness(false);
     initial.run({current:{querySelectorAll:()=>elements}},layout,0,'sequence');assert.equal(initial.timelines[0].played,false);initial.effects[0]();
+});
+
+test('frozen catalogue snapshot contains complete unique names and stable source IDs in extractor order',()=>{
+    const snapshot=JSON.parse(readFileSync('src/components/logoLab/rockNames.snapshot.json','utf8'));
+    assert.ok(snapshot.length>0);
+    assert.equal(new Set(snapshot.map(node=>node.rt_name)).size,snapshot.length);
+    assert.equal(new Set(snapshot.map(node=>node.rt_id)).size,snapshot.length);
+    assert.ok(snapshot.every(node=>Number.isSafeInteger(node.rt_id) && typeof node.rt_name==='string' && node.rt_name.length>0 && node.rt_name===node.rt_name.trim()));
+    const extracted=rocks.extractRockNames(snapshot.map(node=>({...node,rt_id_parent:-2})));
+    assert.equal(JSON.stringify(snapshot),JSON.stringify(extracted));
+    assert.ok(snapshot.some(node=>node.rt_name.includes(',')));
 });

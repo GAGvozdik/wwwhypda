@@ -1,0 +1,342 @@
+[
+  {
+    "rt_id": 269,
+    "rt_name": "Anhydrite"
+  },
+  {
+    "rt_id": 266,
+    "rt_name": "Anhydrite, with shale"
+  },
+  {
+    "rt_id": 327,
+    "rt_name": "Basalt, vesicular"
+  },
+  {
+    "rt_id": 329,
+    "rt_name": "Basalt, weathered"
+  },
+  {
+    "rt_id": 301,
+    "rt_name": "Chalk"
+  },
+  {
+    "rt_id": 313,
+    "rt_name": "Clay, high plasticity"
+  },
+  {
+    "rt_id": 315,
+    "rt_name": "Clay, inorganic"
+  },
+  {
+    "rt_id": 325,
+    "rt_name": "Clay, kaolinite"
+  },
+  {
+    "rt_id": 245,
+    "rt_name": "Clay, loam"
+  },
+  {
+    "rt_id": 321,
+    "rt_name": "Clay, organic, high plasticity"
+  },
+  {
+    "rt_id": 323,
+    "rt_name": "Clay, organic, low plasticity"
+  },
+  {
+    "rt_id": 317,
+    "rt_name": "Clay, sandy"
+  },
+  {
+    "rt_id": 236,
+    "rt_name": "Clay, silty"
+  },
+  {
+    "rt_id": 257,
+    "rt_name": "Clay, with silt"
+  },
+  {
+    "rt_id": 333,
+    "rt_name": "Coal, spoil"
+  },
+  {
+    "rt_id": 335,
+    "rt_name": "Dolomite, weathered"
+  },
+  {
+    "rt_id": 337,
+    "rt_name": "Gabbro, weathered"
+  },
+  {
+    "rt_id": 293,
+    "rt_name": "Gneiss"
+  },
+  {
+    "rt_id": 339,
+    "rt_name": "Granite, weathered"
+  },
+  {
+    "rt_id": 341,
+    "rt_name": "Gravel, clayey"
+  },
+  {
+    "rt_id": 351,
+    "rt_name": "Gravel, clean poorly graded"
+  },
+  {
+    "rt_id": 353,
+    "rt_name": "Gravel, clean well graded"
+  },
+  {
+    "rt_id": 343,
+    "rt_name": "Gravel, coarse"
+  },
+  {
+    "rt_id": 345,
+    "rt_name": "Gravel, fine"
+  },
+  {
+    "rt_id": 347,
+    "rt_name": "Gravel, medium"
+  },
+  {
+    "rt_id": 357,
+    "rt_name": "Gravel, sandy"
+  },
+  {
+    "rt_id": 349,
+    "rt_name": "Gravel, silty"
+  },
+  {
+    "rt_id": 252,
+    "rt_name": "Gravel, with silt loam"
+  },
+  {
+    "rt_id": 355,
+    "rt_name": "Gravel, with silty sand"
+  },
+  {
+    "rt_id": 261,
+    "rt_name": "Greensand"
+  },
+  {
+    "rt_id": 331,
+    "rt_name": "Lignite"
+  },
+  {
+    "rt_id": 359,
+    "rt_name": "Limestone, karstic"
+  },
+  {
+    "rt_id": 279,
+    "rt_name": "Loam"
+  },
+  {
+    "rt_id": 254,
+    "rt_name": "Loam, clay"
+  },
+  {
+    "rt_id": 249,
+    "rt_name": "Loam, clay sandy"
+  },
+  {
+    "rt_id": 250,
+    "rt_name": "Loam, clay, sandy"
+  },
+  {
+    "rt_id": 246,
+    "rt_name": "Loam, sandy"
+  },
+  {
+    "rt_id": 253,
+    "rt_name": "Loam, silt"
+  },
+  {
+    "rt_id": 256,
+    "rt_name": "Loam, with clay"
+  },
+  {
+    "rt_id": 247,
+    "rt_name": "Loam, with clay sandy"
+  },
+  {
+    "rt_id": 255,
+    "rt_name": "Loam, with silt"
+  },
+  {
+    "rt_id": 258,
+    "rt_name": "Loam, with silt clay"
+  },
+  {
+    "rt_id": 251,
+    "rt_name": "Loam, with silty clay"
+  },
+  {
+    "rt_id": 309,
+    "rt_name": "Loess"
+  },
+  {
+    "rt_id": 411,
+    "rt_name": "Marl, flood"
+  },
+  {
+    "rt_id": 413,
+    "rt_name": "Marl, flood plain"
+  },
+  {
+    "rt_id": 415,
+    "rt_name": "Marl, levee"
+  },
+  {
+    "rt_id": 233,
+    "rt_name": "Marls, flood"
+  },
+  {
+    "rt_id": 235,
+    "rt_name": "Marls, flood plain"
+  },
+  {
+    "rt_id": 232,
+    "rt_name": "Marls, levee"
+  },
+  {
+    "rt_id": 264,
+    "rt_name": "Mudstone, with limestone"
+  },
+  {
+    "rt_id": 277,
+    "rt_name": "Peat"
+  },
+  {
+    "rt_id": 299,
+    "rt_name": "Peridotite"
+  },
+  {
+    "rt_id": 263,
+    "rt_name": "Sand , with silty clay"
+  },
+  {
+    "rt_id": 379,
+    "rt_name": "Sand, clayey"
+  },
+  {
+    "rt_id": 369,
+    "rt_name": "Sand, clean poorly graded"
+  },
+  {
+    "rt_id": 371,
+    "rt_name": "Sand, clean well graded"
+  },
+  {
+    "rt_id": 361,
+    "rt_name": "Sand, coarse"
+  },
+  {
+    "rt_id": 375,
+    "rt_name": "Sand, eolian"
+  },
+  {
+    "rt_id": 363,
+    "rt_name": "Sand, fine"
+  },
+  {
+    "rt_id": 377,
+    "rt_name": "Sand, fluvial"
+  },
+  {
+    "rt_id": 373,
+    "rt_name": "Sand, gravelly"
+  },
+  {
+    "rt_id": 248,
+    "rt_name": "Sand, loamy"
+  },
+  {
+    "rt_id": 365,
+    "rt_name": "Sand, medium"
+  },
+  {
+    "rt_id": 367,
+    "rt_name": "Sand, silty"
+  },
+  {
+    "rt_id": 262,
+    "rt_name": "Sand, with silty clay"
+  },
+  {
+    "rt_id": 231,
+    "rt_name": "Sandstone, chanel"
+  },
+  {
+    "rt_id": 387,
+    "rt_name": "Sandstone, channel"
+  },
+  {
+    "rt_id": 391,
+    "rt_name": "Sandstone, crevasse"
+  },
+  {
+    "rt_id": 381,
+    "rt_name": "Sandstone, fine"
+  },
+  {
+    "rt_id": 385,
+    "rt_name": "Sandstone, levee"
+  },
+  {
+    "rt_id": 383,
+    "rt_name": "Sandstone, medium"
+  },
+  {
+    "rt_id": 389,
+    "rt_name": "Sandstone, midchannel"
+  },
+  {
+    "rt_id": 303,
+    "rt_name": "Schist"
+  },
+  {
+    "rt_id": 237,
+    "rt_name": "Shale, clayey"
+  },
+  {
+    "rt_id": 393,
+    "rt_name": "Shale, weathered"
+  },
+  {
+    "rt_id": 407,
+    "rt_name": "Silt, clayey"
+  },
+  {
+    "rt_id": 401,
+    "rt_name": "Silt, high plasticity"
+  },
+  {
+    "rt_id": 403,
+    "rt_name": "Silt, inorganic"
+  },
+  {
+    "rt_id": 397,
+    "rt_name": "Silt, organic, high plasticity"
+  },
+  {
+    "rt_id": 399,
+    "rt_name": "Silt, organic, low plasticity"
+  },
+  {
+    "rt_id": 405,
+    "rt_name": "Silt, sandy"
+  },
+  {
+    "rt_id": 311,
+    "rt_name": "Siltstone"
+  },
+  {
+    "rt_id": 287,
+    "rt_name": "Till"
+  },
+  {
+    "rt_id": 305,
+    "rt_name": "Tuff"
+  }
+]

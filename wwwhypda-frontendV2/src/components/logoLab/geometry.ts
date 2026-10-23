@@ -2,7 +2,7 @@ import wSvg from '../../logos/logo/W.svg?raw';
 import wordmarkSvg from '../../logos/logo/WWHYPDA.svg?raw';
 import type { Box, Group } from './types';
 
-export const GEOMETRY_VERSION = 'svg-original-v1';
+export const GEOMETRY_VERSION = 'svg-original-v2';
 // These checked assets use absolute M/L/H/V/C/Z paths and no transforms.
 // For the wordmark take the filled silhouette IN the mask, never its outer stroke.
 export function assetPath(svg: string) {
@@ -15,7 +15,7 @@ export const W_PATH = assetPath(wSvg);
 export const WORDMARK_PATH = assetPath(wordmarkSvg);
 export function geometrySpec(group: Group) {
     if (group === 'B') return { width: 5800, height: 1050, path: WORDMARK_PATH, scale: 10, tx: 0, ty: 0 };
-    if (group === 'C') return { width: 1400, height: 1400, path: W_PATH, scale: 6, tx: 376, ty: 443 };
+    if (group === 'C') return { width: 1400, height: 1400, path: W_PATH, scale: 8, tx: 270, ty: 358 };
     return { width: 1400, height: 1120, path: W_PATH, scale: 12.5, tx: 25, ty: 25 };
 }
 export interface Occupancy { width: number; height: number; contains: (box: Box) => boolean }
@@ -72,4 +72,3 @@ export function getOccupancy(group: Group): Occupancy {
     masks.set(group, mask);
     return mask;
 }
-

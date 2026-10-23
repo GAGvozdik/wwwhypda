@@ -32,10 +32,10 @@ export default function WordLogo({layout,palette,reveal,replay,title}: Props) {
     return <svg ref={ref} viewBox={`0 0 ${layout.width} ${layout.height}`} role="img" aria-labelledby={titleId}
         className={styles.wordLogo} data-composition={layout.id} data-palette={palette}>
         <title id={titleId}>{title}</title>
-        {layout.words.map(word=><text key={word.order} x={word.x} y={word.y}
+        {layout.words.map(word=><g key={word.order} data-word-reveal=""><text x={word.x} y={word.y}
             transform={word.rotation ? `rotate(90 ${word.x} ${word.y})` : undefined}
             style={{fontSize:`var(--logo-lab-word-${word.fontSize})`,fontWeight:word.weight,
                 '--word-color':`var(--ink-${palette==='mono' ? 1 : palette==='duo' ? word.colorSlot%2+1 : word.colorSlot+1})`} as CSSProperties}
-            data-order={word.order} data-rock-id={word.rt_id}>{word.rt_name}</text>)}
+            data-order={word.order} data-rock-id={word.rt_id}>{word.rt_name}</text></g>)}
     </svg>;
 }

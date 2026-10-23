@@ -168,3 +168,39 @@ margin-left:auto у accountItem сохраняет выравнивание па
 - XLSX экспорт использует official SheetJS CE0.20.3 (Apache-2.0), все переданные
   результаты, не только страницу. Общий helper проверен roundtrip125 строк,
   zero/null/Unicode и строкой, похожей на formula. AG Grid остаётся Community.
+
+### Stage 011: локальная лаборатория логотипов
+
+- Публичный `/logo-lab` включается `LOGO_LAB_ENABLED` в common/experimentalFeatures.ts;
+  после изменения нужен rebuild. При false — существующий NotFound, без mount lab,
+  API каталога и загрузки lab chunk. Lazy импорт, ссылки в меню нет; это выключатель
+  эксперимента, не access control. Redux/auth/CAPTCHA/transport не менялись.
+- Для lab используется статический rockNames.snapshot.json: 85 полных имён и ID из
+  публичного Search, снимок от 2026-10-23. Запросов каталога и автоматического обновления
+  на lab нет; Search/дерево используют актуальный API без изменений. При создании снимка
+  исключены parent=-1 и узлы с детьми; trim только краёв, стабильные ordinal sort/dedup,
+  moderation status не фильтруется. Loading/error/retry и abort относятся к подготовке
+  раскладок/шрифта; пустой снимок показывает empty. Данные снимка проверяются unit test.
+- SVG paths исходных W.svg/WWHYPDA.svg, включая nonzero countersP/D/A. C — диск минус W,
+  а не заливка поверх слов. Packing принимает целые padded bbox через raster integral
+  с erosion; пространственный индекс исключает пересечения. ТекстSVG остаётся текстом.
+- Шрифт Afacad_Flux600 загружается до расчёта. Canvas actual bounds расширяются SVG
+  getBBox; geometricPrecision делает метрики независимыми от уменьшенного hinting.
+  После mount/resize проверяется getBBox, packing заново не запускается.
+- 18 configs различаются rows/columns/blocks/anchors/cells/sectors, квотами направлений,
+  промежутками и размерами. Обход чередует регионы, чтобы bounded budget не оставлял
+  только верхнюю половину. Кэш по каталогу/версии геометрии/шрифта/packing/config ID,
+  очередь одна с yield/abort; palette/theme/replay/resize не являются ключами.
+- Новые palette/size tokens только в menu.module.scss. Наборы inks
+  выбираются текущей темой сайта; preview и карточки используют --body-color без отдельного surface selector.
+  Mono1/duo2/tones6 оттенков двух семейств/multi8 цветов. Проверенные inks>=4.5:1.
+- Новые карточки открываются в финальном состоянии. Четыре opacity reveal конечны,
+  меняют только атрибут opacity обёрток слов, не CSS/transform самого text; settings останавливают replay и показывают итог. Timeline и
+  media/resize listeners очищаются; reduced motion сразу показывает все слова.
+- Логотипы показываются в карточках с независимыми палитрой и анимацией на фоне текущей темы сайта. Кнопки используют общий submitButton, селекты — inputField из menu.module.scss; UI полностью английский (Play animation). Увеличенный просмотр и его controls удалены по указанию владельца.
+- AnimatedLogo/Home не изменены. Lab-only wrapper до replay рисует статичный snapshot
+  активных исходных paths/masks/transforms, затем remount AnimatedLogo; W mark добавлен
+  только в lab по решению владельца. Прежние GSAP warnings отсутствующего знака в
+  AnimatedLogo сохраняются, не скрываются глобальным подавлением предупреждений.
+- Реализация ещё проходит owner QA. Точные результаты и оставшиеся Firefox/media/
+  zoom/roles/smoke/artifacts проверки: docs/artifacts/stage-011/acceptance.md.

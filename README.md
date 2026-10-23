@@ -1,4 +1,4 @@
-﻿# wwwhypda
+# wwwhypda
 
 ## Работа с LLM-чатами и планами
 
@@ -640,3 +640,33 @@ frontend пересобрать `docker compose build frontend`, затем `doc
 [stage010-rollout](deploy/security/stage010-rollout.md). Изолированные автотесты:
 [security010](deploy/testing/security010/README.md). Secrets/env здесь не приводятся;
 универсальная локальная Gmail-инструкция выше сохраняется.
+
+## Experimental logo laboratory
+
+The local public experiment is available at `/logo-lab` with no main-menu link.
+It uses a frozen snapshot of complete public Search leaf names in
+`wwwhypda-frontendV2/src/components/logoLab/rockNames.snapshot.json` (85 names captured
+on 2026-10-23). The JSON is bundled with the lazy lab page: no catalogue request or
+automatic update is made. Search keeps using the live server catalogue. The page contains a lab-only W mark with the existing Home wordmark,
+six W studies (A1–A6), six WWHYPDA studies (B1–B6), and six disc studies with a
+transparent W (C1–C6). Each study has four palettes, four finite reveals, an
+replay in each card, using the current site background. Controls reuse the site button and field styles; all labels are English.
+
+The single switch is `LOGO_LAB_ENABLED` in
+`wwwhypda-frontendV2/src/common/experimentalFeatures.ts` (currently `true`).
+Changing it requires rebuilding the frontend. When false, the route shows the
+existing NotFound and does not mount or load the lab. This is
+an experiment switch, not access control. The enabled page is public.
+
+Tests from the repository root:
+
+```text
+docker compose --env-file .env.development run --rm --build --no-deps frontend node --test scripts/test-logo-lab.mjs
+```
+
+After edits, update the served bundle with the existing README command
+`docker compose --env-file .env.development up --build --no-deps frontend`, then
+reload. A one-off validation build does not update the served volume.
+
+Implementation and remaining owner checks: [stage 011 acceptance](docs/artifacts/stage-011/acceptance.md).
+The plan remains active until its required acceptance is complete.

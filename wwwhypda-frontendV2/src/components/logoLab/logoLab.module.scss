@@ -4,18 +4,18 @@
 .page h3 { font-size: var(--menu-font-size); margin: 0; }
 .eyebrow { letter-spacing: .18em; }
 .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.5rem; }
-.card { min-width: 0; border: 1px solid var(--menu-border); border-radius: 1rem; padding: 1.2rem; margin-block: 1rem; background: var(--form-color); }
+.card { min-width: 0; border: 1px solid var(--menu-border); border-radius: 1rem; padding: 1.2rem; margin-block: 1rem; background: var(--body-color); }
 .card p { margin: .5rem 0 1rem; }
-.preview, .pan {
+.preview {
     --logo-color: var(--ink-1);
-    color: var(--ink-1); background: var(--local-surface);
+    color: var(--ink-1); background: var(--body-color);
 }
-:global([data-surface='light']) {
-    --local-surface: var(--logo-lab-surface-light);
+.preview {
+
     @for $i from 1 through 10 { --ink-#{$i}: var(--logo-lab-ink-light-#{$i}); }
 }
-:global([data-surface='dark']) {
-    --local-surface: var(--logo-lab-surface-dark);
+:global(:root[data-theme='dark']) .preview {
+
     @for $i from 1 through 10 { --ink-#{$i}: var(--logo-lab-ink-dark-#{$i}); }
 }
 .preview { height: 23rem; display: flex; align-items: center; justify-content: center; border-radius: .5rem; padding: .75rem; box-sizing: border-box; overflow: hidden; }
@@ -25,20 +25,15 @@
 .wordLogo[data-palette='tones'] {
     --ink-5: var(--ink-9); --ink-6: var(--ink-10); --ink-7: var(--ink-3); --ink-8: var(--ink-4);
 }
-.controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; margin-block: 1rem; }
-.controls > :global(.MuiFormControl-root) { min-width: 9rem; flex: 1 1 9rem; }
-.page :global(.MuiButton-root), .dialog :global(.MuiButton-root) { color: var(--tree-text); border-color: var(--menu-border); font: inherit; }
-.page :global(.MuiInputBase-root), .dialog :global(.MuiInputBase-root), .page :global(.MuiInputLabel-root), .dialog :global(.MuiInputLabel-root) { font-family: inherit; color: var(--tree-text); font-size: var(--main-font-size); }
-.controls option { color: var(--tree-text); background: var(--form-color); }
-.dialog:global(.MuiPaper-root) { width: calc(100% - 2rem); max-width: 96rem; margin: 1rem; color: var(--tree-text); background: var(--form-color); font-family: Afacad_Flux; font-size: var(--main-font-size); }
-.pan { overflow: auto; max-height: 65dvh; border: 1px solid var(--menu-border); }
-.pan > div { flex: none; }
-.pan:focus-visible, .controls button:focus-visible { outline: 2px solid var(--buttons); outline-offset: 2px; }
+.controls { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-block: 1rem; }
+.control { display: flex; flex: 1 1 10rem; min-width: 0; flex-direction: column; gap: .35rem; }
+.controls select { width: 100%; margin: 0; box-sizing: border-box; }
+.controls button { width: auto; margin: 0; flex: 0 1 auto; }
+.controls option { color: var(--input-text); background: var(--field-background); }
+.controls button:focus-visible { outline: 2px solid var(--buttons); outline-offset: 2px; }
 .original { gap: 1rem; height: 10rem; }
 .mark { width: 12%; max-height: 100%; flex: none; fill: var(--ink-1); }
 .originalName { width: min(42rem,85%); height: auto; fill: var(--ink-1); }
 .original > div { flex: 1; min-width: 0; }
-.diagnostics { margin-top: .5rem; font-size: var(--menu-font-size-smallest); }
-.diagnostics pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 @media(max-width: 65rem) { .grid { grid-template-columns: minmax(0,1fr); } }
 @media(max-width: 30rem) { .page { padding: .5rem; } .card { padding: .75rem; } .page h1 { font-size: var(--head-font-size); } .preview { height: 18rem; } .original { height: 7rem; } }
