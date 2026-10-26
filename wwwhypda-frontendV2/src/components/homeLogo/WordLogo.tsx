@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import type { Layout, RevealMode } from './types';
 import { wordOutline, outlineUnits } from './wordOutlines';
 import { useLogoAnimation } from './useLogoAnimation';
-import styles from './logoLab.module.scss';
+import styles from './homeLogo.module.scss';
 interface Props { layout: Layout; reveal: RevealMode; replay: number; title: string }
 export default function WordLogo({layout,reveal,replay,title}: Props) {
     const ref=useRef<SVGSVGElement>(null), titleId=useId();

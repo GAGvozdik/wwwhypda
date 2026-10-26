@@ -5,6 +5,7 @@
 
     --main-font-size: 1rem;
     --loading-min-height: 3rem;
+    --account-table-height: 25rem;
     --under-menu-font-size: 1rem;
     --menu-font-size: 1.25rem;
     --menu-font-size-little: 1rem;
@@ -341,34 +342,36 @@ input::placeholder {
     :root { --home-title-font-size: 2rem; }
 }
 
-// Logo Lab: explicit surfaces are available inside either global theme.
+// Home logos: light and dark vector inks follow the existing site palette.
 :root {
-    --logo-lab-surface-light: #fff2d9;
-    --logo-lab-surface-dark: #18272b;
-    --logo-lab-ink-light-1: #164e59;
-    --logo-lab-ink-light-2: #69471f;
-    --logo-lab-ink-light-3: #24636c;
-    --logo-lab-ink-light-4: #80572c;
-    --logo-lab-ink-light-5: #384b50;
-    --logo-lab-ink-light-6: #4e5361;
-    --logo-lab-ink-light-7: #764539;
-    --logo-lab-ink-light-8: #3f5e4b;
-    --logo-lab-ink-dark-1: #93d5db;
-    --logo-lab-ink-dark-2: #ead0a2;
-    --logo-lab-ink-dark-3: #69b6c1;
-    --logo-lab-ink-dark-4: #c5a16c;
-    --logo-lab-ink-dark-5: #b9cacb;
-    --logo-lab-ink-dark-6: #b7bed5;
-    --logo-lab-ink-dark-7: #d6aaa0;
-    --logo-lab-ink-dark-8: #a7c9ad;
-    --logo-lab-ink-light-9: #2a6a75;
-    --logo-lab-ink-light-10: #735022;
-    --logo-lab-ink-dark-9: #80c4cb;
-    --logo-lab-ink-dark-10: #d9b680;
-    --logo-lab-word-12: 12px;
-    --logo-lab-word-16: 16px;
-    --logo-lab-word-20: 20px;
-    --logo-lab-word-24: 24px;
-    --logo-lab-word-32: 32px;
-    --logo-lab-word-40: 40px;
+    --home-logo-mobile-width: 24rem;
+    --home-logo-block-margin: 1rem;
+    --home-logo-loading-radius: 0.75rem;
+
+    --home-logo-ink-light-1: #078a9b;
+    --home-logo-ink-light-2: #b16e22;
+    --home-logo-ink-light-3: #168b90;
+    --home-logo-ink-light-4: #b36d23;
+    --home-logo-ink-light-5: #4d8691;
+    --home-logo-ink-light-6: #6b7bb4;
+    --home-logo-ink-light-7: #bc6551;
+    --home-logo-ink-light-8: #428b62;
+    --home-logo-ink-dark-1: #93d5db;
+    --home-logo-ink-dark-2: #ead0a2;
+    --home-logo-ink-dark-3: #69b6c1;
+    --home-logo-ink-dark-4: #c5a16c;
+    --home-logo-ink-dark-5: #b9cacb;
+    --home-logo-ink-dark-6: #b7bed5;
+    --home-logo-ink-dark-7: #d6aaa0;
+    --home-logo-ink-dark-8: #a7c9ad;
+    --home-logo-ink-light-9: #1d8a97;
+    --home-logo-ink-light-10: #a6732b;
+    --home-logo-ink-dark-9: #80c4cb;
+    --home-logo-ink-dark-10: #d9b680;
+    --home-logo-word-12: 12px;
+    --home-logo-word-16: 16px;
+    --home-logo-word-20: 20px;
+    --home-logo-word-24: 24px;
+    --home-logo-word-32: 32px;
+    --home-logo-word-40: 40px;
 }

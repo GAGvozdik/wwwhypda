@@ -181,7 +181,8 @@ const Search: React.FC = () => {
 
                 }}
             >
-                <SingleSkeleton loading={loading} error={error} height='100%'>
+                <SingleSkeleton loading={loading} error={error} height='100%' borderRadius='0.25rem'>
+                    <div className={styles.parametersContent}>
                     <div
                         className={`${styles.treeText} ${styles.parametersTitle}`}
                         id="search-parameter-title"
@@ -223,6 +224,7 @@ const Search: React.FC = () => {
                         </button>
 
                     </FormControl>
+                </div>
                 </SingleSkeleton>
             </div>
             </div>

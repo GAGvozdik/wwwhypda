@@ -18,7 +18,7 @@ import { IconButton, Tooltip } from '@mui/material';
 import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { useStepsTheme } from '../../inputData/steps';
 import LoadIcon from '../../commonFeatures/loadIcon';
-import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import AccountTable from './AccountTable';
 import InputSuggestions from './inputSuggestions';
 import api from '../../api';
 import axios from 'axios';
@@ -36,7 +36,8 @@ const SuperuserAccount: React.FC = () => {
     const [userData, setUserData] = useState<AccountProfile | null>(null);
     const [allUsers, setAllUsers] = useState<AccountProfile[]>([]);
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [usersLoading, setUsersLoading] = useState(true);
 
 
 
@@ -61,6 +62,7 @@ const SuperuserAccount: React.FC = () => {
     };
 
     const fetchAllUsers = async () => {
+        setUsersLoading(true);
         try {
             const response = await api.get('/admin/get_all_users', {
                 withCredentials: true,
@@ -69,6 +71,8 @@ const SuperuserAccount: React.FC = () => {
         } catch (error: unknown) {
             if (axios.isCancel(error)) return;
             setError(messages.account_users_fetch_failed);
+        } finally {
+            setUsersLoading(false);
         }
     };
 
@@ -171,7 +175,7 @@ const SuperuserAccount: React.FC = () => {
     const containerStyle = useMemo(() => ({
         width: "100%",
         maxWidth: "72rem",
-        height: "25rem",
+        height: "var(--account-table-height)",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0rem',
         marginBottom: '0rem',
@@ -194,7 +198,7 @@ const SuperuserAccount: React.FC = () => {
 
 
                 <div style={containerStyle}>
-                    <SingleSkeleton loading={isLoading} error={error} height={'25rem'}>
+                    <AccountTable loading={usersLoading} error={error}>
                         <AgGridReact
                             defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true }}
                             theme={themeDarkBlue}
@@ -207,7 +211,7 @@ const SuperuserAccount: React.FC = () => {
                             suppressColumnVirtualisation
                             domLayout="normal"
                         />
-                    </SingleSkeleton>
+                    </AccountTable>
 
                 </div>
 

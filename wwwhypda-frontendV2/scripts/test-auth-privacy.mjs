@@ -52,7 +52,8 @@ function fixture(file, post = async () => ({ status: 200, data: {} }), restricte
             if (name === './errorMessage') return components.ErrorMessage;
             if (name === './registrationConfirmation') return 'RegistrationConfirmation';
             if (name.endsWith('/accounts/deleteAccount')) return 'DeleteAccount';
-            if (name.endsWith('/accountSession')) return { termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; }, signOutAccountSession() {} };
+            if (name.endsWith('/authPresentation')) return {rememberAuthenticatedPresentation(){}};
+            if (name.endsWith('/accountSession')) return {sessionVersion:()=>0, termsAcceptanceRequired: () => restricted, termsEvent: 'terms-required', clearTermsRequirement: () => { restricted=false; }, signOutAccountSession() {} };
             if (name.endsWith('/legalDocuments')) return {
                 legalDocuments: ['user-agreement','privacy-policy','cookie-policy'].map(slug => ({slug,label:slug,route:'/'+slug})),
                 legalPdfPath: (slug,version) => 'legal/'+slug+'-'+version+'.pdf',

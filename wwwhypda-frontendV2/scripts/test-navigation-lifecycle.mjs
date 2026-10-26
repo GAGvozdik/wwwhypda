@@ -238,12 +238,13 @@ const jsxRuntime = { Fragment: 'Fragment', jsx: (type, props, key) => ({ type, p
 
 test('App keeps the same provider/shell component path across public, action and protected routes', async () => {
     let pathname = '/';
-    const Shell = () => {}, Captcha = () => {}, Router = () => {}, Provider = () => {};
+    const Shell = () => {}, Captcha = () => {}, Router = () => {}, Provider = () => {}, Transition = () => {};
     const app = await moduleFor('src/App.tsx', {}, {
         'react/jsx-runtime': jsxRuntime,
         'react-redux': { Provider }, './redux/store': { default: {} },
         'react-router-dom': { BrowserRouter: Router, useLocation: () => ({ pathname }) },
         './components/mainWindow/mainWindow': { default: Shell },
+        './components/mainWindow/RouteTransition': { default: Transition },
         './components/commonFeatures/recaptchaProvider': { default: Captcha },
     });
     const site = app.default().props.children.props.children.type;
@@ -252,7 +253,9 @@ test('App keeps the same provider/shell component path across public, action and
         const node = site();
         assert.equal(node.type, Captcha);
         assert.equal(node.props.pathname, pathname);
-        assert.equal(node.props.children.type, Shell);
+        assert.equal(node.props.children.type, Transition);
+        assert.equal(node.props.children.props.children.type, Shell);
+        assert.equal(node.props.children.props.children.key, undefined);
         assert.equal(node.key, undefined);
         assert.equal(node.props.children.key, undefined);
     }
@@ -402,8 +405,8 @@ test('frame origin follows each HTTPS hostname exactly, without adding an altern
 test('existing guards conceal private children during loading and preserve role redirects', async () => {
     let auth = { isAuth: null, isSuperuser: null };
     const dependencies = { '../../commonFeatures/loadingSwap': { default:'LoadingSwap' }, react: { default: {} }, 'react/jsx-runtime': jsxRuntime,
-        'react-router-dom': { Navigate: 'Navigate' }, '../useAuthCheck': { default: () => auth },
-        '../auth/login': { default: 'Login' } };
+        'react-router-dom': { Navigate: 'Navigate' }, '../../mainWindow/RouteRedirect':{default:'Navigate'}, '../useAuthCheck': { default: () => auth },
+        './ProtectedPageSkeleton': { default: 'PageSkeleton' }, '../auth/login':{default:'Login'} };
     const protectedRoute = await moduleFor('src/components/users/routes/protectedRoute.tsx', {}, dependencies);
     const superRoute = await moduleFor('src/components/users/routes/superProtectedRoute.tsx', {}, dependencies);
     const privateChild = { private: true };
@@ -411,7 +414,14 @@ test('existing guards conceal private children during loading and preserve role 
         const node = guard({ children: privateChild });
         assert.notEqual(node.props.children, privateChild);
         assert.equal(node.type,'LoadingSwap');
-        assert.equal(node.props.loading,true);assert.equal(node.props.children,null);assert.equal(node.props.fallback.type,'Login');assert.equal(node.props.fallback.props.checkingAccess,true);
+        assert.equal(node.props.animateEnter,false);assert.equal(node.props.animateSwap,false);assert.equal(node.props.loading,true);assert.equal(node.props.children,null);assert.equal(node.props.fallback.type,'Login');assert.equal(node.props.fallback.props.checkingAccess,true);
+    }
+    auth={isAuth:null,isSuperuser:null,showPageSkeleton:true};
+    for(const kind of ['account','superaccount','dataset','read','edit'])for(const guard of [protectedRoute.default,superRoute.default]){
+        const pending=guard({children:privateChild,skeleton:kind});
+        assert.equal(pending.props.children,null);
+        assert.equal(pending.props.fallback.type,'PageSkeleton');
+        assert.equal(pending.props.fallback.props.kind,kind);
     }
     auth = { isAuth: false, isSuperuser: false };
     for (const guard of [protectedRoute.default, superRoute.default]) assert.equal(guard({ children: privateChild }).props.children.props.to, '/login');
@@ -542,7 +552,7 @@ test('Both account layouts place the existing logout before content and deletion
         'react/jsx-runtime':jsxRuntime,'react-redux':{useSelector:callback=>callback({isDarkTheme:true})},
         'react-router-dom':{useNavigate:()=>()=>{}},'../../api':{default:{}},axios:{default:{}},
         '../accountSession':{signOutAccountSession(){}},'./deleteAccount':{default:'DeleteAccount'},'./userSuggestions':{default:'Suggestions'},'./inputSuggestions':{default:'Suggestions'},
-        '../../commonFeatures/loadIcon':{default:'Loading'},'../../commonFeatures/singleSkeleton':{default:'Skeleton'},
+        '../../commonFeatures/loadIcon':{default:'Loading'},'../../commonFeatures/singleSkeleton':{default:'Skeleton'},'./AccountTable':{default:'AccountTable'},
         '../../commonFeatures/useRemColumns':{default:columns=>columns},'../../inputData/steps':{useStepsTheme:()=>({})},
         'ag-grid-react':{AgGridReact:'Grid'},'@mui/icons-material/CheckCircle':{default:'Icon'},
         '@mui/material':{IconButton:'IconButton',Tooltip:'Tooltip'},'@mui/icons-material':{PersonOff:'Icon',Security:'Icon',DoDisturb:'Icon'},

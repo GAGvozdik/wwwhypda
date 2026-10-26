@@ -641,38 +641,103 @@ frontend пересобрать `docker compose build frontend`, затем `doc
 [security010](deploy/testing/security010/README.md). Secrets/env здесь не приводятся;
 универсальная локальная Gmail-инструкция выше сохраняется.
 
-## Experimental logo laboratory
+## Home word logos
 
-The local public experiment is available at `/logo-lab` through the Logo lab main-menu link when enabled.
-It uses a frozen snapshot of complete public Search leaf names in
-`wwwhypda-frontendV2/src/components/logoLab/rockNames.snapshot.json` (85 names captured
-on 2026-10-23). The JSON is bundled with the lazy lab page: no catalogue request or
-automatic update is made. Search keeps using the live server catalogue. The page contains a lab-only W mark with the existing Home wordmark,
-three W studies (A10–A12), three WWHYPDA studies (B10–B12), and three disc studies with a
-transparent W (C10–C12). Each study uses Multicolour and three finite reveals, with
-replay in each card (Left to right by default). Stands use the existing site dark theme locally, independently of the surrounding page theme. Controls reuse the site button and field styles; all labels are English.
+Home displays C12 (disc with a transparent W) at widths up to48rem and B12
+(WWHYPDA wordmark) above48rem. Only the active variant is prepared and rendered.
+The desktop logo aligns with the hero content: maximum1100px and at least2rem on each side; the mobile disc is capped at24rem.
+Both follow the current site theme and use Multicolour on the existing body background.
 
-The single switch is `LOGO_LAB_ENABLED` in
-`wwwhypda-frontendV2/src/common/experimentalFeatures.ts` (currently `true`).
-Changing it requires rebuilding the frontend. When false, the route shows the
-existing NotFound and does not mount or load the lab. This is
-an experiment switch, not access control. The enabled page is public. The main menu shows Logo lab when LOGO_LAB_ENABLED is true.
+The reusable implementation lives in wwwhypda-frontendV2/src/components/homeLogo/.
+The frozen rockNames.snapshot.json contains85 complete public Search leaf names captured
+on2026-10-23. Search keeps using the live catalogue; logos make no catalogue requests.
+wordOutlines.snapshot.json stores Afacad Flux600 vector outlines. Packing and drawing use
+the same bounds; animation changes only wrapper opacity. Home plays Centre outward on desktop and Word sequence on mobile on
+mount; reduced motion shows the completed logo immediately. Resize/unmount cancels stale
+preparation, and ready layouts are cached. Loading uses the shared smooth skeleton;
+a preparation failure offers the existing site Retry button. Both logo placeholders use the same table-colour surface and standard wave as Search, without an outline. The finished logo keeps its transparent background.
+
+Logo Lab, its menu link, route, controls and feature flag have been removed.
+The former /logo-lab URL now reaches the existing NotFound through the fallback route.
+The previous AnimatedLogo source remains available but is no longer mounted by Home.
+
+To intentionally regenerate the frozen outlines after changing the names/font, run
+python wwwhypda-frontendV2/scripts/generate-logo-word-paths.py with fontTools installed.
+Ordinary builds need no Python or font parser.
 
 Tests from the repository root:
 
-```text
-docker compose --env-file .env.development run --rm --build --no-deps frontend node --test scripts/test-logo-lab.mjs
-```
+    docker compose --env-file .env.development run --rm --build --no-deps frontend node --test scripts/test-home-logo.mjs
 
-After edits, update the served bundle with the existing README command
-`docker compose --env-file .env.development up --build --no-deps frontend`, then
-reload. A one-off validation build does not update the served volume.
+The owner reviews mobile/desktop and both themes on Vercel after their own commit/push.
+Do not automate browsers or generate/send static previews for this work.
+Stage011 stays active until the owner explicitly requests archiving, including while
+they send follow-up fixes. See [current acceptance](docs/artifacts/stage-011/acceptance.md).
 
-Implementation and remaining owner checks: [stage 011 acceptance](docs/artifacts/stage-011/acceptance.md).
-The plan remains active until its required acceptance is complete.
+### Smooth loading states
 
-Logo Lab revision 11: each group has three densely packed studies with graded word sizes. Rows fill the silhouettes first, then an offset pass fills remaining pockets without cutting names. All B studies use full-width cards. C has a 20% larger W, centred by its filled-area centroid. New compositions use frozen SVG outlines of Afacad Flux 600 instead of live SVG text, so opacity animation does not rerasterize font glyphs. Bounds and drawing use the same outlines. To intentionally regenerate after changing the snapshot/font, run python wwwhypda-frontendV2/scripts/generate-logo-word-paths.py with fontTools installed; ordinary builds need no Python or font parser. Outlines use the fixed ASCII names and font advances (no complex-script shaping).
+Shared skeletons stay visible for at least750ms, fade out over220ms, then reveal content
+over220ms using the Search panel easing. Slow requests do not wait another750ms after
+completion. Actual requests and access checks keep their existing behavior. Auth fields
+stay mounted; verified pages may load hidden while their skeleton finishes.
+Reduced motion disables animation. Visual acceptance remains with the owner on Vercel.
+Account uses one combined authentication/role guard, avoiding successive loader cycles.
+During a route access check, guests/unknown sessions see the actual login skeleton, then redirect to login if denied. After a confirmed login/check in this browser session, the target account/admin/dataset placeholder stays opaque instead of
+restarting its entrance animation; its single fade-out and content reveal remain.
+Other form/loading entrances keep their normal animation. Session checks and role redirects remain active.
+Protected-page placeholders never mount real pages or read private data before authorization.
+Account grids reserve25rem and a vertical scrollbar gutter. They start in loading state,
+wait for their own response, then mount with data hidden until the first grid render and two frames.
+The shared750ms minimum and220ms exit/content transitions hide empty-grid flashes; a genuine
+empty response completes on grid-ready. Page scrollbar space is reserved as well.
 
-Logo Lab review: the owner checks the running site on Vercel/mobile after their own commit/push. Do not generate static logo review images or automate browser checks for this work unless the owner requests them again.
+Local regression command from the repository root:
 
-Logo Lab group B always uses one column across the available window width, without the former96rem page cap. B SVG height follows its viewBox aspect ratio instead of a fixed preview height.
+    docker compose --env-file .env.development run --rm --no-deps frontend node --experimental-vm-modules --test scripts/test-account-loading.mjs scripts/test-loading-state.mjs scripts/test-navigation-lifecycle.mjs scripts/test-auth-privacy.mjs
+Loading polish: shared skeletons include the existing site-coloured circular indicator
+by default. Search skeletons cover the full panel bounds, including the tree gutter;
+form padding belongs to the revealed content. Light-theme logo inks are brighter while
+using a brighter, more saturated palette around3:1 against the site background by owner request; dark inks are unchanged.
+
+Registration validation keeps legal-document links in their normal site colour; missing checkboxes and their consent text retain the error highlight.
+
+Protected route correction (stage011 revision22): the presentation hint remembers only
+the current session epoch in memory. It never grants access, stores no profile/role/data,
+and every route still performs /users/check. Logout/session replacement invalidates the
+hint; failed checks forget it. No hint after a full reload means the login fallback until
+the server verifies access. Skeletons reuse the real account action/title/table/details
+classes and the dataset stepper/34rem table-content/actions/navigation classes, including
+the saved step. Read/edit keep their own headings and omit the Add data notice.
+All ordinary page shells (including Search and loading states) reserve the first viewport
+before the footer using the measured header height. Legal pages keep their separate shell.
+
+Additional local regression:
+
+    docker compose --env-file .env.development run --rm --no-deps frontend node --experimental-vm-modules --test scripts/test-route-placeholders.mjs scripts/test-account-loading.mjs scripts/test-maintenance-guard.mjs scripts/test-account-session.mjs
+
+Add data loading: the stepper and page/table titles render normally, without individual skeletons. The step icon is shared with the real stepper (inputData/StepIcon.tsx); table loading remains.
+
+Account loading keeps page headings, Name/Email labels and public privacy/support text
+visible as normal text. Profile name/email values also have no skeleton bars; missing values appear normally after the profile response. Data tables keep their loading placeholders.
+All ModalWindow consumers (read/edit/submit confirmations, terms and maintenance) and
+the delete-account Dialog share220ms enter/180ms exit opacity transitions with their
+backdrops. Reduced motion uses0ms. Shared modal content survives through exit and is
+inert while closing; MUI focus/escape/backdrop behavior remains active.
+
+Stage011 revision26: all internal routes share a sequential content transition:
+the displayed page fades out180ms, the latest destination mounts, then fades in220ms.
+This includes auth forms, Search, input/read/edit, accounts, legal and other pages.
+Only one route is mounted at a time; superseded destinations are cancelled.
+Reduced motion replaces the route immediately. Outgoing/hidden content is inert.
+
+Routes and shell layout use the displayed location, while the CAPTCHA provider still
+receives the live destination immediately. Outgoing guards cannot redirect over a new
+destination, including in the first navigation render before effects.
+Protected loading keeps static headings/stepper visible and delegates the page animation
+to the route transition; individual table loaders retain their own transitions.
+The guard minimum is750ms, with no second local exit delay. Guest Login placeholders
+remain visible until the global exit; profile name/email values use no skeleton strips.
+
+Route regression:
+
+    docker compose --env-file .env.development run --rm --no-deps frontend node --experimental-vm-modules --test scripts/test-route-transitions.mjs scripts/test-route-placeholders.mjs scripts/test-loading-state.mjs

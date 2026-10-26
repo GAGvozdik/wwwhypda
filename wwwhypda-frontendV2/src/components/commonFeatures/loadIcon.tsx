@@ -10,6 +10,9 @@ const LoadIcon: React.FC<LoadIconProps> = ({ size = 30 }) => {
             size={size}
             sx={{
                 color: 'var(--border)',
+                position: 'relative',
+                zIndex: 1,
+                flexShrink: 0,
                 display: 'flex',
                 justifyContent: 'center',
                 alignContent: 'center',

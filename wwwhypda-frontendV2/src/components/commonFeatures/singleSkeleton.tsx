@@ -15,14 +15,18 @@ interface SingleSkeletonProps {
     backgroundColor?: string;
     isLoadIcon?: boolean;
     overlay?: boolean;
+    borderRadius?: string;
 }
 
 
-function SingleSkeletonView({ loading = false, error = null, margin, height, width, children, backgroundColor, isLoadIcon, overlay }: SingleSkeletonProps) {
+function SingleSkeletonView({ loading = false, error = null, margin, height, width, children, backgroundColor, isLoadIcon = true, overlay, borderRadius }: SingleSkeletonProps) {
     if (loading) {
         return (
             <Box role="status" aria-label={messages.ui_loading}
                 sx={{
+                    boxSizing: 'border-box',
+                    borderRadius: borderRadius ?? '0.5rem',
+                    overflow: 'hidden',
                     width: width ?? '100%',
                     height: height ?? '100%',
                     minHeight: height ? undefined : 'var(--loading-min-height)',
@@ -44,12 +48,13 @@ function SingleSkeletonView({ loading = false, error = null, margin, height, wid
                 height="100%"
                 sx={{
                 position: 'absolute',
-                borderRadius: 2,
+                inset: 0,
+                borderRadius: 'inherit',
                 bgcolor: backgroundColor ?? 'var(--table-color)',
                 }}
             />
 
-            {isLoadIcon ? <LoadIcon size={60} /> : ""}
+            {isLoadIcon ? <LoadIcon /> : ""}
             </Box>
         );
     }
@@ -59,6 +64,9 @@ function SingleSkeletonView({ loading = false, error = null, margin, height, wid
 
             <Box role="alert"
                 sx={{
+                    boxSizing: 'border-box',
+                    borderRadius: borderRadius ?? '0.5rem',
+                    overflow: 'hidden',
                     width: width ?? '100%',
                     height: height ?? '100%',
                     minHeight: height ? undefined : 'var(--loading-min-height)',
@@ -78,7 +86,8 @@ function SingleSkeletonView({ loading = false, error = null, margin, height, wid
                     width="100%"
                     height="100%"
                     sx={{
-                        borderRadius: 2,
+                        inset: 0,
+                borderRadius: 'inherit',
                         bgcolor: backgroundColor ? backgroundColor : 'var(--table-color)',
                     }}
 

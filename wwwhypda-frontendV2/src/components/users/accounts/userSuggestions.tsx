@@ -19,7 +19,7 @@ import { IconButton, Tooltip } from '@mui/material';
 // import { PersonOff, Security, DoDisturb } from '@mui/icons-material';
 import { useStepsTheme } from '../../inputData/steps';
 // import LoadIcon from '../../commonFeatures/loadIcon';
-import SingleSkeleton from '../../commonFeatures/singleSkeleton';
+import AccountTable from './AccountTable';
 // import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 // import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 // import { Link } from 'react-router-dom';
@@ -36,7 +36,7 @@ const UserSuggestions: React.FC = () => {
 
     const [allSuggestions, setAllSuggestions] = useState<any[]>([]);
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         fetchMySubmissions();
@@ -196,7 +196,7 @@ const UserSuggestions: React.FC = () => {
     const containerStyle = useMemo(() => ({
         width: "100%",
         maxWidth: "72rem",
-        height: "25rem",
+        height: "var(--account-table-height)",
         "--ag-background-color": "var(--table-color)",
         marginTop: '0rem',
         marginBottom: '0rem',
@@ -210,7 +210,7 @@ const UserSuggestions: React.FC = () => {
             <div style={{ margin: '1rem 0' }}>
 
                 <div style={containerStyle}>
-                    <SingleSkeleton loading={isLoading} error={error} height={'25rem'}>
+                    <AccountTable loading={isLoading} error={error}>
                         <AgGridReact
                             defaultColDef={{ wrapHeaderText: true, autoHeaderHeight: true }}
                             theme={themeDarkBlue}
@@ -223,7 +223,7 @@ const UserSuggestions: React.FC = () => {
                             suppressColumnVirtualisation
                             domLayout="normal"
                         />
-                    </SingleSkeleton>
+                    </AccountTable>
 
                 </div>
 

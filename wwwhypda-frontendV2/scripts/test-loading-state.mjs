@@ -4,7 +4,7 @@ function fixture(){
  const react={useContext:()=>false,useRef:initial=>{const i=cursor++;if(!(i in refs))refs[i]={current:initial};return refs[i];},useLayoutEffect:fn=>effects.push(fn)};
  const jsx=(type,props)=>({type,props});
  const exports={};const code=ts.transpileModule(readFileSync('src/components/commonFeatures/authSkeleton.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
- vm.runInNewContext(code,{exports,require:id=>id.endsWith('useLoadingPresentation')?{useLoadingPresentation:busy=>busy?'loading':'ready'}:id.endsWith('loadingPresentation')?{LOADING_EXIT_MS:220}:id.endsWith('.json')?JSON.parse(readFileSync('src/common/error_messages.json','utf8')):id==='react'?react:id==='react/jsx-runtime'?{jsx,jsxs:jsx}:id.endsWith('.scss')?{}:id.endsWith('authLoadingContext')?{AuthLoadingContext:{}}:id.includes('Skeleton')?'Skeleton':'LoadIcon'});
+ vm.runInNewContext(code,{exports,require:id=>id.endsWith('useLoadingPresentation')?{useLoadingPresentation:busy=>busy?'loading':'ready'}:id.endsWith('loadingPresentation')?{LOADING_EXIT_MS:220}:id.endsWith('.json')?JSON.parse(readFileSync('src/common/error_messages.json','utf8')):id==='react'?react:id==='react/jsx-runtime'?{jsx,jsxs:jsx}:id.endsWith('.scss')?{surface:'surface',noEnter:'noEnter'}:id.endsWith('authLoadingContext')?{AuthLoadingContext:{}}:id.includes('Skeleton')?'Skeleton':'LoadIcon'});
  return props=>{cursor=0;const tree=exports.default(props);for(const fn of effects.splice(0))fn();return tree;};
 }
 function nodes(root){return root&&typeof root==='object'?[root,...[root.props?.children].flat(Infinity).flatMap(nodes)]:[];}
@@ -78,7 +78,7 @@ function swapFixture(phase){
  vm.runInNewContext(ts.transpileModule(readFileSync('src/components/commonFeatures/loadingSwap.tsx','utf8'),
   {compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,
   {exports,require:id=>id==='react/jsx-runtime'?{jsx,jsxs:jsx}:id.endsWith('useLoadingPresentation')?
-   {useLoadingPresentation:()=>phase}:id.endsWith('loadingPresentation')?{LOADING_EXIT_MS:220}:{}});
+   {useLoadingPresentation:()=>phase}:id.endsWith('loadingPresentation')?{LOADING_EXIT_MS:220}:{pending:'pending',noEnterChildren:'noEnterChildren',staticSwap:'staticSwap'}});
  return exports.default;
 }
 test('a regular loading boundary does not mount its content before minimum hold and exit finish',()=>{
@@ -108,8 +108,69 @@ test('shared loader reserves an automatic minimum but preserves compact dimensio
  const automatic=render({loading:true});
  assert.equal(automatic.props.sx.minHeight,'var(--loading-min-height)');
  assert.equal(automatic.props.role,'status');
+ assert.equal(automatic.props.children[1].type,'Component');
+ assert.equal(render({loading:true,isLoadIcon:false}).props.children[1],'');
+ assert.equal(automatic.props.sx.boxSizing,'border-box');
+ assert.equal(automatic.props.children[0].props.sx.inset,0);
+ assert.equal(render({loading:true,borderRadius:'0.25rem'}).props.sx.borderRadius,'0.25rem');
  const compact=render({loading:true,height:'2.5rem'});
  assert.equal(compact.props.sx.height,'2.5rem');assert.equal(compact.props.sx.minHeight,undefined);
  const overlay=render({loading:true,height:'100%',overlay:true});
  assert.equal(overlay.props.sx.position,'absolute');assert.equal(overlay.props.sx.inset,0);
+});
+test('a route handoff keeps its loading surface opaque while retaining the single exit and private-content boundary',()=>{
+ const fallback={type:'skeleton',props:{}},child={type:'private',props:{}};
+ for(const phase of ['loading','exiting']){
+  const tree=swapFixture(phase)({loading:phase==='loading',animateEnter:false,fallback,children:child});
+  const pending=nodes(tree).find(node=>node.props?.['data-phase']===phase);
+  assert.equal(pending.props.className,'pending noEnterChildren');
+  assert.equal(nodes(tree).includes(child),false);
+ }
+ const ordinary=swapFixture('loading')({loading:true,fallback,children:child});
+ assert.equal(nodes(ordinary).find(node=>node.props?.['data-phase']==='loading').props.className,'pending');
+ const routeForm=fixture()({loading:true,animateEnter:false,children:child});
+ const cover=nodes(routeForm).find(node=>node.props?.role==='status');
+ assert.match(cover.props.className,/surface noEnter/);
+ assert.equal(nodes(routeForm).find(node=>node.props?.['aria-hidden']===true).props.style.visibility,'hidden');
+ const defaultForm=fixture()({loading:true,children:child});
+ assert.doesNotMatch(nodes(defaultForm).find(node=>node.props?.role==='status').props.className,/noEnter/);
+});
+
+test('account mounts exactly one authentication/role guard, preventing a second loader cycle after verification',()=>{
+ const ast=ts.createSourceFile('mainBody.tsx',readFileSync('src/components/mainWindow/mainBody.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+ let accountRoute;
+ const visit=node=>{
+  if(ts.isJsxSelfClosingElement(node)&&node.tagName.getText(ast)==='Route'){
+   const path=node.attributes.properties.find(attribute=>ts.isJsxAttribute(attribute)&&attribute.name.getText(ast)==='path');
+   if(path?.initializer?.text==='/account')accountRoute=node;
+  }
+  ts.forEachChild(node,visit);
+ };
+ visit(ast);assert.ok(accountRoute);
+ const source=accountRoute.getText(ast);
+ assert.equal((source.match(/<SuperProtectedRoute\b/g)||[]).length,1);
+ assert.doesNotMatch(source,/<ProtectedRoute\b/);
+ assert.match(source,/redirectIfSuperuser=\{true\}/);
+ assert.match(source,/<Account\s*\/>/);
+});
+test('the shared circular indicator keeps site colour and paints above the skeleton surface',()=>{
+ const exports={},jsx=(type,props)=>({type,props});
+ vm.runInNewContext(ts.transpileModule(readFileSync('src/components/commonFeatures/loadIcon.tsx','utf8'),{
+  compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}
+ }).outputText,{exports,require:id=>id==='react/jsx-runtime'?{jsx,jsxs:jsx}:'CircularProgress'});
+ const icon=exports.default({});
+ assert.equal(icon.props.size,30);
+ assert.equal(icon.props.sx.color,'var(--border)');
+ assert.equal(icon.props.sx.position,'relative');
+ assert.equal(icon.props.sx.zIndex,1);
+});
+test('a protected page keeps its static labels and stepper unchanged while only its data loaders finish',()=>{
+ const child={type:'verified-page',props:{}},fallback={type:'page-placeholder',props:{}};
+ const tree=swapFixture('exiting')({loading:false,preserveContent:true,animateEnter:false,animateSwap:false,children:child,fallback});
+ const pending=nodes(tree).find(node=>node.props?.['data-phase']==='exiting');
+ assert.match(pending.props.className,/staticSwap/);
+ const ready=swapFixture('ready')({loading:false,preserveContent:true,animateSwap:false,children:child,fallback});
+ const retained=nodes(ready).find(node=>node.props?.hidden===false);
+ assert.match(retained.props.className,/staticSwap/);
+ assert.equal(nodes(ready).includes(child),true);
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './home.module.scss';
-import AnimatedLogo from '../../logos/logo/AnimatedLogo';
+import HomeLogo from '../homeLogo/HomeLogo';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -14,7 +14,7 @@ const Home: React.FC = () => {
 
     return (
         <div className={styles.treeText}>
-            <AnimatedLogo></AnimatedLogo>
+            <HomeLogo />
 
             <section className={styles.hero}>
             <div className={styles.heroInner}>

@@ -155,3 +155,11 @@
     &:disabled { opacity: .5; cursor: default; }
 }
 @media (prefers-reduced-motion: reduce) { .neutralLogout { transition: none; } }
+
+
+.tableFrame { position: relative; height: 100%; min-width: 0; }
+.tableContent { height: 100%; min-width: 0; }
+.tableCover { position: absolute; inset: 0; border-radius: 0.5rem; overflow: hidden; }
+.tableError { color: var(--error-text); padding: 1rem; overflow-wrap: anywhere; }
+
+.tableCover { display: flex; align-items: center; justify-content: center; }

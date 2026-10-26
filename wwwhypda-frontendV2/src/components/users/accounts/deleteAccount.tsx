@@ -1,3 +1,4 @@
+import { useDialogMotion } from '../../modal/useDialogMotion';
 import { useRef, useState } from 'react';
 import axios from 'axios';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
@@ -12,6 +13,7 @@ import styles from './accountsStyles.module.scss';
 import { pauseAccountSession, resumeAccountSession, endAccountSession } from '../accountSession';
 
 export default function DeleteAccount() {
+    const duration = useDialogMotion();
     const [open, setOpen] = useState(false);
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -24,7 +26,6 @@ export default function DeleteAccount() {
         if (busy.current) return;
         setOpen(false);
         setPassword('');
-        setError('');
     };
 
     const submit = async (event: React.FormEvent) => {
@@ -59,11 +60,12 @@ export default function DeleteAccount() {
     };
 
     return <div className={styles.deleteAction}>
-        <Button className={styles.deleteButton} onClick={() => setOpen(true)}>{messages.account_delete_button}</Button>
-        <Dialog open={open} onClose={close} aria-labelledby="delete-account-title"
+        <Button className={styles.deleteButton} onClick={() => { setError(''); setOpen(true); }}>{messages.account_delete_button}</Button>
+        <Dialog open={open} onClose={close} transitionDuration={duration}
+            slotProps={{backdrop:{transitionDuration:duration},transition:{onExited:() => setError('')}}} aria-labelledby="delete-account-title"
             aria-describedby="delete-account-description"
             className={`${styles.deleteDialog} ${isDarkTheme ? palette.dark : ''}`}>
-            <form onSubmit={submit} noValidate>
+            <form onSubmit={submit} noValidate inert={!open} aria-hidden={!open || undefined}>
                 <DialogTitle id="delete-account-title">{messages.account_delete_title}</DialogTitle>
                 <DialogContent>
                     <p id="delete-account-description">{messages.account_delete_description}</p>

@@ -1,3 +1,4 @@
+import { useRoutePresentation } from './routePresentationContext';
 // import * as React from 'react';
 // import AppBar from '@mui/material/AppBar';
 // import Toolbar from '@mui/material/Toolbar';
@@ -7,9 +8,7 @@
 // import logo2 from './logo4.png';
 
 // import { useTheme, ThemeProvider, createTheme } from '@mui/material/styles';
-import { lazy, Suspense, useRef} from 'react';
-import { LOGO_LAB_ENABLED } from '../../common/experimentalFeatures';
-import messages from '../../common/error_messages.json';
+import { useRef} from 'react';
 // import {useEffect, useState, useRef} from 'react';
 // import Brightness4Icon from '@mui/icons-material/Brightness4';
 // import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -53,18 +52,17 @@ import SuperuserAccount from '../users/accounts/superuser';
 import SuperProtectedRoute from '../users/routes/superProtectedRoute';
 import { ModalProvider } from '../modal/modalContext';
 
-const LogoLabPage = LOGO_LAB_ENABLED ? lazy(() => import('../logoLab/LogoLabPage')) : null;
 
 export default function MainMenu() {
 
     const isDarkTheme = useSelector((state: State) => state.isDarkTheme);
     const modalRootRef = useRef<HTMLDivElement>(null);
+    const { location, phase } = useRoutePresentation();
 
     return (
-        <div ref={modalRootRef} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
+        <div ref={modalRootRef} data-route-phase={phase} inert={phase!=='ready'} aria-hidden={phase!=='ready' || undefined} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
             <ModalProvider modalRootRef={modalRootRef}>
-                <Routes>
-                    <Route path="/logo-lab" element={LogoLabPage ? <Suspense fallback={<p role="status">{messages.logo_lab_loading}</p>}><LogoLabPage /></Suspense> : <NotFound />} />
+                <Routes location={location}>
                     <Route path="/" element={<Home />} />
                     <Route path="/search" element={<Search />} />
                     {/* <Route path="/contribute" element={<Contribute />} /> */}
@@ -84,27 +82,25 @@ export default function MainMenu() {
                     <Route
                         path="/account"
                         element={
-                            <ProtectedRoute>
-                                <SuperProtectedRoute redirectIfSuperuser={true}>
-                                    <Account />
-                                </SuperProtectedRoute>
-                            </ProtectedRoute>
+                            <SuperProtectedRoute redirectIfSuperuser={true} skeleton="account">
+                                <Account />
+                            </SuperProtectedRoute>
                         }
                     />
 
                     <Route
                         path="/superaccount"
-                        element={<SuperProtectedRoute><SuperuserAccount /></SuperProtectedRoute>}
+                        element={<SuperProtectedRoute skeleton="superaccount"><SuperuserAccount /></SuperProtectedRoute>}
                     />
 
                     <Route
                         path="/read"
-                        element={<ProtectedRoute><InputPageRead /></ProtectedRoute>}
+                        element={<ProtectedRoute skeleton="read"><InputPageRead /></ProtectedRoute>}
                     />
 
                     <Route
                         path="/edit"
-                        element={<SuperProtectedRoute><InputPageEdit /></SuperProtectedRoute>}
+                        element={<SuperProtectedRoute skeleton="edit"><InputPageEdit /></SuperProtectedRoute>}
                     />
 
                     <Route
@@ -125,6 +121,7 @@ export default function MainMenu() {
                     <Route path="/register" element={<Register />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
 
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </ModalProvider>
         </div>

@@ -37,6 +37,7 @@ html, body, #root {
 /* One document scrollbar; OS overlay/auto-hide settings can still take precedence. */
 html {
   overflow-y: scroll;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-color) var(--scrollbar-track-color);
 }

@@ -1,7 +1,7 @@
 ---
 stage: 011
-title: Лаборатория анимированных логотипов WWHYPDA
-revision: 12
+title: Логотипы C12/B12 на Home и плавные состояния загрузки
+revision: 27
 status: in_progress
 created: 2026-10-23
 completed: null
@@ -15,7 +15,81 @@ rules:
 
 # Цель
 
-Локально реализовать отдельную отключаемую страницу /logo-lab: существующий логотип как исходный образец и 9 новых векторных композиций из сохранённого во frontend JSON-снимка реальных названий пород каталога Search. Изменения серверного каталога не обновляют логотипы автоматически. Для каждой новой композиции — Multicolour, три конечные анимации, независимый повторный запуск и штатный тёмный фон сайта.
+По актуальному указанию владельца перенести C12 на мобильную Home, B12 на desktop Home;
+удалить Logo Lab, её страницу и кнопку меню. Сохранить выполненное дополнение о плавных
+skeleton. Работа только локально, commit/push и визуальную проверку Vercel делает владелец.
+
+## Актуальный контракт revision27 (26.10.2026)
+
+Этот раздел заменяет прежние требования о сохранении старого Home, наличии лаборатории,
+9 стендах, flag/controls и её приёмке. Остальные разделы ниже сохраняют историю этапов.
+Повторное открытие лаборатории не требуется. Новые правки владельца исполняются в этом же
+цикле. По прямому указанию владельца план НЕ архивировать до его явной команды;
+status=in_progress, completed=null, active_stage остаётся прежним. Это осознанное исключение
+из автоархивирования WORKFLOW по указанию пользователя, а не завершённый цикл.
+
+- До48rem включительно — C12, выше — B12; один активный SVG и одна подготовка раскладки. Desktop B12 выровнен по hero: max1100px, минимум2rem от каждого края.
+- Сохраняются выбранные размеры/плотность, frozen имена/контуры, целые слова и просветы.
+- Тема следует сайту, готовый SVG прозрачен на --body-color; skeleton обоих вариантов использует единую скруглённую контрастную подложку с контуром/волной в палитре сайта. Только Multicolour; autoplay Centre outward на desktop / Word sequence на mobile,
+  reduced motion, cleanup и защита поздних результатов при resize/unmount.
+- Удалить Lab UI/route/menu/flag/строки; общий движок перенести в homeLogo.
+  Прежний /logo-lab показывает штатный NotFound через fallback.
+- Проверки только кодом/Docker. Браузер и статичные превью запрещены владельцем.
+  Актуальная owner QA перечислена в docs/artifacts/stage-011/acceptance.md.
+- Шаг4 лаборатории заменён переносом на Home в шаге6; её прежние controls/flag/role/zoom
+  проверки исключены вместе с удалённой страницей. Шаг5 остаётся открытым для QA владельца
+  и его явного решения об архивировании.
+
+Дополнение revision18 по замечанию владельца: устранить повторное мерцание скелетона
+после login и при входе в аккаунт через иконку. Удалить дублирующий guard /account,
+оставив проверку auth/role в SuperProtectedRoute. На проверке доступа не перезапускать
+вложенные fade-in скелетона; сохранить fade-out,750ms minimum, guards/redirects и hidden/inert.
+Авторизационный транспорт, backend, session/CSRF/CAPTCHA не изменять.
+
+Дополнение revision19: устранить пустую фазу/скачок таблиц обоих аккаунтов. Начальный
+loading=true, admin users ждут собственный ответ; loader до данных и первой отрисовки
+с750ms minimum, фиксированная высота и место под вертикальный scrollbar. Защищённые
+маршруты используют skeleton целевой страницы вместо login, без mount приватных данных
+до проверки. API/auth transport, роли, таблицы и их действия сохранить.
+
+Дополнение revision20: Search skeleton должен точно покрывать свой блок, circular loader
+вернуть на общие skeleton и новые placeholders в существующих стилях сайта; осветлить
+light inks логотипов с сохранением читаемости. Визуальный контроль остаётся у владельца.
+
+Дополнение revision21: убрать мерцание цвета ссылок документов при попытке регистрации
+без обязательных галочек. Ссылки остаются в основном цвете, ошибка выделяет галочки и текст согласия.
+
+Приоритетное дополнение revision22: владелец сообщил, что page skeleton был ошибочно
+показан гостю, макеты аккаунтов/Add data не совпадали с реальным контентом, footer виден
+во время loading и на Search без прокрутки. Для guest/unknown вернуть реальный Login
+checkingAccess; для подтверждённой в этом браузере сессии page skeleton с настоящей
+структурой и CSS-классами страниц. Hint хранит только session epoch, не право входа;
+проверка сервера остаётся на каждом protected route. Footer обычных страниц ниже первого
+viewport, доступен при прокрутке. Визуальный контроль только владельцем.
+
+Приоритетное дополнение revision23: владелец повторно сообщил, что light inks слишком
+тёмные. Вместо слабого осветления при прежнем пороге4.5 сделать заметно более яркую,
+насыщенную палитру. Для декоративных слов логотипа light contrast3–3.3:1 вместо4.55;
+dark palette, фон, геометрия и анимации сохраняются. Остальной текст сайта не меняется.
+
+Приоритетное дополнение revision24: не использовать отдельные skeleton степпера и
+названий страницы/таблицы на Add data. Отображать их обычным видом; реальную общую
+иконку степпера переиспользовать, table loading сохранить.
+
+Приоритетное дополнение revision25: убрать skeleton статичных account/admin заголовков,
+Name/Email labels и публичного privacy/support текста. Добавить плавные enter/exit всем
+модальным окнам (включая read/edit confirmations и delete account), с reduced motion,
+сохранением focus/close/CSRF/pending поведения и содержимого до конца exit.
+
+Приоритетное дополнение revision26 по прямой коррекции владельца: убрать skeleton и у
+значений name/email, не только подписей. Не менять цвет номеров Stepper во время loading.
+Завершить единый fade-out старого/fade-in нового контента между любыми внутренними
+страницами, включая плавный вход skeleton Search/input/accounts. Сохранить auth/privacy/
+CAPTCHA и reduced motion, предотвратить гонки быстрых навигаций и двойные fade у guard.
+План по-прежнему открыт до отдельной команды архивировать.
+
+Приоритетное дополнение revision27: убрать обводку logo-loading и использовать тот же
+цвет и стандартную wave поверхность SingleSkeleton, что у Search, в обеих темах.
 
 ## Объём и ограничения
 
@@ -123,7 +197,7 @@ Revision 3, прямое уточнение владельца: один раз 
 - Потребители общих изменений: menu.module.scss — весь сайт; словарь — все страницы. Новые tokens не переопределяют старые. AnimatedLogo потребляют Home и lab wrapper; регрессия Home обязательна.
 - Документы: frontend.md — только реализованные факты о шрифте, palette scopes, кэше и motion.
 
-### 4. [ ] Страница и выключатель маршрута
+### 4. [x] Страница и выключатель маршрута — заменено шагом6 по revision14
 
 - Файлы: logoLab/LogoLabPage.tsx и SCSS Modules; новый src/common/experimentalFeatures.ts; src/components/mainWindow/mainBody.tsx.
 - Централизованный export const LOGO_LAB_ENABLED = true. Условно зарегистрировать route /logo-lab; при false прямой URL явно показывает существующий NotFound, lab не монтируется и каталог не запрашивается. Импорт страницы lazy, загрузка только при включённом посещении. Флаг действует после пересборки; ссылку в меню не добавлять.
@@ -150,6 +224,135 @@ Revision 3, прямое уточнение владельца: один раз 
 - Обязательные недоступные проверки явно записать; не закрывать цикл до их выполнения или явного исключения владельцем. Не выдавать planning review за browser QA.
 - Обновить README/правила по фактам; отметить шаги, итог и рекомендуемый commit feat(stage-011): add experimental word logo lab. После полной приёмки архивировать этот же план, status archived, STATE.active_stage: null, last_archived: docs/archive/011-logo-lab.md.
 - Финальный отчёт: URL, краткий список A10–A12, B10–B12, C10–C12, точный путь/имя флага и необходимость rebuild, выполненные проверки и их ограничения.
+
+### 6. [x] C12/B12 на Home, удаление лаборатории
+
+- Выполнено: homeLogo/HomeLogo.tsx и SCSS, перенос core/snapshots; только C12/B12,
+  breakpoint48rem, тема сайта, autoplay, async abort/retry, reserve aspect ratio.
+- Удалены Lab UI/diagnostics/flag/route/menu/строки. Home использует новый компонент.
+  Старый AnimatedLogo не монтируется; его исходник сохранён.
+- Тесты перенесены в test-home-logo.mjs; добавлены выбор варианта, race/abort/retry,
+  отсутствие точки входа lab и регрессия маршрута/темы.
+- Проверено: Docker build (legal/TypeScript/Vite) pass;67/67 tests pass; scoped ESLint pass.
+  Полный lint — прежние58 errors/14 warnings. Browser/визуальная приёмка не выполнялись.
+- README, frontend rules, acceptance синхронизированы. Шаг5 открыт по прямому указанию
+  владельца; архивирования, commit/push/VPS нет.
+
+### 7. [x] Устранить повторное мерцание при входе в аккаунт
+
+- /account использует один SuperProtectedRoute с redirectIfSuperuser=true вместо пары
+  ProtectedRoute/SuperProtectedRoute. Auth/role checks и все редиректы сохранены.
+- LoadingSwap/вложенный AuthSkeleton при checkingAccess не перезапускают fade-in.
+  Обычные loader/form entrances, minimum750ms, fade-out, hidden/inert и reduced motion сохранены.
+- Файлы: mainBody.tsx, routes/{protectedRoute,superProtectedRoute}.tsx, auth/login.tsx,
+  commonFeatures/{loadingSwap,authSkeleton}.tsx и loadingSwap.module.scss.
+- Проверки: Docker build/legal/TypeScript/Vite pass;69/69 tests pass.
+  Scoped ESLint пяти loader/route файлов pass; login.tsx имеет только прежнюю ошибку
+  react-refresh/only-export-components на строке26. Полный lint: прежние58 errors/14 warnings.
+- Документация и owner checklist обновлены; визуальная проверка владельцем, план открыт.
+
+### 8. [x] Готовые таблицы аккаунтов и skeleton целевых страниц
+
+- Добавлен AccountTable: начальный loading=true, отдельный usersLoading администратора,
+  ожидание реального первого рендера/пустого ответа, два RAF и750ms minimum; фиксированная
+  высота25rem и alwaysShowVerticalScroll. Callback controller отменяется при reload/unmount.
+- UserSuggestions/InputSuggestions/superuser используют wrapper; account profile начинает
+  loading=true. Document scrollbar-gutter стабилен. Действия/колонки/API/права сохранены.
+- ProtectedPageSkeleton account/superaccount/dataset заменил Login в guards; приватные
+  страницы до проверки не монтируются. MainBody передаёт нужный layout.
+- Шесть новых account-loading tests; регрессия guards адаптирована. Проверки revision19:
+ 75/75 pass, build pass; итоговые проверки вместе с revision20 ниже.
+
+### 9. [x] Границы Search skeleton, circular loader и светлые слова
+
+- SingleSkeleton: spinner по умолчанию, inset0, border-box/clip/radius; общий LoadIcon
+  позиционируется выше поверхности. В новых account/page skeleton добавлен тот же spinner.
+- Search parameters padding внутри content, не вокруг loader; min-height24rem только
+  stacked loading. Дерево использует overlay всей treePanel вместе с gutter.
+- Light inks осветлены с contrast>=4.55, dark inks сохранены.
+- Итог:76/76 tests pass; build/legal/TypeScript/Vite pass; новый scoped lint pass,
+  tree/mainTree имеет только прежнюю ошибку51:13; full lint58 errors/14 warnings.
+  Документы/чеклист синхронизированы. Шаг5 и план остаются открыты для владельца.
+
+### 10. [x] Стабильный цвет ссылок согласий
+
+- Удалено наследование error color для policyLink в checkboxRowError. Ссылки документов
+  сохраняют основной цвет при visited/focus и при ошибке; checkbox и текст согласия красные.
+- Только users.module.scss; валидация, required consent и обработчики формы сохранены.
+- Docker build/legal/TypeScript/Vite pass;15/15 auth/privacy tests pass;
+  full lint — прежние58 errors/14 warnings. Новые тесты для CSS-правки не добавлялись.
+- README/rules/owner checklist обновлены; визуальная приёмка владельцем, план открыт.
+
+### 11. [x] Исправить выбор и соответствие skeleton, убрать footer из первого экрана
+
+- Гость/unknown: Login checkingAccess. Ранее подтверждённая сессия: page placeholder.
+  Добавлен authPresentation (только epoch в памяти); login/check записывают подтверждение,
+  отказ забывает, смена sessionVersion инвалидирует. Авторизация/роли не кэшируются.
+- ProtectedPageSkeleton перестроен по реальным accounts/users/stepper классам, порядку блоков,
+  высотам table/stepContent и сохранённому activeStep. Реальные приватные компоненты/данные
+  до проверки не монтируются. /read,/edit имеют свои kind/title.
+- MainWindow применяет существующий fullScreenContent ко всем обычным страницам,
+  включая Search/loading; динамическое измерение header сохранено. Footer в потоке ниже
+  первого viewport. Legal shell прежний.
+-90/90 tests pass, build/legal/TS/Vite pass; scoped ESLint authPresentation/useAuthCheck/
+  routes/MainWindow/MainBody pass. Full lint — прежние58 errors/14 warnings.
+- README/rules/acceptance обновлены. Шаг5 открыт, план не архивировать до команды владельца.
+
+### 12. [x] Сделать светлые слова логотипа заметно ярче
+
+- Только home-logo-ink-light1–10 заменены на более яркие и насыщенные teal/copper/
+  coral/blue/green. Dark palette, контуры и анимации прежние.
+- По повторному прямому указанию владельца прежний порог4.55 для decorative light inks
+  заменён диапазоном3–3.3:1; тест не позволяет снова затемнить light palette до4.5.
+- Docker build/legal/TypeScript/Vite pass,14/14 logo tests pass; full lint58 errors/14 warnings.
+  Документы синхронизированы, визуальная проверка владельцем, план открыт.
+
+### 13. [x] Упростить loading Add data
+
+- В dataset/read/edit макете Stepper/StepLabel, page title и table title обычные.
+  StepIconPlaceholder удалён; реальный CustomStepIcon перенесён в inputData/StepIcon.tsx
+  и используется настоящим Stepper и route placeholder. Комментарии сохранены.
+- Проверки: build/legal/TS/Vite pass;90/90 tests pass; scoped StepIcon/placeholder pass.
+  Full lint57 errors/14 warnings: прежняя ошибка Fast Refresh ушла при выделении иконки.
+- README/rules/acceptance обновлены; визуальная проверка владельцем, план открыт.
+
+### 14. [x] Обычные подписи аккаунтов и анимация всех модальных окон
+
+- Account/admin page title, Name/Email и privacy/support copy обычные; dynamic values
+  и таблицы остаются placeholders. Изменены ProtectedPageSkeleton и scoped profile styles.
+- useDialogMotion задаёт220/180ms (0 при reduced motion). Общий ModalWindow: Fade,
+  backdrop duration, closeAfterTransition, retained body до exit и inert/aria-hidden.
+  Все общие confirmations/terms/maintenance используют его автоматически.
+- DeleteAccount Dialog использует общие длительности. Error очищается после exit/open;
+  password/pending-close guard и API/session/CSRF сохранены. Повторные нажатия на
+  закрывающееся тело исключены inert.
+- Проверки:94/94 tests pass (добавлены3 dialog и1 static-label test), Docker build/legal/
+  TS/Vite pass; scoped lint pass; full lint прежние57 errors/14 warnings.
+- README/rules/owner checklist обновлены; визуальная проверка владельцем. План открыт.
+
+### 15. [x] Полный page transition, отсутствие profile skeleton и стабильный степпер
+
+- Из ProtectedPageSkeleton удалены Skeleton значений name/email. Публичные подписи и
+  профиль после ответа нормальные; в dataset добавлены реальные treeText/StepLabel classes.
+- Новые mainWindow/{routePresentation,routePresentationContext}.ts, RouteTransition.tsx,
+  RouteRedirect.tsx: один displayed route, exit180ms -> последний target -> enter220ms,
+ 2RAF, cancellation/reduced/StrictMode. MainBody/Window и App подключены к одной схеме.
+- Guard LoadingSwap staticSwap сохраняет750ms и видимый fallback до общего выхода,
+  без повторного fade полного макета/пустого кадра при Navigate. Tables/auth flows сохранены.
+  useLoadingPresentation skipExit убирает вторую локальную задержку статичного guard.
+-107/107tests pass: новые route races/query/state/cleanup/reduced/inert/stale-redirect и
+  прежние формы/модальные/session/privacy/CAPTCHA/таблицы/логотипы. Build/legal/TS/Vite pass.
+  Scoped изменённых файлов pass; full lint прежние57 errors/14 warnings.
+- README/frontend rules/acceptance обновлены. Visual QA владельцем, шаг5/план открыты.
+
+### 16. [x] Logo skeleton без обводки, цвет как в Search
+
+- HomeLogo использует штатный SingleSkeleton table-color вместо отдельного mix.
+  Удалены inset shadow и custom wave; обе темы получают тот же MUI wave/background,
+  что Search. Неиспользуемые surface/border/wave tokens удалены, radius/spinner сохранены.
+- Build/legal/TS/Vite pass,14/14 logo tests pass, scoped HomeLogo ESLint pass;
+  full lint прежние57 errors/14 warnings. Новые тесты для косметической правки не добавлялись.
+- README/rules/acceptance обновлены; план остаётся открыт для owner QA.
 
 ## Критерии завершения цикла
 
@@ -178,6 +381,9 @@ Revision 3, прямое уточнение владельца: один раз 
 Актуальное уточнение revision11 по прямым указаниям владельца26.10.2026: заменить все прежние A/B/C тремя вариантами на группу, всего9. A10/11/12:[32,28.8]/[35,31.5]/[38,34.2]; B10/11/12:[40,36]/[44,39.6]/[48,43.2]; C10/11/12:[34,30.6]/[37,33.3]/[40,36]. Основной проход — плотные строки с gap1; дополнительный проход — оставшиеся карманы. SVG-контуры, целые имена, прозрачные просветы, enlarged W, Multicolour, три анимации и меню сохраняются. Прежние экспериментальные правила о структурных различиях, размерах и ограничениях повторов заменены этим контрактом плотности; repeatLimit24, предпочтение наименее использованных подходящих имён. Полные bbox и пересечения проверяются на каждом размещении.
 
 Владелец выполняет визуальную приёмку сам на сайте Vercel с мобильного после своего commit/push. По его указанию браузерную автоматизацию и генерацию/отправку статичных превью прекратить; не возобновлять без нового прямого поручения. Старые требования screenshots/contact sheets для этого уточнения отменены. Ожидаемые результаты owner QA фиксировать в этом же плане, не объявлять проверенными автоматически.
+
+
+Дополнение revision13 по прямому поручению владельца: общие skeleton должны показываться не менее0.75s и плавно появляться/исчезать, контент — плавно проявляться, с поведением как у панелей Search. Применить к auth, дереву/таблицам/формам и route loading. Не задерживать API или проверки доступа; сохранить поля и guards; reduced-motion и очистка таймеров обязательны. Код этого дополнения проверять локальными тестами/build/lint. Браузер и статичные превью по-прежнему исключены, визуальную приёмку выполняет владелец после своего commit/push.
 
 ## Журнал выполнения
 
@@ -264,3 +470,158 @@ Revision 3, прямое уточнение владельца: один раз 
 
 
 2026-10-26 — revision12 по указанию владельца: закреплён отдельный одноколоночный grid группы B в LogoLabPage, все B на всю доступную ширину окна. С lab снят max-width96rem; B preview/wordLogo имеют auto height, SVG заполняет ширину с сохранением исходных пропорций. A/C responsive columns сохранены. Браузер и статичные картинки не используются по запрету владельца. Штатная build/legal/TypeScript/Vite pass, scoped lint LogoLabPage pass; полный lint — прежние58errors/14warnings. git diff --check pass. Просмотр результата на Vercel выполняет владелец после своего commit/push; commit/push/VPS агентом не выполнялись.
+
+
+2026-10-26 — revision13: createLoadingPresentation + useLoadingPresentation + LoadingSwap добавляют минимум750ms, enter160/exit220/content220ms. SingleSkeleton сохраняет исходные формы/стили и комментарии, имеет отдельный overlay для Search; внешнее условное размонтирование overlay удалено. AuthSkeleton сохраняет поля/значения, скрытие/inert действует до окончания перехода. Guards сохраняют проверки/редиректы: приватные children не передаются при неизвестном доступе; уже проверенные страницы монтируются скрытыми сразу, без новой задержки их запросов. Добавлен общий token loading-min-height, loading label в словаре; синхронизирован только source hash legal manifest, PDF/версии не менялись. Таймерные и компонентные тесты покрывают min hold, slow response, rapid retry, reduced motion, cleanup/StrictMode, отсутствие раннего mount, hidden/inert и сохранение auth markup. Проверки:53/53 tests pass через node --experimental-vm-modules --test scripts/test-loading-state.mjs scripts/test-navigation-lifecycle.mjs scripts/test-auth-privacy.mjs в штатном frontend Docker; scoped lint pass; полный lint — прежние58errors/14warnings. Финальная штатная build/legal/TypeScript/Vite после правки минимальной высоты pass. Финальный scoped lint всех изменённых TS/TSX pass. git diff --check pass. Браузер/images/commit/push/VPS не выполнялись; owner visual QA остаётся открытой.
+
+2026-10-26 — revision14 по прямому указанию владельца:
+- C12/B12 перенесены на Home вместо AnimatedLogo, max-width48rem выбирает C12.
+  Движок и85 имён/контуры перенесены из logoLab в homeLogo без регенерации данных.
+  Тема адаптивная, geometry/размеры выбранных композиций сохранены.
+- Lab page/cards/controls/original preview/diagnostics, экспериментальный flag и меню удалены.
+  Удалены lab-only UI strings; manifest обновлён только нормализованным hash словаря,
+  юридические версии/PDF не менялись. Генератор и тесты используют актуальные пути.
+- Docker build/legal/TypeScript/Vite pass (прежнее предупреждение о крупных chunks);
+ 67/67 tests pass (14 Home logo +53 loading/navigation/auth); scoped ESLint pass;
+  полный lint58 errors/14 warnings в прежних несвязанных файлах.
+- Визуальная приёмка только владельцем на Vercel после его commit/push.
+  Браузер/изображения/публикация/VPS/commit/push агентом не выполнялись.
+- По явному указанию пользователя stage остаётся in_progress до его команды архивировать,
+  даже после будущих исправлений. Исторические критерии lab заменены актуальным разделом14.
+
+2026-10-26 — revision15 по указанию владельца: [x] B12 на desktop проявляется Centre outward,
+C12 на mobile — Word sequence. Изменён только выбор reveal в HomeLogo; геометрия и packing
+сохранены. Тест переключения ширины проверяет оба режима. Docker build/legal/TypeScript/Vite
+pass;14/14 logo tests pass; scoped ESLint pass; полный lint — прежние58 errors/14 warnings.
+README/rules/acceptance синхронизированы. Browser/preview/commit/push/VPS не выполнялись.
+План остаётся открытым до явного указания владельца архивировать.
+
+2026-10-26 — revision16: [x] desktop B12 выровнен по hero-контенту:
+width=min(1100px,100%-4rem), минимум2rem с каждого края, margin auto; aspect ratio
+и мобильный C12 сохранены. Build/legal/TypeScript/Vite pass; полный lint — прежние58/14.
+Запись результата восстановлена после прерванного пользователем предыдущего вызова.
+
+2026-10-26 — revision17: [x] единый skeleton C12/B12 вместо сливающегося body-color:
+surface из tree-text12%/body88%, inset контур20%, волна10%, радиус0.75rem.
+Все tokens в menu.module.scss, оформление scoped к HomeLogo через общий SingleSkeleton.
+Готовый SVG прозрачен; плавный переход/minimum750ms/reduced-motion сохранены.
+README/rules/acceptance синхронизированы. Docker build/legal/TypeScript/Vite pass,
+14/14 logo tests pass, scoped ESLint pass; полный lint — прежние58 errors/14 warnings.
+Визуальная приёмка только владельцем на Vercel. Браузер/изображения/VPS/commit/push
+не выполнялись. План остаётся открытым до явной команды владельца архивировать.
+
+2026-10-26 — revision18 по сообщению владельца о мерцании:
+- Исследование: /account проходил две независимые проверки с двумя LoadingSwap.
+  Проверочный Login также анимировал вход своего AuthSkeleton внутри route fade-in.
+- Удалён лишний ProtectedRoute на /account. SuperProtectedRoute сохраняет проверку сессии,
+  role и прежние redirect destinations. API transport/useAuthCheck/login requests не менялись.
+- animateEnter=false только в route loading и Login checkingAccess: при handoff скелетон
+  остаётся непрозрачным, а завершение использует прежний единичный exit/reveal.
+- Добавлены проверки структуры guard /account и route handoff/обычного fade-in, усилена
+  проверка guards.69/69 tests pass: auth/privacy, loading, navigation, Home logos.
+- Docker build/legal/TypeScript/Vite pass, scoped lint loaders/routes/mainBody pass;
+  login scoped — одна прежняя Fast Refresh ошибка26:7. Full lint58 errors/14 warnings.
+  git diff --check pass. README/frontend rules/acceptance актуализированы.
+- Визуальное устранение мерцания требует owner QA после его commit/push на Vercel.
+  Браузер/изображения/VPS/commit/push не выполнялись. План не архивирован по указанию владельца.
+
+2026-10-26 — revisions19/20 по прямым замечаниям владельца:
+- Начальная пустая таблица исключена loading=true. Admin users loading отделён от профиля.
+  AccountTable скрывает grid до ответа/первого рендера +2RAF, сохраняет размеры и scrollbar.
+  Общая750ms presentation с exit/content fade применяется после готовности; empty/error
+  завершаются корректно. Controller отменяет кадры и поздний результат.
+- Guards показывают публичный skeleton целевой account/admin/dataset страницы без Login.
+  Реальные компоненты/запросы приватных страниц недоступны до auth/role verification.
+- Search skeleton выровнен: form padding относится к готовому content, tree overlay
+  покрывает gutter, surface inset0/radius/box-sizing согласованы с блоками.
+- CircularProgress LoadIcon возвращён по умолчанию SingleSkeleton и добавлен в новые
+  AccountTable/ProtectedPageSkeleton. Цвет border, z-index1 поверх фона, reduced-motion.
+- Светлые inks осветлены; все10 light slots contrast>=4.55. Dark palette не менялась.
+- Итоговые Docker тесты76/76pass, build/legal/TypeScript/Vitepass (прежние large chunk warnings).
+  Scoped новых компонентов/guards/SingleSkeleton/LoadIcon/Search pass; mainTree scoped
+  содержит прежний set-state-in-effect51:13. Full lint прежние58 errors/14 warnings.
+- README/frontend rules/acceptance обновлены. git diff --check pass.
+  Браузер/изображения/VPS/commit/push не выполнялись. Owner QA на Vercel после его commit/push;
+  план по прямому указанию остаётся in_progress до явной команды архивировать.
+
+2026-10-26 — revision21: убран конфликт checkboxRowError .policyLink color:inherit
+с постоянным tree-text у visited/focus ссылок документов. Это исключает смену цвета
+ссылок при валидации; error highlight галочек/текста сохранён. Build/legal/TS/Vite pass,
+15/15 существующих auth/privacy tests pass; full lint58 errors/14 warnings; diff --check pass.
+Документы синхронизированы. Браузер/preview/VPS/commit/push не выполнялись; план открыт.
+
+2026-10-26 — revision22, исправление после замечаний владельца:
+- Прежний единый page placeholder признан неверным для guest, а формы из шести полей —
+  неверной геометрией dataset. Guards снова умеют Login checkingAccess для guest/unknown.
+- В authPresentation только память о текущем подтверждённом epoch; нет токенов, профилей,
+  роли или persistence. useAuthCheck всё равно начинает isAuth=null и делает server check;
+  login запоминает epoch только после /users/check. Отказ/terms/logout не дают доступа.
+- Макеты повторяют настоящую структуру и используют её CSS classes: accounts top/title/
+  table/details/privacy/second admin table/bottom, dataset Stepper+34rem stepContent/
+  actions/grid/navigation. Учитывается только activeStep; содержимое черновиков не читается.
+- MainWindow fullScreenContent применён на всех обычных маршрутах, исправляя footer как
+  на Search, так и во время skeleton. Юридическая оболочка не изменялась.
+- Регрессия90/90pass: новые hint/guest/server-check/epoch/logout/footer tests и проверка
+  переиспользования layout; существующие session/privacy/maintenance/guards/loading/logos.
+  Scoped lint изменённых новых модулей pass; full58 errors/14 warnings прежние.
+  Docker build/legal/TypeScript/Vite pass, прежние large-chunk warnings; diff --check pass.
+- README/frontend rules/current acceptance обновлены. Визуальная приёмка ожидается на
+  Vercel владельцем после его commit/push. Browser/images/VPS/commit/push не выполнялись.
+  Stage остаётся in_progress и не архивируется без явной команды владельца.
+
+2026-10-26 — revision23: повторное осветление light inks сделано существенным, с повышенной
+насыщенностью. Прежний лимит4.5 не сохраняется для decorative logo по прямому требованию
+владельца; новый диапазон3–3.3, dark>=4.5. Только CSS tokens и palette test.
+После случайного прерывания проверено сохранение файлов, запущенных Docker checks не
+осталось; проверки завершены повторно. Build/legal/TS/Vite pass,14/14 tests pass,
+full lint прежние58 errors/14 warnings. README/rules/acceptance обновлены, diff --check pass.
+Browser/images/VPS/commit/push не выполнялись. Stage не архивирован.
+
+2026-10-26 — revision24: по указанию владельца убраны отдельные skeleton степпера,
+названий страницы/таблицы в dataset route loading. Они рисуются обычными публичными
+элементами с общей настоящей StepIcon. Иконка перемещена без изменения поведения;
+аккаунты, guest/Login fallback и table loading сохранены.
+Build/legal/TS/Vite pass,90/90tests pass, scoped lint pass, full57errors/14warnings
+(минус одна прежняя Fast Refresh ошибка при необходимом выделении иконки).
+Документы обновлены, diff --check pass. Browser/images/VPS/commit/push не выполнялись;
+план остаётся открытым до явной команды владельца.
+
+2026-10-26 — revision25 по прямым указаниям владельца:
+- Статичные account/admin подписи больше не завернуты TextPlaceholder. Public privacy/
+  support copy и email обычные; Skeleton персональных значений сохранён после label.
+- Все ModalWindow consumers получили Fade/backdrop220ms enter/180ms exit, closeAfterTransition
+  и retained ReactNode до onExited. Closed content inert/aria-hidden, focus/portal/ARIA прежние.
+- Delete Dialog использует общую motion policy, pending guard сохранён, пароль очищается
+  на close, ошибка после exit. Reduced motion0ms. HTTP/CSRF/session behavior не изменены.
+-94/94tests pass: общая регрессия + static-labels/shared fade/retention/reduced/delete-pending.
+  Build/legal/TypeScript/Vite pass, scoped ESLint4 изменённых компонентов pass;
+  full lint57errors/14warnings прежние. Large chunk warning остаётся.
+- README/frontend rules/acceptance синхронизированы; diff --check pass. Browser/images/
+  VPS/commit/push не выполнялись. Owner QA на Vercel; stage не архивирован.
+
+2026-10-26 — revision26 после уточнения владельца:
+- Признано неверным прежнее ограничение задачи только labels: value skeleton name/email
+  удалены полностью. Полос нет; неизвестные значения не выдумываются и не кэшируются.
+- Повторный fade полного protected placeholder при раскрытии verified page исключён
+  staticSwap с корректной specificity preserved.staticSwap; Stepper использует реальный
+  treeText wrapper/labels и общую StepIcon, без иной палитры/затухания на loading complete.
+- Общий route controller180/220ms в App удерживает один displayed route до выхода,
+  заменяет pending destination при новых кликах, разрешает latest target после exit,
+  фиксирует новый кадр двумя RAF. Reduced motion переключает сразу, cleanup/StrictMode
+  отменяют callbacks. Legal/public/protected layout выбирается по displayed Location.
+- Контекст видит live target синхронно и блокирует stale Navigate исходящего guard ещё
+  до effects; RouteRedirect удерживает public fallback до общего выхода. Guard minimum750ms
+  сохранён без двойного локального exit. Private children до auth proof не монтируются.
+- RecaptchaProvider продолжает получать live pathname, lifecycle/actions/frames не
+  продлеваются визуальным exit. Session/CSRF/roles/API transport не изменены.
+-107/107tests pass (включая recaptcha-scope); финальные build/legal/TS/Vite pass, scoped
+ 11 изменённых TS/TSX групп pass; full lint прежние57errors/14warnings. Large chunks прежние.
+- README/rules/current acceptance обновлены, diff --check pass. Browser/images/VPS/
+  commit/push не выполнялись. Визуальная приёмка владельцем на Vercel; stagein_progress.
+
+2026-10-26 — revision27: по указанию владельца logo-loading без обводки и без отдельной
+палитры подложки/волны. Переиспользуется default SingleSkeleton table-color (совпадает
+с Search light/dark drawer/table token), стандартная MUI wave и прежний circular loader.
+Build/legal/TS/Vite pass,14/14 tests pass, scoped ESLint pass, full57errors/14warnings,
+diff --check pass. Документы синхронизированы. Browser/images/VPS/commit/push нет,
+stage остаётся in_progress до явной команды владельца архивировать.

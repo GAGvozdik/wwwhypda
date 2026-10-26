@@ -62,3 +62,5 @@
 @container workspace (min-width: 65rem) { .treePanel { height: var(--search-panel-height); } }
 
 .treePanel .treeBody::-webkit-scrollbar-corner { background: var(--drawer-color); }
+
+.treePanel { position: relative; }

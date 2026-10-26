@@ -1,4 +1,4 @@
-"""Freeze the lab's ASCII rock names as Afacad Flux 600 vector outlines.
+"""Freeze the home logos' ASCII rock names as Afacad Flux 600 vector outlines.
 
 Run manually with Python + fontTools after intentionally changing the snapshot/font.
 No runtime font parser or network dependency is added to the frontend.
@@ -15,7 +15,7 @@ from fontTools.pens.transformPen import TransformPen
 
 ROOT = Path(__file__).resolve().parents[1]
 font_path = ROOT / "src/assets/fonts/Afacad_Flux/AfacadFlux-VariableFont_slnt,wght.ttf"
-names = json.loads((ROOT / "src/components/logoLab/rockNames.snapshot.json").read_text(encoding="utf-8"))
+names = json.loads((ROOT / "src/components/homeLogo/rockNames.snapshot.json").read_text(encoding="utf-8"))
 font = instantiateVariableFont(TTFont(font_path), {"wght": 600, "slnt": 0}, inplace=False)
 glyphs = font.getGlyphSet()
 cmap = font.getBestCmap()
@@ -37,6 +37,6 @@ for name in names:
     words[str(name["rt_id"])] = {"name": text, "path": path_pen.getCommands(), "bounds": bounds_pen.bounds}
 output = {"font_sha256": hashlib.sha256(font_path.read_bytes()).hexdigest(),
           "unitsPerEm": font["head"].unitsPerEm, "weight": 600, "words": words}
-target = ROOT / "src/components/logoLab/wordOutlines.snapshot.json"
+target = ROOT / "src/components/homeLogo/wordOutlines.snapshot.json"
 target.write_text(json.dumps(output, separators=(",", ":")) + "\n", encoding="utf-8")
 print(f"{len(words)} vector words, {target.stat().st_size} bytes, unitsPerEm={output['unitsPerEm']}")

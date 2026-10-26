@@ -1,6 +1,7 @@
+import { useRoutePresentation } from './routePresentationContext';
 import MaintenanceNotice from '../commonFeatures/maintenanceNotice';
 import { useLayoutEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import LegalLinks from '../pages/legalLinks';
 import { requiresRecaptcha } from '../commonFeatures/recaptchaRoutes';
 import { applyTheme } from '../../common/theme';
@@ -21,8 +22,8 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 
 
 export default function MainWindow() {
-    const pathname = useLocation().pathname;
-    const fillsFirstScreen = pathname === '/' || pathname === '/search';
+    const pathname = useRoutePresentation().location.pathname;
+    const fillsFirstScreen = !['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(pathname);
     const shellRef = useRef<HTMLDivElement>(null);
     const isLegalPage = ['/privacy-policy', '/cookie-policy', '/user-agreement'].includes(pathname);
     // useTokenRefresh();
@@ -71,7 +72,7 @@ export default function MainWindow() {
 
 
     return (
-        <div ref={shellRef} className={`${windowStyles.container} ${pathname === '/' ? windowStyles.fullScreenContent : ''} ${isDarkTheme ? styles.dark : ''}`}>
+        <div ref={shellRef} className={`${windowStyles.container} ${fillsFirstScreen ? windowStyles.fullScreenContent : ''} ${isDarkTheme ? styles.dark : ''}`}>
 
             <MainMenu />
             <MainBody />

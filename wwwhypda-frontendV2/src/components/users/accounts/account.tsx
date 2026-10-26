@@ -22,7 +22,7 @@ const Account: React.FC = () => {
 
     const [userData, setUserData] = useState<AccountProfile | null>(null);
     const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         fetchUserData();

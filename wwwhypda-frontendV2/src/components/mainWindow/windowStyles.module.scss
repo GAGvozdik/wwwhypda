@@ -205,3 +205,11 @@
 // its box would shrink and recenter the entire legal column during auth checks.
 .guardRecaptchaNotice { visibility: hidden; }
 .container:has([data-auth-check='true']) .guardRecaptchaNotice { visibility: visible; }
+
+// One sequential route transition for every content page, including loading states.
+.bodyMenuItem[data-route-phase] { opacity: 1; transition: opacity 220ms ease-in-out; }
+.bodyMenuItem[data-route-phase='entering'] { opacity: 0; }
+.bodyMenuItem[data-route-phase='exiting'] { opacity: 0; transition-duration: 180ms; pointer-events: none; }
+@media(prefers-reduced-motion:reduce) {
+    .bodyMenuItem[data-route-phase] { opacity: 1; transition: none; }
+}

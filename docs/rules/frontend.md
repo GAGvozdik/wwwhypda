@@ -91,7 +91,7 @@
   контурном стиле, Delete account по центру нижнего блока после контента. Dialog/CSRF/session handlers без изменений.
   Контейнер до 72rem; кнопки не fixed. Расположение и стиль приняты владельцем; источник и ограничения browser-проверок в архиве 006.
 
-Search не использует fullScreenContent min-height общей оболочки; Home его сохраняет.
+Все обычные страницы, включая Search и loading, используют fullScreenContent min-height общей оболочки; footer ниже первого viewport. Legal shell отдельный.
 При возврате фокуса с скрываемой панели используется preventScroll, без скролла на mount.
 
 В Search внешний treePanel имеет radius 8px и overflow:hidden, treeBody наследует
@@ -112,9 +112,8 @@ radius, сохраняя внутреннюю прокрутку. Это обр�
   (общий formContour: 1px/25px + прежняя modal shadow), прежний form-color, MUI wave слева направо и existing LoadIcon по центру.
   Search/tree/table/profile loaders возвращены к прежнему коду SingleSkeleton;
   никаких новых borders/background/min-height для них.
-- Проверка доступа рендерит реальный Login checkingAccess под auth skeleton, без
-  requests/модальных окон из самого login. После auth guard действуют прежние
-  redirect/terms/role gates. Account-shaped 34rem placeholder удалён.
+- Проверка доступа гостя/неизвестной сессии показывает Login checkingAccess; после подтверждённого входа — безопасный ProtectedPageSkeleton целевого маршрута;
+  реальные страницы до проверки не монтируются. Redirect/terms/role gates сохранены.
 - Проверка подтверждения/явный resend показывают skeleton именно confirmation
   формы; callback busy true/false не теряется при переходе к обычному login.
   Email на шаге подтверждения маскируется (p***@e***.test); Back to sign in — Link
@@ -123,10 +122,9 @@ radius, сохраняя внутреннюю прокрутку. Это обр�
   отдельных вкладках. Status проверяется на route/focus/manual retry, throttle1.5s,
   без polling. Никакого logout, очищения drafts, смешивания с terms или POST replay.
 
-Во время Login checkingAccess на /account/input footer показывает ту же
-reCAPTCHA подпись, что у обычного login: data-auth-check marker и CSS :has без
-отдельного state/effect. После проверки действует обычная route visibility.
-Это только текстовый notice; allowlist/provider/iframe lifecycle не расширяются.
+ProtectedPageSkeleton не включает
+login-specific reCAPTCHA notice. Footer на реальных auth-страницах сохраняет своё поведение;
+allowlist/provider/iframe lifecycle не расширяются.
 
 Footer notice скрывается через visibility:hidden, не display:none: его реальная
 ширина/высота и переносы сохраняются при route/guard transition. LegalLinks не
@@ -155,7 +153,7 @@ margin-left:auto у accountItem сохраняет выравнивание па
 
 ### Stage 010: Home и Search
 - Home h1 использует общий token3rem, до40rem —2rem; остальные заголовки прежние.
-  AnimatedLogo: root SVG в пределах42rem/100%, natural aspect ratio, tight viewBox
+  Прежний AnimatedLogo (заменён на Home в stage011): root SVG в пределах42rem/100%, natural aspect ratio, tight viewBox
   реальных букв, без13vh/95vw и counter-zoom. GSAP/masks сохранены; reduced-motion
   завершает timeline, listener/timeline очищаются, конфигурация букв memoized.
 - В stacked Search форма растёт по содержимому без внутреннего scroll параметров;
@@ -169,44 +167,184 @@ margin-left:auto у accountItem сохраняет выравнивание па
   результаты, не только страницу. Общий helper проверен roundtrip125 строк,
   zero/null/Unicode и строкой, похожей на formula. AG Grid остаётся Community.
 
-### Stage 011: локальная лаборатория логотипов
+### Stage 011: логотипы главной
 
-- Публичный `/logo-lab` включается `LOGO_LAB_ENABLED` в common/experimentalFeatures.ts;
-  после изменения нужен rebuild. При false — существующий NotFound, без mount lab,
-  API каталога и загрузки lab chunk. Lazy импорт; при LOGO_LAB_ENABLED=true пункт Logo lab в основном меню ведёт на /logo-lab; это выключатель
-  эксперимента, не access control. Redux/auth/CAPTCHA/transport не менялись.
-- Для lab используется статический rockNames.snapshot.json: 85 полных имён и ID из
-  публичного Search, снимок от 2026-10-23. Запросов каталога и автоматического обновления
-  на lab нет; Search/дерево используют актуальный API без изменений. При создании снимка
-  исключены parent=-1 и узлы с детьми; trim только краёв, стабильные ordinal sort/dedup,
-  moderation status не фильтруется. Loading/error/retry и abort относятся к подготовке
-  раскладок; пустой снимок показывает empty. Данные снимка проверяются unit test.
-- SVG paths исходных W.svg/WWHYPDA.svg, включая nonzero countersP/D/A. C — диск минус W,
-  а не заливка поверх слов. Packing принимает целые padded bbox через raster integral
-  с erosion; пространственный индекс исключает пересечения. Слова рисуются SVG-контурами, полные имена сохранены в title.
-- Afacad Flux600 заранее преобразован в wordOutlines.snapshot.json. Packing использует bounds этих же контуров; font loading/canvas/text hinting не участвуют. После mount/resize проверяется getBBox обёрток use, packing заново не запускается.
-- 9 configs используют denseRows с тремя размерами слов в каждой группе, квотами направлений,
-  промежутками и размерами. Обход чередует регионы, чтобы bounded budget не оставлял
-  только верхнюю половину. Кэш по каталогу/версии геометрии/шрифта/packing/config ID,
-  очередь одна с yield/abort; palette/theme/replay/resize не являются ключами.
-- Новые palette/size tokens только в menu.module.scss. Наборы inks
-  используют тёмный набор; lab локально применяет существующий класс dark из menu.module.scss. Фон --body-color, без отдельного surface selector; тема остальных страниц не изменяется.
-  Только Multicolour (8 цветов), без селекта палитры. Проверенные inks>=4.5:1.
-- Новые карточки открываются в финальном состоянии. Три opacity reveal (left/sequence/centre; default left) конечны,
-  меняют только атрибут opacity обёрток слов, не геометрию/transform контуров; settings останавливают replay и показывают итог. Timeline и
-  media/resize listeners очищаются; reduced motion сразу показывает все слова.
-- Логотипы показываются в карточках с независимой анимацией на штатном тёмном фоне сайта. Кнопки используют общий submitButton, селекты — inputField из menu.module.scss; UI полностью английский (Play animation). Увеличенный просмотр и его controls удалены по указанию владельца.
-- AnimatedLogo/Home не изменены. Lab-only wrapper до replay рисует статичный snapshot
-  активных исходных paths/masks/transforms, затем remount AnimatedLogo; W mark добавлен
-  только в lab по решению владельца. Прежние GSAP warnings отсутствующего знака в
-  AnimatedLogo сохраняются, не скрываются глобальным подавлением предупреждений.
-- Реализация ещё проходит owner QA. Точные результаты и оставшиеся Firefox/media/
-  zoom/roles/smoke/artifacts проверки: docs/artifacts/stage-011/acceptance.md.
+- Home использует homeLogo/HomeLogo.tsx: C12 при max-width48rem, B12 выше.
+  В DOM только один вариант; desktop wordmark выровнен по hero (max1100px, по2rem с краёв) с исходным
+  aspect ratio5800/1050, мобильный диск — квадрат до24rem. Hero и действия сохранены.
+- Logo Lab, её route/menu/controls/feature flag удалены. Прежний /logo-lab попадает
+  в существующий NotFound через fallback route; отдельной страницы лаборатории нет.
+- homeLogo/rockNames.snapshot.json содержит85 полных публичных leaf names/ID от23.10.2026:
+  trim только краёв, ordinal sort/dedup, исключены parent=-1 и узлы с детьми.
+  Home не запрашивает каталог; Search/дерево продолжают использовать API.
+- SVG paths взяты из исходных W.svg/WWHYPDA.svg с сохранением просветов.
+  C — диск минус W scale9.6/translate186.585,333.181; центроид площади W700,700.
+  Packing denseRows сначала заполняет строки, затем карманы; целые padded bbox
+  проверяются raster integral/erosion и spatial hash. Размеры B12[48,43.2], C12[40,36],
+  gap1, repeatLimit24 сохранены из выбранных владельцем вариантов.
+- Слова рисуются defs/use из frozen wordOutlines.snapshot.json (Afacad Flux600).
+  Packing измеряет те же контуры; runtime font loading/text hinting отсутствуют.
+  Генератор: scripts/generate-logo-word-paths.py. Проверки: scripts/test-home-logo.mjs.
+- Home автозапускает Centre outward на desktop и Word sequence на mobile; меняется только opacity обёрток.
+  Координаты/transform контуров фиксированы. useLayoutEffect исключает flash до старта.
+  Reduced motion сразу показывает итог; GSAP/resize/media listeners очищаются.
+- Тема Home следует Redux isDarkTheme. Tokens home-logo-ink-light/dark в menu.module.scss,
+  только Multicolour,8 используемых цветов; light inks ярче по revision23 (contrast3–3.3:1), dark>=4.5:1.
+  Отдельной подложки нет. AnimatedLogo больше не монтируется на Home.
+- Тяжёлые packing/renderer/outlines загружаются динамически. Одна очередь с yield/abort,
+  кэш по каталогу/версии геометрии/шрифта/packing/config ID; тема не пересоздаёт раскладку.
+  При resize/unmount поздний результат игнорируется, ошибка подготовки имеет безопасный Retry.
+  Место резервируется aspect-ratio; подготовка отображается через общий SingleSkeleton.
+  Оба варианта используют штатный цвет table-color и MUI wave как Search, без обводки; radius scoped к HomeLogo.
+  Готовый SVG остаётся на прозрачном фоне. Общие skeleton остальных страниц не переоформляются.
+- По прямому указанию владельца визуальная проверка выполняется им на Vercel/mobile
+  после своего commit/push. Браузерную автоматизацию и статичные превью не использовать.
+  Stage011 остаётся открытым до отдельного указания владельца архивировать.
+  Текущие сценарии: docs/artifacts/stage-011/acceptance.md.
 
-- По revision 6 в lab после дополнения revision 8 доступны 9 вариантов: A10–A12, B10–B12, C10–C12. Soft reveal исключён.
+### Плавные состояния загрузки — дополнение stage 011
 
-- Revision 8: в новых композициях названия рисуются SVG defs/use из wordOutlines.snapshot.json (Afacad Flux600, wght600/slnt0). Packing берёт bounds из того же snapshot; renderer не использует живой text/font/canvas. Snapshot генерируется scripts/generate-logo-word-paths.py, без новых browser deps. SVG title сохраняет полное имя. Контуры и transforms статичны; reveal меняет только opacity обёртки. C: W scale9.6/translate186.585,333.181, центроид площади700,700. A10–A12/B10–B12/C10–C12 заменяют прежние варианты. У всех B полный ряд. Сначала заполняются строки, затем свободные карманы; bbox/collision checks сохранены.
+- SingleSkeleton и AuthSkeleton используют общую loadingPresentation: минимум750ms с начала
+  загрузки; после готовности скелетон гаснет220ms, затем контент появляется220ms.
+  Вход скелетона160ms, easing ease-in-out соответствует панелям Search.
+  Если загрузка дольше750ms, дополнительной выдержки после ответа нет.
+- Уже готовый контент без события loading не удерживается. Новый loading во время exit
+  отменяет старые таймеры; unmount/смена состояния очищают timers/media listeners.
+  Reduced motion выключает переходы, wave/spinner; минимум750ms сохраняется.
+- LoadingSwap использует display:contents, сохраняя flex/grid потребителей.
+  Для высоты auto минимальный размер SingleSkeleton задаётся token loading-min-height3rem;
+  явно заданные размеры (в том числе компактная кнопка2.5rem) сохраняются.
+- AuthSkeleton оставляет реальные поля/значения смонтированными и скрывает/inert до конца
+  показа; общий SingleSkeleton не подменяется auth-формой.
+- ProtectedRoute/SuperProtectedRoute используют тот же переход. Пока проверка не завершена,
+  приватных children нет. После подтверждения доступа страница монтируется сразу скрытой/inert,
+  чтобы её запросы не ждали окончания скелетона. Редиректы и разрешения прежние.
+- Search results loader смонтирован постоянно: overlay появляется/исчезает через общий
+  переход, таблица сохраняется под ним; обрыв анимации внешним условным unmount устранён.
+  API/CSRF/CAPTCHA/session и сетевые задержки не менялись.
+- По указанию владельца браузерную автоматизацию и статичные превью не использовать.
+  Владелец проверяет формы, Search, account/input/edit/read и обе роли/темы на Vercel.
+- Исправление мерцания аккаунта: /account обёрнут только SuperProtectedRoute с
+  redirectIfSuperuser=true; он проверяет и сессию, и роль. Дополнительный ProtectedRoute
+  не нужен и не должен создавать второй lifecycle проверки/показа loader.
+- Route LoadingSwap использует animateEnter=false; скелетон проверки не гаснет/не появляется повторно
+  на handoff после login. Минимум750ms, единственный fade-out и reveal контента сохранены.
+  Обычные формы и SingleSkeleton сохраняют прежний fade-in. Приватные children до проверки
+  не монтируются, после подтверждения скрыты/inert до конца transition; редиректы прежние.
 
-- Указание владельца26.10.2026: визуальную приёмку /logo-lab он выполняет сам на Vercel/мобильном после своего commit/push. Не автоматизировать браузерную проверку и не генерировать/отправлять статичные превью без нового прямого поручения.
+### Stage011: загрузка таблиц аккаунтов и защищённых страниц
 
-- Revision12: B10–B12 всегда в одноколоночном wordmarkGrid, по одной карточке на всю доступную ширину окна. У lab нет max-width96rem; высота B-preview/SVG автоматическая по исходному viewBox, чтобы логотип заполнял ширину без искажения aspect ratio. Для A/C сохраняется двухколоночная desktop grid и одна колонка на узких экранах. Визуальная проверка по-прежнему только владельцем.
+- Guards для подтверждённой ранее сессии показывают ProtectedPageSkeleton: account для /account,
+  superaccount для /superaccount, dataset для /input,/read,/edit. Макет не читает приватные
+  данные и не монтирует настоящую страницу до успешной проверки. Auth/role/redirects прежние.
+- UserSuggestions/InputSuggestions и profile loading начинаются с true, поэтому первый
+  commit не показывает пустую таблицу перед запросом. Админский список пользователей имеет
+  отдельный usersLoading, не зависит от завершения /users/ profile request.
+- Все три AG Grid используют AccountTable: фиксированная высота account-table-height25rem,
+  grid монтируется только с готовыми данными и остаётся в layout с visibility:hidden/inert.
+  Непустой ответ ждёт onFirstDataRendered, пустой — onGridReady, затем два RAF.
+  Ключ подготовки меняется при загрузке/смене rows; controller отменяет старые кадры на
+  reload/unmount. Нет сброса состояния в effect или дополнительной задержки API.
+- useLoadingPresentation удерживает skeleton минимум750ms с начала цикла, затем exit220ms
+  и content reveal220ms. Ошибка имеет role=alert, настоящий пустой ответ не зависает.
+  Reduced motion сохраняет minimum, отключая визуальные эффекты.
+- alwaysShowVerticalScroll резервирует скроллбар grid и исключает смену ширины колонок при
+  заполнении; document html сохраняет overflow-y:scroll и scrollbar-gutter:stable.
+  Пагинация/колонки/действия/права/данные сохранены; AG Grid Community.
+- Регрессия: scripts/test-account-loading.mjs вместе с loading/navigation/auth и Home tests.
+  Визуальная проверка владельцем на Vercel, без браузерной автоматизации агента.
+
+### Stage011: границы skeleton, circular loader и светлая палитра
+
+- SingleSkeleton по умолчанию содержит LoadIcon (isLoadIcon=false остаётся явным opt-out).
+  LoadIcon — прежний CircularProgress цвета border, size30 и position:relative/z-index1,
+  чтобы абсолютная поверхность не закрывала индикатор. AccountTable и ProtectedPageSkeleton
+  тоже используют общий LoadIcon; AuthSkeleton сохраняет свой индикатор.
+- SingleSkeleton box-sizing:border-box, overflow:hidden и radius на контейнере; поверхность
+  имеет inset0 и radius:inherit. Search parameters radius0.25rem, tree/results0.5rem.
+- Отступы формы Search перенесены в parametersContent под готовым содержимым; skeleton
+  покрывает всю parametersPanel. В stacked-loading min-height24rem, в wide — прежняя
+  высота workspace. Tree overlay закреплён на treePanel и покрывает также gutter.
+- Light inks логотипов осветлены в menu.module.scss; dark inks и фон прежние.
+  По revision23 все10 light slots заметно ярче и насыщеннее: contrast3–3.3:1 на светлом body; dark>=4.5:1. Проверяется тестом.
+
+- Регистрация: checkboxRowError подсвечивает текст согласия и checkbox, но не меняет
+  цвет policyLink. Ссылки документов сохраняют tree-text во всех состояниях (включая
+  visited/focus), чтобы валидация не вызывала переход между красным и основным цветом.
+
+### Stage011 revision22: гостевой fallback, реальные макеты и footer
+
+- Guest/unknown session: Login checkingAccess остаётся skeleton до redirect; это реальная
+  auth-разметка с прежним data-auth-check/notice и без запросов/модальных действий Login.
+- showPageSkeleton выбирается один раз при mount из authPresentation. В памяти только
+  номер ранее подтверждённого session epoch, записанный после успешного login/check.
+  sessionVersion меняется при logout/session changes; terms/sessionUnavailable запрещают
+  page hint. Не использовать localStorage.isSuperuser как свидетельство входа.
+- Hint не кэширует разрешение и не отменяет /users/check. isAuth остаётся null до ответа;
+  private children не монтируются. Отказ забывает hint и использует Login перед редиректом.
+  После полной перезагрузки без доказанной сессии fallback — Login.
+- ProtectedPageSkeleton использует реальные accountsStyles/users классы: logout сверху,
+  центрированный заголовок,25rem table, профиль/публичные privacy строки для ordinary,
+  второй table для admin, delete action снизу. Ни AG Grid, ни private records не монтируются.
+- Dataset макет использует MUI Stepper, те же stepperPage/stepContent34rem/stepTitle4rem/
+  measurementGrid/stepActions/tableArea/stepNavigation. Только безопасный activeStep из
+  localStorage определяет шаг/завершение; private draft contents не читаются и не изменяются.
+  /read и /edit передают свои kind/title; Add data notice только у /input.
+- MainWindow применяет fullScreenContent ко всем обычным страницам, включая Search и
+  loading/login. body min-height=100dvh-measuredHeader+1rem удерживает footer ниже первого
+  экрана; footer остаётся в document flow и доступен прокруткой. Legal layout прежний.
+- Проверки: route-placeholders, account-loading, maintenance-guard, account-session,
+  auth/privacy/navigation/loading/Home. Визуальное совпадение подтверждает владелец на Vercel.
+
+- Revision24: в dataset/read/edit placeholder степпер и page/table titles отображаются
+  обычным видом, без Skeleton/TextPlaceholder. CustomStepIcon вынесен из stepper.tsx в
+  inputData/StepIcon.tsx и используется обоими представлениями. Загрузка таблицы сохранена.
+
+### Stage011 revision25: статичные подписи и модальные переходы
+
+- В account/admin placeholders заголовок страницы, Name/Email, Access/correction/deletion,
+  публичный support email и Logout does not delete — обычный текст/ссылка. Skeleton только
+  у таблиц; имена и email тоже без полос skeleton, неизвестные значения ожидают ответ профиля без имитации текста.
+- ModalWindow использует MUI Fade и closeAfterTransition:220ms enter/180ms exit,
+  тот же transitionDuration у backdrop. Последнее открытое содержимое хранится до onExited,
+  даже если caller сразу очистил children. После exit освобождается.
+- Закрывающееся содержимое inert/aria-hidden; focus trap/restore, Escape/backdrop close,
+  labelledBy/describedBy и portal container сохраняются. Подтверждения read/edit/submit,
+  terms и maintenance наследуют общую анимацию.
+- DeleteAccount использует тот же useDialogMotion/transitionDuration для Dialog/backdrop.
+  Pending не допускает закрытия; пароль очищается на close, error — после exit (и при
+  следующем open), чтобы размер тела не менялся во время затухания.
+- prefers-reduced-motion даёт0ms. Новые запросы/действия не добавлены; CSRF/session/удаление
+  и существующие тексты сохранены. Проверки: test-dialog-motion.mjs + общая регрессия.
+
+### Stage011 revision26: полный переход маршрутов и стабильная загрузка
+
+- У имени и email нет skeleton даже для значений. В публичном макете только нормальные
+  подписи/зарезервированное место; реальные значения приходят после проверки и профиля.
+- Dataset placeholder использует те же treeText/stepperPage/StepLabel и CustomStepIcon,
+  что реальная страница. Цвета номеров не переопределяются для loading.
+- RouteTransition в App между RecaptchaProvider и MainWindow управляет displayed Location.
+  BrowserRouter URL обновляется штатно; исходящий контент затухает180ms, затем монтируется
+  последний выбранный route. Два RAF фиксируют opacity0 до появления220ms.
+  MainBody Routes location и layout MainWindow используют именно displayed Location.
+- Последующие переходы заменяют pending target; возврат к текущему отменяет exit.
+  Таймеры/RAF отменяются на cleanup, StrictMode безопасен. Reduced motion сразу ready,
+  без ожидания exit/RAF, CSS transition:none. Слои страниц не дублируются.
+- MainBody entering/exiting inert/aria-hidden, outgoing pointer events выключены.
+  Context публикует live target и распознаёт уходящий route ещё до layout effect.
+  RouteRedirect не выполняет устаревший Navigate; публичный fallback остаётся видимым
+  до глобального exit, чтобы guest redirect не давал пустой кадр.
+- ProtectedRoute/SuperProtectedRoute используют LoadingSwap animateSwap=false: сохраняется
+  минимум750ms и hidden/inert, но нет повторного локального exit/reveal всего макета.
+  Это исключает затухание статичного степпера при готовности данных. Общий route transition
+  плавно показывает сам skeleton; SingleSkeleton/AccountTable и auth-запросы прежние.
+- useLoadingPresentation skipExit применяется только к этой статичной смене guard content.
+  Обычные data loaders сохраняют220ms exit и вход/проявление.
+- RecaptchaProvider остаётся с live pathname и сразу закрывает старую область, независимо
+  от180ms визуального exit. Session/CSRF/роль всё ещё проверяются сервером; hint не даёт доступ.
+- Регрессия: test-route-transitions.mjs вместе с session/privacy/CAPTCHA/loading/navigation.
+  Визуальные кадры/плавность проверяет владелец на Vercel; агент браузер не использует.
+
+- Revision27: у Home logo skeleton убрана обводка и отдельная wave/surface палитра.
+  Используется штатный SingleSkeleton background table-color и MUI wave как в Search
+  в обеих темах. Удалены неиспользуемые loading-surface/border/wave tokens; radius сохранён.

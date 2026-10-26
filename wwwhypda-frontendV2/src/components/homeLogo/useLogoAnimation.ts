@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import type { RefObject } from 'react';
 import { gsap } from 'gsap';
 import type { Layout, RevealMode } from './types';
 export function useLogoAnimation(ref: RefObject<SVGSVGElement | null>, layout: Layout, replay: number, mode: RevealMode) {
-    useEffect(() => {
+    useLayoutEffect(() => {
         const svg=ref.current;
         if (!svg) return;
         // Animate only wrapper attributes: outline geometry and SVG rotation stay untouched.

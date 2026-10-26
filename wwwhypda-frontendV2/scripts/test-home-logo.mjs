@@ -20,9 +20,9 @@ function load(path) {
         {exports,require:resolve,performance,AbortController,setTimeout,Uint8Array,Uint32Array});
     return exports;
 }
-const rocks=load('src/components/logoLab/rockNames.ts');
-const geometry=load('src/components/logoLab/geometry.ts');
-const packing=load('src/components/logoLab/packing.ts');
+const rocks=load('src/components/homeLogo/rockNames.ts');
+const geometry=load('src/components/homeLogo/geometry.ts');
+const packing=load('src/components/homeLogo/packing.ts');
 const row=(rt_id,rt_name,rt_id_parent=10)=>({rt_id,rt_name,rt_id_parent});
 test('leaf extractor preserves complete spelling, trims edges, excludes categories, deduplicates by display name',()=>{
     const data=[row(10,' -- Generic earth material -- ',-1),row(11,'Group'),row(12,'Sandstone, chanel',11),row(13,' Clay, silty '),row(14,'Clay, silty'),row(15,' '),row(16,'Service',-1)];
@@ -61,9 +61,9 @@ test('packing is deterministic, uses whole names and rejects every padded out-of
 });
 
 
-test('all logo inks meet 4.5:1 on the corresponding site body background',()=>{
+test('logo inks keep the owner-selected brighter light palette and contrasting dark palette',()=>{
     const css=readFileSync('src/components/menu.module.scss','utf8');
-    const token=name=>css.match(new RegExp(`--logo-lab-${name}:\\s*(#[a-f0-9]{6})`,'i'))[1];
+    const token=name=>css.match(new RegExp(`--home-logo-${name}:\\s*(#[a-f0-9]{6})`,'i'))[1];
     const luminance=hex=>{
         const rgb=hex.slice(1).match(/../g).map(value=>parseInt(value,16)/255).map(value=>value<=.04045 ? value/12.92 : ((value+.055)/1.055)**2.4);
         return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
@@ -72,7 +72,7 @@ test('all logo inks meet 4.5:1 on the corresponding site body background',()=>{
         const backgrounds=[...css.matchAll(/--body-color:\s*(#[a-f0-9]{6})/gi)].map(match=>match[1]);
         const a=luminance(backgrounds[surface==='light'?0:1]),b=luminance(token(`ink-${surface}-${slot}`));
         const ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
-        assert.ok(ratio>=4.5,`${surface}/${slot}: ${ratio}`);
+		assert.ok(surface==='light' ? ratio>=3 && ratio<=3.3 : ratio>=4.5,`${surface}/${slot}: ${ratio}`);
     }
 });
 
@@ -90,8 +90,8 @@ function animationHarness(reduced) {
         }
     };
     const exports={};
-    const require=name=>name==='react' ? {useEffect:callback=>effects.push(callback())} : {gsap};
-    vm.runInNewContext(ts.transpileModule(readFileSync('src/components/logoLab/useLogoAnimation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
+    const require=name=>name==='react' ? {useLayoutEffect:callback=>effects.push(callback())} : {gsap};
+    vm.runInNewContext(ts.transpileModule(readFileSync('src/components/homeLogo/useLogoAnimation.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
         {exports,require,window:{matchMedia:()=>media}});
     return {run:exports.useLogoAnimation,effects,timelines,listeners,media};
 }
@@ -121,7 +121,7 @@ test('three finite reveal modes preserve coordinates, replay is local and reduce
 });
 
 test('frozen catalogue snapshot contains complete unique names and stable source IDs in extractor order',()=>{
-    const snapshot=JSON.parse(readFileSync('src/components/logoLab/rockNames.snapshot.json','utf8'));
+    const snapshot=JSON.parse(readFileSync('src/components/homeLogo/rockNames.snapshot.json','utf8'));
     assert.ok(snapshot.length>0);
     assert.equal(new Set(snapshot.map(node=>node.rt_name)).size,snapshot.length);
     assert.equal(new Set(snapshot.map(node=>node.rt_id)).size,snapshot.length);
@@ -132,11 +132,11 @@ test('frozen catalogue snapshot contains complete unique names and stable source
 });
 
 test('frozen vector words match the exact catalogue and font, and measure by outline bounds at any size',()=>{
-    const snapshot=JSON.parse(readFileSync('src/components/logoLab/wordOutlines.snapshot.json','utf8'));
-    const names=JSON.parse(readFileSync('src/components/logoLab/rockNames.snapshot.json','utf8'));
+    const snapshot=JSON.parse(readFileSync('src/components/homeLogo/wordOutlines.snapshot.json','utf8'));
+    const names=JSON.parse(readFileSync('src/components/homeLogo/rockNames.snapshot.json','utf8'));
     assert.equal(snapshot.font_sha256,createHash('sha256').update(readFileSync('src/assets/fonts/Afacad_Flux/AfacadFlux-VariableFont_slnt,wght.ttf')).digest('hex'));
     assert.equal(Object.keys(snapshot.words).length,names.length);
-    const outlines=load('src/components/logoLab/wordOutlines.ts');
+    const outlines=load('src/components/homeLogo/wordOutlines.ts');
     for(const name of names){
         const shape=snapshot.words[String(name.rt_id)];
         assert.equal(shape.name,name.rt_name);
@@ -177,4 +177,131 @@ test('dense readable rows cover the usable silhouette with full names, determini
     assert.ok(area/(width*height-80*70)>.4);
     const aborted=new AbortController();aborted.abort();
     await assert.rejects(packing.pack(config,names,measure,aborted.signal,mask));
+});
+test('Home selects exactly C12 on mobile and B12 on desktop without changing their accepted sizes',()=>{
+    const configs=load('src/components/homeLogo/compositions.ts');
+    assert.equal(configs.HOME_LOGO_MOBILE_QUERY,'(max-width: 48rem)');
+    assert.equal(configs.compositions.length,2);
+    for(const [mobile,id,sizes] of [[true,'C12',[40,36]],[false,'B12',[48,43.2]]]){
+        const config=configs.homeLogoComposition(mobile);
+        assert.equal(config.id,id);
+        assert.equal(JSON.stringify(config.sizes),JSON.stringify(sizes));
+        assert.equal(config.structure,'denseRows');
+        assert.equal(config.gap,1);
+        assert.equal(config.repeatLimit,24);
+    }
+});
+
+function homeHarness() {
+    const states=[],requests=[];
+    let cursor=0,previousDeps,cleanup,nextEffect,mobile=false,dark=false;
+    const jsx=(type,props)=>({type,props});
+    const configs=load('src/components/homeLogo/compositions.ts');
+    const Renderer=()=>null;
+    const hooks={
+        useState(initial){
+            const slot=cursor++;
+            if(!(slot in states))states[slot]=initial;
+            return [states[slot],value=>states[slot]=typeof value==='function'?value(states[slot]):value];
+        },
+        useEffect(callback,deps){
+            if(!previousDeps || deps.some((value,index)=>value!==previousDeps[index])){
+                nextEffect=callback;previousDeps=deps;
+            }
+        }
+    };
+    const require=name=>{
+        if(name==='react')return hooks;
+        if(name==='react/jsx-runtime')return {jsx,jsxs:jsx};
+        if(name==='react-responsive')return {useMediaQuery:()=>mobile};
+        if(name==='react-redux')return {useSelector:selector=>selector({isDarkTheme:dark})};
+        if(name==='./compositions')return configs;
+        if(name==='./rockNames.snapshot.json')return {default:[{rt_id:1,rt_name:'Clay'}]};
+        if(name==='./layoutCache')return {getLayout:(config,names,signal)=>new Promise((resolve,reject)=>requests.push({config,names,signal,resolve,reject}))};
+        if(name==='./WordLogo')return {default:Renderer};
+        if(name.endsWith('.scss'))return {default:{frame:'frame',dark:'dark',submitButton:'button'}};
+        if(name.endsWith('error_messages.json'))return {default:{home_logo_label:'WWHYPDA',home_logo_failed:'Failed',maintenance_retry:'Retry'}};
+        if(name.endsWith('singleSkeleton'))return {default:'Skeleton'};
+        throw Error('Unexpected import: '+name);
+    };
+    const exports={};
+    vm.runInNewContext(ts.transpileModule(readFileSync('src/components/homeLogo/HomeLogo.tsx','utf8'),{
+        compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}
+    }).outputText,{exports,require,AbortController});
+    return {
+        requests,Renderer,
+        viewport(value){mobile=value;},
+        theme(value){dark=value;},
+        render(){
+            cursor=0;nextEffect=undefined;
+            const tree=exports.default();
+            if(nextEffect){cleanup?.();cleanup=nextEffect();}
+            return tree;
+        },
+        unmount(){cleanup?.();}
+    };
+}
+const settle=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('Home computes only the active variant, ignores stale viewport responses and aborts on unmount',async()=>{
+    const h=homeHarness();
+    let tree=h.render();
+    assert.equal(tree.props['data-home-logo'],'B12');
+    await settle();
+    assert.equal(h.requests.length,1);
+    assert.equal(h.requests[0].config.id,'B12');
+    h.viewport(true);tree=h.render();
+    assert.equal(h.requests[0].signal.aborted,true);
+    assert.equal(tree.props['data-home-logo'],'C12');
+    assert.equal(tree.props['aria-busy'],true);
+    await settle();
+    assert.equal(h.requests.length,2);
+    const [old,current]=h.requests;
+    old.resolve({id:'B12'});await settle();
+    assert.equal(h.render().props['aria-busy'],true);
+    current.resolve({id:'C12'});await settle();
+    tree=h.render();
+    const logo=tree.props.children.props.children;
+    assert.equal(logo.type,h.Renderer);
+    assert.equal(logo.props.layout.id,'C12');
+    assert.equal(logo.props.replay,1);
+    assert.equal(logo.props.reveal,'sequence');
+    h.theme(true);tree=h.render();
+    assert.equal(tree.props.className,'frame dark');
+    assert.equal(h.requests.length,2);
+    h.viewport(false);h.render();await settle();
+    h.requests[2].resolve({id:'B12'});await settle();
+    assert.equal(h.render().props.children.props.children.props.reveal,'centre');
+    h.unmount();assert.equal(h.requests[2].signal.aborted,true);
+});
+
+test('Home exposes a safe retry and keeps a failed or cancelled preparation from rendering another variant',async()=>{
+    const h=homeHarness();
+    h.render();await settle();
+    h.requests[0].reject(Error('private diagnostics'));await settle();
+    let tree=h.render();
+    assert.equal(tree.props['aria-busy'],false);
+    const fallback=tree.props.children.props.children;
+    assert.equal(fallback.props.role,'alert');
+    assert.equal(fallback.props.children[0].props.children,'Failed');
+    fallback.props.children[1].props.onClick();
+    tree=h.render();
+    assert.equal(tree.props['aria-busy'],true);
+    await settle();
+    assert.equal(h.requests.length,2);
+    h.unmount();
+    h.requests[1].resolve({id:'B12'});await settle();
+    assert.equal(h.render().props.children.props.children,null);
+});
+
+test('Home route uses the new responsive logo and the laboratory entry points are removed',()=>{
+    const home=readFileSync('src/components/pages/home.tsx','utf8');
+    const routes=readFileSync('src/components/mainWindow/mainBody.tsx','utf8');
+    const menu=readFileSync('src/components/menu/mainMenu.tsx','utf8');
+    assert.match(home,/<HomeLogo\s*\/>/);
+    assert.doesNotMatch(home,/AnimatedLogo/);
+    for(const source of [routes,menu])assert.doesNotMatch(source,/logo-lab|LogoLab|LOGO_LAB_ENABLED/);
+    assert.match(routes,/<Route path="\*" element={<NotFound \/>} \/>/);
+    const css=readFileSync('src/components/homeLogo/homeLogo.module.scss','utf8');
+    assert.match(css,/@media\(max-width: 48rem\)/);
 });

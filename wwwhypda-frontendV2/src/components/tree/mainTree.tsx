@@ -62,7 +62,7 @@ const ModelsTreeDrawer: React.FC<{ onRootKnown?: (id: string | null) => void }> 
             style={{
                 backgroundColor: 'var(--drawer-color)',
             }}>
-                    <SingleSkeleton loading={loading} error={error}>
+                    <SingleSkeleton loading={loading} error={error} height="100%" overlay borderRadius="0.5rem">
                         <SimpleTreeView
                             onItemSelectionToggle={(_event, itemId, selected) => {
                                 const node = treeData.find(item => String(item.rt_id) === itemId);

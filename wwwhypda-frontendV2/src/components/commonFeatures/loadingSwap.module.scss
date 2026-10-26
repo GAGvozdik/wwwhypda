@@ -14,3 +14,9 @@
     .surface :global(.MuiCircularProgress-root), .pending :global(.MuiCircularProgress-root),
     .surface :global(.MuiCircularProgress-circle), .pending :global(.MuiCircularProgress-circle) { animation: none; }
 }
+// Route checks continue the existing loading surface without fading in a second time.
+.noEnter, .noEnterChildren > * { animation: none; }
+
+// Stable page labels must not fade out again when only the table loading finishes.
+.staticSwap > *, .preserved.staticSwap > * { animation: none; transition: none; }
+.staticSwap[data-phase='exiting'] > * { opacity: 1; }

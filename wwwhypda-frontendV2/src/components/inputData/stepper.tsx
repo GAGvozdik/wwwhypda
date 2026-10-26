@@ -9,15 +9,13 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import styles from './stepper.module.scss';
 
-import type { StepIconProps } from '@mui/material/StepIcon';
-import Check from '@mui/icons-material/Check';
+import CustomStepIcon from './StepIcon';
 
 import SiteInfo from './steps/siteInfo';
 import GeneralInfo from './steps/generalInfo';
 import SourceInfo from './steps/sourceInfo';
 import MeasurementSample from './steps/measurementSample';
 import Measurements from './steps/measurements';
-import {CustomStepIconRoot, StepNumberCircle} from './steps';
 // import {sendAllDataToServer, CustomStepIconRoot, StepNumberCircle} from './steps';
 // import { useModal } from '../modal/modalContext';
 import { useDispatch } from 'react-redux';
@@ -33,20 +31,6 @@ const steps = [
     { label: messages.step_4, title: messages.step_sample_title },
     { label: messages.step_5, title: messages.step_measurements_title },
 ];
-
-function CustomStepIcon(props: StepIconProps) {
-    const { active, completed, className, icon } = props;
-
-    return (
-        <CustomStepIconRoot ownerState={{ active, completed }} className={className}>
-            {completed ? (
-                <Check className="MuiStepIcon-completedIcon" />
-            ) : (
-                <StepNumberCircle ownerState={{ active }}>{icon}</StepNumberCircle>
-            )}
-        </CustomStepIconRoot>
-    );
-}
 
 interface CustomStepperProps {
     handleClick: () => void;

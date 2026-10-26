@@ -1,0 +1,28 @@
+.frame {
+    width: min(1100px, calc(100% - 4rem));
+    min-width: 0;
+    aspect-ratio: 5800 / 1050;
+    margin: var(--home-logo-block-margin) auto;
+    @for $i from 1 through 8 { --ink-#{$i}: var(--home-logo-ink-light-#{$i}); }
+}
+.dark { @for $i from 1 through 8 { --ink-#{$i}: var(--home-logo-ink-dark-#{$i}); } }
+.wordLogo { width: 100%; height: 100%; display: block; overflow: visible; }
+.wordLogo [data-word-shape] { fill: var(--word-color); }
+.fallback {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--home-logo-block-margin);
+    color: var(--tree-text);
+    text-align: center;
+}
+.fallback > button { width: auto; margin: 0; }
+@media(max-width: 48rem) {
+    .frame { width: min(100%,var(--home-logo-mobile-width)); aspect-ratio: 1; }
+}
+// Both variants share a theme-aware loading surface; the finished SVG keeps its transparent background.
+.frame :global(.MuiSkeleton-root) {
+    border-radius: var(--home-logo-loading-radius);
+}

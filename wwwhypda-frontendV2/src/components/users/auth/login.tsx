@@ -1,3 +1,4 @@
+import { rememberAuthenticatedPresentation } from '../authPresentation';
 import { getCsrfTokenFromCookie } from '../../../common/types';
 import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
@@ -17,7 +18,7 @@ import Button from '@mui/material/Button';
 import api from '../../api';
 import DeleteAccount from '../accounts/deleteAccount';
 import { legalDocuments, legalPdfPath } from '../../../common/legalDocuments';
-import { termsAcceptanceRequired, termsEvent, clearTermsRequirement, signOutAccountSession } from '../accountSession';
+import { sessionVersion, termsAcceptanceRequired, termsEvent, clearTermsRequirement, signOutAccountSession } from '../accountSession';
 import withRecaptcha from '../../commonFeatures/withRecaptcha';
 import type{ WithRecaptchaProps } from '../../commonFeatures/withRecaptcha';
 
@@ -108,6 +109,7 @@ const Login: React.FC<LoginProps> = ({ executeRecaptcha, checkingAccess = false 
 
             const checkResponse = await api.get('/users/check', { withCredentials: true });
 
+            rememberAuthenticatedPresentation(sessionVersion());
             const { is_superuser } = checkResponse.data;
             localStorage.setItem('isSuperuser', JSON.stringify(is_superuser));
 
@@ -153,7 +155,7 @@ const Login: React.FC<LoginProps> = ({ executeRecaptcha, checkingAccess = false 
 
     return (
         <div className={styles.authPage} data-auth-check={checkingAccess || undefined}>
-            <AuthSkeleton loading={checkingAccess || isLoading}><div className={styles.authForm}>
+            <AuthSkeleton loading={checkingAccess || isLoading} animateEnter={!checkingAccess}><div className={styles.authForm}>
                 <div className={styles.formTitle}>{messages.auth_title}</div>
 
                 <form onSubmit={handleLogin}>

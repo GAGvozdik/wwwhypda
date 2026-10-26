@@ -1,0 +1,18 @@
+.page { width: min(100%,72rem); margin-inline: auto; min-width: 0; font-family: Afacad_Flux, sans-serif; font-size: var(--main-font-size); }
+.page :global(.MuiSkeleton-root) { background-color: var(--form-color); }
+.tableBlock { margin: 1rem 0; height: var(--account-table-height); }
+.table { position: relative; width: 100%; height: 100%; min-height: 0; }
+.table > :global(.MuiSkeleton-root) { background-color: var(--table-color); }
+.activity { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; }
+.textPlaceholder { position: relative; display: inline-block; color: transparent; max-width: 100%; }
+.textPlaceholder > .textCover { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0.25rem; }
+.datasetTitle { display: flex; justify-content: center; font-size: calc(var(--main-font-size) * 2.5); padding: 0.5rem; }
+.spacer { flex: 1 1 auto; }
+.profile { min-width: 14rem; }
+.adminDetails { margin-block: 1.5rem; }
+@media(prefers-reduced-motion:reduce) {
+    .page :global(.MuiSkeleton-root), .activity :global(.MuiCircularProgress-root),
+    .activity :global(.MuiCircularProgress-circle) { animation: none; }
+}
+.profileLine { display: flex; align-items: center; gap: 0.25rem; min-height: 1.5rem; }
+.profileLine > :global(.MuiSkeleton-root) { max-width: 65%; }

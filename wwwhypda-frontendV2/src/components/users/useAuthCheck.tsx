@@ -1,6 +1,7 @@
+import { hasAuthenticatedPresentation, rememberAuthenticatedPresentation, forgetAuthenticatedPresentation } from './authPresentation';
 import { maintenanceActive, maintenanceEvent } from '../commonFeatures/maintenanceState';
 import axios from 'axios';
-import { sessionEvent, sessionUnavailable, sessionEnded, termsEvent, termsAcceptanceRequired } from './accountSession';
+import { sessionVersion, sessionEvent, sessionUnavailable, sessionEnded, termsEvent, termsAcceptanceRequired } from './accountSession';
 import { useEffect, useState } from 'react';
 import api from '../api';
 
@@ -10,8 +11,10 @@ interface AuthState {
     termsRequired: boolean;
 }
 
-const useAuthCheck = (): AuthState => {
+const useAuthCheck = (): AuthState & { showPageSkeleton: boolean } => {
     const [auth, setAuth] = useState<AuthState>({ isAuth: null, isSuperuser: null, termsRequired: false });
+
+    const [showPageSkeleton] = useState(() => hasAuthenticatedPresentation(sessionVersion()) && !sessionUnavailable() && !termsAcceptanceRequired());
 
     useEffect(() => {
         let cancelled = false;
@@ -33,6 +36,7 @@ const useAuthCheck = (): AuthState => {
                 const response = await api.get('/users/check', { withCredentials: true });
 
                 if (cancelled || sessionUnavailable()) return;
+                rememberAuthenticatedPresentation(sessionVersion());
                 setAuth({
                     isAuth: true,
                     termsRequired: false,
@@ -40,6 +44,7 @@ const useAuthCheck = (): AuthState => {
                 });
             } catch (error) {
                 if (cancelled || axios.isCancel(error) || sessionUnavailable() || maintenanceActive()) return;
+                forgetAuthenticatedPresentation();
                 setAuth({ isAuth: false, isSuperuser: false, termsRequired: termsAcceptanceRequired() });
             }
         };
@@ -57,7 +62,7 @@ const useAuthCheck = (): AuthState => {
         };
     }, []);
 
-    return auth;
+    return { ...auth, showPageSkeleton };
 };
 
 export default useAuthCheck;
