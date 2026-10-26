@@ -401,7 +401,7 @@ test('frame origin follows each HTTPS hostname exactly, without adding an altern
 
 test('existing guards conceal private children during loading and preserve role redirects', async () => {
     let auth = { isAuth: null, isSuperuser: null };
-    const dependencies = { react: { default: {} }, 'react/jsx-runtime': jsxRuntime,
+    const dependencies = { '../../commonFeatures/loadingSwap': { default:'LoadingSwap' }, react: { default: {} }, 'react/jsx-runtime': jsxRuntime,
         'react-router-dom': { Navigate: 'Navigate' }, '../useAuthCheck': { default: () => auth },
         '../auth/login': { default: 'Login' } };
     const protectedRoute = await moduleFor('src/components/users/routes/protectedRoute.tsx', {}, dependencies);
@@ -410,18 +410,18 @@ test('existing guards conceal private children during loading and preserve role 
     for (const guard of [protectedRoute.default, superRoute.default]) {
         const node = guard({ children: privateChild });
         assert.notEqual(node.props.children, privateChild);
-        assert.equal(node.type,'Login');
-        assert.equal(node.props.checkingAccess,true);
+        assert.equal(node.type,'LoadingSwap');
+        assert.equal(node.props.loading,true);assert.equal(node.props.children,null);assert.equal(node.props.fallback.type,'Login');assert.equal(node.props.fallback.props.checkingAccess,true);
     }
     auth = { isAuth: false, isSuperuser: false };
-    for (const guard of [protectedRoute.default, superRoute.default]) assert.equal(guard({ children: privateChild }).props.to, '/login');
+    for (const guard of [protectedRoute.default, superRoute.default]) assert.equal(guard({ children: privateChild }).props.children.props.to, '/login');
     auth = { isAuth: true, isSuperuser: false };
-    assert.equal(protectedRoute.default({ children: privateChild }).props.children, privateChild);
-    assert.equal(superRoute.default({ children: privateChild }).props.to, '/account');
-    assert.equal(superRoute.default({ children: privateChild, redirectIfSuperuser: true }).props.children, privateChild);
+    assert.equal(protectedRoute.default({ children: privateChild }).props.children.props.children, privateChild);
+    assert.equal(superRoute.default({ children: privateChild }).props.children.props.to, '/account');
+    assert.equal(superRoute.default({ children: privateChild, redirectIfSuperuser: true }).props.children.props.children, privateChild);
     auth = { isAuth: true, isSuperuser: true };
-    assert.equal(superRoute.default({ children: privateChild }).props.children, privateChild);
-    assert.equal(superRoute.default({ children: privateChild, redirectIfSuperuser: true }).props.to, '/superaccount');
+    assert.equal(superRoute.default({ children: privateChild }).props.children.props.children, privateChild);
+    assert.equal(superRoute.default({ children: privateChild, redirectIfSuperuser: true }).props.children.props.to, '/superaccount');
 });
 
 

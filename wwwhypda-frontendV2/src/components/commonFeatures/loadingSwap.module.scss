@@ -1,0 +1,16 @@
+.contents, .pending, .content, .preserved { display: contents; }
+.preserved[hidden] { display: none; }
+.surface, .pending > * {
+    opacity: 1;
+    animation: loadingEnter 160ms ease-in-out;
+    transition: opacity var(--loading-exit-duration, 220ms) ease-in-out;
+}
+.surface[data-phase='exiting'], .pending[data-phase='exiting'] > * { opacity: 0; }
+.content > *, .preserved:not([hidden]) > *, .enter { animation: loadingEnter 220ms ease-in-out; }
+@keyframes loadingEnter { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+    .surface, .pending > *, .content > *, .preserved:not([hidden]) > *, .enter { animation: none; transition: none; }
+    .surface :global(.MuiSkeleton-root)::after, .pending :global(.MuiSkeleton-root)::after,
+    .surface :global(.MuiCircularProgress-root), .pending :global(.MuiCircularProgress-root),
+    .surface :global(.MuiCircularProgress-circle), .pending :global(.MuiCircularProgress-circle) { animation: none; }
+}

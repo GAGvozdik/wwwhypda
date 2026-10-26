@@ -2,6 +2,8 @@ import * as React from 'react';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 import LoadIcon from './loadIcon';
+import LoadingSwap from './loadingSwap';
+import messages from '../../common/error_messages.json';
 
 interface SingleSkeletonProps {
     loading?: boolean;
@@ -12,21 +14,26 @@ interface SingleSkeletonProps {
     margin?: string;
     backgroundColor?: string;
     isLoadIcon?: boolean;
+    overlay?: boolean;
 }
 
 
-export default function SingleSkeleton({ loading = false, error = null, margin, height, width, children, backgroundColor, isLoadIcon }: SingleSkeletonProps) {
+function SingleSkeletonView({ loading = false, error = null, margin, height, width, children, backgroundColor, isLoadIcon, overlay }: SingleSkeletonProps) {
     if (loading) {
         return (
-            <Box
+            <Box role="status" aria-label={messages.ui_loading}
                 sx={{
                     width: width ?? '100%',
                     height: height ?? '100%',
+                    minHeight: height ? undefined : 'var(--loading-min-height)',
                     margin: margin ?? '',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    position: 'relative',
+                    position: overlay ? 'absolute' : 'relative',
+                    inset: overlay ? 0 : undefined,
+                    zIndex: overlay ? 1 : undefined,
+                    bgcolor: overlay ? (backgroundColor ?? 'var(--drawer-color)') : undefined,
                     // overflowY: 'auto'
                 }}
             >
@@ -50,15 +57,19 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
     if (error) {
         return (
 
-            <Box
+            <Box role="alert"
                 sx={{
                     width: width ?? '100%',
                     height: height ?? '100%',
+                    minHeight: height ? undefined : 'var(--loading-min-height)',
                     margin: margin ?? '',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: 'transparent',
+                    position: overlay ? 'absolute' : undefined,
+                    inset: overlay ? 0 : undefined,
+                    zIndex: overlay ? 1 : undefined,
+                    bgcolor: overlay ? (backgroundColor ?? 'var(--drawer-color)') : 'transparent',
                 }}
             >
                 {/* <Skeleton
@@ -92,4 +103,10 @@ export default function SingleSkeleton({ loading = false, error = null, margin, 
     }
 
     return <>{children}</>;
+}
+
+export default function SingleSkeleton(props: SingleSkeletonProps) {
+    return <LoadingSwap loading={props.loading??false} fallback={<SingleSkeletonView {...props} loading />}>
+        <SingleSkeletonView {...props} loading={false}/>
+    </LoadingSwap>;
 }

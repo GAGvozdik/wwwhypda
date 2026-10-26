@@ -3,3 +3,7 @@
 .cover { @include formContour.contour; position: absolute; inset: 0; box-sizing: border-box; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 .cover > :global(.MuiCircularProgress-root) { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) { .cover :global(.MuiSkeleton-root)::after { animation: none; } }
+
+.content { opacity: 1; transition: opacity var(--loading-exit-duration, 220ms) ease-in-out; }
+.content[aria-hidden='true'] { opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .content { transition: none; } }
