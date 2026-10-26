@@ -17,7 +17,7 @@ export default function LogoLabPage() {
         {!names.length ? <p role="status">{messages.logo_lab_empty}</p> :
             (['A','B','C'] as const).map(group=><section key={group} aria-labelledby={`logo-lab-${group}`}>
                 <h2 id={`logo-lab-${group}`}>{messages[`logo_lab_group_${group.toLowerCase()}` as keyof typeof messages]}</h2>
-                <div className={styles.grid}>{compositions.filter(config=>config.group===group).map(config=><LogoLabCard key={config.id} composition={config} names={names}/>)}</div>
+                <div className={`${styles.grid} ${group==="B" ? styles.wordmarkGrid : ""}`}>{compositions.filter(config=>config.group===group).map(config=><LogoLabCard key={config.id} composition={config} names={names}/>)}</div>
             </section>)}
     </main>;
 }

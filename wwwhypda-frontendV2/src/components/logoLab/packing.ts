@@ -2,7 +2,7 @@ import type { Box, Composition, Layout, RockName, WordPlacement } from './types'
 import { getOccupancy } from './geometry';
 import { outlineMetrics } from './wordOutlines';
 import { wordmarkRegion, wordmarkRegions } from './regions';
-export const PACKING_VERSION = 'afacad-600-outlines-v7';
+export const PACKING_VERSION = 'afacad-600-dense-rows-v9';
 export const yieldToControls = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 export function intersects(a: Box, b: Box) {
     return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
@@ -27,6 +27,7 @@ export class BoxIndex {
 }
 export async function pack(config: Composition, names: RockName[], measure: Measure, signal: AbortSignal,
     mask = getOccupancy(config.group)): Promise<Layout> {
+    if(config.structure==='denseRows') return packDenseRows(config,names,measure,signal,mask);
     const started = performance.now();
     const words: WordPlacement[] = [], index = new BoxIndex();
     const uses = new Map<number, number>();
@@ -35,7 +36,7 @@ export async function pack(config: Composition, names: RockName[], measure: Meas
     let attempts = 0, visited = 0;
     const limit = config.group === 'B' ? 360000 : 150000;
     const cap = config.group === 'B' ? 1800 : 700;
-    const seed = config.id.charCodeAt(0) * 31 + Number(config.id[1]) * 7919;
+    const seed = config.id.charCodeAt(0) * 31 + Number(config.id.slice(1)) * 7919;
     const ordered = [...names].sort((a,b) => a.rt_name < b.rt_name ? -1 : a.rt_name > b.rt_name ? 1 : a.rt_id-b.rt_id);
     for (let sizeIndex = 0; sizeIndex < config.sizes.length; sizeIndex++) {
         const size = config.sizes[sizeIndex];
@@ -112,4 +113,61 @@ export async function pack(config: Composition, names: RockName[], measure: Meas
     }
     signal.throwIfAborted();
     return { id:config.id,width:mask.width,height:mask.height,words,milliseconds:performance.now()-started };
+}
+
+// Fill readable rows first, then use a smaller, offset pass only in the remaining pockets.
+// Every placement still uses the same full padded-box mask and collision checks.
+export async function packDenseRows(config: Composition, names: RockName[], measure: Measure, signal: AbortSignal,
+    mask = getOccupancy(config.group)): Promise<Layout> {
+    const started=performance.now();
+    signal.throwIfAborted();
+    const words: WordPlacement[]=[], index=new BoxIndex(), uses=new Map<number,number>();
+    const seed=config.id.charCodeAt(0)*31+Number(config.id.slice(1))*7919;
+    const ordered=[...names].sort((a,b)=>a.rt_name<b.rt_name?-1:a.rt_name>b.rt_name?1:a.rt_id-b.rt_id);
+    if(!ordered.length) return {id:config.id,width:mask.width,height:mask.height,words,milliseconds:0};
+    const cap=config.group==='B'?1800:900;
+    const maxUses=config.repeatLimit??24;
+    let visits=0;
+    const phases=config.sizes.flatMap((size,i)=>[{size,offset:0,turn:false},
+        ...(i===config.sizes.length-1?[{size,offset:.5,turn:true}]:[])]);
+    for(const phase of phases){
+        const entries=ordered.map(name=>({name,metrics:measure(name.rt_name,phase.size)}))
+            .map(entry=>({...entry,width:entry.metrics.left+entry.metrics.right,height:entry.metrics.ascent+entry.metrics.descent}));
+        const rowHeight=Math.max(...entries.map(entry=>entry.height))+config.gap*2;
+        const minWidth=Math.min(...entries.map(entry=>entry.width)),minHeight=Math.min(...entries.map(entry=>entry.height));
+        const minSide=Math.min(minWidth,minHeight);
+        const ranked=()=>entries.filter(entry=>(uses.get(entry.name.rt_id)||0)<maxUses).sort((a,b)=>
+            (uses.get(a.name.rt_id)||0)-(uses.get(b.name.rt_id)||0) || b.width-a.width ||
+            ((a.name.rt_id+seed)%997)-((b.name.rt_id+seed)%997));
+        let candidates=ranked();
+        for(let y=config.gap+1+rowHeight*phase.offset;y<mask.height-minHeight-config.gap;y+=rowHeight){
+            let x=config.gap+1;
+            while(x<mask.width-minSide-config.gap && words.length<cap){
+                if(++visits%256===0){await yieldToControls();signal.throwIfAborted();}
+                const probe={x,y,width:phase.turn?minSide:minWidth,height:phase.turn?minSide:minHeight};
+                if(!mask.contains(padded(probe,config.gap)) || index.collides(padded(probe,config.gap))){x+=2;continue;}
+                let placed=false;
+                for(const rotation of (phase.turn?[0,90]:[0]) as (0|90)[]){
+                    for(const entry of candidates){
+                        const {name,metrics,width,height}=entry;
+                        const bbox={x,y,width:rotation?height:width,height:rotation?width:height};
+                        const box=padded(bbox,config.gap);
+                        if(!mask.contains(box)||index.collides(box)) continue;
+                        words.push({...name,x:rotation?x+metrics.descent:x+metrics.left,
+                            y:rotation?y+metrics.left:y+metrics.ascent,bbox,fontSize:phase.size,weight:600,rotation,
+                            order:words.length,colorSlot:(seed+words.length*7)%8});
+                        index.add(box);uses.set(name.rt_id,(uses.get(name.rt_id)||0)+1);
+                        x+=bbox.width+config.gap*2;
+                        candidates=ranked();placed=true;break;
+                    }
+                    if(placed) break;
+                }
+                if(!placed) x+=2;
+            }
+            if(words.length>=cap) break;
+        }
+        if(words.length>=cap) break;
+    }
+    signal.throwIfAborted();
+    return {id:config.id,width:mask.width,height:mask.height,words,milliseconds:performance.now()-started};
 }

@@ -156,3 +156,25 @@ test('C hole is enlarged and its filled-area centroid is aligned with the disc c
     assert.ok(Math.abs(spec.tx+53.480778027633036*spec.scale-700)<.001);
     assert.ok(Math.abs(spec.ty+38.21029965343391*spec.scale-700)<.001);
 });
+test('dense readable rows cover the usable silhouette with full names, deterministic placement and intact holes',async()=>{
+    const width=240,height=180,cells=new Uint8Array(width*height).fill(1);
+    for(let y=55;y<125;y++)for(let x=80;x<160;x++)cells[y*width+x]=0;
+    const mask=geometry.createIntegral(width,height,cells);
+    const config={id:'A10',group:'A',gap:1,vertical:0,sizes:[16,14.4],structure:'denseRows',repeatLimit:30};
+    const names=['Till','Tuff','Loam','Peat','Loess'].map((name,i)=>row(i,name));
+    const measure=(name,size)=>({left:0,right:name.length*size*.45,ascent:size*.7,descent:size*.15});
+    const first=await packing.pack(config,names,measure,new AbortController().signal,mask);
+    const second=await packing.pack(config,[...names].reverse(),measure,new AbortController().signal,mask);
+    assert.equal(JSON.stringify(first.words),JSON.stringify(second.words));
+    assert.ok(first.words.length>30);
+    const index=new packing.BoxIndex();let area=0;
+    for(const word of first.words){
+        const box=packing.padded(word.bbox,config.gap);
+        assert.ok(mask.contains(box));assert.equal(index.collides(box),false);index.add(box);
+        assert.ok(names.some(name=>name.rt_name===word.rt_name));
+        assert.ok(word.fontSize>=14.4);area+=word.bbox.width*word.bbox.height;
+    }
+    assert.ok(area/(width*height-80*70)>.4);
+    const aborted=new AbortController();aborted.abort();
+    await assert.rejects(packing.pack(config,names,measure,aborted.signal,mask));
+});

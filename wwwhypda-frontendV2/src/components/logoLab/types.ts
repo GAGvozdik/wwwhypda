@@ -1,6 +1,6 @@
 import type { RockTypeData } from '../../common/types';
 export type Group = 'A' | 'B' | 'C';
-export type CompositionId = `${Group}${1 | 2 | 3 | 4 | 5 | 6 | 9}`;
+export type CompositionId = `${Group}${1 | 2 | 3 | 4 | 5 | 6 | 9 | 10 | 11 | 12}`;
 export type RevealMode = 'left' | 'sequence' | 'centre';
 export type RockName = Pick<RockTypeData, 'rt_id' | 'rt_name'>;
 export interface Box { x: number; y: number; width: number; height: number }
@@ -12,6 +12,6 @@ export interface Layout { id: CompositionId; width: number; height: number; word
 export interface Composition {
     id: CompositionId; group: Group; vertical: number; gap: number;
     gridStep?: number; repeatLimit?: number;
-    sizes: readonly number[]; structure: 'rows' | 'columns' | 'blocks' | 'anchors' | 'cells' | 'sectors';
+    sizes: readonly number[]; structure: 'rows' | 'columns' | 'blocks' | 'anchors' | 'cells' | 'sectors' | 'denseRows';
 }
 export interface CardSettings { reveal: RevealMode; replayVersion: number }

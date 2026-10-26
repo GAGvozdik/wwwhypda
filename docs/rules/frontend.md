@@ -185,7 +185,7 @@ margin-left:auto у accountItem сохраняет выравнивание па
   а не заливка поверх слов. Packing принимает целые padded bbox через raster integral
   с erosion; пространственный индекс исключает пересечения. Слова рисуются SVG-контурами, полные имена сохранены в title.
 - Afacad Flux600 заранее преобразован в wordOutlines.snapshot.json. Packing использует bounds этих же контуров; font loading/canvas/text hinting не участвуют. После mount/resize проверяется getBBox обёрток use, packing заново не запускается.
-- 15 configs различаются rows/columns/blocks/anchors/cells, квотами направлений,
+- 9 configs используют denseRows с тремя размерами слов в каждой группе, квотами направлений,
   промежутками и размерами. Обход чередует регионы, чтобы bounded budget не оставлял
   только верхнюю половину. Кэш по каталогу/версии геометрии/шрифта/packing/config ID,
   очередь одна с yield/abort; palette/theme/replay/resize не являются ключами.
@@ -203,6 +203,10 @@ margin-left:auto у accountItem сохраняет выравнивание па
 - Реализация ещё проходит owner QA. Точные результаты и оставшиеся Firefox/media/
   zoom/roles/smoke/artifacts проверки: docs/artifacts/stage-011/acceptance.md.
 
-- По revision 6 в lab после дополнения revision 8 доступны 15 вариантов: A3/A4/A6/A9, B1–B6/B9, C1–C3/C9. Soft reveal исключён.
+- По revision 6 в lab после дополнения revision 8 доступны 9 вариантов: A10–A12, B10–B12, C10–C12. Soft reveal исключён.
 
-- Revision 8: в новых композициях названия рисуются SVG defs/use из wordOutlines.snapshot.json (Afacad Flux600, wght600/slnt0). Packing берёт bounds из того же snapshot; renderer не использует живой text/font/canvas. Snapshot генерируется scripts/generate-logo-word-paths.py, без новых browser deps. SVG title сохраняет полное имя. Контуры и transforms статичны; reveal меняет только opacity обёртки. C: W scale9.6/translate186.585,333.181, центроид площади700,700. A9/B9/C9 имеют промежуточные размеры слов, B9 — полный ряд. Прежние пары7/8 удалены.
+- Revision 8: в новых композициях названия рисуются SVG defs/use из wordOutlines.snapshot.json (Afacad Flux600, wght600/slnt0). Packing берёт bounds из того же snapshot; renderer не использует живой text/font/canvas. Snapshot генерируется scripts/generate-logo-word-paths.py, без новых browser deps. SVG title сохраняет полное имя. Контуры и transforms статичны; reveal меняет только opacity обёртки. C: W scale9.6/translate186.585,333.181, центроид площади700,700. A10–A12/B10–B12/C10–C12 заменяют прежние варианты. У всех B полный ряд. Сначала заполняются строки, затем свободные карманы; bbox/collision checks сохранены.
+
+- Указание владельца26.10.2026: визуальную приёмку /logo-lab он выполняет сам на Vercel/мобильном после своего commit/push. Не автоматизировать браузерную проверку и не генерировать/отправлять статичные превью без нового прямого поручения.
+
+- Revision12: B10–B12 всегда в одноколоночном wordmarkGrid, по одной карточке на всю доступную ширину окна. У lab нет max-width96rem; высота B-preview/SVG автоматическая по исходному viewBox, чтобы логотип заполнял ширину без искажения aspect ratio. Для A/C сохраняется двухколоночная desktop grid и одна колонка на узких экранах. Визуальная проверка по-прежнему только владельцем.

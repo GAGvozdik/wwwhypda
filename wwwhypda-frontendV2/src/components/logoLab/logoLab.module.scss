@@ -1,4 +1,4 @@
-.page { max-width: 96rem; width: 100%; min-width: 0; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; color: var(--tree-text); background: var(--body-color); font-size: var(--main-font-size); }
+.page { max-width: none; width: 100%; min-width: 0; margin: 0 auto; padding: 1.5rem; box-sizing: border-box; color: var(--tree-text); background: var(--body-color); font-size: var(--main-font-size); }
 .page h1 { font-size: var(--home-title-font-size); margin: .3em 0; }
 .page h2 { font-size: var(--head-font-size); }
 .page h3 { font-size: var(--menu-font-size); margin: 0; }
@@ -32,3 +32,9 @@
 
 // Larger wordmarks span both columns so their larger words remain readable in the overview.
 .wideCard { grid-column: 1 / -1; }
+
+@media(max-width: 30rem) { .preview:not(.original) { padding: 0; } }
+
+.wordmarkGrid { grid-template-columns: minmax(0,1fr); }
+.wideCard .preview { height: auto; display: block; }
+.wideCard .wordLogo { height: auto; }
