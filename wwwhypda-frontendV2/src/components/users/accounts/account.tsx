@@ -1,3 +1,4 @@
+import { useInitialPageLoading } from '../../commonFeatures/initialPageLoading';
 import { signOutAccountSession } from '../accountSession';
 import accountStyles from './accountsStyles.module.scss';
 import React, { useState, useEffect } from 'react';
@@ -23,6 +24,7 @@ const Account: React.FC = () => {
     const [userData, setUserData] = useState<AccountProfile | null>(null);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    useInitialPageLoading(isLoading);
 
     useEffect(() => {
         fetchUserData();

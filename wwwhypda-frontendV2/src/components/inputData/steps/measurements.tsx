@@ -1,3 +1,4 @@
+import { useInitialGridReady } from '../../commonFeatures/initialPageLoading';
 import useRemColumns from '../../commonFeatures/useRemColumns';
 import StepActions from '../stepActions';
 import type { InputStepProps } from '../../../common/types';
@@ -224,6 +225,7 @@ const Measurements: React.FC<MeasurementsProps> = ({isEditable= true, clearActio
 
     const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
+    const initialGridReady = useInitialGridReady(tableData.length,error);
 
 
         const handleCellValueChanged = (event: any) => {
@@ -243,6 +245,7 @@ const Measurements: React.FC<MeasurementsProps> = ({isEditable= true, clearActio
             <StepActions clearAction={clearAction}>
 
                 <SingleSkeleton
+                    isLoadIcon={false}
                     loading={loading}
                     margin={'0'}
                     width={'7.5rem'}
@@ -258,6 +261,7 @@ const Measurements: React.FC<MeasurementsProps> = ({isEditable= true, clearActio
                 </SingleSkeleton>
 
                 <SingleSkeleton
+                    isLoadIcon={false}
                     loading={loading}
                     margin={'0'}
                     width={'7.5rem'}
@@ -277,7 +281,7 @@ const Measurements: React.FC<MeasurementsProps> = ({isEditable= true, clearActio
             <div className={styles.tableArea}>
                 <SingleSkeleton loading={loading} error={error}>
                     {/* <div style={{height: '50vh'}}> */}
-                        <AgGridReact
+                        <AgGridReact {...initialGridReady}
                             theme={themeDarkBlue}
                             rowData={tableData}
                             columnDefs={scaledColumns}

@@ -530,6 +530,7 @@ test('Search table keeps stable IDs, Community controls and XLSX rows including 
     const table=await moduleFor('src/components/search/dataTable.tsx',{}, {
         react:{default:{},useMemo:callback=>callback()},'react/jsx-runtime':jsxRuntime,
         '../commonFeatures/useRemColumns':{default:columns=>columns},
+        '../commonFeatures/useLoadingPresentation':{useLoadingPresentation:()=> 'ready'},
         '../inputData/steps':{useStepsTheme:()=>({})},'ag-grid-react':{AgGridReact:'Grid'},
         xlsx:{...XLSX,writeFile:book=>{workbook=book;}},
     });
@@ -552,7 +553,7 @@ test('Both account layouts place the existing logout before content and deletion
         'react/jsx-runtime':jsxRuntime,'react-redux':{useSelector:callback=>callback({isDarkTheme:true})},
         'react-router-dom':{useNavigate:()=>()=>{}},'../../api':{default:{}},axios:{default:{}},
         '../accountSession':{signOutAccountSession(){}},'./deleteAccount':{default:'DeleteAccount'},'./userSuggestions':{default:'Suggestions'},'./inputSuggestions':{default:'Suggestions'},
-        '../../commonFeatures/loadIcon':{default:'Loading'},'../../commonFeatures/singleSkeleton':{default:'Skeleton'},'./AccountTable':{default:'AccountTable'},
+        '../../commonFeatures/initialPageLoading':{useInitialPageLoading(){}},'../../commonFeatures/loadIcon':{default:'Loading'},'../../commonFeatures/singleSkeleton':{default:'Skeleton'},'./AccountTable':{default:'AccountTable'},
         '../../commonFeatures/useRemColumns':{default:columns=>columns},'../../inputData/steps':{useStepsTheme:()=>({})},
         'ag-grid-react':{AgGridReact:'Grid'},'@mui/icons-material/CheckCircle':{default:'Icon'},
         '@mui/material':{IconButton:'IconButton',Tooltip:'Tooltip'},'@mui/icons-material':{PersonOff:'Icon',Security:'Icon',DoDisturb:'Icon'},
@@ -602,7 +603,7 @@ test('MUI keyboard/mouse selection uses original catalog ID/name rather than dis
         'react/jsx-runtime':jsxRuntime,'./treeBuilder':{buildTree:()=>[]},
         '@mui/x-tree-view/SimpleTreeView':{SimpleTreeView:'Tree'},
         '../commonFeatures/singleSkeleton':{default:'Skeleton'},'../api':{default:{}},
-        'react-redux':{useDispatch:()=>action=>updates.push(action)},
+        'react-redux':{useDispatch:()=>action=>updates.push(action),useSelector:select=>select({currentRTID:''})},
         '../../redux/actions':{UpdateRTID:payload=>({type:'id',payload}),UpdateRTName:payload=>({type:'name',payload})},
     });
     const tree=component.default({}).props.children.props.children.props.children;
@@ -642,4 +643,61 @@ test('All parameters is selected on first render without automatic search',async
     assert.equal(executions,0);assert.equal(view.calls.length,1);
     view.submit();await flush();assert.equal(executions,1);
     assert.equal(view.calls.at(-1).config.params.parameter_id,'all');
+});
+
+test('Search forwards pending state through the results component and the grid suppresses empty text throughout hold and exit',async()=>{
+    let token;
+    const view=await searchView(()=>new Promise(resolve=>{token=resolve;}));
+    assert.equal(view.find('./searchResultsTable').props.loading,false);
+    const job=view.submit();await flush();
+    assert.equal(view.find('./searchResultsTable').props.loading,true);
+    const rows=[];
+    const results=await moduleFor('src/components/search/searchResultsTable.tsx',{}, {
+        react:{default:{},useMemo:callback=>callback()},'react/jsx-runtime':jsxRuntime,
+        'react-redux':{useSelector:select=>select({currentTableData:rows})},
+        '../../common/types':{generateColumns:()=>[]},'./dataTable':{default:'DataTable'},
+    });
+    const forwarded=results.default(view.find('./searchResultsTable').props).props.children;
+    assert.equal(forwarded.props.loading,true);assert.equal(forwarded.props.rows,rows);
+    let phase='loading',input;
+    const table=await moduleFor('src/components/search/dataTable.tsx',{}, {
+        react:{default:{},useMemo:callback=>callback()},'react/jsx-runtime':jsxRuntime,
+        '../commonFeatures/useRemColumns':{default:columns=>columns},
+        '../commonFeatures/useLoadingPresentation':{useLoadingPresentation:loading=>{input=loading;return phase;}},
+        '../inputData/steps':{useStepsTheme:()=>({})},'ag-grid-react':{AgGridReact:'Grid'},
+        'xlsx':{writeFile(){}},'../../common/exportWorkbook':{createDataWorkbook(){}},
+    });
+    const findGrid=node=>{
+        if(!node||typeof node!=='object')return;
+        if(Array.isArray(node))return node.map(findGrid).find(Boolean);
+        return node.type==='Grid'?node:findGrid(node.props?.children);
+    };
+    for(const loading of [true,false])for(const value of ['loading','exiting','ready']){
+        phase=value;
+        const grid=findGrid(table.default({...forwarded.props,loading}));
+        assert.equal(input,loading);
+        assert.equal(grid.props.suppressNoRowsOverlay,value!=='ready');
+        assert.ok(grid.props.overlayNoRowsTemplate.includes('No measurements or samples'));
+    }
+    token('synthetic-token');await job;await flush();
+    assert.equal(view.find('./searchResultsTable').props.loading,false);
+    view.unmount();
+});
+test('Search tree defaults to the unique All rock types root without overwriting a previous selection or inventing a root ID',async()=>{
+    const root={rt_id:73,rt_name:'-- generic earth material --',rt_id_parent:-1};
+    for(const [data,selected,expected] of [[[root],'',true],[[root],'9',false],[[],'',false],[[root,{...root,rt_id:85}],'',false]]){
+        const effects=[],updates=[];
+        const component=await moduleFor('src/components/tree/mainTree.tsx',{}, {
+            react:{default:{},useEffect:callback=>effects.push(callback),useState:initial=>[Array.isArray(initial)?data:initial,()=>{}]},
+            'react/jsx-runtime':jsxRuntime,'./treeBuilder':{buildTree:()=>[]},
+            '@mui/x-tree-view/SimpleTreeView':{SimpleTreeView:'Tree'},
+            '../commonFeatures/singleSkeleton':{default:'Skeleton'},'../api':{default:{}},
+            'react-redux':{useDispatch:()=>action=>updates.push(action),useSelector:select=>select({currentRTID:selected})},
+            '../../redux/actions':{UpdateRTID:payload=>({type:'id',payload}),UpdateRTName:payload=>({type:'name',payload})},
+        });
+        const tree=component.default({}).props.children.props.children.props.children;
+        assert.equal(tree.props.selectedItems,selected||null);
+        effects.at(-1)();
+        assert.deepEqual(JSON.parse(JSON.stringify(updates)),expected?[{type:'id',payload:'73'},{type:'name',payload:root.rt_name}]:[]);
+    }
 });

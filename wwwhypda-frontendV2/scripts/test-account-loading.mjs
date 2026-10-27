@@ -38,6 +38,7 @@ function fixture(file,resolve=()=>undefined){
         if(name.endsWith('.scss'))return new Proxy({},{get:(_,key)=>key==='__esModule'?false:String(key)});
         if(name.endsWith('/useLoadingPresentation'))return {useLoadingPresentation:loading=>loading?'loading':'ready'};
         if(name.endsWith('/loadingPresentation'))return {LOADING_EXIT_MS:220};
+        if(name.endsWith('/initialPageLoading'))return {useInitialPageLoading(){},useInitialGridReady:()=>({})};
         if(name==='react-redux')return {useSelector:selector=>selector({isDarkTheme:true})};
         if(name==='react-router-dom')return {useNavigate:()=>()=>{}};
         if(name.endsWith('/useRemColumns'))return columns=>columns;

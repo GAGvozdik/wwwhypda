@@ -16,3 +16,5 @@
 }
 .profileLine { display: flex; align-items: center; gap: 0.25rem; min-height: 1.5rem; }
 .profileLine > :global(.MuiSkeleton-root) { max-width: 65%; }
+
+.table { border-radius: 0.5rem; overflow: hidden; }

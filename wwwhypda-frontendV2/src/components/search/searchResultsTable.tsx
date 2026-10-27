@@ -6,7 +6,7 @@ import { generateColumns } from '../../common/types';
 import DataTable from './dataTable'; 
 // import styles from "./searchStyles.module.scss";
 
-const SearchResultsTable: React.FC = () => {
+const SearchResultsTable: React.FC<{ loading?: boolean }> = ({ loading = false }) => {
     // Получаем данные из Redux
     const rows = useSelector((state: State) => state.currentTableData);
 
@@ -16,7 +16,7 @@ const SearchResultsTable: React.FC = () => {
     })), [rows]);
     return (
         <>
-            <DataTable rows={rows as DynamicRowData[]} columns={columns} />
+            <DataTable rows={rows as DynamicRowData[]} columns={columns} loading={loading} />
         </>
     );
 };

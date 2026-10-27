@@ -84,6 +84,7 @@ function CustomStepper({handleClick, isLoading, isEditable}: CustomStepperProps 
 
     const clearAction = (
         <SingleSkeleton
+            isLoadIcon={false}
             loading={isLoading}
             margin={'0'}
             width={'7.5rem'}

@@ -1,10 +1,10 @@
 ---
 stage: 011
 title: Логотипы C12/B12 на Home и плавные состояния загрузки
-revision: 27
-status: in_progress
+revision: 33
+status: archived
 created: 2026-10-23
-completed: null
+completed: 2026-10-27
 rules:
   - docs/rules/project.md
   - docs/rules/frontend.md
@@ -13,12 +13,39 @@ rules:
   - docs/rules/runtime-and-privacy.md
 ---
 
+## Закрытие цикла — revision33, 27.10.2026
+
+Владелец явно поручил архивировать план. Требование удерживать цикл открытым до
+команды архивирования выполнено; active_stage очищен. Текущая реализация: мобильный
+C12 с конечным intro/fade/collapse, desktop B12, Logo Lab удалена; плавная навигация,
+согласованные skeleton и modal transitions; стабильное initial loading защищённых
+таблиц; Search suppressNoRowsOverlay во время pending и All rock types по умолчанию.
+Ниже сохранена история решений; устаревшие варианты Lab и owner QA не являются
+действующим требованием восстановить лабораторию или повторно открыть цикл.
+
+Локально build/legal/TypeScript/Vite pass. Последние регрессии:29/29 navigation/Search,
+17/17 logo,43/43 loading/navigation до финального root-default дополнения; ранее114/114
+общей матрицы initial loading. Полный lint: прежние57errors/14warnings; scoped Search
+и logo animation pass, scoped mainTree — прежняя set-state-in-effect на setLoading.
+Все эти результаты отражают фактически выполненные запуски, не новый общий прогон.
+Браузер/статичные превью исключены владельцем; полного подтверждения Chrome/Firefox,
+zoom/OS/mobile матрицы агентом нет. По явной команде завершить цикл формальная матрица
+вынесена в BACKLOG как будущая QA, не объявлена пройденной. VPS/commit/push агент не
+выполнял. Визуальная проверка Vercel и публикация остаются за владельцем.
 # Цель
 
 По актуальному указанию владельца перенести C12 на мобильную Home, B12 на desktop Home;
 удалить Logo Lab, её страницу и кнопку меню. Сохранить выполненное дополнение о плавных
 skeleton. Работа только локально, commit/push и визуальную проверку Vercel делает владелец.
 
+## Уточнение revision29 (27.10.2026): мобильная Home после intro
+
+По указанию владельца мобильный C12 после полного sequence reveal остаётся ещё0.6s,
+затем плавно гаснет за0.35s; через0.2s после начала fade область сворачивается по
+height/margin за0.65s, поднимая hero естественным layout без принудительного scroll.
+Desktop B12 остаётся. Reduced motion сразу освобождает мобильную область.
+Только до48rem уменьшены title на20%, основной текст с1.2 до1.05 базового размера,
+badge/feature titles на10%, CTA с1.6 до1.3. Desktop typography сохранена.
 ## Актуальный контракт revision27 (26.10.2026)
 
 Этот раздел заменяет прежние требования о сохранении старого Home, наличии лаборатории,
@@ -207,7 +234,7 @@ Revision 3, прямое уточнение владельца: один раз 
 - Права: страница публична при включённом флаге для anonymous/ordinary/superuser; существующие protected routes и reCAPTCHA allowlist не меняются.
 - Документы: README.md и frontend.md — адрес, выключатель, обязательный rebuild, отсутствие access-control обещаний.
 
-### 5. [ ] Локальная приёмка и завершение
+### 5. [x] Локальная приёмка и завершение — закрыто revision33 с указанными ограничениями
 
 - Выполнить штатные команды из docs/rules/validation.md из корня wwwhypda:
   - docker compose --env-file .env.development run --rm --build --no-deps frontend npm run build -- --mode development
@@ -354,46 +381,74 @@ Revision 3, прямое уточнение владельца: один раз 
   full lint прежние57 errors/14 warnings. Новые тесты для косметической правки не добавлялись.
 - README/rules/acceptance обновлены; план остаётся открыт для owner QA.
 
+### 17. [x] Непрерывное initial loading и точечные исправления skeleton
+
+- Один public cover до готовности профиля, всех таблиц и первого grid paint;
+  private children до auth proof не монтируются, refresh не перезапускает page cover.
+- Гостевой login сохраняет layout /login через display:contents обёрток LoadingSwap.
+- Пять action-button skeletons Add data без circular loader; таблицы со spinner.
+- 26/26 релевантных tests и build/legal/TS/Vite pass; full lint прежние57/14.
+- Visual QA владельцем на Vercel; план открыт до явной команды архивировать.
+
+### 18. [x] Сворачивание мобильного intro и более компактная типографика Home
+
+- useLogoAnimation.ts: конечная mobile C12 fade/collapse последовательность после всех
+  слов, cleanup inline styles при unmount/смене breakpoint, reduced-motion finish.
+- homeLogo.module.scss ограничивает overflow мобильной области при сворачивании;
+  pages/home.module.scss уменьшает только mobile typography и padding hero.
+- test-home-logo.mjs:17/17 pass, в том числе порядок reveal/pause/exit, освобождение
+  места, cleanup, reduced-motion смена и отсутствие collapse у desktop B12.
+- Docker build/legal/TS/Vite и scoped ESLint pass; full lint прежние57errors/14warnings.
+- Визуальная приёмка владельцем на Vercel; stage остаётся in_progress.
+### 19. [x] Пустой результат Search скрыт до завершения загрузки
+
+- searchStyles.module.scss: внутри tableLayer при наличии загрузочного role=status
+  скрыт только AG Grid no-rows overlay. Сообщение не просвечивает под spinner,
+  включая minimum hold/exit; после снятия загрузки пустой результат снова виден.
+- Существующие42/42 loading/navigation/search tests и Docker build/legal/TS/Vite pass.
+  Full lint baseline57errors/14warnings; SCSS проверен сборкой, новых тестов для
+  точечной стилевой правки не добавлено. Визуальная приёмка владельцем на Vercel.
+### 20. [x] Исправление после owner QA: штатное подавление empty overlay Search
+
+- Скриншот владельца опроверг визуальный результат revision30. CSS visibility
+  selector не обеспечил скрытие; заменён передачей loading из Search через
+  SearchResultsTable в DataTable и штатным suppressNoRowsOverlay={pending} AG Grid.
+- pending включает useLoadingPresentation minimum/exit. Grid остаётся смонтирован.
+- Новая регрессия проверяет передачу busy от запроса до Grid и no-rows подавление
+  в loading/exiting, восстановление ready.43/43 loading/navigation tests pass.
+- Build/legal/TS/Vite и scoped ESLint трёх Search компонентов pass; full lint прежние
+  57errors/14warnings. Visual QA владельцем на Vercel, план не архивирован.
+### 21. [x] All rock types по умолчанию в Search
+
+- mainTree.tsx после загрузки каталога выбирает единственный корень через
+  findAllRockTypesId, если currentRTID пуст. ID и исходное имя берутся из ответа;
+  selectedItems отражает Redux. Предыдущий выбор не перезаписывается, автозапроса нет.
+-29/29 navigation/Search tests pass, в том числе root default, прежний выбор,
+  отсутствующий/неоднозначный root. Docker build/legal/TS/Vite pass.
+- Full lint прежние57errors/14warnings. Scoped mainTree имеет одну прежнюю ошибку
+  react-hooks/set-state-in-effect на setLoading(false); этот эффект не изменён.
+- Визуальная приёмка владельцем на Vercel; план открыт.
 ## Критерии завершения цикла
 
-- [ ] Исходный Home сохранён, исходный образец перезапускается независимо.
-- [ ] Есть 9 структурно разных композиций A10–A12, B10–B12, C10–C12 из зафиксированного JSON-снимка публичных листьев Search; lab не зависит от последующих изменений API.
-- [ ] Полные названия не пересекаются, не обрезаются, силуэты/просветы точны, W-hole прозрачно.
-- [ ] Для каждой работают Multicolour и три конечных reveal, reduced-motion и повторный replay.
-- [ ] Тема/цвет/replay/resize не меняют placements и не перезапускают packing.
-- [ ] Есть адаптивные карточки, штатный тёмный фон сайта и работающий route flag.
-- [ ] Build/lint/геометрические тесты и браузерная приёмка выполнены; ограничения явно зафиксированы.
-- [ ] Документы описывают фактическое поведение, все шаги закрыты и план архивирован по WORKFLOW.md.
-
-
-Уточнение revision 6: исключены A1/A2/A5/C4/C5/C6 и Soft reveal. Сохранить номера/раскладки остальных 12 вариантов. Default reveal — Left to right. Lab применяет штатный dark scope локально, независимо от темы окружающего сайта, без изменения глобального theme/storage.
-
-
-Уточнение revision 7: оставить только Multicolour, удалить селект палитры. Цвет слова всегда определяется прежним colorSlot; остальные варианты и анимации сохранены.
-
-
-Уточнение revision 8: увеличить W в C на 20% (scale 9.6) и центрировать по площади (tx186.585/ty333.181); добавить A7/A8, B7/B8, C7/C8 с крупными/очень крупными словами, B7/B8 — во всю ширину ряда. Все слова новых композиций рисовать готовыми SVG-контурами Afacad Flux 600 из фиксированного snapshot, без шрифтовой растеризации при анимации. Packing измеряет те же контуры. Проверить в браузере формы, просветы, bounds/overlaps, три режима проявления и визуальную неподвижность.
-
-
-Уточнение revision 10 по указанию владельца: удалить A7/A8/B7/B8/C7/C8; добавить только A9/B9/C9 с промежуточными размерами слов. Увеличенную W, SVG outlines, Multicolour, тёмный scope и пункт меню сохранить. Стандартный repeat limit, без прежнего допуска12 повторов для очень крупных вариантов.
-
-
-Актуальное уточнение revision11 по прямым указаниям владельца26.10.2026: заменить все прежние A/B/C тремя вариантами на группу, всего9. A10/11/12:[32,28.8]/[35,31.5]/[38,34.2]; B10/11/12:[40,36]/[44,39.6]/[48,43.2]; C10/11/12:[34,30.6]/[37,33.3]/[40,36]. Основной проход — плотные строки с gap1; дополнительный проход — оставшиеся карманы. SVG-контуры, целые имена, прозрачные просветы, enlarged W, Multicolour, три анимации и меню сохраняются. Прежние экспериментальные правила о структурных различиях, размерах и ограничениях повторов заменены этим контрактом плотности; repeatLimit24, предпочтение наименее использованных подходящих имён. Полные bbox и пересечения проверяются на каждом размещении.
-
-Владелец выполняет визуальную приёмку сам на сайте Vercel с мобильного после своего commit/push. По его указанию браузерную автоматизацию и генерацию/отправку статичных превью прекратить; не возобновлять без нового прямого поручения. Старые требования screenshots/contact sheets для этого уточнения отменены. Ожидаемые результаты owner QA фиксировать в этом же плане, не объявлять проверенными автоматически.
-
-
-Дополнение revision13 по прямому поручению владельца: общие skeleton должны показываться не менее0.75s и плавно появляться/исчезать, контент — плавно проявляться, с поведением как у панелей Search. Применить к auth, дереву/таблицам/формам и route loading. Не задерживать API или проверки доступа; сохранить поля и guards; reduced-motion и очистка таймеров обязательны. Код этого дополнения проверять локальными тестами/build/lint. Браузер и статичные превью по-прежнему исключены, визуальную приёмку выполняет владелец после своего commit/push.
-
+- [x] C12 на мобильной Home, B12 desktop; лаборатория, её маршрут и кнопка удалены.
+- [x] Frozen JSON names/outlines, целые слова, детерминированные placements и прозрачные просветы сохранены.
+- [x] Multicolour, sequence mobile/centre desktop, reduced motion и cleanup реализованы; mobile intro освобождает место контенту.
+- [x] Общие skeleton, навигация и модальные переходы согласованы; auth/roles/API/data сохранены.
+- [x] Initial protected-table cover непрерывен; guest login layout исправлен, action-button skeleton без spinner.
+- [x] Search не показывает no-rows во время pending; All rock types выбран по умолчанию без автозапроса.
+- [x] Локальные build/tests выполнены; lint baseline отделён. Браузерная матрица исключена из обязательного закрытия по команде владельца и перенесена в BACKLOG, не считается выполненной.
+- [x] Документация обновлена, план архивирован по явной команде владельца, STATE очищен.
 ## Журнал выполнения
 
 2026-10-23 — архитектор: прочитаны README/роль/workflow/state/template/manual, применимые rules, routing/search/tree/catalog/types/theme/palette/Home/AnimatedLogo, SVG и три визуальных референса; backend прочитан только для публичного каталога. План подготовлен в соответствии с запретом менять код. Frontend не реализован; браузерная приёмка, build/lint и проверка текущего runtime-каталога не выполнялись и остаются работой имплементатора. Для документальных изменений build/lint не требуются.
 
 ## Итог
 
-Локальная реализация готова к проверке владельцем: /logo-lab, LOGO_LAB_ENABLED=true,18 SVG-композиций. Обязательная приёмка ещё не завершена: Firefox, системный reduced-motion,200%zoom,authenticated roles,проверка ошибки подготовки раскладки и retry,шахматная подложка и файловые снимки. Владелец сообщил, что сам выполняет commit/push и просмотрVercel; их результаты пока не получены. Статус остаётсяin_progress, active_stage не очищается, архивирование поWORKFLOW запрещено до завершения/явного исключения обязательных проверок. Подробности: docs/artifacts/stage-011/acceptance.md и diagnostics.md. Рекомендуемое название исходного коммита: feat(stage-011): add experimental word logo lab; владелец уже создал8cebb9f Add logo laboratory, после него остались локальные уточнения C/центрирования/docs.
-
-
+Цикл завершён и архивирован27.10.2026 по явной команде владельца. C12/B12 перенесены
+на Home, Logo Lab удалена; реализованы последующие UX-исправления загрузки, таблиц,
+аккаунтов, форм/модальных окон и Search. Актуальные результаты и ограничения —
+в разделе закрытия revision33 выше. История ниже сохранена без выдачи прежних
+промежуточных состояний за текущее поведение.
 2026-10-23 — имплементатор: работа начата. Уточнение владельца: текущий Home/AnimatedLogo выводит только название; знак добавить только в лаборатории, Home сохранить. Локальные db/backend запущены без миграций/сброса volumes; публичный GET вернул 102 записи, 86 листьев до trim/dedup. Среди листьев rt_status 0 и 1, служебных названий не обнаружено; status не фильтруется.
 
 
@@ -625,3 +680,47 @@ Build/legal/TS/Vite pass,90/90tests pass, scoped lint pass, full57errors/14warni
 Build/legal/TS/Vite pass,14/14 tests pass, scoped ESLint pass, full57errors/14warnings,
 diff --check pass. Документы синхронизированы. Browser/images/VPS/commit/push нет,
 stage остаётся in_progress до явной команды владельца архивировать.
+
+2026-10-27 — revision28: исправлена повторная загрузочная презентация таблиц /input,
+/account и /superaccount. Добавлены initial readiness coordinator, hooks и тесты;
+guards, account profile, все пять input grids и LoadingSwap подключены к одному
+initial lifecycle. DOM cover стабилен до всех данных и первого grid paint, затем
+один exit. Public table wave/radius согласованы с реальными таблицами.
+Дополнительно исправлено смещение guest login skeleton из-за grid wrapper:
+display:contents восстанавливает containing block отдельной authPage. По уточнению
+владельца отключены круговые индикаторы пяти action-button skeletons Add data;
+табличные индикаторы сохранены. Подготовленные ранее114/114 regression tests pass;
+после последних правок26/26 loading/route-placeholder tests pass, Docker build/legal/
+TypeScript/Vite pass. Full lint: прежние57 errors/14 warnings. Browser/images/VPS/
+commit/push не выполнялись; визуальная приёмка на Vercel владельцем. План открыт.
+2026-10-27 — revision29: мобильный C12 после sequence reveal и0.6s паузы исчезает,
+его область сворачивается, hero поднимается без автопрокрутки. Desktop B12 сохранён.
+Мобильные шрифты Home уменьшены, desktop не изменён. Cleanup GSAP убирает размеры/
+opacity/margins при уходе и смене breakpoint, reduced motion без ожидания/движения.
+Изменены useLogoAnimation.ts, homeLogo.module.scss, pages/home.module.scss и tests.
+17/17 logo tests, Docker build/legal/TypeScript/Vite и scoped ESLint pass. Full lint
+57errors/14warnings baseline; large chunks warning прежний. README/frontend rules/
+acceptance синхронизированы. Browser/images/VPS/commit/push нет; план не архивирован.
+2026-10-27 — revision30: по указанию владельца скрыто no-rows сообщение результатов
+Search, пока существует загрузочный status слой, в том числе при первом запросе и
+на протяжении минимального времени/затухания. После пустого ответа и полного exit
+сообщение возвращается; таблица/результаты не размонтируются. Изменён только Search
+SCSS; README/rules/acceptance синхронизированы.42/42 существующих loading/navigation/
+Search tests pass; Docker build/legal/TS/Vite pass, full lint прежние57errors/14warnings.
+Browser/images/VPS/commit/push нет. План остаётся in_progress до команды владельца.
+2026-10-27 — revision31: владелец прислал скриншот с no-rows текстом под spinner,
+поэтому результат CSS-попытки revision30 не принят визуально. Не предполагалась
+проблема deployment; реализация заменена штатным suppressNoRowsOverlay AG Grid.
+Изменены search.tsx, searchResultsTable.tsx, dataTable.tsx, Search SCSS и navigation
+regression.43/43 tests, build/legal/TS/Vite, scoped3components ESLint pass; full lint
+baseline57errors/14warnings. README/rules исправлены, owner QA остаётся открытой.
+Browser/VPS/commit/push не выполнялись. Stage in_progress, completed null.
+2026-10-27 — revision32: по указанию владельца All rock types автоматически выбран
+при пустом currentRTID после получения настоящего root каталога. Redux defaults
+не менялись, sentinel/root ID не хардкодились. Controlled selectedItems отражает выбор
+в дереве; реальное имя сохраняется для исходного каталога. Ручной выбор сохраняется,
+поиск остаётся по Find data. Изменены mainTree.tsx и test-navigation-lifecycle.mjs.
+29/29 tests и build/legal/TS/Vite pass. Full lint прежние57errors/14warnings; scoped
+mainTree: прежняя set-state-in-effect на строке52, вне новой логики. README/rules/
+acceptance обновлены; browser/VPS/commit/push нет; stage in_progress.
+2026-10-27 — revision33: владелец поручил архивирование. Шаг5 закрыт с явно записанными ограничениями, устаревшие Lab-критерии заменены итоговым объёмом; формальная visual QA в BACKLOG. Документы/STATE/индексы синхронизированы, commit/push/VPS не выполнялись.

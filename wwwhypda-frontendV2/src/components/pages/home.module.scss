@@ -150,3 +150,11 @@
 
 .heroInner, .featureCard { min-width: 0; }
 .heroTitle, .featureText { overflow-wrap: anywhere; }
+
+@media (max-width: 48rem) {
+  .hero { padding: 1rem; }
+  .heroTitle { font-size: calc(var(--home-title-font-size) * 0.8); }
+  .heroBadge, .featureTitle { font-size: calc(var(--menu-font-size) * 0.9); }
+  .heroSubtitle, .featureText { font-size: calc(var(--main-font-size) * 1.05); }
+  .primaryButton { font-size: calc(var(--button-font-size) * 1.3); }
+}

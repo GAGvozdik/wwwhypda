@@ -26,3 +26,8 @@
 .frame :global(.MuiSkeleton-root) {
     border-radius: var(--home-logo-loading-radius);
 }
+
+@media (max-width: 48rem) {
+    // Height is animated only after C12 has fully appeared; the following content rises naturally.
+    .frame { overflow: hidden; }
+}

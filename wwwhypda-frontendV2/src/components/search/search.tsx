@@ -246,7 +246,7 @@ const Search: React.FC = () => {
                 }}
             >
                 <div className={styles.tableLayer} aria-busy={isSearching}>
-                    <SearchResultsTable/>
+                    <SearchResultsTable loading={isSearching}/>
                     <SingleSkeleton loading={isSearching} error={searchError} height="100%" isLoadIcon={true}
                         overlay backgroundColor="var(--drawer-color)"><span /></SingleSkeleton>
                 </div>

@@ -9,18 +9,19 @@ import styles from './treeStyles.module.scss';
 import {useEffect, useState} from 'react';
 import { findAllRockTypesId } from '../../common/catalog';
 import { buildTree } from './treeBuilder';
-import type { RockTypeData } from '../../common/types';
+import type { State, RockTypeData } from '../../common/types';
 // import IconButton from '@mui/material/IconButton';
 // import ClearIcon from '@mui/icons-material/Clear';
 // import MenuIcon from '@mui/icons-material/Menu';
 // import axios from 'axios';
 import SingleSkeleton from '../commonFeatures/singleSkeleton';
 import api from '../api';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { UpdateRTID, UpdateRTName } from '../../redux/actions';
 
 const ModelsTreeDrawer: React.FC<{ onRootKnown?: (id: string | null) => void }> = ({ onRootKnown }) => {
     const dispatch = useDispatch();
+    const selectedId = useSelector((state: State) => state.currentRTID);
     const [treeData, setTreeData] = useState<RockTypeData[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -53,6 +54,14 @@ const ModelsTreeDrawer: React.FC<{ onRootKnown?: (id: string | null) => void }> 
     }, [treeData, error]);
 
 
+    useEffect(() => {
+        if (selectedId) return;
+        const rootId = findAllRockTypesId(treeData);
+        const root = treeData.find(node => String(node.rt_id) === rootId);
+        if (!root) return;
+        dispatch(UpdateRTID(String(root.rt_id)));
+        dispatch(UpdateRTName(root.rt_name));
+    }, [treeData, selectedId, dispatch]);
     const tree = buildTree(treeData);
 
     return (
@@ -64,6 +73,7 @@ const ModelsTreeDrawer: React.FC<{ onRootKnown?: (id: string | null) => void }> 
             }}>
                     <SingleSkeleton loading={loading} error={error} height="100%" overlay borderRadius="0.5rem">
                         <SimpleTreeView
+                            selectedItems={selectedId || null}
                             onItemSelectionToggle={(_event, itemId, selected) => {
                                 const node = treeData.find(item => String(item.rt_id) === itemId);
                                 if (selected && node) {

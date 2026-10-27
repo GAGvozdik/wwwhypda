@@ -741,3 +741,30 @@ remain visible until the global exit; profile name/email values use no skeleton 
 Route regression:
 
     docker compose --env-file .env.development run --rm --no-deps frontend node --experimental-vm-modules --test scripts/test-route-transitions.mjs scripts/test-route-placeholders.mjs scripts/test-loading-state.mjs
+
+### Защищённые страницы: initial loading — revision28
+
+Один public skeleton сохраняется от auth check до готовности профиля, всех таблиц
+и первого paint AG Grid. Данные готовятся под visibility:hidden cover; private page
+монтируется только после подтверждения прав. Поздние обновления не перезапускают
+initial page cover. Гостевой login сохраняет layout отдельной /login через
+ display:contents обёрток LoadingSwap. В Add data скелетоны кнопок Clear all/Add row/
+Delete row без circular loader; у таблиц он сохранён.
+### Мобильная Home после логотипа — revision29
+
+C12 до48rem после завершения sequence reveal и паузы0.6s плавно исчезает, затем
+height и вертикальные margins сворачиваются до0: основной контент поднимается
+естественно, без автопрокрутки. B12 desktop остаётся. При reduced motion мобильная
+область освобождается сразу. GSAP cleanup восстанавливает inline styles при уходе/
+смене варианта. Только мобильные Home title/badge/описания/feature/CTA стали компактнее;
+размеры и цвета слов внутри логотипов сохранены.
+Revision31 (заменяет CSS-попытку revision30, не прошедшую owner QA): Search передаёт
+isSearching через SearchResultsTable в DataTable. useLoadingPresentation удерживает
+pending до конца750ms minimum/220ms exit; штатный AG Grid suppressNoRowsOverlay
+отключает пустое сообщение, пока pending. После готовности пустой результат показывает
+штатную надпись. Таблица остаётся смонтирована; от внутренних CSS-классов AG Grid
+поведение не зависит. Регрессия проверяет всю цепочку передачи состояния.
+Revision32: при первом открытии Search с пустым currentRTID дерево после загрузки
+каталога выбирает All rock types — единственный root, найденный findAllRockTypesId.
+Используются реальные ID/rt_name; selectedItems синхронизирован с Redux. Существующий
+выбор не перезаписывается; All parameters остаётся выбранным, запрос только по Find data.

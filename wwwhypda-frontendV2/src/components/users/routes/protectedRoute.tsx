@@ -16,15 +16,15 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, skeleton = 'd
     const fallback=showPageSkeleton && isAuth!==false ? <ProtectedPageSkeleton kind={skeleton} /> : <Login checkingAccess />;
 
     if (isAuth === null) {
-        return <LoadingSwap animateEnter={false} animateSwap={false} loading fallback={fallback}>{null}</LoadingSwap>;
+        return <LoadingSwap coordinatePage animateEnter={false} animateSwap={false} loading fallback={fallback}>{null}</LoadingSwap>;
     }
     // const delay = (ms: number) => { const end = Date.now() + ms; while (Date.now() < end) {} };
     // delay(1000);
 
     if (!isAuth) {
-        return <LoadingSwap animateEnter={false} animateSwap={false} loading={false} fallback={fallback}><Navigate fallback={fallback} to="/login" state={{ termsRequired }} /></LoadingSwap>;
+        return <LoadingSwap coordinatePage animateEnter={false} animateSwap={false} loading={false} fallback={fallback}><Navigate fallback={fallback} to="/login" state={{ termsRequired }} /></LoadingSwap>;
     }
-    return <LoadingSwap animateEnter={false} animateSwap={false} loading={false} preserveContent fallback={fallback}><>{children}</></LoadingSwap>;
+    return <LoadingSwap coordinatePage animateEnter={false} animateSwap={false} loading={false} preserveContent fallback={fallback}><>{children}</></LoadingSwap>;
 };
 
 export default ProtectedRoute;

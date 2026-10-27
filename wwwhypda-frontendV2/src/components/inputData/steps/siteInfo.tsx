@@ -1,3 +1,4 @@
+import { useInitialGridReady } from '../../commonFeatures/initialPageLoading';
 import useRemColumns from '../../commonFeatures/useRemColumns';
 import styles from '../stepper.module.scss';
 import StepActions from '../stepActions';
@@ -170,6 +171,7 @@ function SiteInfo({isEditable=true, clearAction}: SiteInfoProps) {
 
     const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
+    const initialGridReady = useInitialGridReady(tableData.length,error);
 
     const handleCellValueChanged = (params: any) => {
         const updatedData = tableData.map((row) =>
@@ -189,7 +191,7 @@ function SiteInfo({isEditable=true, clearAction}: SiteInfoProps) {
             <StepActions clearAction={clearAction} />
             <div className={styles.tableArea}>
                 <SingleSkeleton loading={loading} error={error}>
-                    <AgGridReact
+                    <AgGridReact {...initialGridReady}
                         gridOptions={gridOptions}
                         theme={themeDarkBlue}
                         rowData={tableData}

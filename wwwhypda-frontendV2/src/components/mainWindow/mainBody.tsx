@@ -62,7 +62,7 @@ export default function MainMenu() {
     return (
         <div ref={modalRootRef} data-route-phase={phase} inert={phase!=='ready'} aria-hidden={phase!=='ready' || undefined} className={`${styles.bodyMenuItem} ${isDarkTheme ? styles.dark : ''}`}>
             <ModalProvider modalRootRef={modalRootRef}>
-                <Routes location={location}>
+                <Routes key={location.pathname} location={location}>
                     <Route path="/" element={<Home />} />
                     <Route path="/search" element={<Search />} />
                     {/* <Route path="/contribute" element={<Contribute />} /> */}

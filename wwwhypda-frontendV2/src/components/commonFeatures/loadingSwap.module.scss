@@ -20,3 +20,24 @@
 // Stable page labels must not fade out again when only the table loading finishes.
 .staticSwap > *, .preserved.staticSwap > * { animation: none; transition: none; }
 .staticSwap[data-phase='exiting'] > * { opacity: 1; }
+
+// The initial protected-page cover stays mounted while real grids prepare in layout behind it.
+.pageStack { display: grid; grid-template-columns: minmax(0,1fr); min-width: 0; }
+.pageContent, .pageFallback { grid-area: 1 / 1; min-width: 0; }
+.pageFallback { position: relative; }
+.pageFallback[data-phase='exiting']:has([data-page-skeleton]) { visibility: hidden; }
+.pageFallback [data-page-loading-surface] { opacity: 1; transition: opacity var(--loading-exit-duration,220ms) ease-in-out; }
+.pageFallback[data-phase='exiting'] [data-page-loading-surface] { visibility: visible; opacity: 0; }
+.pageFallback[data-phase='exiting']:not(:has([data-page-skeleton])) { opacity: 0; transition: opacity var(--loading-exit-duration,220ms) ease-in-out; }
+@media(prefers-reduced-motion:reduce) {
+    .pageFallback [data-page-loading-surface], .pageFallback[data-phase='exiting'] { transition: none; }
+    .pageFallback :global(.MuiSkeleton-root), .pageFallback :global(.MuiSkeleton-root)::after,
+    .pageFallback :global(.MuiCircularProgress-root), .pageFallback :global(.MuiCircularProgress-circle) { animation: none; }
+}
+
+// Access checks use the same layout as the standalone login form. The table
+// preparation grid must not interrupt authPage's percentage-height containing block.
+.pageStack:has([data-auth-check='true']) {
+    display: contents;
+    > .pageContent, > .pageFallback { display: contents; }
+}

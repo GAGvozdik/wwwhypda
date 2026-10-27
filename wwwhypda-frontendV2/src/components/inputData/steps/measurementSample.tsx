@@ -1,3 +1,4 @@
+import { useInitialGridReady } from '../../commonFeatures/initialPageLoading';
 import useRemColumns from '../../commonFeatures/useRemColumns';
 import StepActions from '../stepActions';
 import type { InputStepProps } from '../../../common/types';
@@ -288,6 +289,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps> = ({isEditab
 
     const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
+    const initialGridReady = useInitialGridReady(tableData.length,error);
 
 
     return (
@@ -297,6 +299,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps> = ({isEditab
 
             <StepActions clearAction={clearAction}>
                 <SingleSkeleton
+                    isLoadIcon={false}
                     loading={loading}
                     margin={'0'}
                     width={'7.5rem'}
@@ -312,6 +315,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps> = ({isEditab
                 </SingleSkeleton>
 
                 <SingleSkeleton
+                    isLoadIcon={false}
                     loading={loading}
                     margin={'0'}
                     width={'7.5rem'}
@@ -329,7 +333,7 @@ const MeasurementSampleTable: React.FC<MeasurementSampleTableProps> = ({isEditab
 
             <div className={styles.tableArea}>
                 <SingleSkeleton loading={loading} error={error}>
-                    <AgGridReact
+                    <AgGridReact {...initialGridReady}
                         theme={themeDarkBlue}
                         rowData={tableData}
                         columnDefs={scaledColumns}

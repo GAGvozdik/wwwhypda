@@ -1,3 +1,4 @@
+import { useLoadingPresentation } from '../commonFeatures/useLoadingPresentation';
 import useRemColumns from '../commonFeatures/useRemColumns';
 import messages from '../../common/error_messages.json';
 import { AgGridReact } from "ag-grid-react";
@@ -12,11 +13,13 @@ import { useStepsTheme } from '../inputData/steps';
 interface DataTableProps {
     rows: DynamicRowData[];
     columns: ColDef[];
+    loading?: boolean;
 }
 
 const getRowId = ({ data }: GetRowIdParams<DynamicRowData>) => String(data.row_id ?? data.id ?? data.id_Measure);
 
-const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
+const DataTable: React.FC<DataTableProps> = ({ rows, columns, loading = false }) => {
+    const pending = useLoadingPresentation(loading) !== 'ready';
     const containerStyle = useMemo(
         () => ({
             width: "100%",
@@ -62,6 +65,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns }) => {
                     theme={themeDarkBlue}
                     rowData={rows}
                     getRowId={getRowId}
+                    suppressNoRowsOverlay={pending}
                     overlayNoRowsTemplate={messages.search_empty}
                     columnDefs={reversedColumns}
                     // columnDefs={columns}

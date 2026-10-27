@@ -1,3 +1,4 @@
+import { useInitialPageLoading } from './initialPageLoading';
 import { useLayoutEffect, useState } from 'react';
 import { createLoadingPresentation, type LoadingPhase } from './loadingPresentation';
 
@@ -11,5 +12,7 @@ export function useLoadingPresentation(loading: boolean, skipExit = false): Load
         return ()=>{media.removeEventListener('change',update);controller.dispose();};
     },[loading,controller,skipExit]);
     // Hide content on the very render that starts a request, before the effect runs.
-    return loading?'loading':phase;
+    const visiblePhase=loading?'loading':phase;
+    useInitialPageLoading(visiblePhase!=='ready');
+    return visiblePhase;
 }

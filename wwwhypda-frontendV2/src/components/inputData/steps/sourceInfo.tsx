@@ -1,3 +1,4 @@
+import { useInitialGridReady } from '../../commonFeatures/initialPageLoading';
 import useRemColumns from '../../commonFeatures/useRemColumns';
 import styles from '../stepper.module.scss';
 import StepActions from '../stepActions';
@@ -94,12 +95,13 @@ const SourceInfo = ({isEditable=true, clearAction}: SourceInfoProps) => {
 
     const scaledColumns = useRemColumns(columnDefs);
     const themeDarkBlue = useStepsTheme();
+    const initialGridReady = useInitialGridReady(tableData.length);
 
     return (
         <div style={containerStyle} className={styles.measurementGrid}>
             <StepActions clearAction={clearAction} />
             <div className={styles.tableArea}>
-                <AgGridReact
+                <AgGridReact {...initialGridReady}
                     theme={themeDarkBlue}
                     rowData={tableData}
                     columnDefs={scaledColumns}

@@ -77,7 +77,7 @@ function swapFixture(phase){
  const exports={};const jsx=(type,props)=>({type,props});
  vm.runInNewContext(ts.transpileModule(readFileSync('src/components/commonFeatures/loadingSwap.tsx','utf8'),
   {compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,
-  {exports,require:id=>id==='react/jsx-runtime'?{jsx,jsxs:jsx}:id.endsWith('useLoadingPresentation')?
+  {exports,require:id=>id==='react'?{useState:value=>[typeof value==='function'?value():value,()=>{}],useLayoutEffect(){}}:id.endsWith('initialPageLoadingState')?{createInitialPageLoading:()=>({start(){},dispose(){}})}:id.endsWith('/initialPageLoading')?{InitialPageLoadingContext:{Provider:'PageProvider'}}:id==='react/jsx-runtime'?{jsx,jsxs:jsx}:id.endsWith('useLoadingPresentation')?
    {useLoadingPresentation:()=>phase}:id.endsWith('loadingPresentation')?{LOADING_EXIT_MS:220}:{pending:'pending',noEnterChildren:'noEnterChildren',staticSwap:'staticSwap'}});
  return exports.default;
 }

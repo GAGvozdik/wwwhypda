@@ -20,8 +20,8 @@ function TextPlaceholder({children}: {children:ReactNode}) {
     </span>;
 }
 function TablePlaceholder() {
-    return <div className={styles.table}>
-        <Skeleton variant="rounded" width="100%" height="100%"/>
+    return <div className={styles.table} data-page-loading-surface="">
+        <Skeleton variant="rounded" animation="wave" width="100%" height="100%" sx={{borderRadius:'inherit'}}/>
         <div className={styles.activity} aria-hidden="true"><LoadIcon /></div>
     </div>;
 }

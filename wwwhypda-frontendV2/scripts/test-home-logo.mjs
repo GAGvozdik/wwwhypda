@@ -80,12 +80,16 @@ function animationHarness(reduced) {
     const effects=[],timelines=[],listeners=new Set();
     const media={matches:reduced,addEventListener:(_,callback)=>listeners.add(callback),removeEventListener:(_,callback)=>listeners.delete(callback)};
     const gsap={
-        set:(elements,values)=>elements.forEach(element=>Object.assign(element,values.attr)),
+        set:(target,values)=>{
+            if(Array.isArray(target))target.forEach(element=>Object.assign(element,values.attr));
+            else if(values.clearProps)values.clearProps.split(',').forEach(key=>delete target[key]);
+            else Object.assign(target,values);
+        },
         timeline:()=>{
             const timeline={tweens:[],played:false,killed:false,paused:false,
                 pause(){this.paused=true;return this;},kill(){this.killed=true;},
                 to(element,values,delay){this.tweens.push({element,values,delay});return this;},
-                play(){this.played=true;return this;},complete(){this.tweens.forEach(({element,values})=>Object.assign(element,values.attr));}};
+                play(){this.played=true;return this;},complete(){this.tweens.forEach(({element,values})=>Object.assign(element,values.attr??values));}};
             timelines.push(timeline);return timeline;
         }
     };
@@ -304,4 +308,42 @@ test('Home route uses the new responsive logo and the laboratory entry points ar
     assert.match(routes,/<Route path="\*" element={<NotFound \/>} \/>/);
     const css=readFileSync('src/components/homeLogo/homeLogo.module.scss','utf8');
     assert.match(css,/@media\(max-width: 48rem\)/);
+});
+
+test('mobile C12 exits only after its final word and a reading pause, releases space, and clears layout styles on unmount',()=>{
+    const harness=animationHarness(false),frame={},elements=[{opacity:1},{opacity:1}];
+    const layout={id:'C12',width:100,height:100,words:[{bbox:{x:10,y:10}},{bbox:{x:40,y:30}}]};
+    harness.run({current:{querySelectorAll:()=>elements,closest:()=>frame}},layout,1,'sequence');
+    const timeline=harness.timelines[0],words=timeline.tweens.filter(tween=>elements.includes(tween.element));
+    const lastWord=Math.max(...words.map(tween=>tween.delay+tween.values.duration));
+    const exit=timeline.tweens.filter(tween=>tween.element===frame);
+    assert.equal(exit.length,2);
+    assert.ok(exit[0].delay>=lastWord+.6);
+    assert.equal(exit[0].values.opacity,0);
+    assert.ok(exit[1].delay>=exit[0].delay);
+    assert.equal(exit[1].values.height,0);
+    assert.equal(exit[1].values.marginTop,0);assert.equal(exit[1].values.marginBottom,0);
+    timeline.complete();assert.equal(frame.height,0);assert.equal(frame.opacity,0);
+    harness.effects[0]();assert.equal(frame.height,undefined);assert.equal(frame.opacity,undefined);
+    assert.ok(timeline.killed);assert.equal(harness.listeners.size,0);
+});
+
+test('reduced motion exposes mobile content immediately and a changed preference cancels an in-progress reveal',()=>{
+    for(const initial of [true,false]){
+        const harness=animationHarness(initial),frame={},elements=[{opacity:0}];
+        harness.run({current:{querySelectorAll:()=>elements,closest:()=>frame}},
+            {id:'C12',width:100,height:100,words:[{bbox:{x:10,y:10}}]},1,'sequence');
+        if(!initial){assert.equal(frame.height,undefined);harness.media.matches=true;harness.listeners.forEach(callback=>callback());}
+        assert.equal(frame.height,0);assert.equal(frame.opacity,0);assert.equal(elements[0].opacity,1);
+        assert.ok(harness.timelines[0].paused);harness.effects[0]();assert.equal(frame.height,undefined);
+    }
+});
+
+test('desktop B12 never collapses its frame after reveal',()=>{
+    const harness=animationHarness(false),frame={},elements=[{opacity:1}];
+    harness.run({current:{querySelectorAll:()=>elements,closest:()=>frame}},
+        {id:'B12',width:100,height:100,words:[{bbox:{x:10,y:10}}]},1,'centre');
+    assert.equal(harness.timelines[0].tweens.length,1);
+    harness.timelines[0].complete();assert.equal(frame.height,undefined);
+    harness.effects[0]();
 });

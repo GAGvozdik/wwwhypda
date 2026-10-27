@@ -1,3 +1,4 @@
+import { useInitialPageLoading } from '../../commonFeatures/initialPageLoading';
 import { signOutAccountSession } from '../accountSession';
 import useRemColumns from '../../commonFeatures/useRemColumns';
 import { useSelector } from 'react-redux';
@@ -37,6 +38,7 @@ const SuperuserAccount: React.FC = () => {
     const [allUsers, setAllUsers] = useState<AccountProfile[]>([]);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    useInitialPageLoading(isLoading);
     const [usersLoading, setUsersLoading] = useState(true);
 
 

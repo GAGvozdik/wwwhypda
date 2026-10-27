@@ -188,3 +188,6 @@
 @container workspace (min-width: 65rem) {
     .parametersPanel:has([role='status']) { min-height: 0; }
 }
+
+// The empty-result message belongs to a completed search, including after the loader's exit.
+// Empty-state suppression is controlled by the grid through suppressNoRowsOverlay.
