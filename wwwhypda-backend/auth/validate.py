@@ -1,4 +1,5 @@
 """Validator Module"""
+from auth.password_policy import password_error
 import re
 import json
 import os
@@ -37,10 +38,8 @@ def validate(data, regex):
 
 def validate_password(password: str):
     """Password Validator"""
-    reg = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,20}$"
-    if not validate(password, reg):
-        return messages['password_invalid']
-    return True
+    error = password_error(password)
+    return messages[error] if error else True
 
 def validate_email(email: str):
     """Email Validator"""

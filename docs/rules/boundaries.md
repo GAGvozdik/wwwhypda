@@ -84,3 +84,16 @@
 - auth.migrate_security_state additive apply/check до нового backend и cleanup.
   Две таблицы/FK/index/check constraints, без DML/backfill истории. Очистка сессий
   только после refresh expiry; удаление User очищает связанные state записи.
+
+### Новые пароли регистрации/сброса — 30.10.2026
+
+-15–128 Unicode code points, любые корректные Unicode/пробелы/спецсимволы; никаких
+  composition whitelist/обязательных типов символов. Malformed surrogate отклонять.
+- Не trim/normalize/truncate credentials. Login/повторное подтверждение прежнего
+  пароля проверяют существующий hash без применения новой strength policy.
+- Политика common/passwordPolicy.json и frontend src/common/passwordPolicy.json
+  синхронна; cross-runtime test проверяет обе копии и messages. Базовая локальная
+  common/repeated blocklist не заменяет полноценную базу утечек. Пароли наружу не отправляются.
+- Подсказки регистрации/сброса соответствуют API; paste/autofill не ограничивать.
+  При публикации обновлять frontend и backend вместе. Детали и результаты:
+  ../artifacts/password-policy-2026-10-30.md. Выполнено без stage по прямому указанию владельца.

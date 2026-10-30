@@ -256,7 +256,7 @@ class AuthenticationFlowTests(unittest.TestCase):
     def test_registration_and_reset_use_and_expiry(self):
         client = self.app.test_client()
         with patch("auth.authentication.send_auth_email"):
-            response = client.post("/users/", json={"email": "new@example.test", "name": "New User", "password": "Password1!", "recaptcha_token": "test-token", "adult_confirmed": True, "terms_accepted": True, "terms_version": CURRENT_TERMS_VERSION})
+            response = client.post("/users/", json={"email": "new@example.test", "name": "New User", "password": "New-registry_pass-42", "recaptcha_token": "test-token", "adult_confirmed": True, "terms_accepted": True, "terms_version": CURRENT_TERMS_VERSION})
         self.assertEqual(response.status_code, 200)
         code = ConfirmationCode.query.filter_by(email="new@example.test", type="registration").one().code
         self.assertEqual(client.post("/users/confirm-registration", json={"email": "new@example.test", "code": code, "recaptcha_token": "test-token"}).status_code, 200)
@@ -267,14 +267,14 @@ class AuthenticationFlowTests(unittest.TestCase):
         code = record.code
         record.created_at = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(seconds=120)
         db.session.commit()
-        body = {"email": "new@example.test", "code": code, "new_password": "OtherPass2!", "recaptcha_token": "test-token"}
+        body = {"email": "new@example.test", "code": code, "new_password": "Other-new_pass-42", "recaptcha_token": "test-token"}
         self.assertEqual(client.post("/users/confirm-password-reset", json=body).status_code, 401)
         record = ConfirmationCode.query.filter_by(email="new@example.test").one()
         record.created_at = datetime.now(timezone.utc).replace(tzinfo=None)
         db.session.commit()
         self.assertEqual(client.post("/users/confirm-password-reset", json=body).status_code, 200)
         self.assertEqual(ConfirmationCode.query.filter_by(email="new@example.test").count(), 0)
-        self.assertTrue(User.query.filter_by(email="new@example.test").one().check_password("OtherPass2!"))
+        self.assertTrue(User.query.filter_by(email="new@example.test").one().check_password("Other-new_pass-42"))
 
 
 class PostgreSQLConcurrencyTests(unittest.TestCase):

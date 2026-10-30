@@ -151,7 +151,7 @@ class PasswordResetPrivacyTests(unittest.TestCase):
         with patch('auth.authentication.send_reset_email',return_value=True):
             self.reset()
         code=ConfirmationCode.query.one()
-        payload={'email':code.email,'code':code.code,'new_password':'DifferentPass2!','recaptcha_token':'test-token'}
+        payload={'email':code.email,'code':code.code,'new_password':'Different-new_pass-42','recaptcha_token':'test-token'}
         bad={**payload,'code':'000000'}
         self.assertEqual(self.app.test_client().post('/users/confirm-password-reset',json=bad).status_code,401)
         code.created_at-=timedelta(seconds=121)
@@ -161,7 +161,7 @@ class PasswordResetPrivacyTests(unittest.TestCase):
         code.created_at=datetime.now(timezone.utc)
         db.session.commit()
         self.assertEqual(self.app.test_client().post('/users/confirm-password-reset',json=payload).status_code,200)
-        self.assertTrue(User.query.filter_by(email=payload['email']).one().check_password('DifferentPass2!'))
+        self.assertTrue(User.query.filter_by(email=payload['email']).one().check_password('Different-new_pass-42'))
         self.assertEqual(ConfirmationCode.query.count(),0)
         self.assertEqual(self.app.test_client().post('/users/confirm-password-reset',json=payload).status_code,401)
         self.assertEqual(old_session.get('/users/check').status_code,401)

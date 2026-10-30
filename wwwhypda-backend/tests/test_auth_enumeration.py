@@ -28,7 +28,7 @@ class AuthEnumerationTests(unittest.TestCase):
         fixtures.PasswordResetPrivacyTests.setUp(self)
 
     def register(self,email,**changes):
-        data=dict(name='Researcher',email=email,password='Password1!',adult_confirmed=True,
+        data=dict(name='Researcher',email=email,password='New-registry_pass-42',adult_confirmed=True,
             terms_accepted=True,terms_version=CURRENT_TERMS_VERSION,recaptcha_token='test-token')
         data.update(changes)
         return self.app.test_client().post('/users/',json=data)
@@ -83,7 +83,7 @@ class AuthEnumerationTests(unittest.TestCase):
                 hashing_mock.reset_mock()
                 response=self.register(email)
                 self.assertEqual((response.status_code,response.json),(200,{'message':messages['registration_requested']}))
-                hashing_mock.assert_called_once_with('Password1!')
+                hashing_mock.assert_called_once_with('New-registry_pass-42')
                 self.assertEqual(trace[:2],['hash','lock'])
             self.assertEqual(sender.call_count,1)
         after=self.snapshot()
@@ -289,7 +289,7 @@ class AuthEnumerationTests(unittest.TestCase):
             for code in (None,{},[],True,123456,'bad','１'*6):
                 outcomes=[]
                 for email in ('owner@example.test','unconfirmed@example.test','disabled@example.test','missing@example.test'):
-                    response=self.app.test_client().post('/users/'+endpoint,json=dict(email=email,code=code,new_password='DifferentPass2!',recaptcha_token='test-token'))
+                    response=self.app.test_client().post('/users/'+endpoint,json=dict(email=email,code=code,new_password='Different-new_pass-42',recaptcha_token='test-token'))
                     outcomes.append((response.status_code,response.json))
                 self.assertTrue(all(result==outcomes[0] for result in outcomes))
                 self.assertEqual(outcomes[0][0],400)

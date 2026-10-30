@@ -1,7 +1,10 @@
 {
   "registration_requested": "If registration can proceed for this email address, activation instructions will be sent.",
   "password_reset_requested": "If an active account exists for this email address, password reset instructions will be sent.",
-  "password_invalid": "Password must be 8-20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+  "password_invalid": "Use 15-128 characters. Spaces, Unicode and all special characters are allowed; no required character combinations.",
+  "password_common": "This password is too common or repetitive. Choose a longer, unique passphrase or use a password manager.",
+  "password_unicode_invalid": "Password contains an invalid Unicode character. Please enter it again.",
+  "password_policy_hint": "Use 15-128 characters. Spaces and all special characters are welcome. A unique passphrase or a password manager is recommended.",
   "password_required": "Password is required.",
   "passwords_do_not_match": "Passwords do not match!",
   "email_invalid": "Email is invalid. Expected format: example@domain.com",

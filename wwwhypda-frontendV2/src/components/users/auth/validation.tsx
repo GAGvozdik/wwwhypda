@@ -1,3 +1,4 @@
+import { validateNewPassword } from '../../../common/passwordPolicy';
 export const validateUsername = (username: string): string | null => {
     const messages: string[] = [];
 
@@ -27,33 +28,7 @@ export const validateEmail = (email: string): string | null => {
     return messages.length > 0 ? messages.join(" ") : null;
 };
 
-export const validatePassword = (password: string): string | null => {
-    const messages: string[] = [];
-
-    if (password === "") {
-        messages.push("Please enter a password.");
-    } 
-    else {
-        if (password.length < 8 || password.length > 64) {
-            messages.push("Password must be at least 8 characters long.");
-        } else {
-            if (!/[A-Z]/.test(password)) {
-                messages.push("Password must contain at least one uppercase letter.");
-            }
-            if (!/[a-z]/.test(password)) {
-                messages.push("Password must contain at least one lowercase letter.");
-            }
-            if (!/[0-9]/.test(password)) {
-                messages.push("Password must contain at least one number.");
-            }
-            if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)) {
-                messages.push("Password must contain at least one special character (e.g. !@#$%^&*).");
-            }
-        }
-    }
-
-    return messages.length > 0 ? messages.join(" ") : null;
-};
+export const validatePassword = validateNewPassword;
 
 export const validateRegistration = (username: string, email: string, password: string) => {
     const usernameMessages = validateUsername(username);

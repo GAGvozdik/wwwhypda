@@ -1,3 +1,4 @@
+import { validatePassword } from './validation';
 import AuthSkeleton from '../../commonFeatures/authSkeleton';
 import axios from 'axios';
 import messages from '../../../common/error_messages.json';
@@ -110,6 +111,9 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
 
         if (!executeRecaptcha) { setError(messages.captcha_unavailable); setIsError(true); return; }
 
+        const passwordError = validatePassword(newPassword);
+        if (passwordError) { setError(passwordError); setIsError(true); return; }
+
         pendingRequest.current = true;
         setIsLoading(true);
 
@@ -190,6 +194,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             required
                         />
                         <input
+                            aria-describedby="new-password-policy"
                             type="password"
                             placeholder={messages.new_password_label}
                             aria-label={messages.new_password_label}
@@ -199,6 +204,7 @@ const ForgotPassword: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             className={styles.inputField}
                             required
                         />
+                        <p id="new-password-policy" className={styles.passwordHint}>{messages.password_policy_hint}</p>
                         <input
                             type="password"
                             placeholder={messages.confirm_new_password_label}

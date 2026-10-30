@@ -768,3 +768,12 @@ Revision32: при первом открытии Search с пустым currentR
 каталога выбирает All rock types — единственный root, найденный findAllRockTypesId.
 Используются реальные ID/rt_name; selectedItems синхронизирован с Redux. Существующий
 выбор не перезаписывается; All parameters остаётся выбранным, запрос только по Find data.
+### Password validation — 30.10.2026
+
+Registration/reset accept15–128 Unicode characters, including spaces, hyphens and
+underscores, without mandatory character combinations. Obvious common/repeated
+passwords are blocked locally; existing login passwords remain valid. Frontend and
+backend policy JSON copies must stay identical (covered by contract tests).
+Deploy both frontend and backend; a frontend-only Vercel update cannot fix the old
+server whitelist. No deployment was performed. Implementation/testing details:
+[password policy fix](docs/artifacts/password-policy-2026-10-30.md).

@@ -140,6 +140,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             required
                         />
                         <input
+                            aria-describedby="new-password-policy"
                             type="password"
                             placeholder={messages.password_label}
                             aria-label={messages.password_label}
@@ -150,6 +151,7 @@ const Register: React.FC<WithRecaptchaProps> = ({ executeRecaptcha }) => {
                             name="password"
                             required
                         />
+                        <p id="new-password-policy" className={styles.passwordHint}>{messages.password_policy_hint}</p>
                         <input
                             type="password"
                             placeholder={messages.confirm_password_label}

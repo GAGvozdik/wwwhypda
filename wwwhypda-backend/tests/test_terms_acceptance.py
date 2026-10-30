@@ -24,7 +24,7 @@ class TermsAcceptanceTests(unittest.TestCase):
     delete = lifecycle.AccountDeletionTests.delete
 
     def payload(self, **changes):
-        body = dict(name="New User", email="new@example.test", password="Password1!",
+        body = dict(name="New User", email="new@example.test", password="New-registry_pass-42",
             recaptcha_token="test-token", adult_confirmed=True, terms_accepted=True,
             terms_version=CURRENT_TERMS_VERSION)
         body.update(changes)
@@ -159,10 +159,10 @@ class TermsAcceptanceTests(unittest.TestCase):
             self.assertEqual(client.post("/users/resend-confirmation",json=body).status_code,200)
             code = ConfirmationCode.query.filter_by(email=user.email,type="registration").order_by(ConfirmationCode.id.desc()).first().code
             self.assertEqual(client.post("/users/confirm-registration",json={**body,"code":code}).status_code,200)
-            self.assertEqual(client.post("/users/login",json={**body,"password":"Password1!"}).status_code,200)
+            self.assertEqual(client.post("/users/login",json={**body,"password":"New-registry_pass-42"}).status_code,200)
             self.assertEqual(client.post("/users/request-password-reset",json=body).status_code,200)
             code = ConfirmationCode.query.filter_by(email=user.email,type="password_reset").one().code
-            self.assertEqual(client.post("/users/confirm-password-reset",json={**body,"code":code,"new_password":"OtherPass2!"}).status_code,200)
+            self.assertEqual(client.post("/users/confirm-password-reset",json={**body,"code":code,"new_password":"Other-new_pass-42"}).status_code,200)
             db.session.expire_all()
             self.assertEqual((user.terms_version,user.terms_accepted_at),original)
 
